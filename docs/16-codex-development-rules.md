@@ -11,6 +11,7 @@ Before implementing a module, Codex must read:
 - module-specific document,
 - testing strategy.
 - global market model.
+- current development handoff.
 
 ## 2. Existing repository
 

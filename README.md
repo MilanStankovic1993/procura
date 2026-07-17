@@ -42,6 +42,7 @@ Read and implement the documents in this order:
 15. `docs/15-delivery-roadmap.md`
 16. `docs/16-codex-development-rules.md`
 17. `docs/17-global-market-model.md`
+18. `docs/18-development-handoff.md`
 
 ## Implementation principle
 
