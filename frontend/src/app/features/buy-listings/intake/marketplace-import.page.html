@@ -1,0 +1,214 @@
+<div class="page">
+  <a class="back" routerLink="/app/buy">{{ 'marketplaceImport.back' | t }}</a>
+
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'marketplaceImport.eyebrow' | t }}</p>
+      <h1>{{ 'marketplaceImport.title' | t }}</h1>
+      <p>{{ 'marketplaceImport.description' | t }}</p>
+    </div>
+    <button class="button button-quiet" type="button" (click)="downloadTemplate()">
+      {{ 'marketplaceImport.downloadTemplate' | t }}
+    </button>
+  </header>
+
+  @if (loading()) {
+    <section class="loading">{{ 'marketplaceImport.loading' | t }}</section>
+  } @else {
+    @if (error()) {
+      <div class="alert error" role="alert">{{ error() }}</div>
+    }
+    @if (success()) {
+      <div class="alert saved" role="status">{{ success() }}</div>
+    }
+
+    <form class="panel" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">{{ 'marketplaceImport.controlledBoundary' | t }}</p>
+          <h2>{{ 'marketplaceImport.uploadTitle' | t }}</h2>
+        </div>
+        <span>{{ 'marketplaceImport.privateEvidence' | t }}</span>
+      </div>
+
+      @if (!connectorAvailable()) {
+        <div class="notice">{{ 'marketplaceImport.connectorUnavailable' | t }}</div>
+      }
+
+      <div class="fields two">
+        <div class="wide upload">
+          <label for="marketplace-import-file">{{ 'marketplaceImport.file' | t }}</label>
+          <input
+            id="marketplace-import-file"
+            type="file"
+            accept=".csv,text/csv"
+            (change)="selectFile($event)"
+          />
+          <small>{{ 'marketplaceImport.filePolicy' | t }}</small>
+          @if (selectedFile(); as file) {
+            <strong>{{ file.name }} · {{ bytes(file.size) }}</strong>
+          }
+        </div>
+        <div>
+          <label for="marketplace-import-delimiter">{{
+            'marketplaceImport.delimiter' | t
+          }}</label>
+          <select id="marketplace-import-delimiter" formControlName="delimiter">
+            <option value="comma">{{ 'marketplaceImport.delimiterComma' | t }}</option>
+            <option value="semicolon">{{
+              'marketplaceImport.delimiterSemicolon' | t
+            }}</option>
+            <option value="tab">{{ 'marketplaceImport.delimiterTab' | t }}</option>
+          </select>
+        </div>
+        <div>
+          <label for="marketplace-import-target">{{
+            'marketplaceImport.defaultTarget' | t
+          }}</label>
+          <select
+            id="marketplace-import-target"
+            formControlName="default_target_country_code"
+          >
+            <option value="">{{ 'marketplaceImport.targetFromFile' | t }}</option>
+            @for (country of countries(); track country.code) {
+              <option [value]="country.code">{{ country.name }} · {{ country.code }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="schema">
+        <strong>{{ 'marketplaceImport.schemaTitle' | t }}</strong>
+        <code>{{ 'marketplaceImport.schemaColumns' | t }}</code>
+        <p>{{ 'marketplaceImport.schemaDescription' | t }}</p>
+      </div>
+
+      <label class="attestation">
+        <input type="checkbox" formControlName="authorization_confirmed" />
+        <span>{{ 'marketplaceImport.attestation' | t }}</span>
+      </label>
+
+      @if (
+        form.controls.authorization_confirmed.touched &&
+        form.controls.authorization_confirmed.invalid
+      ) {
+        <p class="field-error">{{ 'marketplaceImport.attestationRequired' | t }}</p>
+      }
+
+      <footer>
+        <p>{{ 'marketplaceImport.queueNote' | t }}</p>
+        <button
+          class="button button-primary"
+          type="submit"
+          [disabled]="saving() || !connectorAvailable()"
+        >
+          {{ (saving() ? 'marketplaceImport.submitting' : 'marketplaceImport.submit') | t }}
+        </button>
+      </footer>
+    </form>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">{{ 'marketplaceImport.historyEyebrow' | t }}</p>
+          <h2>{{ 'marketplaceImport.historyTitle' | t }}</h2>
+        </div>
+        <button
+          class="button button-quiet"
+          type="button"
+          [disabled]="refreshing()"
+          (click)="refresh()"
+        >
+          {{ (refreshing() ? 'marketplaceImport.refreshing' : 'marketplaceImport.refresh') | t }}
+        </button>
+      </div>
+
+      @if (records().length === 0) {
+        <div class="empty">{{ 'marketplaceImport.empty' | t }}</div>
+      } @else {
+        <div class="imports">
+          @for (record of records(); track record.id) {
+            <article>
+              <div class="import-heading">
+                <div>
+                  <strong>{{ record.original_file_name }}</strong>
+                  <small>{{ date(record.created_at) }}</small>
+                </div>
+                <span class="status" [attr.data-status]="record.status">{{
+                  statusLabel(record.status)
+                }}</span>
+              </div>
+              <dl>
+                <div>
+                  <dt>{{ 'marketplaceImport.total' | t }}</dt>
+                  <dd>{{ record.total_rows }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'marketplaceImport.imported' | t }}</dt>
+                  <dd>{{ record.imported_rows }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'marketplaceImport.rejected' | t }}</dt>
+                  <dd>{{ record.rejected_rows }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'marketplaceImport.duplicates' | t }}</dt>
+                  <dd>{{ record.duplicate_rows }}</dd>
+                </div>
+              </dl>
+              @if (record.last_error_message) {
+                <p class="import-error">{{ record.last_error_message }}</p>
+              }
+              <button
+                class="details"
+                type="button"
+                [disabled]="detailsLoading()"
+                (click)="showDetails(record.id)"
+              >
+                {{ 'marketplaceImport.reviewRows' | t }}
+              </button>
+            </article>
+          }
+        </div>
+      }
+    </section>
+
+    @if (selectedImport()?.rows; as rows) {
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ 'marketplaceImport.rowEvidenceEyebrow' | t }}</p>
+            <h2>{{ selectedImport()?.original_file_name }}</h2>
+          </div>
+          <span>{{ 'marketplaceImport.latestRows' | t }}</span>
+        </div>
+        @if (rows.length === 0) {
+          <div class="empty">{{ 'marketplaceImport.noProcessedRows' | t }}</div>
+        } @else {
+          <div class="row-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>{{ 'marketplaceImport.rowNumber' | t }}</th>
+                  <th>{{ 'marketplaceImport.rowStatus' | t }}</th>
+                  <th>{{ 'marketplaceImport.rowIdentity' | t }}</th>
+                  <th>{{ 'marketplaceImport.rowErrors' | t }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of rows; track row.id) {
+                  <tr>
+                    <td>{{ row.row_number }}</td>
+                    <td>{{ rowStatusLabel(row.status) }}</td>
+                    <td>{{ row.raw_payload['external_id'] || '—' }}</td>
+                    <td>{{ errorFields(row.validation_errors) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
+  }
+</div>

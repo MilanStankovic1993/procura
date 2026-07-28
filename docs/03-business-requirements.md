@@ -75,6 +75,11 @@ The system should capture:
 - time-to-sale,
 - user confirmation of outcome.
 
+Realized outcomes must be evidenced independently from estimates and workflow status. Original
+amount/currency, actor, occurrence time, provenance, immutable corrections, and any exact dated
+conversion reference must remain auditable. Actual profit must remain unknown until the purchase,
+complete real-cost, and sold evidence chain is complete.
+
 ## BR-005 Trust
 
 The platform must explain:
@@ -114,16 +119,37 @@ Low-confidence, high-value, and high-risk cases must support human review.
 
 Retention must be configurable by record type and plan.
 
+Procura must provide a traceable data-subject request workflow for account-data export and account
+deletion. Submission, review, required action, approval, fulfillment, rejection, and subject
+cancellation are evidence-bearing states rather than destructive shortcuts. The application must
+preserve the request/event audit trail even if the subject account is later removed.
+
+The product must never automatically export or erase customer data before the approved retention,
+legal-hold, identity-verification, ownership-transfer, billing-resolution, and secure-delivery
+procedures have completed. A workflow status records the reviewed operational outcome; it does not
+replace those production procedures.
+
 ## BR-010 Multilingual product
 
 Initial UI languages:
 
 - English,
-- German.
+- German,
+- Spanish,
+- French,
+- Serbian in Latin script (`sr-Latn`).
 
-Serbian may be supported for internal operations and founder use.
+English is the deterministic fallback language. The interface language is a personal user preference
+and must remain independent from organization market defaults, analysis market scope, currency, and
+listing language.
 
-Marketplace input may be submitted in any language supported by the configured extraction and translation provider. UI localization and listing-language support are separate capabilities.
+Marketplace input may be submitted in any language supported by the configured extraction and
+translation provider. UI localization and listing-language support are separate capabilities.
+
+Every first-party browser screen, including all new feature work, shall ship with complete English,
+German, Spanish, French, and Serbian Latin interface catalogs in the same change. Technical
+identifiers and immutable evidence codes remain language-neutral; their user-facing labels and
+explanatory copy are localized without rewriting the stored source facts.
 
 ## BR-011 Auditability
 
@@ -146,3 +172,50 @@ Sell Analysis
 ```
 
 and at least a pilot group can confirm that recommendations are useful and understandable.
+
+## BR-013 Current Sell pricing boundary
+
+Phase 3 supports explainable Sell asking-price guidance only after a current canonical
+identity/condition assessment. It preserves approved source evidence and every include/exclude
+decision, then derives quick-sale, recommended, and ambitious bands from same-country,
+same-currency evidence. The business promise is transparent guidance with confidence and unknowns,
+not a guaranteed sale price or duration. Listing generation, publication, portfolio management,
+and actual financial outcomes remain later boundaries.
+
+## BR-014 Current Sell listing-draft boundary
+
+Phase 3 may generate marketplace-ready draft copy only from one exact current ready owned-product
+assessment, one exact current complete Sell price band, the user's explicit target asking price,
+and the current private image manifest. The user chooses the price strategy and listing language;
+neither may be inferred from UI locale or market defaults.
+
+Generated content must disclose known condition, accessory, missing-accessory, and defect facts
+without inventing specifications, warranty, transaction results, marketplace claims, or missing
+facts. Every draft and photo-readiness checklist is versioned, append-only, attributable, and
+reproducible. This business capability prepares a draft only: publication, sale-portfolio
+lifecycle, and actual financial outcomes remain separate boundaries.
+
+## BR-015 Current Sell portfolio and manual-publication boundary
+
+Phase 3 may move only one exact current `ready` listing draft with `ready` photo evidence into an
+append-only sale portfolio. The entry preserves the complete draft evidence chain and the initial
+target asking price, but that amount is neither received money nor a completed sale.
+
+Authorized users may manually record publication, price change, reservation, withdrawal, expiry,
+and relisting events. Every event preserves marketplace identity/URL, the exact advertised
+minor-unit price and currency, external occurrence time, actor, idempotency evidence, and the prior
+event head. The server owns allowed lifecycle transitions and rejects stale commands. This
+boundary calls no marketplace API and records no realized financial outcome.
+
+## BR-016 Current transaction-outcome boundary
+
+Phase 4 permits authorized users to append evidenced actual purchase, categorized real costs, and
+sold/cancelled/no-sale outcomes for an owned product. These records are operational truth distinct
+from every estimate, asking price, reservation, and buyer workflow decision. Original money,
+historical conversion, actor, time, evidence, corrections, and exact sale-publication attribution
+must remain auditable.
+
+The platform may present actual profit only from a complete current purchase, fully known current
+cost snapshot, and exact sold outcome in one reporting currency. Missing or mismatched evidence
+must remain visibly unknown. This boundary performs no payment processing, settlement verification,
+marketplace mutation, estimate-accuracy reporting, or outcome-fed model learning.

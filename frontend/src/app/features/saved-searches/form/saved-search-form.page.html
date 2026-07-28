@@ -1,0 +1,370 @@
+<div class="page">
+  <a class="back" routerLink="/app/saved-searches">
+    ← {{ 'savedSearchForm.back' | t }}
+  </a>
+
+  <header>
+    <p class="eyebrow">{{ 'savedSearchForm.eyebrow' | t }}</p>
+    <h1>
+      {{
+        (isEditing() ? 'savedSearchForm.editTitle' : 'savedSearchForm.createTitle')
+          | t
+      }}
+    </h1>
+    <p>{{ 'savedSearchForm.description' | t }}</p>
+  </header>
+
+  @if (error()) {
+    <div class="alert" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <section class="loading" aria-live="polite">
+      <span></span>
+      <p>{{ 'savedSearchForm.loading' | t }}</p>
+    </section>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <section>
+        <div class="section-heading">
+          <span>01</span>
+          <div>
+            <h2>{{ 'savedSearchForm.identityTitle' | t }}</h2>
+            <p>{{ 'savedSearchForm.identityDescription' | t }}</p>
+          </div>
+        </div>
+        <div class="fields two-columns">
+          <label class="wide">
+            <span>{{ 'savedSearchForm.name' | t }}</span>
+            <input
+              type="text"
+              formControlName="title"
+              [placeholder]="'savedSearchForm.namePlaceholder' | t"
+            />
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" formControlName="active" />
+            <span>{{ 'savedSearchForm.activeImmediately' | t }}</span>
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-heading">
+          <span>02</span>
+          <div>
+            <h2>{{ 'savedSearchForm.catalogTitle' | t }}</h2>
+            <p>{{ 'savedSearchForm.catalogDescription' | t }}</p>
+          </div>
+        </div>
+        <div class="fields two-columns">
+          <label>
+            <span>{{ 'savedSearchForm.catalogScope' | t }}</span>
+            <select formControlName="catalog_match_scope">
+              <option value="category">{{ 'savedSearchForm.scopeCategory' | t }}</option>
+              <option value="brand">{{ 'savedSearchForm.scopeBrand' | t }}</option>
+              <option value="model">{{ 'savedSearchForm.scopeModel' | t }}</option>
+            </select>
+          </label>
+          <label>
+            <span>{{ 'savedSearchForm.category' | t }}</span>
+            <select formControlName="product_category_id">
+              <option value="">{{ 'savedSearchForm.anyCategory' | t }}</option>
+              @for (category of categories(); track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+          </label>
+          <div class="product-search wide">
+            <label for="saved-search-product">
+              <span>{{ 'savedSearchForm.productSearch' | t }}</span>
+            </label>
+            <div class="search-control">
+              <input
+                id="saved-search-product"
+                type="search"
+                formControlName="product_query"
+                [placeholder]="'savedSearchForm.productPlaceholder' | t"
+              />
+              <button
+                class="button button-quiet"
+                type="button"
+                [disabled]="searchingProducts()"
+                (click)="searchProducts()"
+              >
+                {{
+                  (searchingProducts()
+                    ? 'savedSearchForm.productSearching'
+                    : 'savedSearchForm.productSearchAction'
+                  ) | t
+                }}
+              </button>
+              @if (selectedCatalog()) {
+                <button class="button button-quiet" type="button" (click)="clearProduct()">
+                  {{ 'common.clear' | t }}
+                </button>
+              }
+            </div>
+            @if (productError()) {
+              <small class="field-error">{{ productError() }}</small>
+            }
+            @if (productResults().length > 0) {
+              <div class="product-results">
+                @for (product of productResults(); track product.id) {
+                  <button type="button" (click)="selectProduct(product)">
+                    <strong>{{ product.brand.name }} · {{ product.name }}</strong>
+                    <span>{{ product.model_number }} · {{ product.category.name }}</span>
+                  </button>
+                }
+              </div>
+            }
+            @if (selectedCatalog(); as selection) {
+              <div class="selection">
+                <strong>{{ 'savedSearchForm.selectedCatalog' | t }}</strong>
+                <span>
+                  {{
+                    selection.brand?.name ||
+                      selection.category?.name ||
+                      ('savedSearchForm.anyCategory' | t)
+                  }}
+                  @if (selection.model) {
+                    · {{ selection.model.name }} ({{ selection.model.model_number }})
+                  }
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-heading">
+          <span>03</span>
+          <div>
+            <h2>{{ 'savedSearchForm.marketTitle' | t }}</h2>
+            <p>{{ 'savedSearchForm.marketDescription' | t }}</p>
+          </div>
+        </div>
+        <div class="fields three-columns">
+          <label>
+            <span>{{ 'savedSearchForm.continent' | t }}</span>
+            <select formControlName="continent_code">
+              <option value="">{{ 'savedSearchForm.anyContinent' | t }}</option>
+              @for (continent of catalog()?.continents ?? []; track continent.code) {
+                <option [value]="continent.code">
+                  {{ continentName(continent.code, continent.name) }}
+                </option>
+              }
+            </select>
+          </label>
+          <label class="wide">
+            <span>{{ 'savedSearchForm.countries' | t }}</span>
+            <select formControlName="country_codes" multiple>
+              @for (
+                continent of catalog()?.continents ?? [];
+                track continent.code
+              ) {
+                <optgroup [label]="continentName(continent.code, continent.name)">
+                  @for (country of continent.countries; track country.code) {
+                    <option [value]="country.code">
+                      {{ countryName(country.code, country.name) }}
+                    </option>
+                  }
+                </optgroup>
+              }
+            </select>
+            <small>{{ 'savedSearchForm.countriesHelp' | t }}</small>
+          </label>
+          <label>
+            <span>{{ 'savedSearchForm.city' | t }}</span>
+            <input
+              type="text"
+              formControlName="city"
+              [placeholder]="'savedSearchForm.cityPlaceholder' | t"
+            />
+          </label>
+          <label>
+            <span>{{ 'savedSearchForm.radius' | t }}</span>
+            <input type="number" min="1" max="1000" formControlName="radius_km" />
+            <small>{{ 'savedSearchForm.radiusEvidence' | t }}</small>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" formControlName="include_cross_border" />
+            <span>{{ 'savedSearchForm.crossBorder' | t }}</span>
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-heading">
+          <span>04</span>
+          <div>
+            <h2>{{ 'savedSearchForm.priceTitle' | t }}</h2>
+            <p>{{ 'savedSearchForm.priceDescription' | t }}</p>
+          </div>
+        </div>
+        <div class="fields three-columns">
+          <label>
+            <span>{{ 'savedSearchForm.minimumPrice' | t }}</span>
+            <input
+              type="text"
+              inputmode="decimal"
+              formControlName="minimum_price"
+              [placeholder]="'savedSearchForm.moneyPlaceholder' | t"
+            />
+          </label>
+          <label>
+            <span>{{ 'savedSearchForm.maximumPrice' | t }}</span>
+            <input
+              type="text"
+              inputmode="decimal"
+              formControlName="maximum_price"
+              [placeholder]="'savedSearchForm.moneyPlaceholder' | t"
+            />
+          </label>
+          <label>
+            <span>{{ 'savedSearchForm.currency' | t }}</span>
+            <select formControlName="price_currency_code">
+              <option value="">{{ 'savedSearchForm.chooseCurrency' | t }}</option>
+              @for (currency of catalog()?.currencies ?? []; track currency.code) {
+                <option [value]="currency.code">
+                  {{ currency.code }} · {{ currencyName(currency.code, currency.name) }}
+                </option>
+              }
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-heading">
+          <span>05</span>
+          <div>
+            <h2>{{ 'savedSearchForm.qualityTitle' | t }}</h2>
+            <p>{{ 'savedSearchForm.qualityDescription' | t }}</p>
+          </div>
+        </div>
+        <div class="fields three-columns">
+          <label>
+            <span>{{ 'savedSearchForm.minimumProfit' | t }}</span>
+            <input
+              type="text"
+              inputmode="decimal"
+              formControlName="minimum_profit"
+              [placeholder]="'savedSearchForm.moneyPlaceholder' | t"
+            />
+          </label>
+          <label>
+            <span>{{ 'savedSearchForm.profitCurrency' | t }}</span>
+            <select formControlName="profit_currency_code">
+              <option value="">{{ 'savedSearchForm.chooseCurrency' | t }}</option>
+              @for (currency of catalog()?.currencies ?? []; track currency.code) {
+                <option [value]="currency.code">{{ currency.code }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            <span>{{ 'savedSearchForm.minimumMargin' | t }}</span>
+            <input
+              type="number"
+              step="0.01"
+              formControlName="minimum_margin_percent"
+            />
+          </label>
+          <label>
+            <span>{{ 'savedSearchForm.minimumDealScore' | t }}</span>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              step="0.01"
+              formControlName="minimum_deal_score"
+            />
+          </label>
+          <label>
+            <span>{{ 'savedSearchForm.maximumRisk' | t }}</span>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              formControlName="maximum_risk_score"
+            />
+          </label>
+        </div>
+        <p class="evidence-boundary">{{ 'savedSearchForm.evidenceBoundary' | t }}</p>
+      </section>
+
+      <section>
+        <div class="section-heading">
+          <span>06</span>
+          <div>
+            <h2>{{ 'savedSearchForm.keywordsTitle' | t }}</h2>
+            <p>{{ 'savedSearchForm.keywordsDescription' | t }}</p>
+          </div>
+        </div>
+        <div class="fields two-columns">
+          <label>
+            <span>{{ 'savedSearchForm.requiredKeywords' | t }}</span>
+            <textarea
+              rows="3"
+              formControlName="required_keywords"
+              [placeholder]="'savedSearchForm.requiredPlaceholder' | t"
+            ></textarea>
+          </label>
+          <label>
+            <span>{{ 'savedSearchForm.excludedKeywords' | t }}</span>
+            <textarea
+              rows="3"
+              formControlName="excluded_keywords"
+              [placeholder]="'savedSearchForm.excludedPlaceholder' | t"
+            ></textarea>
+          </label>
+          <div class="delivery wide">
+            <strong>{{ 'savedSearchForm.deliveryTitle' | t }}</strong>
+            <span>{{ 'savedSearchForm.inAppDelivery' | t }}</span>
+            <label class="checkbox">
+              <input type="checkbox" formControlName="email_notifications" />
+              <span>{{ 'savedSearchForm.emailDelivery' | t }}</span>
+            </label>
+            @if (!emailEnabled()) {
+              <small>{{ 'savedSearchForm.emailUnavailable' | t }}</small>
+            }
+            <label class="checkbox">
+              <input type="checkbox" formControlName="telegram_notifications" />
+              <span>{{ 'savedSearchForm.telegramDelivery' | t }}</span>
+            </label>
+            @if (!telegramEnabled()) {
+              <small>
+                {{ 'savedSearchForm.telegramUnavailable' | t }}
+                <a routerLink="/app/notifications">
+                  {{ 'savedSearchForm.telegramManage' | t }}
+                </a>
+              </small>
+            }
+            <small>{{ 'savedSearchForm.deliveryBoundary' | t }}</small>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <a class="button button-quiet" routerLink="/app/saved-searches">
+          {{ 'common.cancel' | t }}
+        </a>
+        <button
+          class="button button-primary"
+          type="submit"
+          [disabled]="saving() || !canManage()"
+        >
+          {{
+            (saving()
+              ? 'savedSearchForm.saving'
+              : isEditing()
+                ? 'savedSearchForm.saveChanges'
+                : 'savedSearchForm.createAction'
+            ) | t
+          }}
+        </button>
+      </footer>
+    </form>
+  }
+</div>

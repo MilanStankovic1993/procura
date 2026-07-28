@@ -1,0 +1,47 @@
+[program:procura-analysis-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=/usr/bin/php /var/www/procura/current/artisan queue:work --queue=analyses,default --sleep=1 --tries=3 --timeout=60 --max-time=3600
+directory=/var/www/procura/current
+user=www-data
+numprocs=4
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+stopwaitsecs=90
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/procura-analysis-worker.log
+stdout_logfile_maxbytes=50MB
+stdout_logfile_backups=10
+
+[program:procura-connector-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=/usr/bin/php /var/www/procura/current/artisan queue:work --queue=connectors --sleep=1 --tries=4 --timeout=900 --max-time=3600
+directory=/var/www/procura/current
+user=www-data
+numprocs=2
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+stopwaitsecs=930
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/procura-connector-worker.log
+stdout_logfile_maxbytes=50MB
+stdout_logfile_backups=10
+
+[program:procura-notification-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=/usr/bin/php /var/www/procura/current/artisan queue:work --queue=notifications --sleep=1 --tries=4 --timeout=30 --max-time=3600
+directory=/var/www/procura/current
+user=www-data
+numprocs=4
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+stopwaitsecs=45
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/procura-notification-worker.log
+stdout_logfile_maxbytes=50MB
+stdout_logfile_backups=10

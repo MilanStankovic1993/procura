@@ -2,10 +2,9 @@
 
 use App\Models\User;
 
-test('login screen can be rendered', function () {
+test('login screen redirects to the Angular application', function () {
     $this->get(route('login'))
-        ->assertOk()
-        ->assertSee('Welcome back');
+        ->assertRedirect(config('app.frontend_url').'/login');
 });
 
 test('users can authenticate with their email and password', function () {
@@ -19,7 +18,7 @@ test('users can authenticate with their email and password', function () {
         'password' => 'SecurePass123!',
     ]);
 
-    $response->assertRedirect('/dashboard');
+    $response->assertRedirect(config('fortify.home'));
     $this->assertAuthenticatedAs($user);
 });
 

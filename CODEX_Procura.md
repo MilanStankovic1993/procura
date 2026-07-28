@@ -37,15 +37,18 @@ The system must be designed around marketplace connectors so that approved APIs,
 
 Use:
 
-- PHP 8.3+
-- Laravel 12
+- PHP 8.3+ with the Intl extension
+- Laravel 13
 - MySQL 8+
 - Redis
 - Laravel Horizon
 - Laravel Sanctum
+- Angular 22 as the primary browser application
+- TypeScript 6 with strict compiler settings
+- Angular Router, HttpClient, Signals, Vitest, and Angular ESLint
 - Filament v5
-- Livewire
-- Tailwind CSS
+- Livewire and Blade only for Filament administration
+- SCSS design tokens for Angular
 - Laravel Scheduler
 - Laravel Notifications
 - Laravel Cashier with Stripe
@@ -199,6 +202,135 @@ notes
 ```
 
 Allow multiple uploaded images per listing.
+
+### Module B2 — Owned-product intake
+
+The Sell workflow starts with a tenant-owned `OwnedProduct` aggregate that is separate from a
+marketplace `Listing`, Buy `Analysis`, the future sale portfolio, and actual financial outcomes.
+
+The intake stores:
+
+```text
+optional active product category
+brand and model as user-provided facts
+condition and nullable age in months
+nullable accessories and defects
+explicit purchase-history knowledge and context
+one target continent and ordered target countries
+cross-border preference and desired sale speed
+draft, ready, or archived lifecycle
+private product, serial-label, defect, and proof-of-purchase images
+notes
+```
+
+Unknown must remain distinct from known zero or confirmed empty facts. Every material write appends
+an immutable actor/time/hash snapshot; identical updates are idempotent. Archived intake is
+terminal. Private image access requires a short-lived signed URL plus authentication, active
+organization scope, and policy authorization. This module must not calculate price bands, generate
+listing copy, create sale-portfolio records, or store purchase/sale money.
+
+### Module B3 — Owned-product identification and condition assessment
+
+Assessments are tenant-owned, append-only evidence linked to the exact `OwnedProductSnapshot` and
+the stable ordered hash of current private images. Each run records matcher/evaluator versions,
+input and evidence hashes, canonical category/model/variant references when supported, bounded
+candidates, identity and condition facts, included/missing accessories, defects, confidence and
+completeness basis points, language-neutral reason codes, unknown facts, and verification actions.
+
+Identical evidence and provider versions replay idempotently. Any later intake or image change makes
+the previous result historical. Matching reuses the global catalog contract and must never silently
+create or select canonical data. Results are `ready`, `needs_input`, or `review_required`. This
+module must not infer Sell prices, generate listing content, publish, create a portfolio record, or
+record money.
+
+### Module B4 — Sell comparable evidence and price bands
+
+Sell pricing is a separate tenant-owned append-only aggregate anchored to one exact current ready
+owned-product assessment. Approved manual or connector evidence preserves source identity, original
+integer-minor-unit asking price, currency, country, timestamps, classification, condition,
+accessories, reliability, raw input, actor, and hashes. It must never scrape or silently copy Buy
+comparables.
+
+Each versioned selector run is bounded to one country and currency and preserves included and
+excluded candidates, rank, factor scores, reason codes, and source snapshots. Each versioned price
+run preserves selected items, MAD outlier decisions, Q1/Q3, weighted median, dispersion,
+confidence, completeness, unknown facts, verification actions, and the complete replay input.
+Quick-sale spans Q1 to the clamped weighted median, recommended spans Q1 to Q3, and ambitious spans
+the clamped weighted median to Q3. These are asking-price guidance bands, not guaranteed sale
+prices. This module must not generate listing content, publish, create a portfolio record, or record
+actual money.
+
+### Module B5 — Sell listing draft and photo readiness
+
+Listing preparation is a separate tenant-owned append-only aggregate anchored to one exact current
+ready matched assessment, one exact current complete Sell price band, and the current private image
+manifest. The user explicitly submits target country/currency, quick/recommended/ambitious
+strategy, target asking price in integer minor units, and listing language. An out-of-band target
+requires a recorded reason; the system never chooses a target price silently.
+
+Each versioned draft preserves title, structured description, disclosed source facts, photo
+checklist, assessment/price/image hashes, the actual template content hash, the normalized
+photo-policy snapshot/hash, template/generator/photo-evaluator versions, actor, unknown facts,
+warnings, review actions, stable input hash, and complete replay input. Templates support English,
+German, Spanish, French, and Serbian Latin independently from UI locale and market scope. Image
+metadata may prove kind, count, and dimensions but must not be used to invent semantic visibility.
+This module must not publish, call marketplace APIs, create a portfolio record, record actual
+money, scrape, or call external AI.
+
+### Module B6 — Sale portfolio and manual publication history
+
+One exact current `ready` listing draft with `ready` photo evidence may enter the tenant-owned
+append-only sale portfolio. The entry snapshots all assessment, price, image, template, generator,
+and photo-policy evidence plus the initial target asking price. This amount is asking-price
+evidence, not received money.
+
+Manual publication events preserve marketplace name/key, external listing ID/HTTPS URL, exact
+advertised minor-unit price/currency, occurrence time, actor, prior event, UUID idempotency key, and
+payload hash. Server-owned transitions cover publication, price change, reservation, withdrawal,
+expiry, and relisting with optimistic concurrency and immutable history. Stale source evidence
+blocks publication/relisting but remains visible. This module does not call marketplace APIs,
+support a `sold` transition, or record realized financial outcomes.
+
+### Module B7 — Transaction outcomes and realized profit
+
+Actual purchase, actual costs, and actual sale are separate tenant-owned append-only evidence
+streams anchored to an `OwnedProduct`. They never overwrite Buy estimates, buyer workflow
+decisions, Sell price bands, listing drafts, advertised prices, or sale-portfolio events.
+
+Every realized amount preserves the original integer minor units and currency, attributable
+occurrence time, actor, evidence kind/reference, stable input hash, and a complete immutable
+snapshot. Reporting-currency conversion is either identity or references one exact immutable rate
+whose effective date is not after the financial event. Purchase and cost corrections append a new
+optimistic-concurrency version with a bounded reason.
+
+Actual costs preserve transport, repair, platform fees, payment fees, customs, tax, marketing, and
+other costs independently. Null is explicitly unknown while zero is a known zero. Actual sale
+outcomes are `sold`, `cancelled`, or `no_sale` and must link the exact current portfolio entry and
+publication event. `sold` is permitted only from listed/reserved state and contains realized money;
+cancelled/no-sale is permitted only from withdrawn/expired state and contains no sale money.
+
+The system records actual net profit only when current purchase, complete cost snapshot, and sold
+outcome use one reporting currency. The immutable calculation stores exact source IDs/hashes,
+purchase, additional costs, total invested, sale proceeds, signed net profit, basis-point ratios,
+and sale duration. Incomplete chains return explicit unknowns, never a partial precise result. This
+module does not process payments, escrow funds, call marketplace APIs, or mutate external listings.
+
+### Module B8 — Estimate attribution and accuracy
+
+One tenant-owned append-only attribution explicitly links a complete current realized-profit chain
+to the exact current Buy analysis and profit estimate that informed the transaction. Product names,
+catalog matches, marketplace identifiers, and buyer-workflow state never infer this relationship.
+Corrections append a new version with both expected attribution/report heads, actor, bounded
+reason/provenance, tenant UUID idempotency, stable payload/input hashes, and the previous version.
+
+Each immutable report preserves the exact expected and realized evidence IDs/hashes, calculation
+version/key, original estimate currency, realized reporting currency, and identity/direct/inverse
+dated exchange-rate evidence available at the estimate calculation time. Purchase, additional
+costs, sale proceeds, and signed net profit store source expected, converted expected, actual,
+signed/absolute minor error, and bounded signed/absolute basis-point error. Missing/stale FX, a zero
+expected denominator, expected safety reserve versus actual marketing, and absent expected sale
+duration remain explicit. There is no aggregate accuracy score, and this evidence does not feed
+DealScore, price intelligence, external AI, or training.
 
 ### Module C — Listing normalization
 
@@ -378,6 +510,16 @@ timestamps
 
 The calculation must be reproducible from stored details.
 
+Delivered Buy boundary: `ComparableRecord` and `ComparableSet` preserve immutable source and
+selection evidence. `ComparableMarketNormalization` permits a cross-country or cross-currency
+comparable only after an authorized analyst explicitly records compatible/incompatible evidence
+for the exact analysis/comparable. Compatible evidence freezes dated FX provenance, a bounded
+50.00%–150.00% market factor, explicit target-currency shipping/duty/tax/other costs, exact
+half-even calculation results, actor, reference/note, timestamp, version, and hash. The v2 selector
+and weighted-median estimator snapshot and replay that result without a second conversion.
+Missing, stale, mismatched, or unconfirmed evidence fails closed; no factor or cost is invented.
+Production FX and evidence governance is mandatory in `docs/19-production-go-live.md`.
+
 ### Module G — Profit calculator
 
 Users must be able to enter or confirm:
@@ -553,12 +695,21 @@ Supported channels:
 - email,
 - Telegram.
 
+Current implementation boundary (2026-07-26): database/in-app, plan-entitled localized email, and
+plan-entitled localized Telegram delivery are implemented with immutable delivery evidence,
+bounded queue retries, orphan recovery, and read-only operations visibility. Telegram uses a
+platform-managed bot, an explicit one-time private-chat connection, encrypted identifiers,
+keyed identity hashes, a secret-authenticated webhook, revocation, and a separate notification
+worker pool. Production mail and Telegram provider credentials and webhook registration are
+deployment work, not application-domain assumptions.
+
 Tables:
 
 ```text
 alerts
 notification_logs
 telegram_connections
+telegram_connection_events
 ```
 
 Prevent duplicate alerts.
@@ -700,10 +851,16 @@ subscription_usages
 
 marketplace_sources
 marketplace_imports
+marketplace_import_rows
 
 listings
 listing_images
 listing_snapshots
+
+owned_products
+owned_product_target_countries
+owned_product_snapshots
+owned_product_images
 
 product_categories
 brands
@@ -712,6 +869,9 @@ product_aliases
 listing_product_matches
 
 ai_analyses
+comparable_records
+comparable_market_normalizations
+comparable_sets
 price_estimates
 profit_calculations
 risk_assessments
@@ -802,6 +962,14 @@ Each connector must declare whether automated search is supported.
 Do not bypass marketplace restrictions.
 
 Do not implement browser automation, captcha bypassing, residential proxy rotation, stealth scraping, or automated account actions.
+
+Current delivered boundary: a typed connector registry and `AuthorizedCsvConnector` provide
+normalization without automated search or network access. Tenant CSV uploads require source-rights
+attestation, private storage, UUID/content idempotency, full-file preflight, bounded queued
+processing, immutable row outcomes, and listing snapshot provenance. Invalid rows are quarantined
+and duplicate source identities do not rewrite listings. The production kill switch defaults off;
+activation and every external-source approval belong in `docs/19-production-go-live.md`. Email,
+partner-feed, official API, URL-assisted, and browser-extension connectors remain pending.
 
 ---
 
@@ -988,6 +1156,9 @@ register
 /listings/create
 /listings/{listing}
 /listings/{listing}/analysis
+/app/sell
+/app/sell/new
+/app/sell/{ownedProduct}
 /saved-searches
 /alerts
 /profit-tracker
@@ -996,6 +1167,48 @@ register
 /billing
 /settings
 ```
+
+### Interface localization
+
+Every first-party Angular screen, reusable panel, and Filament administration resource ships in:
+
+- English (`en`),
+- German (`de`),
+- Spanish (`es`),
+- French (`fr`),
+- Serbian Latin (`sr-Latn`).
+
+All user-facing text uses typed translation keys. Adding a key requires all five catalog entries,
+and the localization source check must pass. Interface locale is independent from market, country,
+currency and source-listing language. Stored evidence values, ISO codes and immutable reason codes
+must not be translated in persistence.
+
+The localization contract applies equally to owned-product list, intake, detail, assessment,
+validation, loading, error, empty, lifecycle, image, stale-evidence, and unknown-evidence states.
+Filament uses the same authenticated personal preference, exposes its language action in the user
+menu, and keeps admin authorization, organization context, and market scope independent from
+locale. Custom admin labels and known values belong to the five `admin.php` catalogs; application
+vendor overrides may fill documented upstream translation gaps but must never patch `vendor/`.
+
+Laravel API validation follows the same personal locale. Authenticated preference overrides the
+request header; guests resolve supported `Accept-Language` variants with English fallback.
+Fortify/authentication/password-reset messages, every framework validation rule currently used by
+Procura, and every current FormRequest attribute require EN/DE/ES/FR/sr-Latn entries. The resolved
+locale is request-scoped and must be restored after success or failure so persistent PHP workers
+cannot leak language state between users.
+
+Expected billing, marketplace-import, privacy-request, buyer-decision, sale-portfolio, and outcome
+API conflicts use the closed `ApiErrorCode` enum. The response preserves its language-neutral
+`code`, while the request-scoped locale selects a safe message from the five `api_errors.php`
+catalogs. Raw exception/provider diagnostics must never be rendered to a client. Adding a public
+conflict code requires all five catalog entries and the enum/catalog contract test in the same
+change.
+
+Expected application-service `422` failures use the closed `ApplicationValidationCode` enum and
+`ApplicationValidation` boundary. They preserve Laravel's field-keyed error shape while selecting
+safe presentation from the five `application_validation.php` catalogs. Services must not embed
+English validation copy or interpolate database/provider diagnostics into public errors. Adding a
+code requires all five catalog entries and the enum/catalog contract test in the same change.
 
 ### Listing detail screen
 
@@ -1028,6 +1241,11 @@ Use visible warnings when confidence is low.
 ---
 
 ## 13. Filament administration
+
+The entire operator surface, including navigation, resources, columns, actions, dashboard
+statistics, modals, notifications, accessibility labels, known domain values, countries, and
+currencies, must follow the same English/German/Spanish/French/Serbian-Latin locale contract as the
+primary application.
 
 Create Filament resources for:
 
@@ -1160,6 +1378,8 @@ OrganizationAccessTest
 ListingCreationTest
 ListingAuthorizationTest
 ListingPipelineDispatchTest
+OwnedProductIntakeTest
+OwnedProductAssessmentTest
 SavedSearchMatchingTest
 SubscriptionLimitTest
 TelegramConnectionTest
@@ -1276,6 +1496,12 @@ Build:
 - price estimate,
 - admin correction workflow.
 
+Delivered application boundary: append-only catalog-match, comparable-selection, dated FX,
+explicit Buy cross-market normalization, reproducible weighted-median price estimate, full
+five-language evidence UI, and read-only normalization operations. Verified catalog
+administration, live FX ingestion, governed reusable market factors, and Sell cross-market
+normalization remain separate production work.
+
 ### Phase 5 — risk and deal scoring
 
 Build:
@@ -1308,6 +1534,12 @@ Build:
 - upgrade and downgrade flows,
 - subscription enforcement.
 
+Delivered application boundary: provider-independent plan enforcement, Laravel Cashier
+organization subscriptions, owner-only idempotent hosted Checkout and billing portal, signed
+webhook projection, append-only operations evidence, and five-language UI. Stripe test/live
+products, Price IDs, tax/portal policy, production secrets, and complete lifecycle acceptance
+remain external release work governed by `docs/19-production-go-live.md`.
+
 ### Phase 8 — broker requests
 
 Build:
@@ -1337,7 +1569,9 @@ Start by implementing only the following vertical slice:
 11. Deal score
 12. Filament admin listing review
 
-Do not implement Stripe, Telegram, browser extensions, or external marketplace integrations before this vertical slice works.
+Do not implement Stripe, Telegram, browser extensions, or external marketplace integrations before
+this vertical slice works. The current delivered-boundary status is authoritative in
+`docs/15-delivery-roadmap.md` and `docs/18-development-handoff.md`.
 
 The first milestone is complete when a new user can:
 
@@ -1432,9 +1666,24 @@ AI_TIMEOUT=60
 AI_MAX_RETRIES=2
 AI_MONTHLY_BUDGET_EUR=100
 
+BILLING_PROVIDER=stripe
+BILLING_CHECKOUT_ENABLED=false
+BILLING_ALLOW_PROMOTION_CODES=false
+BILLING_COLLECT_TAX_IDS=true
+CASHIER_CURRENCY=eur
+CASHIER_CURRENCY_LOCALE=en_IE
 STRIPE_KEY=
 STRIPE_SECRET=
 STRIPE_WEBHOOK_SECRET=
+STRIPE_WEBHOOK_TOLERANCE=300
+STRIPE_PRICE_STARTER_MONTHLY=
+STRIPE_PRICE_STARTER_YEARLY=
+STRIPE_PRICE_PRO_MONTHLY=
+STRIPE_PRICE_PRO_YEARLY=
+BILLING_PRICE_STARTER_MONTHLY_MINOR=0
+BILLING_PRICE_STARTER_YEARLY_MINOR=0
+BILLING_PRICE_PRO_MONTHLY_MINOR=0
+BILLING_PRICE_PRO_YEARLY_MINOR=0
 
 TELEGRAM_BOT_TOKEN=
 
@@ -1461,7 +1710,7 @@ Do not implement:
 - cryptocurrency payments,
 - complex machine-learning training pipelines,
 - fully automated brokerage,
-- multilingual UI beyond English and German initially.
+- additional interface languages beyond the documented initial five.
 
 ---
 
@@ -1475,6 +1724,8 @@ A task is done only when:
 - validation exists,
 - automated tests pass,
 - UI handles loading and error states,
+- all user-facing UI copy is present in every supported locale,
+- localization source checks and typed catalog compilation pass,
 - queue failures are handled,
 - tenant boundaries are enforced,
 - no sensitive data is logged,
@@ -1489,7 +1740,7 @@ Start with Phase 1 and create the project foundation.
 
 Implement:
 
-1. Laravel 12 project structure
+1. Laravel 13 project structure
 2. Authentication
 3. Filament v5 admin panel
 4. Organizations

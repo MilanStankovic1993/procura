@@ -5,13 +5,12 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 
-test('email verification screen can be rendered', function () {
+test('email verification screen redirects to the Angular application', function () {
     $user = User::factory()->unverified()->create();
 
     $this->actingAs($user)
         ->get(route('verification.notice'))
-        ->assertOk()
-        ->assertSee('Check your inbox');
+        ->assertRedirect(config('app.frontend_url').'/verify-email');
 });
 
 test('users can verify their email through a signed link', function () {
@@ -26,7 +25,7 @@ test('users can verify their email through a signed link', function () {
 
     $response = $this->actingAs($user)->get($verificationUrl);
 
-    $response->assertRedirect('/dashboard?verified=1');
+    $response->assertRedirect(config('fortify.redirects.email-verification').'?verified=1');
     expect($user->fresh()->hasVerifiedEmail())->toBeTrue();
     Event::assertDispatched(Verified::class);
 });

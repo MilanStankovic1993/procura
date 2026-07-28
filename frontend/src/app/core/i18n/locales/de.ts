@@ -1,0 +1,2482 @@
+import { TranslationDictionary } from './en';
+
+export const DE_TRANSLATIONS = {
+  'common.backToProcura': 'Zurück zu Procura',
+  'common.footer': 'Globale Intelligenz. Lokaler Marktkontext.',
+  'common.signIn': 'Anmelden',
+  'common.signOut': 'Abmelden',
+  'common.signingOut': 'Abmeldung…',
+  'common.retry': 'Erneut versuchen',
+  'common.emailAddress': 'E-Mail-Adresse',
+  'common.emailRequired': 'Die E-Mail-Adresse ist erforderlich.',
+  'common.emailInvalid': 'Geben Sie eine gültige E-Mail-Adresse ein.',
+  'common.password': 'Passwort',
+  'common.passwordRequired': 'Das Passwort ist erforderlich.',
+  'common.passwordPolicy':
+    'Verwenden Sie mindestens 12 Zeichen mit Groß- und Kleinbuchstaben, einer Zahl und einem Symbol.',
+  'common.passwordsMatch': 'Die Passwörter müssen übereinstimmen.',
+  'language.label': 'Sprache',
+  'language.saving': 'Sprache wird gespeichert…',
+  'language.error': 'Die Spracheinstellung konnte nicht gespeichert werden.',
+  'route.landing': 'Globale Marktintelligenz',
+  'route.login': 'Anmelden',
+  'route.register': 'Konto erstellen',
+  'route.forgotPassword': 'Passwort vergessen',
+  'route.resetPassword': 'Passwort zurücksetzen',
+  'route.verifyEmail': 'E-Mail bestätigen',
+  'route.confirmPassword': 'Passwort bestätigen',
+  'route.workspaceUnavailable': 'Arbeitsbereich nicht verfügbar',
+  'route.acceptInvitation': 'Einladung annehmen',
+  'route.overview': 'Übersicht',
+  'route.organization': 'Organisation',
+  'route.buyListings': 'Beschaffungsangebote',
+  'route.addSourceListing': 'Beschaffungsangebot hinzufügen',
+  'route.buyAnalysis': 'Status der Kaufanalyse',
+  'route.listingDetail': 'Angebotsdetails',
+  'route.markets': 'Märkte',
+  'route.subscription': 'Plan & Nutzung',
+  'route.privacy': 'Datenschutzanfragen',
+  'shell.workspace': 'Arbeitsbereich',
+  'shell.switchingWorkspace': 'Arbeitsbereich wird gewechselt…',
+  'shell.workspaceKind': '{{type}}-Arbeitsbereich',
+  'shell.navigation': 'Navigation des Arbeitsbereichs',
+  'shell.overview': 'Übersicht',
+  'shell.organization': 'Organisation',
+  'shell.buyAnalysis': 'Kaufanalyse',
+  'shell.sellAnalysis': 'Verkaufsanalyse',
+  'shell.soon': 'Bald',
+  'shell.markets': 'Märkte',
+  'shell.planUsage': 'Plan & Nutzung',
+  'shell.privacy': 'Datenschutz',
+  'organization.type.personal': 'Persönlicher',
+  'organization.type.business': 'Geschäftlicher',
+  'organization.role.owner': 'Inhaber',
+  'organization.role.administrator': 'Administrator',
+  'organization.role.analyst': 'Analyst',
+  'organization.role.viewer': 'Betrachter',
+  'dashboard.eyebrow': 'Übersicht des Arbeitsbereichs',
+  'dashboard.greeting': 'Schön, Sie zu sehen, {{name}}.',
+  'dashboard.context':
+    'Sie arbeiten in {{workspace}}. Beschaffungsangebote und private Nachweise übernehmen diese bestätigte Mandantengrenze.',
+  'dashboard.workspaceFallback': 'Ihrem Procura-Arbeitsbereich',
+  'dashboard.apiOperational': 'API {{version}} betriebsbereit',
+  'dashboard.apiUnavailable': 'API nicht verfügbar',
+  'dashboard.apiChecking': 'API wird geprüft',
+  'dashboard.foundationStatus': 'Plattformstatus',
+  'dashboard.domainOperational': 'Der zentrale Entscheidungslebenszyklus ist betriebsbereit',
+  'dashboard.angularTitle': 'Angular-Anwendung',
+  'dashboard.angularDescription': 'Strikt, eigenständig, geroutet, lokalisiert und geprüft',
+  'dashboard.authTitle': 'Sitzungsauthentifizierung',
+  'dashboard.authDescription': 'Fortify, Sanctum, CSRF und Routenschutz',
+  'dashboard.apiTitle': 'Versionierte API',
+  'dashboard.apiDescription': 'Stabile `/api/v1`-Vertragsgrenze',
+  'dashboard.tenantTitle': 'Mandantenkontext',
+  'dashboard.tenantDescription': 'Indizierte Mitgliedschaft und geschützter Wechsel',
+  'dashboard.globalTitle': 'Globale Architektur',
+  'dashboard.globalDescription': 'Keine fest codierten Länder in Produktgrenzen',
+  'dashboard.listingTitle': 'Angebotsherkunft',
+  'dashboard.listingDescription': 'Mandantentrennung, Snapshots und private signierte Nachweise',
+  'dashboard.nextSlice': 'Integrations-Roadmap',
+  'dashboard.nextTitle': 'Stripe-Abrechnungs- und Abonnementgrenze',
+  'dashboard.nextDescription':
+    'Definieren Sie vor der Aktivierung der Abrechnung separat genehmigte Verträge für Checkout, Webhook-Authentizität, Zahlungs-Idempotenz, Abonnementlebenszyklus, Abstimmung und Audit.',
+  'landing.primaryNavigation': 'Hauptnavigation',
+  'landing.platform': 'Plattform',
+  'landing.approach': 'Ansatz',
+  'landing.eyebrow': 'Globale Marktintelligenz',
+  'landing.title': 'Treffen Sie jede Marktentscheidung auf Grundlage von Fakten.',
+  'landing.lead':
+    'Procura verwandelt verstreute Angebote, Preise, Kosten und Risikosignale in eine klare Kauf- oder Verkaufsentscheidung – über Grenzen und Marktplätze hinweg.',
+  'landing.openWorkspace': 'Arbeitsbereich öffnen',
+  'landing.explorePlatform': 'Plattform entdecken',
+  'landing.platformPrinciples': 'Plattformprinzipien',
+  'landing.countryAware': 'Länderspezifisch',
+  'landing.evidenceBacked': 'Faktenbasiert',
+  'landing.humanReadable': 'Verständlich',
+  'landing.exampleSignal': 'Beispiel für ein Marktsignal',
+  'landing.opportunitySignal': 'Chancensignal',
+  'landing.exampleProduct': 'Professionelles Bohrmaschinen-Set',
+  'landing.sourceMarket': 'Quellmarkt',
+  'landing.targetMarket': 'Zielmarkt',
+  'landing.germanyEur': 'Deutschland · EUR',
+  'landing.canadaCad': 'Kanada · CAD',
+  'landing.expectedMargin': 'Erwartete Nettomarge',
+  'landing.afterCosts': 'Nach Gebühren, Versand und Marktrisiko',
+  'landing.highConfidence': 'Signal mit hoher Sicherheit · 37 vergleichbare Angebote',
+  'landing.decisionLayer': 'Die Entscheidungsebene',
+  'landing.defensibleAnswer': 'Von verstreuten Daten zu einer belastbaren Antwort.',
+  'landing.buyLabel': 'Kaufintelligenz',
+  'landing.buyTitle': 'Kennen Sie die realen Kosten, bevor Sie sich entscheiden.',
+  'landing.buyDescription':
+    'Vergleichen Sie Marktpreis, Gesamtkosten, Risiko und Sicherheit in einer Entscheidung.',
+  'landing.sellLabel': 'Verkaufsintelligenz',
+  'landing.sellTitle': 'Preisgestaltung nach Marge statt Bauchgefühl.',
+  'landing.sellDescription':
+    'Verstehen Sie Nachfrage, Gebühren, Wettbewerb und den wahrscheinlichen Nettogewinn in verschiedenen Märkten.',
+  'landing.globalLabel': 'Globaler Marktgraph',
+  'landing.globalTitle': 'Ein Produkt, jeder relevante Markt.',
+  'landing.globalDescription':
+    'Länder, Währungen, Sprachen, Versandgrenzen und lokale Bedingungen.',
+  'landing.wholeMarket':
+    'Für den gesamten Markt entwickelt, nicht nur für ein Land oder einen Marktplatz.',
+  'landing.start': 'Mit Procura starten',
+  'login.eyebrow': 'Sicherer Arbeitsbereich',
+  'login.title': 'Willkommen zurück.',
+  'login.description': 'Melden Sie sich an, um Ihre Marktanalyse fortzusetzen.',
+  'login.emailPlaceholder': 'sie@unternehmen.de',
+  'login.forgotPassword': 'Passwort vergessen?',
+  'login.passwordPlaceholder': 'Ihr Passwort',
+  'login.remember': 'Auf diesem Gerät angemeldet bleiben',
+  'login.submitting': 'Anmeldung…',
+  'login.newToProcura': 'Neu bei Procura?',
+  'login.createAccount': 'Konto erstellen',
+  'login.security':
+    'Geschützt durch CSRF-Validierung und eine verschlüsselte serverseitige Sitzung.',
+  'login.error': 'Die Anmeldung war nicht möglich. Bitte versuchen Sie es gleich erneut.',
+  'authError.validation': 'Bitte überprüfen Sie die markierten Felder.',
+  'authError.sessionExpired': 'Ihre sichere Sitzung ist abgelaufen. Bitte versuchen Sie es erneut.',
+  'authError.tooManyAttempts':
+    'Zu viele Versuche. Bitte warten Sie einen Moment und versuchen Sie es erneut.',
+  'register.eyebrow': 'Arbeitsbereich erstellen',
+  'register.title': 'Starten Sie mit einem sicheren Konto.',
+  'register.description':
+    'Ihre persönliche Organisation wird automatisch erstellt und kann zu einem Team-Arbeitsbereich wachsen.',
+  'register.fullName': 'Vollständiger Name',
+  'register.nameRequired': 'Ihr Name ist erforderlich.',
+  'register.workEmail': 'Geschäftliche E-Mail',
+  'register.confirmPassword': 'Passwort bestätigen',
+  'register.submitting': 'Konto wird erstellt…',
+  'register.createAccount': 'Konto erstellen',
+  'register.alreadyAccount': 'Sie haben bereits ein Konto?',
+  'register.security':
+    'Die E-Mail-Bestätigung ist erforderlich, bevor Mandantendaten geöffnet werden können.',
+  'register.error':
+    'Ihr Konto konnte nicht erstellt werden. Bitte versuchen Sie es gleich erneut.',
+  'forgot.eyebrow': 'Kontowiederherstellung',
+  'forgot.title': 'Passwort zurücksetzen.',
+  'forgot.description':
+    'Geben Sie die E-Mail-Adresse Ihres Kontos ein. Wenn ein passendes Konto existiert, senden wir einen sicheren Link.',
+  'forgot.submitting': 'Sicherer Link wird gesendet…',
+  'forgot.submit': 'Link zum Zurücksetzen senden',
+  'forgot.remember': 'Passwort wieder eingefallen?',
+  'forgot.back': 'Zurück zur Anmeldung',
+  'forgot.security':
+    'Die Antwort ist für bekannte und unbekannte E-Mail-Adressen absichtlich identisch.',
+  'forgot.error':
+    'Die Anfrage konnte nicht verarbeitet werden. Bitte versuchen Sie es gleich erneut.',
+  'reset.eyebrow': 'Sicheres Zurücksetzen',
+  'reset.title': 'Wählen Sie ein neues Passwort.',
+  'reset.description':
+    'Legen Sie ein neues Passwort für {{email}} fest. Der Link kann nur einmal verwendet werden.',
+  'reset.missingDescription':
+    'Der Wiederherstellungslink muss ein gültiges Token und die Konto-E-Mail enthalten.',
+  'reset.incomplete':
+    'Dieser Link ist unvollständig. Fordern Sie eine neue Wiederherstellungs-E-Mail an.',
+  'reset.requestNew': 'Neuen Link anfordern',
+  'reset.continue': 'Weiter zur Anmeldung',
+  'reset.newPassword': 'Neues Passwort',
+  'reset.confirmPassword': 'Neues Passwort bestätigen',
+  'reset.submitting': 'Passwort wird aktualisiert…',
+  'reset.submit': 'Passwort aktualisieren',
+  'reset.back': 'Zurück zur Anmeldung',
+  'reset.security':
+    'Links laufen ab und werden nach einer erfolgreichen Änderung ungültig.',
+  'reset.invalidError': 'Dieser Link zum Zurücksetzen ist unvollständig oder ungültig.',
+  'reset.expiredError':
+    'Dieser Link ist ungültig oder abgelaufen. Fordern Sie einen neuen Link an.',
+  'verify.eyebrow': 'Arbeitsbereich schützen',
+  'verify.verifiedTitle': 'E-Mail bestätigt.',
+  'verify.pendingTitle': 'Prüfen Sie Ihren Posteingang.',
+  'verify.verifiedDescription':
+    'Ihre Identität ist bestätigt und die Mandantendaten sind jetzt verfügbar.',
+  'verify.pendingDescription':
+    'Wir haben einen signierten, zeitlich begrenzten Bestätigungslink gesendet{{email}}.',
+  'verify.toEmail': ' an {{email}}',
+  'verify.verifying': 'Sicherer Link wird geprüft…',
+  'verify.continue': 'Weiter zum Arbeitsbereich',
+  'verify.sending': 'Wird gesendet…',
+  'verify.sendNew': 'Neuen Bestätigungslink senden',
+  'verify.security':
+    'Die APIs des Arbeitsbereichs bleiben gesperrt, bis die E-Mail bestätigt ist.',
+  'verify.stateError': 'Der bestätigte Kontostatus konnte nicht geprüft werden.',
+  'verify.success': 'Ihre E-Mail-Adresse wurde bestätigt.',
+  'verify.sent': 'Ein neuer Bestätigungslink wurde an Ihre E-Mail gesendet.',
+  'verify.tooManyRequests': 'Zu viele Anfragen. Bitte warten Sie vor der nächsten E-Mail.',
+  'verify.sendError':
+    'Die Bestätigungs-E-Mail konnte nicht gesendet werden. Bitte versuchen Sie es erneut.',
+  'verify.invalidLink':
+    'Dieser Bestätigungslink ist ungültig oder abgelaufen. Fordern Sie unten einen neuen an.',
+  'verify.tooManyAttempts': 'Zu viele Bestätigungsversuche. Bitte warten Sie und versuchen Sie es erneut.',
+  'verify.error': 'Ihre E-Mail konnte nicht bestätigt werden. Bitte versuchen Sie es erneut.',
+  'confirm.eyebrow': 'Sensible Aktion',
+  'confirm.title': 'Bestätigen Sie Ihre Identität.',
+  'confirm.description':
+    'Geben Sie Ihr aktuelles Passwort erneut ein, bevor Sie mit der geschützten Aktion fortfahren.',
+  'confirm.checking': 'Bestätigungsstatus wird geprüft…',
+  'confirm.currentPassword': 'Aktuelles Passwort',
+  'confirm.passwordRequired': 'Ihr aktuelles Passwort ist erforderlich.',
+  'confirm.submitting': 'Wird bestätigt…',
+  'confirm.submit': 'Passwort bestätigen',
+  'confirm.return': 'Zurück zum Arbeitsbereich',
+  'confirm.security': 'Die Passwortbestätigung läuft nach kurzer Zeit automatisch ab.',
+  'confirm.statusError':
+    'Der Bestätigungsstatus konnte nicht geprüft werden. Laden Sie die Seite neu.',
+  'confirm.error': 'Das Passwort konnte nicht bestätigt werden. Bitte versuchen Sie es erneut.',
+  'workspace.eyebrow': 'Arbeitsbereich wiederherstellen',
+  'workspace.title': 'Ihr Konto benötigt einen Organisations-Arbeitsbereich.',
+  'workspace.fallback':
+    'Procura konnte für diese Sitzung keine gültige Organisationsmitgliedschaft finden.',
+  'workspace.support':
+    'Es wurden keine Mandantendaten geöffnet. Versuchen Sie es nach Wiederherstellung Ihrer Mitgliedschaft erneut oder melden Sie sich sicher ab.',
+  'workspace.checking': 'Wird geprüft…',
+  'workspace.retry': 'Arbeitsbereich erneut prüfen',
+  'invitation.eyebrow': 'Einladung zum Arbeitsbereich',
+  'invitation.title': 'Treten Sie Ihrem Team bei.',
+  'invitation.description':
+    'Durch die Annahme wird Ihr Konto dem Arbeitsbereich hinzugefügt und dieser wird aktiv.',
+  'invitation.accepting': 'Wird angenommen…',
+  'invitation.accept': 'Einladung annehmen',
+  'invitation.return': 'Zurück zum Arbeitsbereich',
+  'invitation.incomplete': 'Dieser Einladungslink ist unvollständig.',
+  'invitation.unavailable': 'Diese Einladung ist nicht verfügbar.',
+  'invitation.error': 'Die Einladung konnte nicht angenommen werden.',
+  'common.priceNotProvided': 'Preis nicht angegeben',
+  'common.notSet': 'Nicht festgelegt',
+  'common.save': 'Speichern',
+  'common.saving': 'Wird gespeichert…',
+  'common.loading': 'Wird geladen…',
+  'common.search': 'Suchen',
+  'common.clear': 'Zurücksetzen',
+  'common.included': 'Enthalten',
+  'common.unavailable': 'Nicht verfügbar',
+  'common.unlimited': 'Unbegrenzt',
+  'common.used': 'Verwendet',
+  'common.limit': 'Limit',
+  'common.member': 'Mitglied',
+  'common.system': 'System',
+  'common.total': '{{count}} insgesamt',
+  'common.expires': 'läuft am {{date}} ab',
+  'privacy.eyebrow': 'Datenschutz und Datenrechte',
+  'privacy.title': 'Zentrum für Datenschutzanfragen',
+  'privacy.description':
+    'Fordern Sie einen portablen Datenexport an oder starten Sie einen geprüften Kontolöschungsprozess mit vollständiger Nachweiskette.',
+  'privacy.auditBoundary': 'Auditierter Ablauf',
+  'privacy.boundaryTitle': 'Eine Anfrage löscht oder exportiert Daten nicht automatisch',
+  'privacy.boundaryDescription':
+    'Procura protokolliert die genaue Anfrage, das operative Ziel, Blockaden, Entscheidungen und Erfüllungsnachweise. Aufbewahrung, Eigentum, Abrechnung und rechtliche Prüfungen bleiben verpflichtend.',
+  'privacy.newRequestEyebrow': 'Neue Anfrage',
+  'privacy.newRequestTitle': 'Datenrecht ausüben',
+  'privacy.oneActivePerType': 'Eine aktive Anfrage je Typ',
+  'privacy.requestType': 'Anfragetyp',
+  'privacy.type.data_export': 'Datenexport',
+  'privacy.type.account_deletion': 'Kontolöschung',
+  'privacy.type.dataExportHelp':
+    'Fordert eine portable Kopie über den geprüften Zustellprozess an.',
+  'privacy.type.accountDeletionHelp':
+    'Startet die Prüfung von Konto, Eigentum, Abrechnung, Aufbewahrung und Löschpflichten.',
+  'privacy.residenceCountry': 'Wohnsitzland',
+  'privacy.residenceCountryHelp':
+    'Optionaler Rechtsraumkontext. Er bestimmt die rechtliche Berechtigung nicht allein.',
+  'privacy.reason': 'Anfragekontext',
+  'privacy.reasonPlaceholder':
+    'Relevanten Umfang oder Kontext ohne Geheimnisse angeben.',
+  'privacy.reasonHelp':
+    'Optional, 10 bis 1.000 Zeichen. Niemals Passwörter oder Token eingeben.',
+  'privacy.deletionWarningTitle': 'Kontolöschung erfordert operative Prüfung',
+  'privacy.deletionWarningDescription':
+    'Geschäftseigentum, aktive Abrechnung, gesetzliche Aufbewahrung, Betrugsprävention und Auditnachweise können vor der Erfüllung Maßnahmen erfordern.',
+  'privacy.confirmNotice':
+    'Ich bestätige, dass ich diese Anfrage für mein eigenes authentifiziertes Procura-Konto stelle und den Hinweis zum Datenschutzablauf gelesen habe.',
+  'privacy.responseTargetDisclosure':
+    'Das angezeigte Ziel ist ein operatives Ziel und keine rechtsraumspezifische rechtliche Bewertung.',
+  'privacy.submitting': 'Anfrage wird gesendet…',
+  'privacy.submit': 'Datenschutzanfrage senden',
+  'privacy.historyEyebrow': 'Nachweisregister',
+  'privacy.historyTitle': 'Ihre Datenschutzanfragen',
+  'privacy.historyCount': '{{count}} Anfragen',
+  'privacy.loading': 'Datenschutzanfragen werden geladen…',
+  'privacy.emptyTitle': 'Noch keine Datenschutzanfragen',
+  'privacy.emptyDescription':
+    'Neue Export- und Löschanfragen erscheinen hier mit ihrem vollständigen Statusverlauf.',
+  'privacy.requestedAt': 'Angefragt',
+  'privacy.responseTarget': 'Operatives Antwortziel',
+  'privacy.workflowVersion': 'Ablaufversion',
+  'privacy.eventCount': 'Protokollierte Ereignisse',
+  'privacy.yourReason': 'Ihr Anfragekontext',
+  'privacy.blockersTitle': 'Maßnahme vor Erfüllung erforderlich',
+  'privacy.blockersDescription':
+    'Diese Kontrollen werden serverseitig bestimmt und können im Browser nicht umgangen werden.',
+  'privacy.timeline': 'Statusverlauf',
+  'privacy.cancelConfirmation':
+    'Diese aktive Anfrage stornieren? Der protokollierte Verlauf bleibt unveränderlich.',
+  'privacy.keepRequest': 'Anfrage beibehalten',
+  'privacy.cancelling': 'Wird storniert…',
+  'privacy.confirmCancel': 'Stornierung bestätigen',
+  'privacy.cancelRequest': 'Anfrage stornieren',
+  'privacy.loadError': 'Datenschutzanfragen konnten nicht geladen werden.',
+  'privacy.createError': 'Die Datenschutzanfrage konnte nicht gesendet werden.',
+  'privacy.created': 'Datenschutzanfrage protokolliert.',
+  'privacy.cancelError': 'Die Datenschutzanfrage konnte nicht storniert werden.',
+  'privacy.cancelled': 'Datenschutzanfrage storniert.',
+  'privacy.status.requested': 'Angefragt',
+  'privacy.status.in_review': 'In Prüfung',
+  'privacy.status.action_required': 'Maßnahme erforderlich',
+  'privacy.status.approved': 'Genehmigt',
+  'privacy.status.fulfilled': 'Erfüllt',
+  'privacy.status.rejected': 'Abgelehnt',
+  'privacy.status.cancelled': 'Storniert',
+  'privacy.actor.subject': 'Kontoinhaber',
+  'privacy.actor.operator': 'Datenschutzoperator',
+  'privacy.actor.system': 'System',
+  'privacy.blocker.retention_review_required': 'Aufbewahrungsprüfung erforderlich',
+  'privacy.blocker.business_ownership_transfer_required':
+    'Geschäftseigentum muss übertragen werden',
+  'privacy.blocker.active_subscription_resolution_required':
+    'Aktives Abonnement muss geklärt werden',
+  'privacy.blocker.super_admin_reassignment_required':
+    'Superadministratorzugriff muss neu zugewiesen werden',
+  'privacy.event.privacy_request_submitted': 'Anfrage gesendet',
+  'privacy.event.cancelled_by_subject': 'Vom Kontoinhaber storniert',
+  'privacy.event.review_started': 'Operative Prüfung gestartet',
+  'privacy.event.export_approved': 'Datenexport genehmigt',
+  'privacy.event.export_delivered': 'Datenexport zugestellt',
+  'market.eyebrow': 'Globaler Marktkontext',
+  'market.title': 'Märkte',
+  'market.description':
+    'Legen Sie Organisationsstandards fest. Jede Analyse speichert weiterhin ihren ausdrücklichen Marktumfang.',
+  'market.loading': 'Globale Referenzdaten werden geladen…',
+  'market.homeCountry': 'Heimatland',
+  'market.reportingCurrency': 'Berichtswährung',
+  'market.locale': 'BCP-47-Gebietsschema',
+  'market.timezone': 'IANA-Zeitzone',
+  'market.useDevice': 'Gerät verwenden',
+  'market.measurement': 'Maßsystem',
+  'market.measurement.metric': 'Metrisch',
+  'market.measurement.usCustomary': 'US-amerikanisch',
+  'market.measurement.ukMixed': 'Britisch gemischt',
+  'market.crossBorder': 'Grenzüberschreitende Märkte standardmäßig aktivieren',
+  'market.coverage': 'Standardabdeckung',
+  'market.countries': 'Länder',
+  'market.selected': '{{count}} ausgewählt',
+  'market.searchPlaceholder': 'Land oder Code suchen',
+  'market.toggleAll': 'Alle umschalten',
+  'market.permission':
+    'Nur Eigentümer und Administratoren des Arbeitsbereichs können Standards ändern.',
+  'market.save': 'Marktstandards speichern',
+  'market.saving': 'Marktstandards werden gespeichert…',
+  'market.loadError': 'Die Marktreferenzdaten konnten nicht geladen werden.',
+  'market.countryRequired': 'Wählen Sie mindestens ein Land aus.',
+  'market.saved': 'Marktstandards gespeichert.',
+  'market.saveError': 'Die Marktstandards konnten nicht gespeichert werden.',
+  'market.continent.africa': 'Afrika',
+  'market.continent.antarctica': 'Antarktika',
+  'market.continent.asia': 'Asien',
+  'market.continent.europe': 'Europa',
+  'market.continent.northAmerica': 'Nordamerika',
+  'market.continent.oceania': 'Ozeanien',
+  'market.continent.southAmerica': 'Südamerika',
+  'subscription.eyebrow': 'Abonnementsteuerung',
+  'subscription.title': 'Tarif & Nutzung',
+  'subscription.description':
+    'Vom Backend verbindlich festgelegte Berechtigungen für den aktiven Arbeitsbereich.',
+  'subscription.loadError': 'Tarif- und Nutzungsdaten konnten nicht geladen werden.',
+  'subscription.loading': 'Tarif und Nutzung werden geladen…',
+  'subscription.currentPlan': 'Aktueller Tarif',
+  'subscription.period': 'Aktueller Nutzungszeitraum',
+  'subscription.enforcement': 'Backend-Durchsetzung',
+  'subscription.entitlements': 'Berechtigungen',
+  'subscription.clientBoundary': 'Limits können vom Client nicht umgangen werden',
+  'subscription.billingNote':
+    'Checkout startet nur eine Anbietersitzung. Bezahlte Berechtigungen werden erst nach einem verifizierten Stripe-Webhook aktiv.',
+  'subscription.billing.eyebrow': 'Sichere Abrechnung',
+  'subscription.billing.title': 'Abonnementabrechnung',
+  'subscription.billing.secureBoundary':
+    'Von Stripe gehosteter Checkout · Webhook-verbindlicher Zugriff',
+  'subscription.billing.ownerOnly':
+    'Nur der Eigentümer des Arbeitsbereichs kann die Abrechnung verwalten.',
+  'subscription.billing.notConfiguredTitle':
+    'Die Abrechnung ist in dieser Umgebung nicht konfiguriert',
+  'subscription.billing.notConfiguredDescription':
+    'Checkout bleibt deaktiviert, bis Stripe-Schlüssel, signierter Webhook, Preis-IDs und übereinstimmende Anzeigebeträge die Produktionscheckliste bestanden haben.',
+  'subscription.billing.providerStatus': 'Anbieterstatus',
+  'subscription.billing.endsAt': 'Zugriffszeitraum endet',
+  'subscription.billing.openingPortal': 'Portal wird geöffnet…',
+  'subscription.billing.manage': 'Abrechnung verwalten',
+  'subscription.billing.choosePlan':
+    'Wählen Sie einen Abrechnungszeitraum. Stripe verarbeitet Zahlungsdaten sicher.',
+  'subscription.billing.interval.monthly': 'Monatlich',
+  'subscription.billing.interval.yearly': 'Jährlich',
+  'subscription.billing.pricePending': 'Preiskonfiguration ausstehend',
+  'subscription.billing.openingCheckout': 'Checkout wird geöffnet…',
+  'subscription.billing.continueToCheckout': 'Weiter zum Checkout',
+  'subscription.billing.priceDisclosure':
+    'Der genaue wiederkehrende Betrag und Zeitraum werden vor der Zahlung im Stripe-Checkout erneut bestätigt.',
+  'subscription.billing.actionError':
+    'Die sichere Abrechnungssitzung konnte nicht geöffnet werden. Versuchen Sie es erneut oder wenden Sie sich an den Support.',
+  'subscription.billing.status.active': 'Aktiv',
+  'subscription.billing.status.trialing': 'Testphase aktiv',
+  'subscription.billing.status.pastDue': 'Zahlung überfällig',
+  'subscription.billing.status.incomplete': 'Zahlungsbestätigung erforderlich',
+  'subscription.billing.status.unpaid': 'Unbezahlt',
+  'subscription.billing.status.canceled': 'Gekündigt',
+  'subscription.billing.status.none': 'Kein Anbieterabonnement',
+  'subscription.billing.status.attention': 'Aktion erforderlich',
+  'subscription.feature.analysesMonthly': 'Monatliche Analysen',
+  'subscription.feature.savedSearches': 'Gespeicherte Suchen',
+  'subscription.feature.teamMembers': 'Teammitglieder',
+  'subscription.feature.emailNotifications': 'E-Mail-Benachrichtigungen',
+  'subscription.feature.telegramNotifications': 'Telegram-Benachrichtigungen',
+  'subscription.feature.basicPriceHistory': 'Einfacher Preisverlauf',
+  'subscription.feature.fullRiskReport': 'Vollständiger Risikobericht',
+  'subscription.feature.priorityAnalysis': 'Prioritätsanalyse',
+  'subscription.feature.profitTracking': 'Gewinnverfolgung',
+  'subscription.feature.organizationReporting': 'Organisationsberichte',
+  'subscription.feature.brokerRequestsMonthly': 'Monatliche Makleranfragen',
+  'subscription.feature.exportsMonthly': 'Monatliche Exporte',
+  'subscription.feature.prioritySupport': 'Prioritätssupport',
+  'organizationManagement.eyebrow': 'Arbeitsbereichsverwaltung',
+  'organizationManagement.title': 'Organisation',
+  'organizationManagement.description':
+    'Verwalten Sie die Grenze, den Zugriff und die prüfbare Mitgliedschaft Ihres Arbeitsbereichs.',
+  'organizationManagement.businessWorkspace': 'Geschäftsarbeitsbereich',
+  'organizationManagement.createTitle': 'Gemeinsame Organisation erstellen',
+  'organizationManagement.createDescription':
+    'Ihr persönlicher Arbeitsbereich bleibt privat. Ein Geschäftsarbeitsbereich ergänzt Rollen und Einladungen.',
+  'organizationManagement.name': 'Organisationsname',
+  'organizationManagement.creating': 'Wird erstellt…',
+  'organizationManagement.create': 'Arbeitsbereich erstellen',
+  'organizationManagement.loading': 'Organisationssteuerung wird geladen…',
+  'organizationManagement.settings': 'Einstellungen',
+  'organizationManagement.identity': 'Arbeitsbereichsidentität',
+  'organizationManagement.shortName': 'Name',
+  'organizationManagement.invitation': 'Einladung',
+  'organizationManagement.addMember': 'Mitglied hinzufügen',
+  'organizationManagement.email': 'E-Mail',
+  'organizationManagement.role': 'Rolle',
+  'organizationManagement.sendInvitation': 'Einladung senden',
+  'organizationManagement.access': 'Zugriff',
+  'organizationManagement.members': 'Mitglieder',
+  'organizationManagement.makeOwner': 'Zum Eigentümer machen',
+  'organizationManagement.remove': 'Entfernen',
+  'organizationManagement.pending': 'Ausstehend',
+  'organizationManagement.invitations': 'Einladungen',
+  'organizationManagement.revoke': 'Widerrufen',
+  'organizationManagement.noInvitations': 'Keine ausstehenden Einladungen.',
+  'organizationManagement.audit': 'Prüfprotokoll',
+  'organizationManagement.activity': 'Letzte Aktivitäten',
+  'organizationManagement.noActivity': 'Noch keine Prüfereignisse.',
+  'organizationManagement.created': 'Geschäftsarbeitsbereich erstellt.',
+  'organizationManagement.renamed': 'Name des Arbeitsbereichs aktualisiert.',
+  'organizationManagement.invited': 'Einladung gesendet.',
+  'organizationManagement.roleUpdated': 'Mitgliedsrolle aktualisiert.',
+  'organizationManagement.removed': 'Mitglied entfernt.',
+  'organizationManagement.transferred': 'Eigentum übertragen.',
+  'organizationManagement.revoked': 'Einladung widerrufen.',
+  'organizationManagement.formError': 'Bitte prüfen Sie das Formular.',
+  'organizationManagement.operationError':
+    'Der Arbeitsbereichsvorgang konnte nicht abgeschlossen werden.',
+  'organizationManagement.confirmRemove':
+    '{{name}} aus diesem Arbeitsbereich entfernen?',
+  'organizationManagement.confirmTransfer':
+    'Eigentum am Arbeitsbereich an {{name}} übertragen? Sie werden Administrator.',
+  'organizationManagement.event.organizationCreated': 'Organisation erstellt',
+  'organizationManagement.event.organizationRenamed': 'Organisation umbenannt',
+  'organizationManagement.event.invitationCreated': 'Einladung erstellt',
+  'organizationManagement.event.invitationRevoked': 'Einladung widerrufen',
+  'organizationManagement.event.invitationAccepted': 'Einladung angenommen',
+  'organizationManagement.event.memberRoleChanged': 'Mitgliedsrolle geändert',
+  'organizationManagement.event.memberRemoved': 'Mitglied entfernt',
+  'organizationManagement.event.ownershipTransferred': 'Eigentum übertragen',
+  'subscription.plan.free.name': 'Kostenlos',
+  'subscription.plan.free.description':
+    'Grundlegende Werkzeuge zur Bewertung gelegentlicher Chancen.',
+  'subscription.plan.starter.name': 'Starter',
+  'subscription.plan.starter.description':
+    'Mehr Analysen und Überwachung für aktive Käufer und Verkäufer.',
+  'subscription.plan.pro.name': 'Pro',
+  'subscription.plan.pro.description':
+    'Fortgeschrittene Informationen und höhere Limits für Profis.',
+  'subscription.plan.business.name': 'Business',
+  'subscription.plan.business.description':
+    'Teamsteuerung, Berichte, Exporte und konfigurierbare Limits.',
+  'common.notProvided': 'Nicht angegeben',
+  'common.unknownDate': 'Unbekanntes Datum',
+  'common.files': '{{count}} Dateien',
+  'common.snapshots': '{{count}} Schnappschüsse',
+  'common.selectedCount': '{{count}} ausgewählt',
+  'listing.status.active': 'Aktiv',
+  'listing.status.reserved': 'Reserviert',
+  'listing.status.sold': 'Verkauft',
+  'listing.status.removed': 'Entfernt',
+  'listing.status.expired': 'Abgelaufen',
+  'listing.status.unknown': 'Unbekannt',
+  'analysis.status.draft': 'Entwurf',
+  'analysis.status.queued': 'In Warteschlange',
+  'analysis.status.processing': 'In Bearbeitung',
+  'analysis.status.needsInput': 'Eingabe erforderlich',
+  'analysis.status.completed': 'Abgeschlossen',
+  'analysis.status.failed': 'Fehlgeschlagen',
+  'analysis.status.archived': 'Archiviert',
+  'listing.image.product': 'Produktbild',
+  'listing.image.screenshot': 'Marktplatz-Screenshot',
+  'listingList.eyebrow': 'Erfassung für Kaufanalyse',
+  'listingList.title': 'Quellangebote',
+  'listingList.description':
+    'Ursprüngliche Marktplatzfakten, private Nachweise und ein nachvollziehbarer Änderungsverlauf.',
+  'listingList.add': 'Angebot hinzufügen',
+  'listingList.searchPlaceholder': 'Titel, Marktplatz oder externe ID',
+  'listingList.lifecycle': 'Lebenszyklusstatus',
+  'listingList.allStatuses': 'Alle Status',
+  'listingList.apply': 'Filter anwenden',
+  'listingList.loading': 'Quellangebote werden geladen…',
+  'listingList.loadError':
+    'Angebote konnten nicht geladen werden. Bitte versuchen Sie es erneut.',
+  'listingList.emptyTitle': 'Keine Angebote in diesem Arbeitsbereich',
+  'listingList.emptyDescription':
+    'Erfassen Sie die ursprünglichen Quelldaten, bevor Sie eine Analyse starten.',
+  'listingList.addFirst': 'Erstes Angebot hinzufügen',
+  'listingList.readOnly':
+    'Ihre Arbeitsbereichsrolle hat schreibgeschützten Angebotszugriff.',
+  'listingList.aria': 'Quellangebote',
+  'listingList.marketRoute': 'Marktroute',
+  'listingList.evidence': 'Nachweise',
+  'listingList.history': 'Verlauf',
+  'listingList.loadMore': 'Mehr laden',
+  'listingList.loadingMore': 'Wird geladen…',
+  'listingIntake.back': '← Quellangebote',
+  'listingIntake.eyebrow': 'Manueller Konnektor',
+  'listingIntake.title': 'Quellangebot hinzufügen',
+  'listingIntake.description':
+    'Erfassen Sie, was der Marktplatz tatsächlich anzeigt. Procura bewahrt den ursprünglichen Schnappschuss.',
+  'listingIntake.scope': 'Nur aktiver Arbeitsbereich',
+  'listingIntake.readOnlyTitle': 'Schreibgeschützter Angebotszugriff',
+  'listingIntake.readOnlyDescription':
+    'Ihre Arbeitsbereichsrolle kann Angebote ansehen, aber nicht erstellen oder ändern.',
+  'listingIntake.return': 'Zurück zu den Angeboten',
+  'listingIntake.loading': 'Märkte und Quellenrichtlinie werden geladen…',
+  'listingIntake.referenceTitle': 'Referenzdaten nicht verfügbar',
+  'listingIntake.referenceDescription':
+    'Ein Angebot kann ohne aktiven Konnektor und globale Marktreferenzen nicht gespeichert werden.',
+  'listingIntake.savedUploadPending':
+    'Der Angebotseintrag ist sicher gespeichert. Nur ausstehende Uploads werden erneut versucht.',
+  'listingIntake.sourceIdentity': 'Quellenidentität',
+  'listingIntake.provenance': 'Ursprüngliche Herkunft',
+  'listingIntake.connector': 'Konnektor',
+  'listingIntake.marketplaceName': 'Marktplatzname *',
+  'listingIntake.externalId': 'Externe Angebots-ID',
+  'listingIntake.sourceUrl': 'Quell-URL',
+  'listingIntake.facts': 'Angebotsfakten',
+  'listingIntake.noAi': 'Keine KI-Normalisierung in diesem Schritt',
+  'listingIntake.titleField': 'Titel *',
+  'listingIntake.descriptionField': 'Beschreibung',
+  'listingIntake.askingPrice': 'Angebotspreis',
+  'listingIntake.priceHelp':
+    'Wird exakt in der kleinsten Einheit der Währung gespeichert.',
+  'listingIntake.currency': 'Währung',
+  'listingIntake.chooseCurrency': 'Währung auswählen',
+  'listingIntake.lifecycle': 'Lebenszyklusstatus *',
+  'listingIntake.location': 'Angebotsort',
+  'listingIntake.seller': 'Verkäuferinformationen',
+  'listingIntake.marketRoute': 'Marktroute',
+  'listingIntake.explicitRoute': 'Expliziter Ursprung und Zielmarkt',
+  'listingIntake.sourceCountry': 'Quellland *',
+  'listingIntake.targetCountry': 'Zielland *',
+  'listingIntake.chooseCountry': 'Land auswählen',
+  'listingIntake.notes': 'Private Notizen des Arbeitsbereichs',
+  'listingIntake.evidence': 'Private Nachweise',
+  'listingIntake.evidencePolicy': 'JPEG, PNG, WebP · je 10 MB',
+  'listingIntake.productImages': 'Produktbilder',
+  'listingIntake.productImageLimit': 'Bis zu 10 ursprüngliche Artikelfotos',
+  'listingIntake.screenshots': 'Marktplatz-Screenshots',
+  'listingIntake.screenshotLimit':
+    'Bis zu 5 Screenshots, die den Kontext bewahren',
+  'listingIntake.footer':
+    'Beim Speichern entsteht ein unveränderlicher Quellschnappschuss. Analyse und Kontingentnutzung beginnen in einem späteren Schritt.',
+  'listingIntake.retryUploads': 'Ausstehende Uploads wiederholen',
+  'listingIntake.save': 'Quellangebot speichern',
+  'listingIntake.imageLimit':
+    'Wählen Sie höchstens {{maximum}} Bilder vom Typ {{kind}}.',
+  'listingIntake.imagePolicyError':
+    'Bilder müssen JPEG-, PNG- oder WebP-Dateien und jeweils höchstens 10 MB groß sein.',
+  'listingIntake.roleError':
+    'Ihre Arbeitsbereichsrolle kann keine Angebote erstellen.',
+  'listingIntake.requiredError':
+    'Füllen Sie die erforderlichen Quellen- und Marktfelder aus.',
+  'listingIntake.choosePriceCurrency':
+    'Wählen Sie eine Währung für den Angebotspreis.',
+  'listingIntake.priceInvalid': 'Geben Sie einen gültigen Angebotspreis ein.',
+  'listingIntake.priceReview':
+    'Prüfen Sie den Angebotspreis vor dem Speichern.',
+  'listingIntake.saveError': 'Das Angebot konnte nicht gespeichert werden.',
+  'listingIntake.referenceError':
+    'Die Referenzdaten für Angebote konnten nicht geladen werden. Bitte versuchen Sie es erneut.',
+  'listingIntake.uploadError':
+    'Das Angebot wurde gespeichert, aber einige Dateien wurden nicht hochgeladen. Wiederholen Sie den Upload unten sicher.',
+  'listingDetail.back': '← Quellangebote',
+  'listingDetail.loading': 'Angebotsherkunft wird geladen…',
+  'listingDetail.captured': 'Erfasst {{date}}',
+  'listingDetail.factsEyebrow': 'Ursprüngliche Quellenfakten',
+  'listingDetail.record': 'Angebotseintrag',
+  'listingDetail.marketplace': 'Marktplatz',
+  'listingDetail.externalId': 'Externe ID',
+  'listingDetail.location': 'Ort',
+  'listingDetail.marketRoute': 'Marktroute',
+  'listingDetail.openSource': 'Originalquelle öffnen ↗',
+  'listingDetail.description': 'Beschreibung',
+  'listingDetail.noDescription': 'Es wurde keine Beschreibung angegeben.',
+  'listingDetail.seller': 'Verkäuferinformationen',
+  'listingDetail.noSeller': 'Es wurden keine Verkäuferinformationen angegeben.',
+  'listingDetail.privateStorage': 'Privater Speicher',
+  'listingDetail.evidence': 'Nachweise',
+  'listingDetail.noEvidence':
+    'Es wurden keine Produktbilder oder Marktplatz-Screenshots hochgeladen.',
+  'listingDetail.removeAria': '{{filename}} entfernen',
+  'listingDetail.removing': 'Wird entfernt…',
+  'listingDetail.remove': 'Entfernen',
+  'listingDetail.evidenceType': 'Nachweistyp',
+  'listingDetail.productImages': 'Produktbilder',
+  'listingDetail.screenshots': 'Marktplatz-Screenshots',
+  'listingDetail.filePolicy': 'JPEG, PNG oder WebP · je 10 MB',
+  'listingDetail.uploading': 'Wird hochgeladen…',
+  'listingDetail.uploadFiles': '{{count}} Dateien hochladen',
+  'listingDetail.refreshLinks': 'Ablaufende Bildlinks aktualisieren',
+  'listingDetail.analysisEyebrow': 'Kontingentbewusster Ablauf',
+  'listingDetail.analysisTitle': 'Kaufanalyseanfragen',
+  'listingDetail.recent': '{{count}} kürzlich',
+  'listingDetail.analysisIntro':
+    'Ein Entwurf friert diesen Angebotsschnappschuss und die Marktroute ein. Kontingent wird erst verbraucht, wenn ein berechtigter Benutzer den Entwurf ausdrücklich einreicht.',
+  'listingDetail.analysisLoading': 'Analyseanfragen werden geladen…',
+  'listingDetail.noAnalysis':
+    'Für dieses Quellangebot wurde noch keine Analyseanfrage erstellt.',
+  'listingDetail.creatingDraft': 'Entwurf wird erstellt…',
+  'listingDetail.createDraft': 'Analyseentwurf erstellen',
+  'listingDetail.analysisReadOnly':
+    'Ihre Arbeitsbereichsrolle hat schreibgeschützten Analysezugriff.',
+  'listingDetail.openingDraft': 'Entwurf wird geöffnet…',
+  'listingDetail.continueDraft': 'Offenen Entwurf fortsetzen',
+  'listingDetail.createAnotherDraft': 'Weiteren Entwurf erstellen',
+  'listingDetail.provenance': 'Herkunft',
+  'listingDetail.snapshotHistory': 'Schnappschussverlauf',
+  'listingDetail.lifecycle': 'Lebenszyklus',
+  'listingDetail.sourceStatus': 'Quellenstatus',
+  'listingDetail.observedStatus': 'Beobachteter Marktplatzstatus',
+  'listingDetail.privateNotes': 'Private Notizen',
+  'listingDetail.saveSnapshot': 'Neuen Schnappschuss speichern',
+  'listingDetail.aggregateBoundary': 'Aggregationsgrenze',
+  'listingDetail.boundaryTitle': 'Quellenfakten bleiben getrennt',
+  'listingDetail.boundaryDescription':
+    'Analyseanfragen kopieren einen unveränderlichen Schnappschuss. Verarbeitungsstatus und Kontingentnutzung überschreiben weder dieses Angebot noch seinen Herkunftsverlauf.',
+  'listingDetail.noChanges': 'Keine Lebenszyklusänderungen zu speichern.',
+  'listingDetail.lifecycleSaved':
+    'Lebenszyklus aktualisiert und neuer Schnappschuss gespeichert.',
+  'listingDetail.lifecycleError':
+    'Die Lebenszyklusänderung konnte nicht gespeichert werden.',
+  'listingDetail.draftError':
+    'Der unveränderliche Analyseentwurf konnte nicht erstellt werden.',
+  'listingDetail.fileSelectionError':
+    'Wählen Sie bis zu 10 JPEG-, PNG- oder WebP-Bilder mit jeweils höchstens 10 MB.',
+  'listingDetail.uploaded': 'Private Nachweise hochgeladen.',
+  'listingDetail.uploadError':
+    'Die ausgewählten Dateien konnten nicht hochgeladen werden.',
+  'listingDetail.removed': 'Privater Nachweis entfernt.',
+  'listingDetail.removeError': 'Die Datei konnte nicht entfernt werden.',
+  'listingDetail.idMissing': 'Die Angebotskennung fehlt.',
+  'listingDetail.loadError':
+    'Dieses Angebot konnte im aktiven Arbeitsbereich nicht geladen werden.',
+  'listingDetail.analysisLoadError': 'Analyseanfragen konnten nicht geladen werden.',
+  'common.notCalculated': 'Nicht berechnet',
+  'common.notYet': 'Noch nicht',
+  'common.pending': 'Ausstehend',
+  'common.unknown': 'Unbekannt',
+  'common.none': 'Keine',
+  'common.notRecorded': 'nicht erfasst',
+  'common.noneRecorded': 'keine erfasst',
+  'common.notSpecified': 'Nicht angegeben',
+  'common.current': 'aktuell',
+  'priceEstimate.eyebrow': 'Reproduzierbare statistische Nachweise',
+  'priceEstimate.title': 'Preisschätzung',
+  'priceEstimate.lowerBand': 'Beobachtete Untergrenze',
+  'priceEstimate.center': 'Geschätzte Marktmitte',
+  'priceEstimate.upperBand': 'Beobachtete Obergrenze',
+  'priceEstimate.targetMarket': 'Zielmarkt',
+  'priceEstimate.usedEvidence': 'Verwendete Nachweise',
+  'priceEstimate.outliers': 'Ausreißer',
+  'priceEstimate.unresolved': 'Ungeklärte Umrechnungen',
+  'priceEstimate.confidence': 'Konfidenz',
+  'priceEstimate.algorithm': 'Algorithmus',
+  'priceEstimate.rateResolver': 'Kursauflösung',
+  'priceEstimate.run': 'Schätzungslauf',
+  'priceEstimate.calculated': 'Berechnet',
+  'priceEstimate.median': 'Median',
+  'priceEstimate.weightedMedian': 'Gewichteter Median',
+  'priceEstimate.quartiles': 'Q1 / Q3',
+  'priceEstimate.deviation': 'Median der absoluten Abweichung',
+  'priceEstimate.dispersion': 'Relative Streuung',
+  'priceEstimate.confidenceComponents': 'Konfidenzkomponenten',
+  'priceEstimate.calculationEvidence': 'Berechnungsnachweise',
+  'priceEstimate.selector': 'Auswahlrang #{{rank}}',
+  'priceEstimate.excluded': 'ausgeschlossen',
+  'priceEstimate.weight': 'Gewicht {{weight}}',
+  'priceEstimate.noRate': 'Kein externer Wechselkurs erforderlich',
+  'priceEstimate.effective': 'gültig am {{date}}',
+  'priceEstimate.warning':
+    'Diese Spannen beschreiben die ausgewählten Angebotspreisnachweise. Versand, Steuern, Zoll, Zustandsanpassungen, Transaktionsergebnisse und Gewinn werden hier nicht abgeleitet.',
+  'risk.eyebrow': 'Nachweisbasierte Transaktionsunsicherheit',
+  'risk.title': 'Risikobewertung',
+  'risk.level': 'Risikostufe',
+  'risk.confidence': 'Nachweiskonfidenz',
+  'risk.signals': 'Erfasste Signale',
+  'risk.unknownFacts': 'Unbekannte Fakten',
+  'risk.evaluator': 'Auswerter',
+  'risk.run': 'Bewertungslauf',
+  'risk.calculated': 'Berechnet',
+  'risk.status': 'Status',
+  'risk.coverage': 'Konfidenzabdeckung',
+  'risk.actions': 'Erforderliche Prüfmaßnahmen',
+  'risk.source': 'Quelle: {{source}}',
+  'risk.unknown': 'unbekannt',
+  'risk.points': '+{{points}} Punkte',
+  'risk.warning':
+    'Dieser Wert beschreibt die erfasste Transaktionsunsicherheit, kein Betrugsurteil. Unbekannte Fakten verringern die Nachweiskonfidenz und bleiben ausdrückliche Prüfungen; sie gelten weder stillschweigend als sicher noch erzeugen sie unbelegte Risikopunkte.',
+  'dealScore.eyebrow': 'Erklärbare Chancenrangfolge',
+  'dealScore.title': 'Endgültiger DealScore',
+  'dealScore.description':
+    'Fünf unveränderliche Nachweiskomponenten werden deterministisch gewichtet. Die Empfehlung verwendet den endgültigen begrenzten Wert.',
+  'dealScore.final': 'Endwert',
+  'dealScore.uncapped': 'Unbegrenzt',
+  'dealScore.cap': 'Anwendbare Obergrenze',
+  'dealScore.confidence': 'Konfidenz',
+  'dealScore.runVersion': 'Lauf / Version',
+  'dealScore.components': 'Gewichtete Komponenten',
+  'dealScore.totalWeight': 'Exaktes Gesamtgewicht: 100 %',
+  'dealScore.weight': '{{value}} Gewicht',
+  'dealScore.input': 'Erfasste Eingabe',
+  'dealScore.normalized': 'Normalisiert',
+  'dealScore.contribution': 'Gewichteter Beitrag',
+  'dealScore.evidenceConfidence': 'Nachweiskonfidenz',
+  'dealScore.increasing': 'Wertsteigernde Faktoren',
+  'dealScore.noIncreasing':
+    'Keine Komponente überschritt die dokumentierte Verstärkungsschwelle.',
+  'dealScore.reducing': 'Wertmindernde Faktoren',
+  'dealScore.noReducing':
+    'Keine Komponente überschritt die dokumentierte Minderungsschwelle.',
+  'dealScore.capDecisions': 'Entscheidungen zu Obergrenzen',
+  'dealScore.safeguards': 'Alle dokumentierten Schutzmaßnahmen werden geprüft',
+  'dealScore.maximum': 'Maximum {{score}} / 100',
+  'dealScore.capApplied': 'Angewendet',
+  'dealScore.capBelow': 'Ausgelöst, Wert bereits unter der Obergrenze',
+  'dealScore.capNotTriggered': 'Nicht ausgelöst',
+  'dealScore.assumptions': 'Annahmen',
+  'dealScore.nextChecks': 'Nächste empfohlene Prüfungen',
+  'dealScore.insufficient': 'Unzureichende Daten',
+  'dealScore.risk': '{{value}} / 100 Risiko',
+  'dealScore.points': '{{value}} Pkt.',
+  'dealScore.disclaimer':
+    'DealScore ordnet die erfassten Chancennachweise. Er garantiert weder Wiederverkaufspreis, realisierten Gewinn, Lieferergebnis, Produktzustand, Verkäuferlegitimität, steuerliche Behandlung noch Transaktionssicherheit.',
+  'buyerDecision.eyebrow': 'Käuferablauf',
+  'buyerDecision.title': 'Entscheidungsstatus',
+  'buyerDecision.description':
+    'Jede Änderung ist ein unveränderliches Ereignis, das mit DealScore-Lauf #{{run}} verknüpft ist. Ein neuerer Wert startet einen frischen Entscheidungsstatus und bewahrt den vollständigen Verlauf.',
+  'buyerDecision.none': 'Keine Entscheidung',
+  'buyerDecision.boundary': 'Bewertungsgrenze',
+  'buyerDecision.score': 'Wert {{score}} / 100 · {{recommendation}}',
+  'buyerDecision.recordedBy': 'Erfasst von',
+  'buyerDecision.recordedAt': 'Erfasst am',
+  'buyerDecision.sequence': 'Ereignisfolge',
+  'buyerDecision.reason': 'Grund',
+  'buyerDecision.emptyCurrent':
+    'Für genau diesen DealScore wurde keine Käuferentscheidung erfasst.',
+  'buyerDecision.nextState': 'Nächster Status *',
+  'buyerDecision.chooseState': 'Zulässigen Übergang auswählen',
+  'buyerDecision.transitionHelp':
+    'Der Server liefert die vom aktuellen Ereignis aus zulässigen Übergänge.',
+  'buyerDecision.reasonCode': 'Grundcode',
+  'buyerDecision.reasonPlaceholder': 'z. B. seller_contacted',
+  'buyerDecision.reasonHelp':
+    'Optionale kleingeschriebene Kennung mit Unterstrichen.',
+  'buyerDecision.note': 'Interne Notiz',
+  'buyerDecision.notePlaceholder':
+    'Kurze Nachweise oder die nächste Folgemaßnahme erfassen.',
+  'buyerDecision.expected': 'Erwartetes Ereignis:',
+  'buyerDecision.recording': 'Wird erfasst…',
+  'buyerDecision.record': 'Entscheidungsereignis erfassen',
+  'buyerDecision.readOnly':
+    'Ihre Arbeitsbereichsrolle hat schreibgeschützten Zugriff auf Käuferentscheidungen.',
+  'buyerDecision.noTransitions':
+    'Entscheidungsübergänge werden erst verfügbar, wenn der aktuelle DealScore vollständig bewertet ist.',
+  'buyerDecision.warning':
+    '„Gekauft“ ist nur ein Status im Käuferablauf. Er erstellt weder Kauf, Zahlung, Bestandsposten, realisierten Gewinn noch einen finanziellen Ergebnisdatensatz.',
+  'buyerDecision.history': 'Entscheidungsverlauf',
+  'buyerDecision.showing': '{{shown}} von {{total}} Ereignissen angezeigt',
+  'buyerDecision.emptyHistory': 'Es wurden keine Entscheidungsereignisse erfasst.',
+  'buyerDecision.scoreRun': 'DealScore-Lauf #{{run}}',
+  'buyerDecision.eventSummary':
+    '{{actor}} · {{date}} · Wert {{score}} / 100',
+  'buyerDecision.formError':
+    'Wählen Sie einen zulässigen Status und prüfen Sie den optionalen Grund und die Notiz.',
+  'buyerDecision.staleState':
+    'Dieser Status ist nicht mehr verfügbar. Aktualisieren Sie die Analyse.',
+  'buyerDecision.created':
+    'Käuferentscheidung als unveränderliches Ereignis erfasst.',
+  'buyerDecision.duplicate':
+    'Die identische Käuferentscheidung war bereits erfasst; es wurde kein Duplikat erstellt.',
+  'buyerDecision.saveError':
+    'Die Käuferentscheidung konnte nicht erfasst werden. Aktualisieren Sie, falls sich Status oder DealScore geändert haben.',
+  'buyerDecision.state.watchlist': 'Beobachtungsliste',
+  'buyerDecision.state.interested': 'Interessiert',
+  'buyerDecision.state.negotiating': 'In Verhandlung',
+  'buyerDecision.state.purchased': 'Gekauft',
+  'buyerDecision.state.rejected': 'Abgelehnt',
+  'buyerDecision.state.archived': 'Archiviert',
+  'buyerDecision.state.contacted': 'Kontaktiert',
+  'analysisLabel.low': 'Niedrig',
+  'analysisLabel.medium': 'Mittel',
+  'analysisLabel.high': 'Hoch',
+  'analysisLabel.critical': 'Kritisch',
+  'analysisLabel.estimated': 'Geschätzt',
+  'analysisLabel.lowConfidence': 'Niedrige Konfidenz',
+  'analysisLabel.needsInput': 'Eingabe erforderlich',
+  'analysisLabel.assessed': 'Bewertet',
+  'analysisLabel.included': 'Einbezogen',
+  'analysisLabel.outlier': 'Ausreißer',
+  'analysisLabel.missingRate': 'Fehlender Kurs',
+  'analysisLabel.staleRate': 'Veralteter Kurs',
+  'analysisLabel.invalidAmount': 'Ungültiger Betrag',
+  'analysisLabel.unresolved': 'Ungeklärt',
+  'analysisLabel.identity': 'Gleiche Währung',
+  'analysisLabel.direct': 'Direkter Kurs',
+  'analysisLabel.inverse': 'Inverser Kurs',
+  'analysisLabel.strongOpportunity': 'Starke Chance',
+  'analysisLabel.potentialOpportunity': 'Mögliche Chance',
+  'analysisLabel.needsVerification': 'Prüfung erforderlich',
+  'analysisLabel.weakOpportunity': 'Schwache Chance',
+  'analysisLabel.avoid': 'Vermeiden',
+  'analysisLabel.insufficientData': 'Unzureichende Daten',
+  'analysisLabel.estimatedNetMargin': 'Geschätzte Nettomarge',
+  'analysisLabel.priceConfidence': 'Preiskonfidenz',
+  'analysisLabel.resaleDemand': 'Wiederverkaufsnachfrage',
+  'analysisLabel.inverseRisk': 'Umgekehrtes Risiko',
+  'analysisLabel.logisticsSimplicity': 'Logistische Einfachheit',
+  'analysisLabel.strengthens': 'Stärkt',
+  'analysisLabel.neutral': 'Neutral',
+  'analysisLabel.reduces': 'Schwächt',
+  'analysisLabel.unknown': 'Unbekannt',
+  'analysisLabel.listing': 'Angebot',
+  'analysisLabel.seller': 'Verkäufer',
+  'analysisLabel.product': 'Produkt',
+  'analysisLabel.transaction': 'Transaktion',
+  'verification.listingSellerProduct':
+    'Prüfen Sie vor der Zahlung Angebot, Verkäufer, Produktidentität und Zustand.',
+  'verification.priceConversion':
+    'Erfassen Sie einen positiven Angebotspreis in der Schätzwährung oder legen Sie geprüfte Umrechnungsnachweise vor.',
+  'verification.moreComparables':
+    'Sammeln Sie weitere geprüfte Vergleichsangebote, bevor Sie sich auf die Marktspanne verlassen.',
+  'verification.crossBorder':
+    'Prüfen Sie vor dem Kauf Versand, Zoll, Steuern, Rückgabe und regionale Kompatibilität.',
+  'verification.seller':
+    'Prüfen Sie Identität, Verlauf, Eigentum und Kontaktdaten des Verkäufers.',
+  'verification.location':
+    'Bestätigen Sie den physischen Standort von Produkt und Verkäufer.',
+  'verification.images':
+    'Beschaffen Sie aktuelle Originalbilder des Produkts und der Seriennummer.',
+  'verification.condition':
+    'Prüfen und dokumentieren Sie Zustand, Mängel, enthaltene Teile und Funktion.',
+  'verification.ownership':
+    'Prüfen Sie Eigentumsnachweis, Seriennummer, Sperren und Blacklist-Status.',
+  'verification.payment':
+    'Verwenden Sie eine nachvollziehbare Zahlungsmethode mit Käuferschutz.',
+  'verification.shipping':
+    'Bestätigen Sie versicherten Versand, Übergabenachweis und Rückgabebedingungen.',
+  'common.yes': 'Ja',
+  'common.no': 'Nein',
+  'common.recorded': 'erfasst',
+  'costProfit.eyebrow': 'Vom Benutzer bestätigte exakte Geldgrenze',
+  'costProfit.title': 'Kosten & erwarteter Gewinn',
+  'costProfit.description':
+    'Der erwartete Verkaufswert stammt aus Preisschätzungslauf #{{run}}. Jeder Betrag wird ohne abgeleitete Umrechnung in {{currency}} erfasst.',
+  'costProfit.awaiting': 'Eingabe ausstehend',
+  'costProfit.blankUnknown':
+    'Leer bedeutet unbekannt. Geben Sie 0 nur ein, wenn Sie ausdrücklich bestätigen, dass keine Kosten anfallen.',
+  'costProfit.unknownEffect':
+    'Unbekannte Beträge bleiben erhalten und verhindern ein fälschlich präzises Nettogewinnergebnis.',
+  'costProfit.purchasePrice': 'Kaufpreis',
+  'costProfit.transport': 'Transport',
+  'costProfit.repair': 'Reparatur',
+  'costProfit.platformFees': 'Plattformgebühren',
+  'costProfit.paymentFees': 'Zahlungsgebühren',
+  'costProfit.customs': 'Zoll',
+  'costProfit.tax': 'Steuer',
+  'costProfit.otherCosts': 'Sonstige Kosten',
+  'costProfit.safetyReserve': 'Sicherheitsreserve',
+  'costProfit.compatibility':
+    'Ich habe die regionale Kompatibilität für {{source}} → {{target}} bestätigt. Transport, Zoll und Steuer müssen ebenfalls ausdrücklich erfasst werden.',
+  'costProfit.versionHelp':
+    'Beim Speichern entsteht eine neue unveränderliche Version. Geänderte Werte überschreiben nie einen älteren Lauf.',
+  'costProfit.calculating': 'Wird berechnet…',
+  'costProfit.submit': 'Kosten bestätigen & Gewinn berechnen',
+  'costProfit.readOnly':
+    'Ihre Rolle kann Kosten- und Gewinnnachweise ansehen, aber keine neue Version erstellen.',
+  'costProfit.expectedSale': 'Erwarteter Verkaufswert',
+  'costProfit.grossMargin': 'Bruttomarge',
+  'costProfit.totalCost': 'Gesamtkosten',
+  'costProfit.netProfit': 'Erwarteter Nettogewinn',
+  'costProfit.profitMargin': 'Gewinnmarge',
+  'costProfit.returnCapital': 'Rendite auf eingesetztes Kapital',
+  'costProfit.calculation': 'Berechnung',
+  'costProfit.run': 'Lauf',
+  'costProfit.confidence': 'Konfidenz',
+  'costProfit.unknownInputs': 'Unbekannte Eingaben',
+  'costProfit.formulaEvidence': 'Formelnachweise',
+  'costProfit.confidenceComponents': 'Konfidenzkomponenten',
+  'costProfit.reasonCodes': 'Grundcodes',
+  'costProfit.disclaimer':
+    'Dies ist eine Schätzung des erwarteten Gewinns ausschließlich auf Basis erfasster Nachweise. Sie garantiert weder Kaufkosten, Wiederverkaufspreis, steuerliche Behandlung noch realisierten Gewinn.',
+  'costProfit.formError':
+    'Prüfen Sie vor dem Speichern die exakten Geldfelder.',
+  'costProfit.amountError': 'Geben Sie gültige nichtnegative Beträge ein.',
+  'costProfit.created':
+    'Unveränderliche Kostennachweise gespeichert und erwarteter Gewinn berechnet.',
+  'costProfit.duplicate':
+    'Die identische Eingabe ist bereits vorhanden; die Berechnung blieb idempotent.',
+  'costProfit.saveError':
+    'Kostennachweise konnten nicht gespeichert werden. Aktualisieren Sie, falls sich vorgelagerte Nachweise geändert haben.',
+  'opportunity.eyebrow': 'Erfasste Chancennachweise',
+  'opportunity.title': 'Logistik & Wiederverkaufsnachfrage',
+  'opportunity.description':
+    'Dies sind getrennte, erfasste Eingaben für den endgültigen DealScore. Vergleichsangebote bleiben Marktnachweise, gelten aber nicht als Beleg abgeschlossener Verkäufe.',
+  'opportunity.evidenceRun': 'Nachweislauf #{{run}}',
+  'opportunity.awaiting': 'Nachweise ausstehend',
+  'opportunity.unknownTitle': 'Unbekannt bleibt unbekannt.',
+  'opportunity.unknownDescription':
+    'Wählen Sie „Nein“ nur für eine geprüfte negative Tatsache. Lassen Sie ein Feld unbekannt, wenn es nicht geprüft wurde. Procura berechnet DealScore nur aus den daraus erfassten Komponenten.',
+  'opportunity.logisticsWeight': 'Komponente 10 %',
+  'opportunity.logisticsEvidence': 'Nachweise zur logistischen Einfachheit',
+  'opportunity.shippingMethod': 'Versandart',
+  'opportunity.localPickup': 'Abholung vor Ort',
+  'opportunity.parcel': 'Paket',
+  'opportunity.sellerArranged': 'Vom Verkäufer organisiert',
+  'opportunity.freight': 'Fracht',
+  'opportunity.distance': 'Versandentfernung (km)',
+  'opportunity.pickup': 'Abholung möglich',
+  'opportunity.tracking': 'Sendungsverfolgung verfügbar',
+  'opportunity.insurance': 'Versicherung verfügbar',
+  'opportunity.packaging': 'Verpackung bestätigt',
+  'opportunity.crossBorder': 'Grenzüberschreitende Abwicklung bestätigt',
+  'opportunity.demandWeight': 'Komponente 15 %',
+  'opportunity.demandEvidence': 'Beobachtete Wiederverkaufsnachfrage',
+  'opportunity.manualObservation': 'Manuelle, zuordenbare Beobachtung',
+  'opportunity.soldCount': 'Beobachtete verkaufte Vergleichsangebote',
+  'opportunity.medianDays': 'Median der Verkaufstage',
+  'opportunity.window': 'Beobachtungsfenster (Tage)',
+  'opportunity.observedAt': 'Nachweis beobachtet am',
+  'opportunity.source': 'Nachweisquelle / Referenz',
+  'opportunity.sourcePlaceholder':
+    'Verkauft-Filter, Bericht oder prüfbare Referenz',
+  'opportunity.versionHelp':
+    'Die aktuellen Kennungen für Vergleich, Preis, Risiko, Kosten und Gewinn werden gemeinsam übermittelt. Veraltete Nachweise werden abgelehnt; geänderte Fakten hängen Komponenten- und DealScore-Läufe an.',
+  'opportunity.assessing': 'Wird bewertet…',
+  'opportunity.submit': 'Nachweise bestätigen & DealScore berechnen',
+  'opportunity.readOnly':
+    'Ihre Rolle kann diese Nachweise ansehen, aber keine neue Version erstellen.',
+  'opportunity.independent': 'Unabhängige Komponente',
+  'opportunity.logistics': 'Logistische Einfachheit',
+  'opportunity.demand': 'Wiederverkaufsnachfrage',
+  'opportunity.status': 'Status',
+  'opportunity.run': 'Lauf',
+  'opportunity.confidence': 'Konfidenz',
+  'opportunity.unknowns': 'Unbekannte Werte',
+  'opportunity.disclaimer':
+    'Diese Komponentenbewertungen beschreiben erfasste Logistik- und beobachtete Marktnachweise. Sie garantieren weder Lieferung, Wiederverkaufsgeschwindigkeit, Zahl abgeschlossener Verkäufe noch das im separaten DealScore-Panel eingeordnete Ergebnis.',
+  'opportunity.formError':
+    'Prüfen Sie vor dem Speichern die begrenzten Logistik- und Nachfragefelder.',
+  'opportunity.integerError':
+    '{{field}} muss eine nichtnegative ganze Zahl sein.',
+  'opportunity.rangeError':
+    '{{field}} liegt außerhalb des unterstützten Bereichs.',
+  'opportunity.medianRequired':
+    'Der Median der Verkaufstage ist erforderlich, wenn verkaufte Vergleichsangebote beobachtet wurden.',
+  'opportunity.created':
+    'Unveränderliche Chancennachweise und der endgültige DealScore wurden bewertet.',
+  'opportunity.duplicate':
+    'Die identischen Nachweise sind bereits vorhanden; Bewertungen und DealScore blieben idempotent.',
+  'opportunity.saveError':
+    'Chancennachweise konnten nicht gespeichert werden. Aktualisieren Sie, falls sich vorgelagerte Nachweise geändert haben.',
+  'analysisDetail.backListing': '← Angebotsdetail',
+  'analysisDetail.backListings': '← Quellangebote',
+  'analysisDetail.loading': 'Analyseanfrage wird geladen…',
+  'analysisDetail.createdAt': 'Erstellt {{date}}',
+  'analysisDetail.refreshing': 'Wird aktualisiert…',
+  'analysisDetail.refresh': 'Status aktualisieren',
+  'analysisDetail.quotaEyebrow': 'Explizite Kontingentgrenze',
+  'analysisDetail.ready': 'Bereit zum Einreichen',
+  'analysisDetail.quotaDescription':
+    'Die Anfrage ist unveränderlich, aber es wurde kein Kontingent verbraucht. Das Einreichen verbraucht atomar eine monatliche Analyseberechtigung und erstellt einen idempotenten Warteschlangeneintrag.',
+  'analysisDetail.submitting': 'Wird eingereicht…',
+  'analysisDetail.submit': 'In Analysewarteschlange einreichen',
+  'analysisDetail.readOnly': 'Ihre Rolle hat schreibgeschützten Analysezugriff.',
+  'analysisDetail.resultEyebrow': 'Validierte strukturierte Ausgabe',
+  'analysisDetail.extraction': 'Normalisierte Extraktion',
+  'analysisDetail.confidenceValue': '{{value}} Konfidenz',
+  'analysisDetail.titleField': 'Titel',
+  'analysisDetail.marketplace': 'Marktplatz',
+  'analysisDetail.askingMinor': 'Angebotspreis in kleinster Einheit',
+  'analysisDetail.currency': 'Währung',
+  'analysisDetail.sourceCountry': 'Quellland',
+  'analysisDetail.targetCountry': 'Zielland',
+  'analysisDetail.evidenceFiles': 'Nachweisdateien',
+  'analysisDetail.additionalInput': 'Zusätzliche Eingabe erforderlich',
+  'analysisDetail.completedSteps': 'Abgeschlossene Analyseschritte',
+  'analysisDetail.pendingSteps': 'Ausstehende Analyseschritte',
+  'analysisDetail.catalogEyebrow': 'Kanonische Kataloggrenze',
+  'analysisDetail.productMatch': 'Produktzuordnung',
+  'analysisDetail.brand': 'Marke',
+  'analysisDetail.model': 'Modell',
+  'analysisDetail.modelNumber': 'Modellnummer',
+  'analysisDetail.variant': 'Variante',
+  'analysisDetail.modelLevel': 'Modellebene',
+  'analysisDetail.category': 'Kategorie',
+  'analysisDetail.canonicalKey': 'Kanonischer Schlüssel',
+  'analysisDetail.noProduct':
+    'Es wurde nicht stillschweigend ein kanonisches Produkt ausgewählt. Kandidatennachweise bleiben zur Bestätigung erhalten.',
+  'analysisDetail.method': 'Methode',
+  'analysisDetail.matcherVersion': 'Matcher-Version',
+  'analysisDetail.confidence': 'Konfidenz',
+  'analysisDetail.review': 'Prüfung',
+  'analysisDetail.decisionEvidence': 'Entscheidungsnachweise',
+  'analysisDetail.alias': 'Alias „{{alias}}“',
+  'analysisDetail.comparablesEyebrow': 'Unveränderliche Marktnachweise',
+  'analysisDetail.comparableSelection': 'Vergleichsauswahl',
+  'analysisDetail.selected': 'Ausgewählt',
+  'analysisDetail.minimum': 'mindestens {{count}}',
+  'analysisDetail.excluded': 'Ausgeschlossen',
+  'analysisDetail.candidatePool': 'Kandidatenpool',
+  'analysisDetail.marketBoundary': 'Marktgrenze',
+  'analysisDetail.currencyMissing': 'Währung fehlt',
+  'analysisDetail.selector': 'Auswahlverfahren',
+  'analysisDetail.run': 'Lauf',
+  'analysisDetail.selectionState': 'Auswahlstatus',
+  'analysisDetail.noComparables':
+    'Für diesen Mandanten und das kanonische Modell liegen keine Vergleichsnachweise vor. Es wurde kein Preis abgeleitet.',
+  'analysisDetail.observed': 'beobachtet {{date}}',
+  'analysisDetail.relevance': '{{value}} Relevanz',
+  'analysisDetail.selectionWarning':
+    'Diese Stufe ordnet nur Quellnachweise. Sie berechnet keinen Marktwert und mischt keine Länder oder Währungen ohne geprüfte Umrechnung und Marktkontext.',
+  'analysisDetail.comparableEyebrow': 'Genehmigter manueller Konnektor',
+  'analysisDetail.addComparable': 'Vergleichsnachweis hinzufügen',
+  'analysisDetail.appendOnly': 'Nur anhängen · aktiver Arbeitsbereich',
+  'analysisDetail.marketplaceRequired': 'Marktplatz *',
+  'analysisDetail.externalId': 'Externe Angebots-ID',
+  'analysisDetail.sourceUrl': 'Quell-URL',
+  'analysisDetail.sourceIdentityRequired':
+    'Eine URL oder externe Angebots-ID ist erforderlich.',
+  'analysisDetail.originalTitle': 'Originaltitel *',
+  'analysisDetail.originalDescription': 'Originalbeschreibung',
+  'analysisDetail.askingPrice': 'Angebotspreis *',
+  'analysisDetail.originalCurrency': 'Originalwährung *',
+  'analysisDetail.chooseCurrency': 'Währung auswählen',
+  'analysisDetail.listingCountry': 'Angebotsland *',
+  'analysisDetail.chooseCountry': 'Land auswählen',
+  'analysisDetail.location': 'Ort',
+  'analysisDetail.listingType': 'Angebotstyp *',
+  'analysisDetail.type.product': 'Produkt',
+  'analysisDetail.type.sparePart': 'Ersatzteil',
+  'analysisDetail.type.brokenOnly': 'Nur defekt',
+  'analysisDetail.type.wanted': 'Suchanzeige',
+  'analysisDetail.type.rental': 'Vermietung',
+  'analysisDetail.type.bundle': 'Unklares Paket',
+  'analysisDetail.condition': 'Zustand *',
+  'analysisDetail.condition.new': 'Neu',
+  'analysisDetail.condition.likeNew': 'Wie neu',
+  'analysisDetail.condition.usedGood': 'Gebraucht · gut',
+  'analysisDetail.condition.usedFair': 'Gebraucht · befriedigend',
+  'analysisDetail.condition.usedPoor': 'Gebraucht · schlecht',
+  'analysisDetail.condition.broken': 'Defekt',
+  'analysisDetail.sellerType': 'Verkäufertyp *',
+  'analysisDetail.seller.private': 'Privat',
+  'analysisDetail.seller.business': 'Gewerblich',
+  'analysisDetail.observedAt': 'Beobachtet am *',
+  'analysisDetail.publishedAt': 'Veröffentlicht am',
+  'analysisDetail.includedAccessories': 'Enthaltenes Zubehör',
+  'analysisDetail.includedPlaceholder': 'Koffer, Ladegerät, zwei Akkus',
+  'analysisDetail.commaFacts': 'Kommagetrennte Quellenfakten.',
+  'analysisDetail.missingAccessories': 'Fehlendes Zubehör',
+  'analysisDetail.missingPlaceholder': 'Akku, Seitengriff',
+  'analysisDetail.immutableComparable':
+    'Originalbetrag, Währung, Quellenidentität und Zeitstempel können nach dem Speichern nicht geändert werden.',
+  'analysisDetail.savingEvidence': 'Nachweis wird gespeichert…',
+  'analysisDetail.saveEvidence': 'Vergleichsnachweis speichern',
+  'analysisDetail.loadingReferences': 'Länder- und Währungsreferenzen werden geladen…',
+  'analysisDetail.requestEyebrow': 'Unveränderliche Anfrage',
+  'analysisDetail.provenance': 'Quellenherkunft',
+  'analysisDetail.listingSnapshot': 'Angebotsschnappschuss',
+  'analysisDetail.snapshotHash': 'Schnappschuss-Hash',
+  'analysisDetail.marketRoute': 'Marktroute',
+  'analysisDetail.evidenceCaptured': 'Erfasste Nachweise',
+  'analysisDetail.missing': 'Fehlt',
+  'analysisDetail.processingEyebrow': 'Beobachtbare Verarbeitung',
+  'analysisDetail.attemptHistory': 'Versuchsverlauf',
+  'analysisDetail.attempts': '{{count}} Versuche',
+  'analysisDetail.noAttempts': 'Es wurde noch kein Worker-Versuch gestartet.',
+  'analysisDetail.validation': 'Validierung {{status}}',
+  'analysisDetail.confidenceInline': 'Konfidenz {{value}}',
+  'analysisDetail.requestState': 'Anfragestatus',
+  'analysisDetail.submitted': 'Eingereicht',
+  'analysisDetail.finished': 'Beendet',
+  'analysisDetail.processingAttempts': 'Verarbeitungsversuche',
+  'analysisDetail.nextRetry': 'Nächster Versuch',
+  'analysisDetail.queueOutbox': 'Warteschlangen-Ausgang',
+  'analysisDetail.queue': 'Warteschlange',
+  'analysisDetail.dispatchAttempts': 'Versandversuche',
+  'analysisDetail.maxAttempts': 'Maximale Worker-Versuche',
+  'analysisDetail.dispatched': 'Versandt',
+  'analysisDetail.queued':
+    'Analyse eingereiht. Eine monatliche Berechtigung wurde genau einmal verbraucht.',
+  'analysisDetail.submitError':
+    'Die Analyse konnte nicht in die Warteschlange eingereiht werden.',
+  'analysisDetail.matchRequired':
+    'Ein bestätigtes kanonisches Produkt und Analyseverwaltungsrecht sind erforderlich.',
+  'analysisDetail.comparableFields':
+    'Füllen Sie die erforderlichen Quellen- und Marktfelder des Vergleichs aus.',
+  'analysisDetail.sourceRequired':
+    'Geben Sie eine Quell-URL oder externe Angebots-ID an.',
+  'analysisDetail.positivePrice':
+    'Geben Sie einen positiven Vergleichsangebotspreis ein.',
+  'analysisDetail.validPrice': 'Geben Sie einen gültigen Vergleichspreis ein.',
+  'analysisDetail.reviewPrice': 'Prüfen Sie den Vergleichsangebotspreis.',
+  'analysisDetail.timestamps': 'Geben Sie gültige Beobachtungszeitstempel ein.',
+  'analysisDetail.comparableCreated':
+    'Unveränderlicher Vergleichsnachweis gespeichert und Auswahl neu berechnet.',
+  'analysisDetail.comparableDuplicate':
+    'Der identische Nachweis ist bereits vorhanden; die Auswahl blieb idempotent.',
+  'analysisDetail.comparableSaveError':
+    'Der Vergleichsnachweis konnte nicht gespeichert werden.',
+  'analysisDetail.normalization.eyebrow': 'Marktübergreifender Nachweis',
+  'analysisDetail.normalization.title': 'Marktnormalisierung',
+  'analysisDetail.normalization.missing': 'Nachweis erforderlich',
+  'analysisDetail.normalization.sourceValue': 'Ursprünglicher Quellwert',
+  'analysisDetail.normalization.normalizedValue': 'Normalisierter Zielwert',
+  'analysisDetail.normalization.convertedValue': 'Währungsumgerechneter Wert',
+  'analysisDetail.normalization.marketFactor': 'Regionaler Marktfaktor',
+  'analysisDetail.normalization.marketAdjustedValue': 'Marktbereinigter Wert',
+  'analysisDetail.normalization.rate': 'Wechselkurs',
+  'analysisDetail.normalization.rateEffective': 'Kurs gültig ab',
+  'analysisDetail.normalization.rateProvider': 'Kursanbieter',
+  'analysisDetail.normalization.rateReference': 'Kursanbieter-Referenz',
+  'analysisDetail.normalization.reference': 'Nachweisreferenz',
+  'analysisDetail.normalization.observedAt': 'Beobachtet am',
+  'analysisDetail.normalization.version': 'Berechnungsversion',
+  'analysisDetail.normalization.evidenceHash': 'Nachweis-Hash',
+  'analysisDetail.normalization.explanation':
+    'Dieser Vergleich bleibt ausgeschlossen, bis regionale Kompatibilität, datierter Wechselkurs und explizite Zielmarktanpassungen bestätigt sind.',
+  'analysisDetail.normalization.record': 'Nachweis erfassen oder ersetzen',
+  'analysisDetail.normalization.compatibility': 'Regionale Kompatibilität *',
+  'analysisDetail.normalization.marketFactorPercent': 'Zielmarktfaktor (%) *',
+  'analysisDetail.normalization.factorHint':
+    'Zulässig sind 50,00–150,00. Verwenden Sie 100,00 ohne belegte Preisniveauanpassung.',
+  'analysisDetail.normalization.shipping': 'Versandkosten',
+  'analysisDetail.normalization.importDuty': 'Einfuhrabgabe',
+  'analysisDetail.normalization.tax': 'Steuerkosten',
+  'analysisDetail.normalization.otherCost': 'Sonstige Marktkosten',
+  'analysisDetail.normalization.compatibilityNote': 'Kompatibilitätsnachweis *',
+  'analysisDetail.normalization.attestation':
+    'Ich bestätige, dass Kompatibilität, Wechselkurs, Marktfaktor und Kosten aus geprüften Nachweisen stammen.',
+  'analysisDetail.normalization.formula':
+    'Normalisierter Wert = umgerechneter Angebotspreis × Marktfaktor + Versand + Einfuhrabgabe + Steuer + weitere explizite Kosten.',
+  'analysisDetail.normalization.targetCurrencyRequired':
+    'Eine bestätigte Zielwährung ist erforderlich.',
+  'analysisDetail.normalization.invalidForm':
+    'Prüfen Sie die erforderlichen Marktnormalisierungsnachweise.',
+  'analysisDetail.normalization.invalidFactor':
+    'Geben Sie einen Marktfaktor von 50,00 % bis 150,00 % mit höchstens zwei Dezimalstellen ein.',
+  'analysisDetail.normalization.invalidCost':
+    'Geben Sie gültige nicht negative Kosten in der Zielwährung ein.',
+  'analysisDetail.normalization.save': 'Unveränderlichen Nachweis erfassen',
+  'analysisDetail.normalization.saving': 'Wird erfasst…',
+  'analysisDetail.normalization.saved':
+    'Der unveränderliche Marktnormalisierungsnachweis wurde erfasst und die Analyse neu berechnet.',
+  'analysisDetail.normalization.replayed':
+    'Derselbe Nachweis ist bereits vorhanden; das aktuelle Ergebnis blieb erhalten.',
+  'analysisDetail.normalization.saveError':
+    'Der Marktnormalisierungsnachweis konnte nicht erfasst werden.',
+  'analysisDetail.normalization.code.targetCurrencyUnavailable':
+    'Zielwährung nicht verfügbar',
+  'analysisDetail.normalization.code.currencyUnavailable':
+    'Nachweis zur Währungsnormalisierung fehlt',
+  'analysisDetail.normalization.code.crossCountryUnavailable':
+    'Nachweis zur länderübergreifenden Normalisierung fehlt',
+  'analysisDetail.normalization.code.compatibilityRejected':
+    'Regionale Kompatibilität abgelehnt',
+  'analysisDetail.normalization.code.invalidEvidence':
+    'Marktnormalisierungsnachweis ungültig',
+  'analysisDetail.normalization.code.invalidAmount':
+    'Normalisierter Betrag ungültig',
+  'analysisDetail.normalization.code.crossCountryNormalized':
+    'Länderübergreifender Nachweis normalisiert',
+  'analysisDetail.normalization.code.currencyNormalized':
+    'Währung mit datiertem Nachweis normalisiert',
+  'analysisDetail.normalization.code.compatibilityConfirmed':
+    'Regionale Kompatibilität bestätigt',
+  'analysisDetail.normalization.code.rateResolved':
+    'Datierter Wechselkurs aufgelöst',
+  'analysisDetail.normalization.code.identityRate':
+    'Keine Währungsumrechnung erforderlich',
+  'analysisDetail.normalization.code.marketFactorApplied':
+    'Regionaler Marktfaktor angewendet',
+  'analysisDetail.normalization.code.shippingApplied': 'Versandkosten angewendet',
+  'analysisDetail.normalization.code.importDutyApplied':
+    'Einfuhrabgabe angewendet',
+  'analysisDetail.normalization.code.taxApplied': 'Steuerkosten angewendet',
+  'analysisDetail.normalization.code.otherCostApplied':
+    'Weitere explizite Marktkosten angewendet',
+  'analysisDetail.normalization.code.normalizationApplied':
+    'Marktübergreifende Normalisierung angewendet',
+  'analysisDetail.normalization.code.datedRatesApplied':
+    'Datierte Wechselkurse angewendet',
+  'analysisDetail.status.draft':
+    'Unveränderliche Anfrage erfasst. Kontingent wurde nicht verbraucht.',
+  'analysisDetail.status.queued':
+    'Im Versand-Ausgang gespeichert und wartet auf einen Worker.',
+  'analysisDetail.status.processing':
+    'Ein begrenzter, beobachtbarer Verarbeitungsversuch läuft.',
+  'analysisDetail.status.needsInput':
+    'Verarbeitung beendet, aber Quelldaten oder Produktbestätigung sind erforderlich.',
+  'analysisDetail.status.completed': 'Die erfasste Analysepipeline ist abgeschlossen.',
+  'analysisDetail.status.failed':
+    'Verarbeitung nach einem erfassten Versuch fehlgeschlagen. Wiederholungsmetadaten bleiben erhalten.',
+  'analysisDetail.status.archived':
+    'Diese Anfrage ist archiviert und kann nicht eingereicht werden.',
+  'analysisDetail.routeError': 'Die Analyseroute ist unvollständig.',
+  'analysisDetail.listingMismatch':
+    'Diese Analyse gehört nicht zum Angebot der aktuellen Route.',
+  'analysisDetail.loadError':
+    'Diese Analyse konnte im aktiven Arbeitsbereich nicht geladen werden.',
+  'analysisDetail.marketError':
+    'Marktreferenzen sind nicht verfügbar; Vergleichsnachweise können nicht hinzugefügt werden.',
+  'analysisLabel.draft': 'Entwurf',
+  'analysisLabel.queued': 'In Warteschlange',
+  'analysisLabel.processing': 'In Bearbeitung',
+  'analysisLabel.completed': 'Abgeschlossen',
+  'analysisLabel.failed': 'Fehlgeschlagen',
+  'analysisLabel.archived': 'Archiviert',
+  'analysisLabel.pending': 'Ausstehend',
+  'analysisLabel.dispatching': 'Wird versandt',
+  'analysisLabel.dispatched': 'Versandt',
+  'analysisLabel.valid': 'Gültig',
+  'analysisLabel.invalid': 'Ungültig',
+  'analysisLabel.matched': 'Zugeordnet',
+  'analysisLabel.reviewRequired': 'Prüfung erforderlich',
+  'analysisLabel.unmatched': 'Nicht zugeordnet',
+  'analysisLabel.notRequired': 'Nicht erforderlich',
+  'analysisLabel.confirmed': 'Bestätigt',
+  'analysisLabel.rejected': 'Abgelehnt',
+  'analysisLabel.compatible': 'Kompatibel',
+  'analysisLabel.incompatible': 'Nicht kompatibel',
+  'analysisLabel.unspecified': 'Nicht angegeben',
+  'analysisLabel.ready': 'Bereit',
+  'analysisLabel.insufficient': 'Unzureichend',
+  'analysisLabel.excluded': 'Ausgeschlossen',
+  'common.cancel': 'Abbrechen',
+  'route.ownedProducts': 'Eigene Produkte',
+  'route.addOwnedProduct': 'Eigenes Produkt hinzufügen',
+  'route.ownedProductDetail': 'Eigenes Produkt',
+  'ownedProduct.status.draft': 'Entwurf',
+  'ownedProduct.status.ready': 'Bereit',
+  'ownedProduct.status.archived': 'Archiviert',
+  'ownedProduct.condition.unknown': 'Unbekannt',
+  'ownedProduct.condition.new': 'Neu',
+  'ownedProduct.condition.like_new': 'Wie neu',
+  'ownedProduct.condition.used_good': 'Gebraucht · gut',
+  'ownedProduct.condition.used_fair': 'Gebraucht · befriedigend',
+  'ownedProduct.condition.used_poor': 'Gebraucht · schlecht',
+  'ownedProduct.condition.broken': 'Defekt',
+  'ownedProduct.border.unknown': 'Unbekannt',
+  'ownedProduct.border.domestic_only': 'Nur Inland',
+  'ownedProduct.border.cross_border_allowed': 'Grenzüberschreitend erlaubt',
+  'ownedProduct.border.cross_border_preferred': 'Grenzüberschreitend bevorzugt',
+  'ownedProduct.speed.unknown': 'Unbekannt',
+  'ownedProduct.speed.fast': 'Schneller Verkauf',
+  'ownedProduct.speed.balanced': 'Ausgewogen',
+  'ownedProduct.speed.maximum_value': 'Maximaler Erlös',
+  'ownedProduct.image.product': 'Produkt',
+  'ownedProduct.image.serial_label': 'Typenschild',
+  'ownedProduct.image.defect': 'Mangel',
+  'ownedProduct.image.proof_of_purchase': 'Kaufnachweis',
+  'ownedProduct.common.unknownProduct': 'Unbekanntes Produkt',
+  'ownedProduct.common.categoryUnknown': 'Kategorie unbekannt',
+  'ownedProduct.common.category': 'Kategorie',
+  'ownedProduct.common.brand': 'Marke',
+  'ownedProduct.common.model': 'Modell',
+  'ownedProduct.common.condition': 'Zustand',
+  'ownedProduct.common.targetMarket': 'Zielmarkt',
+  'ownedProduct.common.evidence': 'Private Nachweise',
+  'ownedProduct.common.history': 'Verlauf',
+  'ownedProduct.common.lifecycle': 'Lebenszyklus',
+  'ownedProduct.common.privateNotes': 'Private Notizen',
+  'ownedProduct.common.readOnly':
+    'Sie haben nur Lesezugriff auf eigene Produkte.',
+  'ownedProduct.common.unknownHint': 'Unbekannte Fakten bleiben ausdrücklich offen',
+  'ownedProduct.common.noneConfirmed': 'Bestätigt: keine',
+  'ownedProduct.list.eyebrow': 'Verkaufsaufnahme',
+  'ownedProduct.list.title': 'Eigene Produkte',
+  'ownedProduct.list.description':
+    'Erfassen Sie eigene Produkte, bevor Preisfindung, Anzeigenerstellung oder Verkaufsverfolgung beginnen.',
+  'ownedProduct.list.add': 'Eigenes Produkt hinzufügen',
+  'ownedProduct.list.searchPlaceholder': 'Marke, Modell oder private Notizen suchen',
+  'ownedProduct.list.allStatuses': 'Alle Status',
+  'ownedProduct.list.apply': 'Filter anwenden',
+  'ownedProduct.list.loading': 'Eigene Produkte werden geladen…',
+  'ownedProduct.list.loadError':
+    'Die eigenen Produkte konnten für den aktiven Arbeitsbereich nicht geladen werden.',
+  'ownedProduct.list.emptyTitle': 'Noch keine eigenen Produkte',
+  'ownedProduct.list.emptyDescription':
+    'Erstellen Sie den ersten Nachweisdatensatz für ein Produkt, das Sie verkaufen möchten.',
+  'ownedProduct.list.addFirst': 'Erstes Produkt hinzufügen',
+  'ownedProduct.list.aria': 'Eigene Produkte',
+  'ownedProduct.list.loadingMore': 'Wird geladen…',
+  'ownedProduct.list.loadMore': 'Mehr laden',
+  'ownedProduct.intake.back': '← Eigene Produkte',
+  'ownedProduct.intake.eyebrow': 'Phase 3 · Aufnahme eigener Produkte',
+  'ownedProduct.intake.title': 'Eigenes Produkt erfassen',
+  'ownedProduct.intake.description':
+    'Identität, Zustand, Herkunft und Zielmarkt erfassen, ohne fehlende Nachweise zu erfinden.',
+  'ownedProduct.intake.loading': 'Katalog- und Marktreferenzen werden geladen…',
+  'ownedProduct.intake.identityEyebrow': 'Produktidentität',
+  'ownedProduct.intake.identityTitle': 'Welches Produkt besitzen Sie?',
+  'ownedProduct.intake.ageMonths': 'Alter in Monaten',
+  'ownedProduct.intake.agePlaceholder': 'Leer bedeutet unbekannt',
+  'ownedProduct.intake.zeroAgeHint':
+    'Leer bedeutet unbekannt. Null ist ein bestätigtes Alter von null Monaten.',
+  'ownedProduct.intake.conditionEyebrow': 'Zustandsnachweise',
+  'ownedProduct.intake.conditionTitle': 'Zubehör, Mängel und Kaufhistorie',
+  'ownedProduct.intake.accessoriesKnown': 'Zubehör wurde geprüft',
+  'ownedProduct.intake.defectsKnown': 'Mängel wurden geprüft',
+  'ownedProduct.intake.onePerLine': 'Ein erfasster Fakt pro Zeile',
+  'ownedProduct.intake.emptyListMeaning':
+    'Geprüft ohne Einträge bedeutet bestätigt keine; ungeprüft bedeutet unbekannt.',
+  'ownedProduct.intake.purchaseKnown': 'Kaufhistorie wurde geprüft',
+  'ownedProduct.intake.purchasePlaceholder':
+    'Kaufdatum, Quelle, Preiskontext oder Eigentumsnachweis',
+  'ownedProduct.intake.marketEyebrow': 'Verkaufsmarkt',
+  'ownedProduct.intake.marketTitle': 'Wo und wie schnell soll es verkauft werden?',
+  'ownedProduct.intake.targetContinent': 'Zielkontinent *',
+  'ownedProduct.intake.chooseContinent': 'Kontinent wählen',
+  'ownedProduct.intake.targetCountries': 'Zielländer *',
+  'ownedProduct.intake.countryHint':
+    'Wählen Sie ein oder mehrere Länder des gewählten Kontinents.',
+  'ownedProduct.intake.crossBorder': 'Grenzüberschreitende Präferenz *',
+  'ownedProduct.intake.saleSpeed': 'Gewünschte Verkaufsgeschwindigkeit *',
+  'ownedProduct.intake.imagesEyebrow': 'Private Nachweise',
+  'ownedProduct.intake.imagesTitle': 'Originale Produktbilder hinzufügen',
+  'ownedProduct.intake.optional': 'Bei der Erstaufnahme optional',
+  'ownedProduct.intake.imageKind': 'Art des Bildnachweises',
+  'ownedProduct.intake.files': 'JPEG, PNG oder WebP · jeweils bis 10 MB',
+  'ownedProduct.intake.selectedFiles': '{{count}} Dateien ausgewählt',
+  'ownedProduct.intake.boundaryTitle': 'Nur Aufnahme',
+  'ownedProduct.intake.boundaryDescription':
+    'Dieser Schritt berechnet keine Verkaufspreise, erzeugt keinen Anzeigentext, veröffentlicht keine Anzeige, erstellt keinen Portfolioeintrag und erfasst kein Geld.',
+  'ownedProduct.intake.save': 'Eigenes Produkt speichern',
+  'ownedProduct.intake.saving': 'Wird gespeichert…',
+  'ownedProduct.intake.retryUpload': 'Ausstehenden Upload wiederholen',
+  'ownedProduct.intake.roleError':
+    'Ihre Rolle darf keine eigenen Produkte anlegen.',
+  'ownedProduct.intake.requiredError':
+    'Prüfen Sie die erforderlichen Markt- und Produktfelder.',
+  'ownedProduct.intake.ageError':
+    'Das Alter muss eine ganze Monatszahl zwischen 0 und 1200 sein.',
+  'ownedProduct.intake.imagePolicyError':
+    'Wählen Sie höchstens 10 JPEG-, PNG- oder WebP-Bilder bis jeweils 10 MB.',
+  'ownedProduct.intake.referenceError':
+    'Katalog- oder Marktreferenzen konnten nicht geladen werden.',
+  'ownedProduct.intake.saveError': 'Das eigene Produkt konnte nicht gespeichert werden.',
+  'ownedProduct.intake.uploadError':
+    'Das Produkt wurde gespeichert, die Bilder jedoch nicht. Wiederholen Sie den Upload.',
+  'ownedProduct.detail.back': '← Eigene Produkte',
+  'ownedProduct.detail.loading': 'Produktnachweise werden geladen…',
+  'ownedProduct.detail.idMissing': 'Die Route zum eigenen Produkt ist unvollständig.',
+  'ownedProduct.detail.loadError':
+    'Dieses Produkt konnte im aktiven Arbeitsbereich nicht geladen werden.',
+  'ownedProduct.detail.factsEyebrow': 'Erfasste Ausgangsfakten',
+  'ownedProduct.detail.factsTitle': 'Aufnahme des eigenen Produkts',
+  'ownedProduct.detail.intakeOnly': 'Kein Preis oder Verkauf abgeleitet',
+  'ownedProduct.detail.age': 'Alter',
+  'ownedProduct.detail.months': '{{count}} Monate',
+  'ownedProduct.detail.crossBorder': 'Grenzüberschreitende Präferenz',
+  'ownedProduct.detail.saleSpeed': 'Gewünschte Verkaufsgeschwindigkeit',
+  'ownedProduct.detail.accessories': 'Zubehör',
+  'ownedProduct.detail.defects': 'Mängel',
+  'ownedProduct.detail.purchaseHistory': 'Kaufhistorie',
+  'ownedProduct.detail.privateStorage': 'Privater signierter Speicher',
+  'ownedProduct.detail.noEvidence': 'Es wurden keine privaten Bildnachweise hochgeladen.',
+  'ownedProduct.detail.evidenceType': 'Nachweisart',
+  'ownedProduct.detail.filePolicy':
+    'JPEG, PNG oder WebP · bis zu 10 Dateien pro Upload',
+  'ownedProduct.detail.uploading': 'Wird hochgeladen…',
+  'ownedProduct.detail.uploadFiles': '{{count}} Dateien hochladen',
+  'ownedProduct.detail.refreshLinks': 'Temporäre Bildlinks erneuern',
+  'ownedProduct.detail.fileSelectionError':
+    'Wählen Sie höchstens 10 JPEG-, PNG- oder WebP-Bilder bis jeweils 10 MB.',
+  'ownedProduct.detail.uploaded': 'Private Bildnachweise wurden hochgeladen.',
+  'ownedProduct.detail.uploadError': 'Die Bilder konnten nicht hochgeladen werden.',
+  'ownedProduct.detail.remove': 'Entfernen',
+  'ownedProduct.detail.removing': 'Wird entfernt…',
+  'ownedProduct.detail.removeAria': '{{filename}} entfernen',
+  'ownedProduct.detail.removed': 'Das private Bild wurde entfernt.',
+  'ownedProduct.detail.removeError': 'Das private Bild konnte nicht entfernt werden.',
+  'ownedProduct.detail.provenance': 'Unveränderliche Herkunft',
+  'ownedProduct.detail.snapshotHistory': 'Verlauf der Aufnahmesnapshots',
+  'ownedProduct.detail.lifecycleTitle': 'Aufnahmestatus',
+  'ownedProduct.detail.status': 'Status',
+  'ownedProduct.detail.saveSnapshot': 'Neuen Snapshot speichern',
+  'ownedProduct.detail.saved': 'Ein neuer Produktsnapshot wurde erfasst.',
+  'ownedProduct.detail.saveError': 'Der Produktstatus konnte nicht gespeichert werden.',
+  'ownedProduct.detail.archivedReadOnly':
+    'Archivierte eigene Produkte sind abgeschlossen und schreibgeschützt.',
+  'ownedProduct.detail.boundaryEyebrow': 'Aggregatgrenze',
+  'ownedProduct.detail.boundaryTitle': 'Nachweise, keine Verkaufsempfehlung',
+  'ownedProduct.detail.boundaryDescription':
+    'Preisbänder, erzeugte Anzeigeninhalte, Veröffentlichung, Portfolio-Lebenszyklus und finanzielle Ergebnisse bleiben getrennte spätere Schritte.',
+  'ownedProduct.assessment.eyebrow': 'Identifikation und Zustand',
+  'ownedProduct.assessment.title': 'Nachweisgebundene Bewertung',
+  'ownedProduct.assessment.description':
+    'Gleicht die erfasste Identität mit dem kanonischen Katalog ab und bewertet Zustandsnachweise, ohne einen Preis zu berechnen.',
+  'ownedProduct.assessment.staleTitle': 'Die letzte Bewertung ist historisch',
+  'ownedProduct.assessment.staleDescription':
+    'Der Aufnahme-Snapshot oder die privaten Bildnachweise wurden geändert. Führen Sie eine neue Bewertung aus.',
+  'ownedProduct.assessment.historical':
+    'Historisches Ergebnis. Es entspricht nicht dem aktuellen Nachweisbestand.',
+  'ownedProduct.assessment.notAssessedTitle': 'Keine Bewertung erfasst',
+  'ownedProduct.assessment.notAssessedDescription':
+    'Markieren Sie die Aufnahme als bereit und bewerten Sie dann den neuesten Snapshot samt Bildnachweisen.',
+  'ownedProduct.assessment.readyRequired':
+    'Die Aufnahme muss vor der Bewertung als bereit markiert sein.',
+  'ownedProduct.assessment.run': 'Bewertung ausführen',
+  'ownedProduct.assessment.reassess': 'Neue Bewertung ausführen',
+  'ownedProduct.assessment.running': 'Bewertung läuft…',
+  'ownedProduct.assessment.recorded':
+    'Eine neue unveränderliche Bewertung wurde erfasst.',
+  'ownedProduct.assessment.error': 'Das eigene Produkt konnte nicht bewertet werden.',
+  'ownedProduct.assessment.matchStatus': 'Katalogabgleich',
+  'ownedProduct.assessment.confidence': 'Konfidenz',
+  'ownedProduct.assessment.completeness': 'Vollständigkeit der Nachweise',
+  'ownedProduct.assessment.assessed': 'Bewertet',
+  'ownedProduct.assessment.runNumber': 'Bewertungslauf',
+  'ownedProduct.assessment.snapshot': 'Aufnahme-Snapshot',
+  'ownedProduct.assessment.evaluator': 'Bewertungsmodul',
+  'ownedProduct.assessment.identifiedProduct': 'Identifiziertes Produkt',
+  'ownedProduct.assessment.noCatalogProduct':
+    'Es wurde kein kanonisches Katalogprodukt ausgewählt.',
+  'ownedProduct.assessment.includedAccessories': 'Enthaltenes Zubehör',
+  'ownedProduct.assessment.missingAccessories': 'Fehlendes Zubehör',
+  'ownedProduct.assessment.defects': 'Erfasste Mängel',
+  'ownedProduct.assessment.candidates': 'Katalogkandidaten zur Prüfung',
+  'ownedProduct.assessment.regionCompatibility': 'Zielmarkt-Kompatibilität',
+  'ownedProduct.assessment.reasons': 'Begründungen',
+  'ownedProduct.assessment.unknownFacts': 'Unbekannte Fakten',
+  'ownedProduct.assessment.actions': 'Erforderliche Prüfschritte',
+  'ownedProduct.assessment.none': 'Keine',
+  'ownedProduct.assessment.boundary':
+    'Diese Bewertung erfasst nur Identitäts- und Zustandsnachweise. Sie erstellt keine Preisspanne, Anzeige, Veröffentlichung oder Finanzbuchung.',
+  'ownedProduct.assessment.code.exactCatalogAlias':
+    'Exakter Katalogalias gefunden',
+  'ownedProduct.assessment.code.searchableProductTextMissing':
+    'Durchsuchbare Produktidentität fehlt',
+  'ownedProduct.assessment.code.catalogAliasNotFound':
+    'Kein Katalogalias gefunden',
+  'ownedProduct.assessment.code.multipleCloseCatalogCandidates':
+    'Mehrere ähnliche Katalogkandidaten müssen geprüft werden',
+  'ownedProduct.assessment.code.targetMarketVariantIncompatible':
+    'Die Variante ist mit dem Zielmarkt nicht kompatibel',
+  'ownedProduct.assessment.code.catalogMatchBelowAutoThreshold':
+    'Katalogtreffer liegt unter der Schwelle für automatische Auswahl',
+  'ownedProduct.assessment.code.accessoriesUnchecked':
+    'Enthaltenes Zubehör wurde nicht geprüft',
+  'ownedProduct.assessment.code.expectedAccessoryBaselineUnavailable':
+    'Erwartete Zubehörbasis ist nicht verfügbar',
+  'ownedProduct.assessment.code.expectedAccessoriesMissing':
+    'Erwartetes Zubehör scheint zu fehlen',
+  'ownedProduct.assessment.code.conditionUnknown': 'Zustand ist unbekannt',
+  'ownedProduct.assessment.code.defectsUnchecked': 'Mängel wurden nicht geprüft',
+  'ownedProduct.assessment.code.productImagesMissing':
+    'Originale Produktbilder fehlen',
+  'ownedProduct.assessment.code.serialLabelMissing':
+    'Bild des Serienetiketts fehlt',
+  'ownedProduct.assessment.code.checkAccessories':
+    'Alle enthaltenen Zubehörteile prüfen und erfassen',
+  'ownedProduct.assessment.code.verifyExpectedAccessories':
+    'Erwartetes Zubehör für diese Marktvariante prüfen',
+  'ownedProduct.assessment.code.confirmMissingAccessories':
+    'Jedes vermutlich fehlende Zubehörteil bestätigen',
+  'ownedProduct.assessment.code.confirmCatalogCandidate':
+    'Den richtigen Katalogkandidaten bestätigen',
+  'ownedProduct.assessment.code.provideIdentifyingModelEvidence':
+    'Modell- oder Serienetikett-Nachweis zur Produktidentifikation bereitstellen',
+  'ownedProduct.assessment.code.confirmCondition':
+    'Produktzustand prüfen und bestätigen',
+  'ownedProduct.assessment.code.inspectDefects': 'Mängel prüfen und erfassen',
+  'ownedProduct.assessment.code.addProductPhotos':
+    'Aktuelle originale Produktfotos hinzufügen',
+  'ownedProduct.assessment.code.addSerialLabelPhoto':
+    'Ein deutliches Foto des Serienetiketts hinzufügen',
+  'ownedProduct.assessment.code.category': 'Kategorie',
+  'ownedProduct.assessment.code.brand': 'Marke',
+  'ownedProduct.assessment.code.model': 'Modell',
+  'ownedProduct.assessment.code.condition': 'Zustand',
+  'ownedProduct.assessment.code.includedAccessories': 'Enthaltenes Zubehör',
+  'ownedProduct.assessment.code.missingAccessories': 'Fehlendes Zubehör',
+  'ownedProduct.assessment.code.defects': 'Mängel',
+  'ownedProduct.pricing.eyebrow': 'Verkaufsmarktdaten',
+  'ownedProduct.pricing.title': 'Vergleichsdaten und Preisbänder',
+  'ownedProduct.pricing.description':
+    'Erfasst freigegebene Angebotspreise für ein bewertetes Produkt und leitet reproduzierbare Hinweise für denselben Markt ab.',
+  'ownedProduct.pricing.loading': 'Verkaufspreisdaten werden geladen…',
+  'ownedProduct.pricing.refresh': 'Preisdaten aktualisieren',
+  'ownedProduct.pricing.loadError':
+    'Die Verkaufsvergleichsdaten konnten nicht geladen werden.',
+  'ownedProduct.pricing.marketReferenceError':
+    'Währungs- und Marktreferenzen konnten nicht geladen werden.',
+  'ownedProduct.pricing.staleTitle': 'Das Preisergebnis ist historisch',
+  'ownedProduct.pricing.staleDescription':
+    'Erfassung, Bilder, Bewertung oder Berechnungsversion wurden geändert. Historische Daten bleiben sichtbar, gelten aber nicht als aktuell.',
+  'ownedProduct.pricing.noCurrentTitle': 'Kein aktuelles Preisband',
+  'ownedProduct.pricing.noCurrentDescription':
+    'Erfassen Sie mindestens drei geeignete Vergleiche für ein Zielland und eine Währung.',
+  'ownedProduct.pricing.quickSale': 'Schnellverkaufsband',
+  'ownedProduct.pricing.quickSaleHint':
+    'Vom unteren Quartil bis zum gewichteten Marktanker.',
+  'ownedProduct.pricing.recommended': 'Empfohlenes Marktband',
+  'ownedProduct.pricing.recommendedHint':
+    'Interquartilsabstand der geeigneten Angebotspreise.',
+  'ownedProduct.pricing.ambitious': 'Ambitioniertes Band',
+  'ownedProduct.pricing.ambitiousHint':
+    'Vom gewichteten Marktanker bis zum oberen Quartil.',
+  'ownedProduct.pricing.confidence': 'Konfidenz',
+  'ownedProduct.pricing.completeness': 'Vollständigkeit der Bewertung',
+  'ownedProduct.pricing.included': 'Einbezogene Nachweise',
+  'ownedProduct.pricing.calculated': 'Berechnet',
+  'ownedProduct.pricing.reasons': 'Methode und Gründe',
+  'ownedProduct.pricing.unknownFacts': 'Unbekannte Fakten',
+  'ownedProduct.pricing.actions': 'Prüfmaßnahmen',
+  'ownedProduct.pricing.selectionSummary':
+    '{{included}} einbezogen · {{excluded}} ausgeschlossen',
+  'ownedProduct.pricing.askingOnly':
+    'Orientierung an Angebotspreisen, kein garantierter Transaktionspreis.',
+  'ownedProduct.pricing.provenance': 'Nur anhängbare Herkunft',
+  'ownedProduct.pricing.evidenceHistory': 'Verlauf der Vergleichsdaten',
+  'ownedProduct.pricing.noEvidence':
+    'Es wurden keine Verkaufsvergleichsdaten erfasst.',
+  'ownedProduct.pricing.openSource': 'Quelle öffnen',
+  'ownedProduct.pricing.historicalRuns':
+    'Verlauf der Preisbänder · {{count}} Läufe',
+  'ownedProduct.pricing.manualEvidence': 'Freigegebene manuelle Quelle',
+  'ownedProduct.pricing.addComparable': 'Vergleich erfassen',
+  'ownedProduct.pricing.appendOnly': 'Nach Erfassung unveränderlich',
+  'ownedProduct.pricing.marketplace': 'Marktplatzname *',
+  'ownedProduct.pricing.externalId': 'Externe Angebots-ID',
+  'ownedProduct.pricing.sourceUrl': 'Quell-URL',
+  'ownedProduct.pricing.urlPlaceholder': 'https://marktplatz.example/artikel/…',
+  'ownedProduct.pricing.sourceIdentityHelp':
+    'Geben Sie eine Quell-URL, eine externe ID oder beides an.',
+  'ownedProduct.pricing.originalTitle': 'Originaler Angebotstitel *',
+  'ownedProduct.pricing.originalDescription': 'Originalbeschreibung',
+  'ownedProduct.pricing.askingPrice': 'Angebotspreis *',
+  'ownedProduct.pricing.currency': 'Währung *',
+  'ownedProduct.pricing.chooseCurrency': 'Währung wählen',
+  'ownedProduct.pricing.marketCountry': 'Marktland *',
+  'ownedProduct.pricing.chooseCountry': 'Zielland wählen',
+  'ownedProduct.pricing.location': 'Ort',
+  'ownedProduct.pricing.listingType': 'Angebotsklassifizierung *',
+  'ownedProduct.pricing.type.product': 'Vollständiges Produkt',
+  'ownedProduct.pricing.type.sparePart': 'Ersatzteil',
+  'ownedProduct.pricing.type.brokenOnly': 'Nur defekt',
+  'ownedProduct.pricing.type.wanted': 'Gesuch',
+  'ownedProduct.pricing.type.rental': 'Vermietung',
+  'ownedProduct.pricing.type.bundle': 'Unklares Paket',
+  'ownedProduct.pricing.condition': 'Zustand des Vergleichs *',
+  'ownedProduct.pricing.sellerType': 'Verkäufertyp *',
+  'ownedProduct.pricing.seller.private': 'Privatverkäufer',
+  'ownedProduct.pricing.seller.business': 'Gewerblicher Verkäufer',
+  'ownedProduct.pricing.publishedAt': 'Veröffentlicht am',
+  'ownedProduct.pricing.observedAt': 'Beobachtet am *',
+  'ownedProduct.pricing.includedAccessories': 'Enthaltenes Zubehör',
+  'ownedProduct.pricing.missingAccessories': 'Fehlendes Zubehör',
+  'ownedProduct.pricing.onePerLine': 'Ein erhaltener Fakt pro Zeile',
+  'ownedProduct.pricing.saving': 'Nachweis wird erfasst…',
+  'ownedProduct.pricing.recordEvidence': 'Nachweis erfassen und neu berechnen',
+  'ownedProduct.pricing.currentAssessmentRequired':
+    'Eine aktuelle, bereite Bewertung ist erforderlich.',
+  'ownedProduct.pricing.requiredFields':
+    'Prüfen Sie die erforderlichen Vergleichsfelder.',
+  'ownedProduct.pricing.sourceIdentityRequired':
+    'Geben Sie eine Quell-URL oder eine externe Angebots-ID an.',
+  'ownedProduct.pricing.positivePrice':
+    'Geben Sie einen Angebotspreis über null ein.',
+  'ownedProduct.pricing.validPrice':
+    'Geben Sie einen gültigen Betrag mit der Währungsgenauigkeit ein.',
+  'ownedProduct.pricing.validTimestamps':
+    'Prüfen Sie Veröffentlichungs- und Beobachtungszeit.',
+  'ownedProduct.pricing.comparableRecorded':
+    'Der unveränderliche Vergleich wurde erfasst und das Preisergebnis neu berechnet.',
+  'ownedProduct.pricing.comparableReplayed':
+    'Der identische Nachweis wurde ohne Duplikat wiederverwendet.',
+  'ownedProduct.pricing.saveError':
+    'Der Vergleichsnachweis konnte nicht erfasst werden.',
+  'ownedProduct.pricing.intakeUnavailableTitle':
+    'Vergleichserfassung ist nicht verfügbar',
+  'ownedProduct.pricing.intakeUnavailableDescription':
+    'Eine verwaltende Person muss zuerst eine aktuelle, bereite Bewertung für ein nicht archiviertes Produkt erstellen.',
+  'ownedProduct.pricing.boundary':
+    'Diese Stufe erzeugt keinen Anzeigentext, veröffentlicht nichts, legt keinen Verkaufsportfolioeintrag an und erfasst keine tatsächliche Transaktion.',
+  'ownedProduct.pricing.code.sameMarketCurrencyOnly':
+    'Nur derselbe Markt und dieselbe Währung sind zulässig',
+  'ownedProduct.pricing.code.explicitMarketNormalizationOnly':
+    'Marktübergreifende Nachweise erfordern eine ausdrückliche Normalisierung',
+  'ownedProduct.pricing.code.nativeMarketAmountUsed':
+    'Nativer Marktbetrag verwendet',
+  'ownedProduct.pricing.code.sufficientEligibleComparables':
+    'Ausreichend native oder ausdrücklich normalisierte Vergleichswerte',
+  'ownedProduct.pricing.code.noEligibleSellComparables':
+    'Keine geeigneten Verkaufsvergleiche',
+  'ownedProduct.pricing.code.insufficientSellComparables':
+    'Nicht genügend geeignete Verkaufsvergleiche',
+  'ownedProduct.pricing.code.candidatePoolTruncated':
+    'Der begrenzte Kandidatenpool wurde gekürzt',
+  'ownedProduct.pricing.code.supersededSourceObservation':
+    'Ersetzte Beobachtung desselben Angebots',
+  'ownedProduct.pricing.code.sparePartListing': 'Ersatzteilangebot',
+  'ownedProduct.pricing.code.brokenOnlyListing': 'Nur-defekt-Angebot',
+  'ownedProduct.pricing.code.wantedListing': 'Gesuch',
+  'ownedProduct.pricing.code.rentalListing': 'Mietangebot',
+  'ownedProduct.pricing.code.unclearBundleListing': 'Unklares Paketangebot',
+  'ownedProduct.pricing.code.brokenCondition': 'Defekter Zustand',
+  'ownedProduct.pricing.code.currencyConversionNotAuthorized':
+    'Währungsumrechnung ist nicht freigegeben',
+  'ownedProduct.pricing.code.crossMarketNormalizationNotAuthorized':
+    'Marktübergreifende Normalisierung ist nicht freigegeben',
+  'ownedProduct.pricing.code.incompatibleVariant':
+    'Inkompatible Produktvariante',
+  'ownedProduct.pricing.code.regionIncompatibleVariant':
+    'Variante ist mit diesem Markt inkompatibel',
+  'ownedProduct.pricing.code.selectionLimitReached':
+    'Auswahllimit für Vergleiche erreicht',
+  'ownedProduct.pricing.code.exactModel': 'Exaktes kanonisches Modell',
+  'ownedProduct.pricing.code.sameMarket': 'Derselbe Markt',
+  'ownedProduct.pricing.code.sameCurrency': 'Dieselbe Währung',
+  'ownedProduct.pricing.code.exactVariant': 'Exakte Produktvariante',
+  'ownedProduct.pricing.code.variantUnspecified': 'Variante nicht angegeben',
+  'ownedProduct.pricing.code.variantNotRequired':
+    'Bewertung erforderte keine exakte Variante',
+  'ownedProduct.pricing.code.targetConditionUnavailable':
+    'Zielzustand ist nicht verfügbar',
+  'ownedProduct.pricing.code.exactCondition': 'Exakter Zustand',
+  'ownedProduct.pricing.code.conditionDiffers': 'Zustand weicht ab',
+  'ownedProduct.pricing.code.targetAccessoriesUnavailable':
+    'Zielzubehör ist nicht verfügbar',
+  'ownedProduct.pricing.code.accessoriesCompared': 'Zubehör wurde verglichen',
+  'ownedProduct.pricing.code.askingPriceOnly':
+    'Nachweise enthalten Angebots-, keine Abschlusspreise',
+  'ownedProduct.pricing.code.minimumEvidenceMet':
+    'Mindestzahl an Verkaufsnachweisen erreicht',
+  'ownedProduct.pricing.code.weightedMedianRecorded':
+    'Gewichteter Median erfasst',
+  'ownedProduct.pricing.code.interquartileRangeRecorded':
+    'Interquartilsabstand erfasst',
+  'ownedProduct.pricing.code.dataDerivedBands':
+    'Alle drei Bänder werden aus ausgewählten Nachweisen abgeleitet',
+  'ownedProduct.pricing.code.noMarketMixing':
+    'Keine Vermischung von Währungen oder Märkten',
+  'ownedProduct.pricing.code.extremeOutliersExcluded':
+    'Extreme Ausreißer wurden ausgeschlossen',
+  'ownedProduct.pricing.code.highPriceDispersion': 'Hohe Preisstreuung',
+  'ownedProduct.pricing.code.lowConfidence':
+    'Niedrige Konfidenz des Verkaufspreises',
+  'ownedProduct.pricing.code.realizedPrices': 'Realisierte Abschlusspreise',
+  'ownedProduct.pricing.code.saleDuration': 'Erwartete Verkaufsdauer',
+  'ownedProduct.pricing.code.sourceDiversity': 'Unabhängige Quellenvielfalt',
+  'ownedProduct.pricing.code.sufficientComparables':
+    'Ausreichende Vergleiche desselben Marktes',
+  'ownedProduct.pricing.code.confirmOutcomes':
+    'Realisierte Verkaufsergebnisse bestätigen',
+  'ownedProduct.pricing.code.addIndependentSource':
+    'Nachweis von einem unabhängigen Marktplatz ergänzen',
+  'ownedProduct.pricing.code.addSameMarketComparables':
+    'Geeignete Vergleiche desselben Marktes und derselben Währung ergänzen',
+  'ownedProduct.pricing.code.addEligibleSellComparables':
+    'Native oder ausdrücklich normalisierte geeignete Vergleiche ergänzen',
+  'ownedProduct.pricing.code.selectedComparable': 'Ausgewählter Vergleich',
+  'ownedProduct.pricing.code.madOutlier':
+    'Ausreißer nach medianer absoluter Abweichung',
+  'ownedProduct.pricing.code.insufficientAfterOutliers':
+    'Nach Ausreißerentfernung verbleiben zu wenige Nachweise',
+  'ownedProduct.pricing.code.comparableCount': 'Anzahl der Vergleiche',
+  'ownedProduct.pricing.code.productMatchQuality': 'Qualität der Produktzuordnung',
+  'ownedProduct.pricing.code.conditionCompleteness':
+    'Vollständigkeit des Zustands',
+  'ownedProduct.pricing.code.priceConsistency': 'Preiskonsistenz',
+  'ownedProduct.pricing.code.freshness': 'Aktualität der Nachweise',
+  'language.en': 'Englisch',
+  'language.de': 'Deutsch',
+  'language.es': 'Spanisch',
+  'language.fr': 'Französisch',
+  'language.sr-Latn': 'Serbisch (Lateinisch)',
+  'ownedProduct.listing.marketReferenceError':
+    'Die Währungsreferenzdaten konnten nicht geladen werden.',
+  'ownedProduct.listing.eyebrow': 'Inseratsvorbereitung',
+  'ownedProduct.listing.title': 'Inseratsentwurf und Fotobereitschaft',
+  'ownedProduct.listing.description':
+    'Erstellen Sie versionierte Marktplatztexte aus exakt bewerteten Fakten, einer ausdrücklich gewählten Preisspanne und dem aktuellen privaten Bildbestand.',
+  'ownedProduct.listing.refresh': 'Entwürfe aktualisieren',
+  'ownedProduct.listing.loading': 'Inseratsentwürfe werden geladen…',
+  'ownedProduct.listing.loadError':
+    'Die Inseratsentwürfe konnten nicht geladen werden.',
+  'ownedProduct.listing.staleTitle': 'Vorgelagerte Nachweise sind historisch',
+  'ownedProduct.listing.staleDescription':
+    'Erstellen Sie eine aktuelle, fertige Bewertung, bevor ein neuer Entwurf erzeugt wird. Bestehende Entwürfe bleiben im Verlauf sichtbar.',
+  'ownedProduct.listing.noBandTitle':
+    'Keine vollständige aktuelle Preisspanne',
+  'ownedProduct.listing.noBandDescription':
+    'Erfassen Sie genügend Vergleichsnachweise aus demselben Markt, bevor Sie Inhalt und Zielpreis wählen.',
+  'ownedProduct.listing.status.ready': 'Entwurf bereit',
+  'ownedProduct.listing.status.review_required': 'Prüfung erforderlich',
+  'ownedProduct.listing.photoStatus.ready': 'Fotos bereit',
+  'ownedProduct.listing.photoStatus.needs_photos':
+    'Weitere Fotos erforderlich',
+  'ownedProduct.listing.photoStatus.review_required':
+    'Fotoprüfung erforderlich',
+  'ownedProduct.listing.checkStatus.satisfied': 'Erfüllt',
+  'ownedProduct.listing.checkStatus.missing': 'Fehlt',
+  'ownedProduct.listing.checkStatus.review_required': 'Prüfen',
+  'ownedProduct.listing.checkStatus.not_applicable': 'Nicht zutreffend',
+  'ownedProduct.listing.targetPrice': 'Ziel-Angebotspreis',
+  'ownedProduct.listing.strategyLabel': 'Preisstrategie',
+  'ownedProduct.listing.photoReadiness': 'Fotobereitschaft',
+  'ownedProduct.listing.completeness': 'Gesamtvollständigkeit',
+  'ownedProduct.listing.generatedDescription': 'Erzeugte Beschreibung',
+  'ownedProduct.listing.warnings': 'Warnungen',
+  'ownedProduct.listing.unknowns': 'Unbekannte Fakten',
+  'ownedProduct.listing.actions': 'Prüfaktionen',
+  'ownedProduct.listing.photoChecklist': 'Foto-Checkliste',
+  'ownedProduct.listing.photoCount':
+    '{{observed}} vorhanden · {{required}} erforderlich',
+  'ownedProduct.listing.sourceFacts': 'Offengelegte Quellfakten',
+  'ownedProduct.listing.emptyTitle': 'Noch kein Inseratsentwurf',
+  'ownedProduct.listing.emptyDescription':
+    'Wählen Sie Preisnachweis, Zielpreis und Inseratssprache ausdrücklich aus.',
+  'ownedProduct.listing.generatorEyebrow': 'Deterministischer Generator',
+  'ownedProduct.listing.generatorTitle':
+    'Unveränderlichen Entwurf erzeugen',
+  'ownedProduct.listing.explicitChoice':
+    'Preis, Strategie und Sprache werden nicht automatisch gewählt',
+  'ownedProduct.listing.priceBand': 'Aktuelle Länder- und Währungsspanne',
+  'ownedProduct.listing.chooseBand': 'Preisspanne auswählen',
+  'ownedProduct.listing.chooseStrategy': 'Preisstrategie auswählen',
+  'ownedProduct.listing.strategy.quick_sale': 'Schnellverkauf',
+  'ownedProduct.listing.strategy.recommended': 'Empfohlen',
+  'ownedProduct.listing.strategy.ambitious': 'Ambitioniert',
+  'ownedProduct.listing.language': 'Inseratssprache',
+  'ownedProduct.listing.chooseLanguage': 'Inseratssprache auswählen',
+  'ownedProduct.listing.selectedRange': 'Gewählte Orientierung: {{range}}',
+  'ownedProduct.listing.overrideReason': 'Grund für Preisabweichung',
+  'ownedProduct.listing.overrideReasonHint':
+    'Nur erforderlich, wenn der Zielpreis außerhalb der gewählten Spanne liegt.',
+  'ownedProduct.listing.requiredFields':
+    'Wählen Sie Preisspanne, Strategie und Sprache und geben Sie dann den Zielpreis ein.',
+  'ownedProduct.listing.upstreamRequired':
+    'Eine aktuelle fertige Bewertung und vollständige aktuelle Preisspanne sind erforderlich.',
+  'ownedProduct.listing.positivePrice':
+    'Geben Sie einen Zielpreis über null ein.',
+  'ownedProduct.listing.validPrice':
+    'Geben Sie einen gültigen Betrag mit der Genauigkeit der gewählten Währung ein.',
+  'ownedProduct.listing.overrideReasonRequired':
+    'Begründen Sie, warum der Zielpreis außerhalb der Orientierungsspanne liegt.',
+  'ownedProduct.listing.created':
+    'Ein neuer unveränderlicher Inseratsentwurf wurde erzeugt.',
+  'ownedProduct.listing.replayed':
+    'Die identische Eingabe wurde ohne Duplikat wiederverwendet.',
+  'ownedProduct.listing.saveError':
+    'Der Inseratsentwurf konnte nicht erzeugt werden.',
+  'ownedProduct.listing.generating': 'Wird erzeugt…',
+  'ownedProduct.listing.generate': 'Inseratsentwurf erzeugen',
+  'ownedProduct.listing.history': 'Entwurfsverlauf · {{count}} Läufe',
+  'ownedProduct.listing.current': 'Aktuell',
+  'ownedProduct.listing.historical': 'Historisch',
+  'ownedProduct.listing.boundary':
+    'Nur Entwurf: Procura veröffentlicht in dieser Phase nicht auf Marktplätzen, erstellt keinen Verkaufsportfolio-Eintrag und erfasst keine echte Transaktion.',
+  'ownedProduct.listing.check.product_overview':
+    'Klare Produktübersicht',
+  'ownedProduct.listing.check.multiple_product_angles':
+    'Mehrere Produktansichten',
+  'ownedProduct.listing.check.high_resolution_product_photos':
+    'Hochauflösende Produktfotos',
+  'ownedProduct.listing.check.serial_label':
+    'Lesbares Serien- oder Modelllabel',
+  'ownedProduct.listing.check.defect_documentation':
+    'Jeder angegebene Mangel dokumentiert',
+  'ownedProduct.listing.check.accessory_visibility':
+    'Enthaltenes Zubehör sichtbar',
+  'ownedProduct.listing.check.private_proof_exclusion':
+    'Kaufbelegbilder bleiben privat',
+  'ownedProduct.listing.code.askingGuidance':
+    'Der Angebotspreis ist eine Orientierung, kein garantierter Transaktionspreis',
+  'ownedProduct.listing.code.photoIncomplete':
+    'Erforderliche Fotonachweise sind unvollständig',
+  'ownedProduct.listing.code.photoReview':
+    'Der Fotoinhalt muss menschlich geprüft werden',
+  'ownedProduct.listing.code.lowConfidenceBand':
+    'Die gewählte Preisspanne hat geringe Sicherheit',
+  'ownedProduct.listing.code.priceOutsideBand':
+    'Der Zielpreis liegt außerhalb der gewählten Orientierungsspanne',
+  'ownedProduct.listing.code.realizedSalePrice': 'Tatsächlicher Verkaufspreis',
+  'ownedProduct.listing.code.timeToSale': 'Tatsächliche Verkaufsdauer',
+  'ownedProduct.listing.code.provideOverview':
+    'Ein klares Produktübersichtsfoto hinzufügen',
+  'ownedProduct.listing.code.provideAngles':
+    'Produktfotos aus mehreren Blickwinkeln hinzufügen',
+  'ownedProduct.listing.code.provideHighResolution':
+    'Ausreichend hochauflösende Produktfotos hinzufügen',
+  'ownedProduct.listing.code.provideSerial':
+    'Ein lesbares Serien- oder Modelllabelfoto hinzufügen',
+  'ownedProduct.listing.code.provideDefects':
+    'Für jeden angegebenen Mangel ein Foto hinzufügen',
+  'ownedProduct.listing.code.provideAccessories':
+    'Ein Foto mit dem enthaltenen Zubehör hinzufügen',
+  'ownedProduct.listing.code.confirmAccessories':
+    'Bestätigen, dass jedes enthaltene Zubehör sichtbar ist',
+  'ownedProduct.listing.code.confirmDefects':
+    'Bestätigen, dass jeder angegebene Mangel klar sichtbar ist',
+  'ownedProduct.listing.code.keepProofPrivate':
+    'Kaufbelegbilder privat halten',
+  'ownedProduct.listing.code.reviewPriceOverride':
+    'Preisabweichung und Begründung prüfen',
+  'ownedProduct.listing.code.reviewLowConfidence':
+    'Preisspanne mit geringer Sicherheit vor Nutzung prüfen',
+  'ownedProduct.portfolio.eyebrow': 'Verkaufsablauf',
+  'ownedProduct.portfolio.title': 'Verkaufsportfolio und Veröffentlichungshistorie',
+  'ownedProduct.portfolio.description':
+    'Einen vollständig geprüften Entwurf ins Portfolio übernehmen und externe Marktplatzereignisse manuell erfassen.',
+  'ownedProduct.portfolio.refresh': 'Portfolio aktualisieren',
+  'ownedProduct.portfolio.loading': 'Verkaufsportfolio wird geladen…',
+  'ownedProduct.portfolio.loadError': 'Das Verkaufsportfolio konnte nicht geladen werden.',
+  'ownedProduct.portfolio.marketReferenceError':
+    'Währungsreferenzdaten konnten nicht geladen werden.',
+  'ownedProduct.portfolio.staleTitle': 'Quelldaten haben sich geändert',
+  'ownedProduct.portfolio.staleDescription':
+    'Historische Einträge bleiben sichtbar; vor Veröffentlichung oder Wiedereinstellung ist ein aktueller vollständig geprüfter Entwurf erforderlich.',
+  'ownedProduct.portfolio.emptyTitle': 'Noch keine Portfolioeinträge',
+  'ownedProduct.portfolio.emptyDescription':
+    'Einen aktuellen vollständig geprüften Anzeigenentwurf auswählen, um einen nachvollziehbaren Verkaufsablauf zu starten.',
+  'ownedProduct.portfolio.untitledDraft': 'Anzeigenentwurf ohne Titel',
+  'ownedProduct.portfolio.status.draft': 'Entwurf',
+  'ownedProduct.portfolio.status.listed': 'Eingestellt',
+  'ownedProduct.portfolio.status.reserved': 'Reserviert',
+  'ownedProduct.portfolio.status.withdrawn': 'Zurückgezogen',
+  'ownedProduct.portfolio.status.expired': 'Abgelaufen',
+  'ownedProduct.portfolio.event.published': 'Veröffentlicht',
+  'ownedProduct.portfolio.event.price_changed': 'Preis geändert',
+  'ownedProduct.portfolio.event.reserved': 'Reserviert',
+  'ownedProduct.portfolio.event.withdrawn': 'Zurückgezogen',
+  'ownedProduct.portfolio.event.expired': 'Abgelaufen',
+  'ownedProduct.portfolio.event.relisted': 'Wiedereingestellt',
+  'ownedProduct.portfolio.evidenceCurrent': 'Aktuelle Quelldaten',
+  'ownedProduct.portfolio.evidenceHistorical': 'Historische Quelldaten',
+  'ownedProduct.portfolio.initialPrice': 'Ursprünglicher Zielpreis',
+  'ownedProduct.portfolio.currentPrice': 'Aktueller Angebotspreis',
+  'ownedProduct.portfolio.enteredAt': 'Ins Portfolio aufgenommen',
+  'ownedProduct.portfolio.marketplace': 'Marktplatz',
+  'ownedProduct.portfolio.openListing': 'Externe Anzeige öffnen',
+  'ownedProduct.portfolio.history': 'Verlauf · {{count}} Ereignisse',
+  'ownedProduct.portfolio.entryEyebrow': 'Portfolioaufnahme',
+  'ownedProduct.portfolio.entryTitle': 'Portfolioeintrag erstellen',
+  'ownedProduct.portfolio.reviewCompleteOnly': 'Nur vollständig geprüfte Entwürfe',
+  'ownedProduct.portfolio.listingDraft': 'Anzeigenentwurf',
+  'ownedProduct.portfolio.chooseDraft': 'Anzeigenentwurf auswählen',
+  'ownedProduct.portfolio.entering': 'Wird hinzugefügt…',
+  'ownedProduct.portfolio.enter': 'Zum Verkaufsportfolio hinzufügen',
+  'ownedProduct.portfolio.entryRequired':
+    'Einen aktuellen vollständig geprüften Anzeigenentwurf auswählen.',
+  'ownedProduct.portfolio.entryCreated':
+    'Ein neuer unveränderlicher Portfolioeintrag wurde erstellt.',
+  'ownedProduct.portfolio.entryReplayed':
+    'Der identische Portfoliobefehl wurde ohne Duplikat wiederholt.',
+  'ownedProduct.portfolio.entrySaveError':
+    'Der Portfolioeintrag konnte nicht erstellt werden.',
+  'ownedProduct.portfolio.eventEyebrow': 'Manueller Marktplatznachweis',
+  'ownedProduct.portfolio.eventTitle': 'Lebenszyklusereignis erfassen',
+  'ownedProduct.portfolio.manualOnly': 'Kein Marktplatz-API-Aufruf',
+  'ownedProduct.portfolio.entry': 'Portfolioeintrag',
+  'ownedProduct.portfolio.chooseEntry': 'Portfolioeintrag auswählen',
+  'ownedProduct.portfolio.eventType': 'Ereignis',
+  'ownedProduct.portfolio.chooseEvent': 'Zulässiges Ereignis auswählen',
+  'ownedProduct.portfolio.occurredAt': 'Ereigniszeit',
+  'ownedProduct.portfolio.marketplaceName': 'Marktplatzname',
+  'ownedProduct.portfolio.marketplaceKey': 'Marktplatzschlüssel',
+  'ownedProduct.portfolio.marketplaceKeyExample': 'beispiel-markt',
+  'ownedProduct.portfolio.externalId': 'Externe Anzeigen-ID',
+  'ownedProduct.portfolio.externalUrl': 'Externe Anzeigen-URL',
+  'ownedProduct.portfolio.advertisedPrice': 'Angebotspreis',
+  'ownedProduct.portfolio.currency': 'Währung',
+  'ownedProduct.portfolio.currencyExample': 'EUR',
+  'ownedProduct.portfolio.withdrawalReason': 'Grundcode für Rücknahme',
+  'ownedProduct.portfolio.reasonExample': 'verkaeufer_plan_geaendert',
+  'ownedProduct.portfolio.note': 'Interne Notiz',
+  'ownedProduct.portfolio.recording': 'Wird erfasst…',
+  'ownedProduct.portfolio.recordEvent': 'Ereignis erfassen',
+  'ownedProduct.portfolio.eventRequired':
+    'Portfolioeintrag, zulässiges Ereignis und Ereigniszeit auswählen.',
+  'ownedProduct.portfolio.publicationRequired':
+    'Marktplatzname, Schlüssel, externe ID und HTTPS-Anzeigen-URL sind erforderlich.',
+  'ownedProduct.portfolio.withdrawalReasonRequired':
+    'Vor der Rücknahme einen begrenzten Grundcode erfassen.',
+  'ownedProduct.portfolio.priceRequired':
+    'Einen positiven Angebotspreis und einen aktiven Währungscode eingeben.',
+  'ownedProduct.portfolio.eventTimeRequired':
+    'Eine gültige Ereigniszeit eingeben, die nicht in der Zukunft liegt.',
+  'ownedProduct.portfolio.eventCreated':
+    'Das unveränderliche Verkaufsereignis wurde erfasst.',
+  'ownedProduct.portfolio.eventReplayed':
+    'Der identische Ereignisbefehl wurde ohne Duplikat wiederholt.',
+  'ownedProduct.portfolio.eventSaveError':
+    'Das Verkaufsereignis konnte nicht erfasst werden.',
+  'ownedProduct.portfolio.boundary':
+    'Nur manuelle Nachverfolgung: Procura veröffentlicht nicht auf Marktplätzen und behandelt Angebotspreise weder als erhaltenes Geld noch als abgeschlossene Verkäufe.',
+  'ownedProduct.outcomes.eyebrow': 'Verifiziertes Finanzergebnis',
+  'ownedProduct.outcomes.title': 'Tatsächlicher Kauf, Kosten und Verkauf',
+  'ownedProduct.outcomes.description':
+    'Erfassen Sie unveränderliche Nachweise für realisierte Beträge getrennt von Schätzungen, Angebotspreisen und Workflow-Entscheidungen.',
+  'ownedProduct.outcomes.refresh': 'Ergebnisse aktualisieren',
+  'ownedProduct.outcomes.loading': 'Finanzergebnisse werden geladen…',
+  'ownedProduct.outcomes.loadError':
+    'Der Verlauf der Finanzergebnisse konnte nicht geladen werden.',
+  'ownedProduct.outcomes.marketReferenceError':
+    'Währungsreferenzdaten konnten nicht geladen werden.',
+  'ownedProduct.outcomes.profitEyebrow': 'Vollständige Nachweiskette',
+  'ownedProduct.outcomes.profitTitle': 'Realisierter Nettogewinn',
+  'ownedProduct.outcomes.incompleteEyebrow': 'Explizit unbekannt',
+  'ownedProduct.outcomes.incompleteTitle':
+    'Der realisierte Gewinn ist noch nicht verfügbar',
+  'ownedProduct.outcomes.incompleteDescription':
+    'Procura zeigt kein Teilergebnis als präzisen Gewinn. Ergänzen Sie die fehlenden Nachweise.',
+  'ownedProduct.outcomes.purchase': 'Tatsächlicher Kauf',
+  'ownedProduct.outcomes.costs': 'Tatsächliche Zusatzkosten',
+  'ownedProduct.outcomes.salePrice': 'Tatsächlicher Verkauf',
+  'ownedProduct.outcomes.margin': 'Gewinnmarge',
+  'ownedProduct.outcomes.return': 'Rendite auf das eingesetzte Kapital',
+  'ownedProduct.outcomes.saleDuration': 'Verkaufsdauer',
+  'ownedProduct.outcomes.durationDays': '{{count}} Tage',
+  'ownedProduct.outcomes.purchaseEvidence': 'Aktueller Kaufnachweis',
+  'ownedProduct.outcomes.costEvidence': 'Aktueller Kostennachweis',
+  'ownedProduct.outcomes.saleEvidence': 'Erfasste Verkaufsergebnisse',
+  'ownedProduct.outcomes.reportingValue': 'Berichtswert',
+  'ownedProduct.outcomes.noPurchase':
+    'Es wurde noch kein tatsächlicher Kaufbetrag erfasst.',
+  'ownedProduct.outcomes.noCosts':
+    'Es wurde noch kein tatsächlicher Kostensnapshot erfasst.',
+  'ownedProduct.outcomes.noSale':
+    'Es wurde noch kein verkauftes, storniertes oder erfolgloses Ergebnis erfasst.',
+  'ownedProduct.outcomes.costCompleteness':
+    '{{known}} bekannt · {{unknown}} unbekannt',
+  'ownedProduct.outcomes.purchaseFormEyebrow': 'Kaufnachweis',
+  'ownedProduct.outcomes.purchaseFormTitle': 'Tatsächlichen Kauf erfassen',
+  'ownedProduct.outcomes.costFormEyebrow': 'Kostennachweis',
+  'ownedProduct.outcomes.costFormTitle':
+    'Tatsächlichen Kostensnapshot erfassen',
+  'ownedProduct.outcomes.saleFormEyebrow': 'Portfolio-Ergebnis',
+  'ownedProduct.outcomes.saleFormTitle':
+    'Tatsächliches Verkaufsergebnis erfassen',
+  'ownedProduct.outcomes.immutableVersion': 'Neue unveränderliche Version',
+  'ownedProduct.outcomes.blankMeansUnknown':
+    'Leer bedeutet ausdrücklich unbekannt; Null ist ein bekannter Nullbetrag',
+  'ownedProduct.outcomes.exactPortfolioOnly':
+    'Nur die exakte aktuelle Veröffentlichungskette',
+  'ownedProduct.outcomes.actualAmount': 'Tatsächlicher Betrag',
+  'ownedProduct.outcomes.sourceCurrency': 'Quellwährung',
+  'ownedProduct.outcomes.reportingCurrency': 'Berichtswährung',
+  'ownedProduct.outcomes.chooseCurrency': 'Währung auswählen',
+  'ownedProduct.outcomes.occurredAt': 'Zeitpunkt',
+  'ownedProduct.outcomes.evidenceKind': 'Nachweistyp',
+  'ownedProduct.outcomes.chooseEvidence': 'Nachweis auswählen',
+  'ownedProduct.outcomes.evidenceReference': 'Nachweisreferenz',
+  'ownedProduct.outcomes.correctionReason': 'Korrekturgrund-Code',
+  'ownedProduct.outcomes.correctionExample': 'beleg_korrigiert',
+  'ownedProduct.outcomes.note': 'Interne Notiz',
+  'ownedProduct.outcomes.portfolioEntry': 'Verkaufsportfolio-Eintrag',
+  'ownedProduct.outcomes.chooseEntry': 'Portfolio-Eintrag auswählen',
+  'ownedProduct.outcomes.outcomeType': 'Ergebnis',
+  'ownedProduct.outcomes.chooseOutcome': 'Zulässiges Ergebnis auswählen',
+  'ownedProduct.outcomes.outcomeReason': 'Storno-/Kein-Verkauf-Grund',
+  'ownedProduct.outcomes.noSaleReasonExample': 'angebot_ohne_verkauf_beendet',
+  'ownedProduct.outcomes.recording': 'Wird erfasst…',
+  'ownedProduct.outcomes.recordPurchase': 'Tatsächlichen Kauf erfassen',
+  'ownedProduct.outcomes.recordCosts': 'Kostensnapshot erfassen',
+  'ownedProduct.outcomes.recordSale': 'Verkaufsergebnis erfassen',
+  'ownedProduct.outcomes.purchaseRequired':
+    'Geben Sie exakten Kaufbetrag, Währungen, Zeitpunkt und Nachweis an. Korrekturen benötigen einen Grund.',
+  'ownedProduct.outcomes.costRequired':
+    'Wählen Sie eine Berichtswährung. Jeder eingegebene Kostenwert benötigt Quellwährung, Zeitpunkt und Nachweis; Korrekturen einen Grund.',
+  'ownedProduct.outcomes.saleRequired':
+    'Wählen Sie Portfolio-Eintrag, zulässiges Ergebnis, Zeitpunkt und Nachweis. Korrekturen benötigen einen Grund.',
+  'ownedProduct.outcomes.saleMoneyRequired':
+    'Ein Verkauf benötigt einen positiven tatsächlichen Betrag und beide Währungen.',
+  'ownedProduct.outcomes.saleReasonRequired':
+    'Ein storniertes oder erfolgloses Ergebnis benötigt einen Grund-Code.',
+  'ownedProduct.outcomes.purchaseRecorded':
+    'Der unveränderliche tatsächliche Kaufnachweis wurde erfasst.',
+  'ownedProduct.outcomes.costsRecorded':
+    'Der unveränderliche tatsächliche Kostensnapshot wurde erfasst.',
+  'ownedProduct.outcomes.saleRecorded':
+    'Das unveränderliche Verkaufsergebnis wurde erfasst.',
+  'ownedProduct.outcomes.commandReplayed':
+    'Der identische Befehl wurde ohne Duplikat wiederholt.',
+  'ownedProduct.outcomes.purchaseSaveError':
+    'Der tatsächliche Kaufnachweis konnte nicht erfasst werden.',
+  'ownedProduct.outcomes.costSaveError':
+    'Der tatsächliche Kostensnapshot konnte nicht erfasst werden.',
+  'ownedProduct.outcomes.saleSaveError':
+    'Das tatsächliche Verkaufsergebnis konnte nicht erfasst werden.',
+  'ownedProduct.outcomes.evidence.receipt': 'Kassenbeleg',
+  'ownedProduct.outcomes.evidence.invoice': 'Rechnung',
+  'ownedProduct.outcomes.evidence.bank_statement': 'Kontoauszug',
+  'ownedProduct.outcomes.evidence.marketplace_record':
+    'Marktplatz-Transaktionsnachweis',
+  'ownedProduct.outcomes.evidence.manual_confirmation':
+    'Manuelle Bestätigung',
+  'ownedProduct.outcomes.evidence.other': 'Anderer Nachweis',
+  'ownedProduct.outcomes.cost.transport': 'Transport',
+  'ownedProduct.outcomes.cost.repair': 'Reparatur',
+  'ownedProduct.outcomes.cost.platform_fees': 'Plattformgebühren',
+  'ownedProduct.outcomes.cost.payment_fees': 'Zahlungsgebühren',
+  'ownedProduct.outcomes.cost.customs': 'Zoll',
+  'ownedProduct.outcomes.cost.tax': 'Steuer',
+  'ownedProduct.outcomes.cost.marketing': 'Marketing',
+  'ownedProduct.outcomes.cost.other_costs': 'Sonstige Kosten',
+  'ownedProduct.outcomes.sale.sold': 'Verkauft',
+  'ownedProduct.outcomes.sale.cancelled': 'Storniert',
+  'ownedProduct.outcomes.sale.no_sale': 'Kein Verkauf',
+  'ownedProduct.outcomes.unknown.actualPurchase':
+    'Der tatsächliche Kaufnachweis fehlt.',
+  'ownedProduct.outcomes.unknown.costSnapshot':
+    'Ein tatsächlicher Kostensnapshot fehlt.',
+  'ownedProduct.outcomes.unknown.costsIncomplete':
+    'Eine oder mehrere tatsächliche Kostenkategorien sind unbekannt.',
+  'ownedProduct.outcomes.unknown.actualSale':
+    'Ein realisiertes Verkaufsergebnis fehlt.',
+  'ownedProduct.outcomes.unknown.purchaseCostCurrency':
+    'Kauf und Kosten verwenden unterschiedliche Berichtswährungen.',
+  'ownedProduct.outcomes.unknown.saleCostCurrency':
+    'Verkauf und Kosten verwenden unterschiedliche Berichtswährungen.',
+  'ownedProduct.outcomes.unknown.profitUnavailable':
+    'Die vollständige Kette für den realisierten Gewinn fehlt.',
+  'ownedProduct.outcomes.unknown.unmapped':
+    'Nicht geklärter Nachweis: {{code}}',
+  'ownedProduct.outcomes.accuracyEyebrow': 'Prüfung der Schätzung',
+  'ownedProduct.outcomes.accuracyTitle': 'Genauigkeit der Schätzung',
+  'ownedProduct.outcomes.accuracyDescription':
+    'Vergleichen Sie die exakte ursprüngliche Kaufprognose mit unveränderlichen Ist-Beträgen. Procura zeigt Fehler je Kennzahl und keinen irreführenden Gesamtscore.',
+  'ownedProduct.outcomes.accuracyUnknownSource':
+    'Unbekannte Quelle der Schätzung',
+  'ownedProduct.outcomes.accuracyMissing':
+    'Ein vollständiges Ergebnis liegt vor, wurde aber noch nicht mit der exakten kaufentscheidenden Schätzung verknüpft.',
+  'ownedProduct.outcomes.accuracyNeedsOutcome':
+    'Vervollständigen Sie Kauf, Kosten und Verkaufsergebnis, bevor die Genauigkeit gemessen wird.',
+  'ownedProduct.outcomes.accuracyAttributionEyebrow':
+    'Explizite Zuordnung',
+  'ownedProduct.outcomes.accuracyAttributionTitle':
+    'Ursprüngliche Kaufprognose verknüpfen',
+  'ownedProduct.outcomes.accuracyAttributionDescription':
+    'Wählen Sie die exakte Analyse für diese Transaktion. Produktnamen und Workflow-Status werden niemals zur Ableitung dieser Beziehung verwendet.',
+  'ownedProduct.outcomes.accuracySearchLabel':
+    'Historische Schätzungen durchsuchen',
+  'ownedProduct.outcomes.accuracySearchPlaceholder':
+    'Angebotstitel oder Analyse-ID',
+  'ownedProduct.outcomes.accuracySearchAction': 'Suchen',
+  'ownedProduct.outcomes.accuracyNoCandidates':
+    'Keine zulässige Schätzung entspricht dieser Suche.',
+  'ownedProduct.outcomes.accuracyEstimate': 'Ursprüngliche Kaufprognose',
+  'ownedProduct.outcomes.accuracyChooseEstimate':
+    'Exakte Schätzung auswählen',
+  'ownedProduct.outcomes.accuracyLoadingCandidates':
+    'Zulässige Schätzungen werden geladen…',
+  'ownedProduct.outcomes.accuracyReasonCode': 'Grundcode der Zuordnung',
+  'ownedProduct.outcomes.accuracyCorrectionExample':
+    'falsche_schaetzung_korrigiert',
+  'ownedProduct.outcomes.accuracyRecord':
+    'Zuordnung speichern und Genauigkeit berechnen',
+  'ownedProduct.outcomes.accuracyRequired':
+    'Wählen Sie eine exakte zulässige Schätzung und vervollständigen Sie den Nachweis. Korrekturen benötigen einen Grund.',
+  'ownedProduct.outcomes.accuracyRecorded':
+    'Die unveränderliche Zuordnung und der Genauigkeitsbericht wurden gespeichert.',
+  'ownedProduct.outcomes.accuracyCandidatesError':
+    'Zulässige Kaufprognosen konnten nicht geladen werden.',
+  'ownedProduct.outcomes.accuracySaveError':
+    'Zuordnung und Genauigkeitsbericht konnten nicht gespeichert werden.',
+  'ownedProduct.outcomes.accuracy.expected': 'Erwartet',
+  'ownedProduct.outcomes.accuracy.actual': 'Tatsächlich',
+  'ownedProduct.outcomes.accuracy.signedError': 'Vorzeichenfehler',
+  'ownedProduct.outcomes.accuracy.absoluteError': 'Absoluter Fehler',
+  'ownedProduct.outcomes.accuracy.percentageError': 'Prozentualer Fehler',
+  'ownedProduct.outcomes.accuracy.sourceExpected':
+    'Ursprünglicher Erwartungswert',
+  'ownedProduct.outcomes.accuracy.notes': 'Hinweise zur Vergleichbarkeit',
+  'ownedProduct.outcomes.accuracy.purchase': 'Kaufpreis',
+  'ownedProduct.outcomes.accuracy.costs': 'Zusatzkosten',
+  'ownedProduct.outcomes.accuracy.sale': 'Verkaufserlös',
+  'ownedProduct.outcomes.accuracy.profit': 'Nettogewinn',
+  'ownedProduct.outcomes.accuracy.unknownMetric': 'Kennzahl: {{code}}',
+  'ownedProduct.outcomes.accuracy.status.calculated': 'Berechnet',
+  'ownedProduct.outcomes.accuracy.status.partial': 'Teilweise vergleichbar',
+  'ownedProduct.outcomes.accuracy.status.unavailable': 'Nicht verfügbar',
+  'ownedProduct.outcomes.accuracy.reason.identity':
+    'Schätzung und Ergebnis verwenden dieselbe Währung.',
+  'ownedProduct.outcomes.accuracy.reason.datedRate':
+    'Erwartungswerte verwenden den exakten Wechselkursnachweis vom Schätzzeitpunkt.',
+  'ownedProduct.outcomes.accuracy.reason.calculated':
+    'Alle vergleichbaren Geldkennzahlen wurden berechnet.',
+  'ownedProduct.outcomes.accuracy.reason.exchangeRateMissing':
+    'Es fehlt ein exakter datierter Wechselkursnachweis; umgerechnete Vergleiche sind nicht verfügbar.',
+  'ownedProduct.outcomes.accuracy.reason.exchangeRateStale':
+    'Der verfügbare datierte Wechselkurs ist veraltet; umgerechnete Vergleiche sind nicht verfügbar.',
+  'ownedProduct.outcomes.accuracy.reason.costCategories':
+    'Zusatzkosten werden nicht verglichen, da erwartete Sicherheitsreserve und tatsächliches Marketing unterschiedliche Kategorien sind.',
+  'ownedProduct.outcomes.accuracy.reason.durationUnavailable':
+    'Die tatsächliche Verkaufsdauer bleibt erhalten, aber die ursprüngliche Schätzung enthielt keine erwartete Dauer.',
+  'ownedProduct.outcomes.accuracy.reason.zeroDenominator':
+    'Der Prozentfehler ist nicht verfügbar, weil der Erwartungswert null ist.',
+  'ownedProduct.outcomes.accuracy.reason.percentageRange':
+    'Der Prozentfehler überschreitet den unterstützten Berichtsbereich.',
+  'ownedProduct.outcomes.accuracy.reason.unmapped':
+    'Berechnungsnachweis: {{code}}',
+  'ownedProduct.outcomes.boundary':
+    'Nur realisierte Nachweise: Angebotspreise, Schätzungen, Reservierungen und „gekauft“-Workflow-Entscheidungen gelten nie als tatsächliches Geld. Procura verarbeitet keine Zahlungen und ändert keine Marktplatzangebote.',
+  'common.edit': 'Bearbeiten',
+  'common.archive': 'Archivieren',
+  'route.savedSearches': 'Gespeicherte Suchen',
+  'route.createSavedSearch': 'Gespeicherte Suche erstellen',
+  'route.editSavedSearch': 'Gespeicherte Suche bearbeiten',
+  'route.savedSearchDetail': 'Details der gespeicherten Suche',
+  'route.notifications': 'Benachrichtigungen',
+  'shell.savedSearches': 'Gespeicherte Suchen',
+  'shell.notifications': 'Benachrichtigungen',
+  'savedSearch.state.active': 'Aktiv',
+  'savedSearch.state.paused': 'Pausiert',
+  'savedSearch.state.archived': 'Archiviert',
+  'savedSearch.match.matched': 'Treffer',
+  'savedSearch.match.notMatched': 'Kein Treffer',
+  'savedSearch.match.insufficient': 'Nachweise erforderlich',
+  'savedSearch.notConfigured': 'Nicht konfiguriert',
+  'savedSearch.anyPrice': 'Beliebiger Angebotspreis',
+  'savedSearch.upToPrice': 'Bis {{price}}',
+  'savedSearch.fromPrice': 'Ab {{price}}',
+  'savedSearch.priceRange': '{{minimum}} – {{maximum}}',
+  'savedSearch.anyMarket': 'Beliebiger Markt',
+  'savedSearchList.eyebrow': 'Chancenüberwachung',
+  'savedSearchList.title': 'Gespeicherte Suchen',
+  'savedSearchList.description':
+    'Definieren Sie klare Markt- und Entscheidungsschwellen und prüfen Sie deterministische Treffer innerhalb des Arbeitsbereichs.',
+  'savedSearchList.create': 'Gespeicherte Suche erstellen',
+  'savedSearchList.searchPlaceholder': 'Gespeicherte Suchen durchsuchen',
+  'savedSearchList.state': 'Status',
+  'savedSearchList.apply': 'Anwenden',
+  'savedSearchList.loadError':
+    'Gespeicherte Suchen konnten nicht geladen werden.',
+  'savedSearchList.loading': 'Gespeicherte Suchen werden geladen…',
+  'savedSearchList.emptyTitle': 'Keine gespeicherten Suchen in dieser Ansicht',
+  'savedSearchList.emptyDescription':
+    'Erstellen Sie eine Überwachungsregel oder wählen Sie einen anderen Statusfilter.',
+  'savedSearchList.createFirst': 'Erste gespeicherte Suche erstellen',
+  'savedSearchList.readOnly':
+    'Ihre Rolle darf gespeicherte Suchen anzeigen, aber nicht ändern.',
+  'savedSearchList.aria': 'Gespeicherte Suchen',
+  'savedSearchList.matches': 'Treffer',
+  'savedSearchList.evaluations': 'Auswertungen',
+  'savedSearchList.version': 'Version',
+  'savedSearchList.loadingMore': 'Weitere werden geladen…',
+  'savedSearchList.loadMore': 'Mehr laden',
+  'savedSearchForm.back': 'Zurück zu gespeicherten Suchen',
+  'savedSearchForm.eyebrow': 'Überwachungsregel',
+  'savedSearchForm.createTitle': 'Gespeicherte Suche erstellen',
+  'savedSearchForm.editTitle': 'Gespeicherte Suche bearbeiten',
+  'savedSearchForm.description':
+    'Jede Änderung erzeugt eine unveränderliche Kriterienversion. Fehlende Finanz- oder Standortnachweise werden als unbekannt gemeldet und nie geschätzt.',
+  'savedSearchForm.loading': 'Überwachungskonfiguration wird geladen…',
+  'savedSearchForm.loadError':
+    'Die Konfiguration der gespeicherten Suche konnte nicht geladen werden.',
+  'savedSearchForm.identityTitle': 'Identität und Status',
+  'savedSearchForm.identityDescription':
+    'Verwenden Sie einen Namen, der die überwachte Chance erklärt.',
+  'savedSearchForm.name': 'Name der gespeicherten Suche',
+  'savedSearchForm.namePlaceholder': 'Profi-Bohrmaschinen in Deutschland',
+  'savedSearchForm.activeImmediately': 'Diese Suche sofort auswerten',
+  'savedSearchForm.catalogTitle': 'Kanonischer Produktumfang',
+  'savedSearchForm.catalogDescription':
+    'Verwenden Sie den Katalog, wenn die Regel eine Kategorie, Marke oder ein exaktes Modell betreffen soll.',
+  'savedSearchForm.catalogScope': 'Abgleichsumfang',
+  'savedSearchForm.scopeCategory': 'Produktkategorie',
+  'savedSearchForm.scopeBrand': 'Marke',
+  'savedSearchForm.scopeModel': 'Exaktes Modell',
+  'savedSearchForm.category': 'Kategorie',
+  'savedSearchForm.anyCategory': 'Beliebige Kategorie',
+  'savedSearchForm.productSearch': 'Kanonisches Produkt finden',
+  'savedSearchForm.productPlaceholder':
+    'Nach Marke, Modell oder Modellnummer suchen',
+  'savedSearchForm.productSearchAction': 'Katalog durchsuchen',
+  'savedSearchForm.productSearching': 'Suche läuft…',
+  'savedSearchForm.productQueryMinimum':
+    'Geben Sie mindestens zwei durchsuchbare Zeichen ein.',
+  'savedSearchForm.productSearchError':
+    'Der Produktkatalog konnte nicht durchsucht werden.',
+  'savedSearchForm.selectCatalogResult':
+    'Wählen Sie für Marken- oder Modellabgleich ein Katalogergebnis.',
+  'savedSearchForm.selectedCatalog': 'Ausgewählter Katalogumfang',
+  'savedSearchForm.marketTitle': 'Markt und Entfernung',
+  'savedSearchForm.marketDescription':
+    'Begrenzen Sie die Suche nach Kontinent, Ländern, Stadt und grenzüberschreitender Absicht.',
+  'savedSearchForm.continent': 'Kontinent',
+  'savedSearchForm.anyContinent': 'Beliebiger Kontinent',
+  'savedSearchForm.countries': 'Länder',
+  'savedSearchForm.countriesHelp':
+    'Mit Strg oder Command können Sie mehrere Länder auswählen.',
+  'savedSearchForm.city': 'Stadt',
+  'savedSearchForm.cityPlaceholder': 'Berlin',
+  'savedSearchForm.radius': 'Radius (km)',
+  'savedSearchForm.radiusEvidence':
+    'Der Radius bleibt offen, bis Koordinaten vorliegen; Procura erfindet keine Entfernungen.',
+  'savedSearchForm.crossBorder': 'Grenzüberschreitende Angebote einschließen',
+  'savedSearchForm.priceTitle': 'Angebotspreisbereich',
+  'savedSearchForm.priceDescription':
+    'Preisvergleiche erfordern dieselbe Währung; es erfolgt keine implizite Umrechnung.',
+  'savedSearchForm.minimumPrice': 'Mindestpreis',
+  'savedSearchForm.maximumPrice': 'Höchstpreis',
+  'savedSearchForm.currency': 'Preiswährung',
+  'savedSearchForm.chooseCurrency': 'Währung auswählen',
+  'savedSearchForm.moneyPlaceholder': '0,00',
+  'savedSearchForm.qualityTitle':
+    'Schwellen für Gewinn, Marge, Deal und Risiko',
+  'savedSearchForm.qualityDescription':
+    'Optionale Entscheidungsschwellen verwenden die aktuellen unveränderlichen Analysenachweise jedes Angebotssnapshots.',
+  'savedSearchForm.minimumProfit': 'Minimaler erwarteter Gewinn',
+  'savedSearchForm.profitCurrency': 'Gewinnwährung',
+  'savedSearchForm.minimumMargin': 'Mindestmarge (%)',
+  'savedSearchForm.minimumDealScore': 'Minimaler Deal-Score (0–100)',
+  'savedSearchForm.maximumRisk': 'Maximaler Risiko-Score (0–100)',
+  'savedSearchForm.evidenceBoundary':
+    'Fehlt ein erforderliches Analyseergebnis, wird die Auswertung als „Nachweise erforderlich“ markiert und keine Benachrichtigung gesendet.',
+  'savedSearchForm.keywordsTitle': 'Schlüsselwörter und Zustellung',
+  'savedSearchForm.keywordsDescription':
+    'Verwenden Sie kommagetrennte Pflicht- und Ausschlussbegriffe für einen prüfbaren Textabgleich.',
+  'savedSearchForm.requiredKeywords': 'Erforderliche Schlüsselwörter',
+  'savedSearchForm.requiredPlaceholder': 'bosch, akku, ladegerät',
+  'savedSearchForm.excludedKeywords': 'Ausgeschlossene Schlüsselwörter',
+  'savedSearchForm.excludedPlaceholder': 'defekt, nur teile',
+  'savedSearchForm.deliveryTitle': 'Zustellkanäle',
+  'savedSearchForm.inAppDelivery':
+    'Ein passendes Angebot wird im Procura-Benachrichtigungszentrum des Eigentümers zugestellt.',
+  'savedSearchForm.emailDelivery':
+    'Bei einem Treffer zusätzlich eine lokalisierte E-Mail senden.',
+  'savedSearchForm.emailUnavailable':
+    'Die E-Mail-Zustellung ist im aktiven Plan nicht aktiviert.',
+  'savedSearchForm.telegramDelivery':
+    'Bei einem Treffer zusätzlich eine lokalisierte Telegram-Nachricht senden.',
+  'savedSearchForm.telegramUnavailable':
+    'Telegram erfordert einen berechtigten Plan und eine verifizierte persönliche Verbindung.',
+  'savedSearchForm.telegramManage': 'Telegram-Verbindung verwalten',
+  'savedSearchForm.deliveryBoundary':
+    'E-Mail und Telegram nutzen unabhängige wiederholungssichere Warteschlangen und unveränderliche Zustellprotokolle.',
+  'savedSearchForm.roleError':
+    'Ihre Rolle darf gespeicherte Suchen nicht verwalten.',
+  'savedSearchForm.validationError':
+    'Prüfen Sie die erforderlichen Felder der gespeicherten Suche.',
+  'savedSearchForm.numberError':
+    'Prüfen Sie Preis-, Prozent-, Radius-, Deal-Score- und Risikowerte.',
+  'savedSearchForm.priceRangeError':
+    'Der Mindestpreis darf nicht über dem Höchstpreis liegen.',
+  'savedSearchForm.currencyError':
+    'Wählen Sie für jeden Geldschwellenwert die genaue Währung aus.',
+  'savedSearchForm.saveError':
+    'Die gespeicherte Suche konnte nicht gespeichert werden.',
+  'savedSearchForm.saving': 'Speichern…',
+  'savedSearchForm.saveChanges': 'Neue Version speichern',
+  'savedSearchForm.createAction': 'Gespeicherte Suche erstellen',
+  'savedSearchDetail.back': 'Zurück zu gespeicherten Suchen',
+  'savedSearchDetail.eyebrow': 'Steuerung der gespeicherten Suche',
+  'savedSearchDetail.loading': 'Nachweise der gespeicherten Suche werden geladen…',
+  'savedSearchDetail.loadError':
+    'Die gespeicherte Suche konnte nicht geladen werden.',
+  'savedSearchDetail.updateError':
+    'Der Status der gespeicherten Suche konnte nicht geändert werden.',
+  'savedSearchDetail.archiveError':
+    'Die gespeicherte Suche konnte nicht archiviert werden.',
+  'savedSearchDetail.matchesError':
+    'Trefferauswertungen konnten nicht geladen werden.',
+  'savedSearchDetail.version': 'Version {{version}}',
+  'savedSearchDetail.updated': 'Aktualisiert {{date}}',
+  'savedSearchDetail.pause': 'Pausieren',
+  'savedSearchDetail.resume': 'Fortsetzen',
+  'savedSearchDetail.archiveConfirmTitle':
+    'Diese gespeicherte Suche archivieren?',
+  'savedSearchDetail.archiveConfirmDescription':
+    'Die Archivierung ist endgültig. Historische Versionen, Auswertungen und Benachrichtigungen bleiben prüfbar.',
+  'savedSearchDetail.archiveConfirmAction': 'Endgültig archivieren',
+  'savedSearchDetail.matchedListings': 'Passende Angebote',
+  'savedSearchDetail.totalEvaluations': 'Auswertungen gesamt',
+  'savedSearchDetail.delivery': 'Zustellkanal',
+  'savedSearchDetail.inApp': 'In der App',
+  'savedSearchDetail.inAppEmail': 'In der App + E-Mail',
+  'savedSearchDetail.inAppTelegram': 'In der App + Telegram',
+  'savedSearchDetail.inAppEmailTelegram':
+    'In der App + E-Mail + Telegram',
+  'savedSearchDetail.criteriaTitle': 'Aktuelle Kriterien',
+  'savedSearchDetail.criteriaDescription':
+    'Dies sind die exakten Kriterien der aktuellen Matcher-Version.',
+  'savedSearchDetail.catalog': 'Produktumfang',
+  'savedSearchDetail.anyProduct': 'Beliebiges Produkt',
+  'savedSearchDetail.market': 'Markt',
+  'savedSearchDetail.price': 'Angebotspreis',
+  'savedSearchDetail.minimumProfit': 'Mindestgewinn',
+  'savedSearchDetail.minimumMargin': 'Mindestmarge',
+  'savedSearchDetail.dealScore': 'Minimaler Deal-Score',
+  'savedSearchDetail.maximumRisk': 'Maximales Risiko',
+  'savedSearchDetail.requiredKeywords': 'Erforderliche Schlüsselwörter',
+  'savedSearchDetail.matchesTitle': 'Auswertungsjournal',
+  'savedSearchDetail.matchesDescription':
+    'Jede Zeile ist mit einem unveränderlichen Angebotssnapshot und den zum Auswertungszeitpunkt verfügbaren Nachweisen verknüpft.',
+  'savedSearchDetail.matchFilter': 'Ergebnis',
+  'savedSearchDetail.allEvaluations': 'Alle Auswertungen',
+  'savedSearchDetail.noMatchesTitle': 'Noch keine Auswertungen',
+  'savedSearchDetail.noMatchesDescription':
+    'Aktive Angebote und neue Nachweise werden über die Warteschlange ausgewertet.',
+  'savedSearchDetail.unknownListing': 'Unbekanntes Angebot',
+  'savedSearchDetail.historyTitle': 'Kriterienverlauf',
+  'savedSearchDetail.historyDescription':
+    'Nur angehängte Versionen bewahren, wer die Regel wann und warum geändert hat.',
+  'notificationList.eyebrow': 'In-App-Zustellung',
+  'notificationList.title': 'Benachrichtigungen',
+  'notificationList.description':
+    'Prüfen Sie Treffer gespeicherter Suchen, die nur Ihrem Konto im aktiven Arbeitsbereich zugestellt wurden.',
+  'notificationList.unread': 'Ungelesen',
+  'notificationList.filter': 'Anzeigen',
+  'notificationList.all': 'Alle aktuellen',
+  'notificationList.unreadOnly': 'Nur ungelesene',
+  'notificationList.readOnly': 'Nur gelesene',
+  'notificationList.loadError':
+    'Benachrichtigungen konnten nicht geladen werden.',
+  'notificationList.stateError':
+    'Der Benachrichtigungsstatus konnte nicht geändert werden.',
+  'notificationList.loading': 'Benachrichtigungen werden geladen…',
+  'notificationList.emptyTitle': 'Keine Benachrichtigungen in dieser Ansicht',
+  'notificationList.emptyDescription':
+    'Neue deterministische Treffer gespeicherter Suchen erscheinen hier.',
+  'notificationList.aria': 'In-App-Benachrichtigungen',
+  'notificationList.savedSearchMatch': 'Treffer einer gespeicherten Suche',
+  'notificationList.emailDelivery': 'E-Mail-Zustellung',
+  'notificationList.emailQueued': 'In Warteschlange',
+  'notificationList.emailAttempting': 'Wird gesendet',
+  'notificationList.emailDelivered': 'Zugestellt',
+  'notificationList.emailFailed': 'Wiederholung geplant',
+  'notificationList.emailExhausted': 'Zustellung fehlgeschlagen',
+  'notificationList.emailSuppressed': 'Nicht gesendet',
+  'notificationList.telegramEyebrow': 'Persönliche Zustellverbindung',
+  'notificationList.telegramTitle': 'Telegram-Verbindung',
+  'notificationList.telegramDescription':
+    'Verbinden Sie Ihr privates Telegram-Konto, um tarifberechtigte Hinweise zu gespeicherten Suchen zu erhalten.',
+  'notificationList.telegramLoading':
+    'Der Status der Telegram-Verbindung wird geladen.',
+  'notificationList.telegramConnected': 'Verbunden',
+  'notificationList.telegramPending':
+    'Warten auf Telegram-Bestätigung',
+  'notificationList.telegramDisconnected': 'Nicht verbunden',
+  'notificationList.telegramExpires': 'Sicherer Link läuft {{date}} ab',
+  'notificationList.telegramProviderUnavailable':
+    'Der Telegram-Anbieter ist in dieser Umgebung nicht konfiguriert.',
+  'notificationList.telegramPlanUnavailable':
+    'Die Telegram-Zustellung ist im aktiven Plan nicht aktiviert.',
+  'notificationList.telegramCreateLink': 'Sicheren Link erstellen',
+  'notificationList.telegramOpen': 'Telegram öffnen',
+  'notificationList.telegramRefresh': 'Status aktualisieren',
+  'notificationList.telegramRevoke': 'Verbindung widerrufen',
+  'notificationList.telegramSecurity':
+    'Der einmalige Link und die Telegram-Kennungen sind im Ruhezustand verschlüsselt. Ein Widerruf unterdrückt ausstehende Zustellungen sofort.',
+  'notificationList.telegramConnectError':
+    'Der sichere Telegram-Link konnte nicht erstellt werden.',
+  'notificationList.telegramRevokeError':
+    'Die Telegram-Verbindung konnte nicht widerrufen werden.',
+  'notificationList.telegramLoadError':
+    'Der Status der Telegram-Verbindung konnte nicht geladen werden.',
+  'notificationList.telegramDelivery': 'Telegram-Zustellung',
+  'notificationList.telegramQueued': 'In Warteschlange',
+  'notificationList.telegramAttempting': 'Wird gesendet',
+  'notificationList.telegramDelivered': 'Zugestellt',
+  'notificationList.telegramFailed': 'Wiederholung geplant',
+  'notificationList.telegramExhausted': 'Zustellung fehlgeschlagen',
+  'notificationList.telegramSuppressed': 'Nicht gesendet',
+  'notificationList.matchTitle': 'Neuer Treffer für {{search}}',
+  'notificationList.matchBody': '{{listing}} wird für {{price}} angeboten.',
+  'notificationList.unknownSearch': 'gespeicherte Suche',
+  'notificationList.openListing': 'Angebot öffnen',
+  'notificationList.markRead': 'Als gelesen markieren',
+  'notificationList.markUnread': 'Als ungelesen markieren',
+  'route.marketplaceImports': 'Marketplace-Importe',
+  'listingList.importCsv': 'CSV importieren',
+  'marketplaceImport.back': 'Zurück zu den Quellangeboten',
+  'marketplaceImport.eyebrow': 'Freigegebene Daten-Connectoren',
+  'marketplaceImport.title': 'Kontrollierter CSV-Import',
+  'marketplaceImport.description':
+    'Importieren Sie autorisierte Quelldaten über einen privaten, nachvollziehbaren und asynchronen Connector.',
+  'marketplaceImport.downloadTemplate': 'CSV-Vorlage herunterladen',
+  'marketplaceImport.loading': 'Connector-Richtlinie und Importverlauf werden geladen…',
+  'marketplaceImport.controlledBoundary': 'Kontrollierte Grenze',
+  'marketplaceImport.uploadTitle': 'Autorisierte Quelldatei einreihen',
+  'marketplaceImport.privateEvidence': 'Private Evidenz · Schema v1',
+  'marketplaceImport.connectorUnavailable':
+    'Der autorisierte CSV-Connector ist in dieser Umgebung nicht freigegeben oder aktiv.',
+  'marketplaceImport.file': 'CSV-Quelldatei',
+  'marketplaceImport.filePolicy': 'Eine .csv-Datei, maximal 5 MB und 10.000 Datenzeilen.',
+  'marketplaceImport.filePolicyError': 'Wählen Sie eine .csv-Datei bis maximal 5 MB.',
+  'marketplaceImport.delimiter': 'Spaltentrennzeichen',
+  'marketplaceImport.delimiterComma': 'Komma (,)',
+  'marketplaceImport.delimiterSemicolon': 'Semikolon (;)',
+  'marketplaceImport.delimiterTab': 'Tabulator',
+  'marketplaceImport.defaultTarget': 'Standard-Zielmarkt',
+  'marketplaceImport.targetFromFile': 'Zielland aus jeder Zeile lesen',
+  'marketplaceImport.schemaTitle': 'Erforderliche Schemaspalten',
+  'marketplaceImport.schemaColumns':
+    'external_id, marketplace_name, title, source_country_code',
+  'marketplaceImport.schemaDescription':
+    'Ein Preis benötigt asking_price_minor und currency_code. target_country_code kann je Zeile oder über den Standard angegeben werden.',
+  'marketplaceImport.attestation':
+    'Ich bestätige, dass diese Organisation die Quelldaten verarbeiten und speichern darf und dass sie nicht durch unzulässiges Scraping oder Kontoautomatisierung beschafft wurden.',
+  'marketplaceImport.attestationRequired': 'Die Quellenautorisierung muss bestätigt werden.',
+  'marketplaceImport.queueNote':
+    'Die Verarbeitung läuft in der Connector-Warteschlange. Ungültige Zeilen werden quarantänisiert.',
+  'marketplaceImport.submit': 'Import einreihen',
+  'marketplaceImport.submitting': 'Datei wird gesichert…',
+  'marketplaceImport.roleError': 'Ihre Workspace-Rolle darf keine Quellangebote importieren.',
+  'marketplaceImport.requiredError': 'Wählen Sie eine gültige CSV-Datei und bestätigen Sie die Autorisierung.',
+  'marketplaceImport.queued': 'Der Import wurde mit unveränderlicher Evidenz eingereiht.',
+  'marketplaceImport.submitError': 'Der Import konnte nicht eingereiht werden.',
+  'marketplaceImport.loadError': 'Connector-Richtlinie oder Importverlauf konnten nicht geladen werden.',
+  'marketplaceImport.detailsError': 'Die Zeilenevidenz konnte nicht geladen werden.',
+  'marketplaceImport.historyEyebrow': 'Mandantenbezogenes Importjournal',
+  'marketplaceImport.historyTitle': 'Letzte Importe',
+  'marketplaceImport.refresh': 'Status aktualisieren',
+  'marketplaceImport.refreshing': 'Aktualisieren…',
+  'marketplaceImport.empty': 'In diesem Workspace wurden noch keine CSV-Importe erfasst.',
+  'marketplaceImport.total': 'Gesamt',
+  'marketplaceImport.imported': 'Importiert',
+  'marketplaceImport.rejected': 'Abgelehnt',
+  'marketplaceImport.duplicates': 'Duplikate',
+  'marketplaceImport.reviewRows': 'Zeilenevidenz prüfen',
+  'marketplaceImport.rowEvidenceEyebrow': 'Letzte 100 unveränderliche Ergebnisse',
+  'marketplaceImport.latestRows': 'Roh- und normalisierte Evidenz bleibt mandantenbezogen',
+  'marketplaceImport.noProcessedRows': 'Es wurden noch keine Zeilen verarbeitet.',
+  'marketplaceImport.rowNumber': 'CSV-Zeile',
+  'marketplaceImport.rowStatus': 'Ergebnis',
+  'marketplaceImport.rowIdentity': 'Externe ID',
+  'marketplaceImport.rowErrors': 'Validierungsfelder',
+  'marketplaceImport.status.pending': 'Ausstehend',
+  'marketplaceImport.status.processing': 'In Verarbeitung',
+  'marketplaceImport.status.completed': 'Abgeschlossen',
+  'marketplaceImport.status.completedWithErrors': 'Mit Fehlern abgeschlossen',
+  'marketplaceImport.status.failed': 'Fehlgeschlagen',
+  'marketplaceImport.row.imported': 'Importiert',
+  'marketplaceImport.row.rejected': 'Abgelehnt',
+  'marketplaceImport.row.duplicate': 'Duplikat',
+} satisfies TranslationDictionary;

@@ -2,13 +2,12 @@
 
 use App\Models\User;
 
-test('password confirmation screen can be rendered for authenticated users', function () {
+test('password confirmation screen redirects authenticated users to Angular', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)
         ->get(route('password.confirm'))
-        ->assertOk()
-        ->assertSee('Confirm it is you');
+        ->assertRedirect(config('app.frontend_url').'/confirm-password');
 });
 
 test('users can confirm their current password', function () {
@@ -18,7 +17,7 @@ test('users can confirm their current password', function () {
         'password' => 'SecurePass123!',
     ]);
 
-    $response->assertRedirect('/dashboard')
+    $response->assertRedirect(config('fortify.redirects.password-confirmation'))
         ->assertSessionHasNoErrors();
     expect(session('auth.password_confirmed_at'))->not->toBeNull();
 });

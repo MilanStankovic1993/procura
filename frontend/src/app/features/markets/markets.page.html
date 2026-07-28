@@ -1,0 +1,91 @@
+<div class="page">
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'market.eyebrow' | t }}</p>
+      <h1>{{ 'market.title' | t }}</h1>
+      <p>{{ 'market.description' | t }}</p>
+    </div>
+    @if (catalog(); as data) { <span class="version">{{ data.version }}</span> }
+  </header>
+
+  @if (error()) { <div class="alert error" role="alert">{{ error() }}</div> }
+  @if (success()) { <div class="alert success" role="status">{{ success() }}</div> }
+
+  @if (loading()) {
+    <div class="loading">{{ 'market.loading' | t }}</div>
+  } @else if (catalog(); as data) {
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <section class="panel settings">
+        <div><label for="home-country">{{ 'market.homeCountry' | t }}</label>
+          <select id="home-country" formControlName="home_country_code">
+            <option value="">{{ 'common.notSet' | t }}</option>
+            @for (continent of data.continents; track continent.code) {
+              <optgroup [label]="continentName(continent.code, continent.name)">
+                @for (country of continent.countries; track country.code) {
+                  <option [value]="country.code">{{ countryName(country.code, country.name) }} ({{ country.code }})</option>
+                }
+              </optgroup>
+            }
+          </select>
+        </div>
+        <div><label for="currency">{{ 'market.reportingCurrency' | t }}</label>
+          <select id="currency" formControlName="reporting_currency_code">
+            <option value="">{{ 'common.notSet' | t }}</option>
+            @for (currency of data.currencies; track currency.code) {
+              <option [value]="currency.code">{{ currency.code }} · {{ currencyName(currency.code, currency.name) }}</option>
+            }
+          </select>
+        </div>
+        <div><label for="locale">{{ 'market.locale' | t }}</label><input id="locale" formControlName="locale" /></div>
+        <div class="timezone"><label for="timezone">{{ 'market.timezone' | t }}</label><input id="timezone" formControlName="timezone" />
+          <button type="button" (click)="useBrowserTimezone()">{{ 'market.useDevice' | t }}</button>
+        </div>
+        <div><label for="measurement">{{ 'market.measurement' | t }}</label>
+          <select id="measurement" formControlName="measurement_system">
+            <option value="metric">{{ 'market.measurement.metric' | t }}</option>
+            <option value="us_customary">{{ 'market.measurement.usCustomary' | t }}</option>
+            <option value="uk_mixed">{{ 'market.measurement.ukMixed' | t }}</option>
+          </select>
+        </div>
+        <label class="cross-border"><input type="checkbox" formControlName="include_cross_border" />
+          <span>{{ 'market.crossBorder' | t }}</span>
+        </label>
+      </section>
+
+      <section class="panel countries">
+        <div class="section-heading">
+          <div><p class="eyebrow">{{ 'market.coverage' | t }}</p><h2>{{ 'market.countries' | t }}</h2>
+            <span>{{ 'market.selected' | t: { count: selectedCountries().size } }}</span>
+          </div>
+          <input type="search" [placeholder]="'market.searchPlaceholder' | t" (input)="updateSearch($event)" />
+        </div>
+        <div class="continent-grid">
+          @for (continent of filteredContinents(); track continent.code) {
+            <article>
+              <div class="continent-title">
+                <h3>{{ continentName(continent.code, continent.name) }}</h3>
+                <button type="button" (click)="selectContinent(continent)">{{ 'market.toggleAll' | t }}</button>
+              </div>
+              <div class="country-list">
+                @for (country of continent.countries; track country.code) {
+                  <label>
+                    <input type="checkbox" [checked]="selectedCountries().has(country.code)"
+                      (change)="toggleCountry(country.code, $any($event.target).checked)" />
+                    <span>{{ countryName(country.code, country.name) }}</span><small>{{ country.code }}</small>
+                  </label>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+
+      <footer>
+        @if (!canSave()) { <span>{{ 'market.permission' | t }}</span> }
+        <button class="button button-primary" [disabled]="saving() || !canSave()">
+          {{ (saving() ? 'market.saving' : 'market.save') | t }}
+        </button>
+      </footer>
+    </form>
+  }
+</div>

@@ -1,0 +1,257 @@
+<div class="page">
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'notificationList.eyebrow' | t }}</p>
+      <h1>{{ 'notificationList.title' | t }}</h1>
+      <p>{{ 'notificationList.description' | t }}</p>
+    </div>
+    <div class="unread">
+      <strong>{{ unreadCount() }}</strong>
+      <span>{{ 'notificationList.unread' | t }}</span>
+    </div>
+  </header>
+
+  <section class="telegram-connection" aria-labelledby="telegram-connection-title">
+    <div>
+      <p class="eyebrow">{{ 'notificationList.telegramEyebrow' | t }}</p>
+      <h2 id="telegram-connection-title">
+        {{ 'notificationList.telegramTitle' | t }}
+      </h2>
+      <p>{{ 'notificationList.telegramDescription' | t }}</p>
+    </div>
+
+    @if (telegramConnection(); as telegram) {
+      <div class="telegram-status">
+        <strong>
+          {{
+            (telegram.status === 'connected'
+              ? 'notificationList.telegramConnected'
+              : telegram.status === 'pending'
+                ? 'notificationList.telegramPending'
+                : 'notificationList.telegramDisconnected'
+            ) | t
+          }}
+        </strong>
+        @if (telegram.connected_at) {
+          <time>{{ date(telegram.connected_at) }}</time>
+        } @else if (telegram.challenge_expires_at) {
+          <span>
+            {{
+              'notificationList.telegramExpires'
+                | t: { date: date(telegram.challenge_expires_at) }
+            }}
+          </span>
+        }
+      </div>
+
+      @if (!telegram.available) {
+        <p class="telegram-boundary">
+          {{ 'notificationList.telegramProviderUnavailable' | t }}
+        </p>
+      } @else if (!telegram.entitled) {
+        <p class="telegram-boundary">
+          {{ 'notificationList.telegramPlanUnavailable' | t }}
+        </p>
+      } @else {
+        <div class="telegram-actions">
+          @if (telegram.status !== 'connected') {
+            <button
+              class="button button-primary"
+              type="button"
+              [disabled]="telegramBusy()"
+              (click)="beginTelegramConnection()"
+            >
+              {{ 'notificationList.telegramCreateLink' | t }}
+            </button>
+          }
+          @if (telegramLink()?.link_url; as linkUrl) {
+            <a
+              class="button button-primary"
+              [href]="linkUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ 'notificationList.telegramOpen' | t }}
+            </a>
+          }
+          <button
+            class="button button-quiet"
+            type="button"
+            [disabled]="telegramBusy()"
+            (click)="refreshTelegramConnection()"
+          >
+            {{ 'notificationList.telegramRefresh' | t }}
+          </button>
+          @if (telegram.status !== 'disconnected') {
+            <button
+              class="button button-danger"
+              type="button"
+              [disabled]="telegramBusy()"
+              (click)="revokeTelegramConnection()"
+            >
+              {{ 'notificationList.telegramRevoke' | t }}
+            </button>
+          }
+        </div>
+      }
+
+      @if (telegramError()) {
+        <p class="telegram-error" role="alert">{{ telegramError() }}</p>
+      }
+    } @else if (telegramError()) {
+      <p class="telegram-error" role="alert">{{ telegramError() }}</p>
+    } @else {
+      <p class="telegram-boundary">
+        {{ 'notificationList.telegramLoading' | t }}
+      </p>
+    }
+
+    <small>{{ 'notificationList.telegramSecurity' | t }}</small>
+  </section>
+
+  <form class="filters" [formGroup]="filters" (ngSubmit)="applyFilter()">
+    <label for="notification-state">{{ 'notificationList.filter' | t }}</label>
+    <select id="notification-state" formControlName="state">
+      <option value="all">{{ 'notificationList.all' | t }}</option>
+      <option value="unread">{{ 'notificationList.unreadOnly' | t }}</option>
+      <option value="read">{{ 'notificationList.readOnly' | t }}</option>
+    </select>
+    <button class="button button-primary" type="submit">
+      {{ 'savedSearchList.apply' | t }}
+    </button>
+  </form>
+
+  @if (error()) {
+    <div class="alert" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" (click)="retry()">{{ 'common.retry' | t }}</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <section class="loading" aria-live="polite">
+      <span></span>
+      <p>{{ 'notificationList.loading' | t }}</p>
+    </section>
+  } @else if (records().length === 0 && !error()) {
+    <section class="empty">
+      <span aria-hidden="true">◎</span>
+      <h2>{{ 'notificationList.emptyTitle' | t }}</h2>
+      <p>{{ 'notificationList.emptyDescription' | t }}</p>
+    </section>
+  } @else {
+    <section class="notification-list" [attr.aria-label]="'notificationList.aria' | t">
+      @for (notification of records(); track notification.id) {
+        <article [class.is-read]="notification.read">
+          <div class="indicator" aria-hidden="true"></div>
+          <div class="content">
+            <div class="meta">
+              <span>{{ 'notificationList.savedSearchMatch' | t }}</span>
+              <time>{{ date(notification.triggered_at) }}</time>
+            </div>
+            <h2>
+              {{
+                'notificationList.matchTitle'
+                  | t
+                    : {
+                        search:
+                          notification.saved_search.title ||
+                          ('notificationList.unknownSearch' | t),
+                      }
+              }}
+            </h2>
+            <p>
+              {{
+                'notificationList.matchBody'
+                  | t
+                    : {
+                        listing:
+                          notification.listing.title ||
+                          ('savedSearchDetail.unknownListing' | t),
+                        price: money(notification),
+                      }
+              }}
+            </p>
+            @if (emailState(notification); as stateKey) {
+              <div
+                class="channel-delivery"
+                [attr.data-state]="notification.delivery.email?.state"
+              >
+                <span>{{ 'notificationList.emailDelivery' | t }}</span>
+                <strong>{{ stateKey | t }}</strong>
+                @if (notification.delivery.email?.occurred_at; as occurredAt) {
+                  <time>{{ date(occurredAt) }}</time>
+                }
+              </div>
+            }
+            @if (telegramState(notification); as stateKey) {
+              <div
+                class="channel-delivery"
+                [attr.data-state]="notification.delivery.telegram?.state"
+              >
+                <span>{{ 'notificationList.telegramDelivery' | t }}</span>
+                <strong>{{ stateKey | t }}</strong>
+                @if (notification.delivery.telegram?.occurred_at; as occurredAt) {
+                  <time>{{ date(occurredAt) }}</time>
+                }
+              </div>
+            }
+            <div class="record-actions">
+              <a
+                class="button button-primary"
+                [routerLink]="['/app/buy', notification.listing.id]"
+              >
+                {{ 'notificationList.openListing' | t }}
+              </a>
+              @if (notification.read) {
+                <button
+                  class="button button-quiet"
+                  type="button"
+                  [disabled]="busyId() !== null"
+                  (click)="markUnread(notification)"
+                >
+                  {{ 'notificationList.markUnread' | t }}
+                </button>
+              } @else {
+                <button
+                  class="button button-quiet"
+                  type="button"
+                  [disabled]="busyId() !== null"
+                  (click)="markRead(notification)"
+                >
+                  {{ 'notificationList.markRead' | t }}
+                </button>
+              }
+              <button
+                class="archive"
+                type="button"
+                [disabled]="busyId() !== null"
+                (click)="archive(notification)"
+              >
+                {{ 'common.archive' | t }}
+              </button>
+            </div>
+          </div>
+        </article>
+      }
+    </section>
+
+    @if (nextCursor()) {
+      <div class="pagination">
+        <button
+          class="button button-quiet"
+          type="button"
+          [disabled]="loadingMore()"
+          (click)="loadMore()"
+        >
+          {{
+            (loadingMore()
+              ? 'savedSearchList.loadingMore'
+              : 'savedSearchList.loadMore'
+            ) | t
+          }}
+        </button>
+      </div>
+    }
+  }
+</div>

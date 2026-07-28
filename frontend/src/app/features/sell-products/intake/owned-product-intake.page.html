@@ -1,0 +1,253 @@
+<div class="page">
+  <a class="back" routerLink="/app/sell">{{ 'ownedProduct.intake.back' | t }}</a>
+
+  <header>
+    <p class="eyebrow">{{ 'ownedProduct.intake.eyebrow' | t }}</p>
+    <h1>{{ 'ownedProduct.intake.title' | t }}</h1>
+    <p>{{ 'ownedProduct.intake.description' | t }}</p>
+  </header>
+
+  @if (error()) {
+    <div class="alert" role="alert">
+      <span>{{ error() }}</span>
+      @if (loading()) {
+        <button type="button" (click)="retryReferenceData()">
+          {{ 'common.retry' | t }}
+        </button>
+      }
+    </div>
+  }
+
+  @if (loading()) {
+    <section class="loading" aria-live="polite">
+      {{ 'ownedProduct.intake.loading' | t }}
+    </section>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ 'ownedProduct.intake.identityEyebrow' | t }}</p>
+            <h2>{{ 'ownedProduct.intake.identityTitle' | t }}</h2>
+          </div>
+          <span>{{ 'ownedProduct.common.unknownHint' | t }}</span>
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label for="owned-category">{{ 'ownedProduct.common.category' | t }}</label>
+            <select id="owned-category" formControlName="product_category_id">
+              <option value="">{{ 'ownedProduct.common.categoryUnknown' | t }}</option>
+              @for (category of categories(); track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label for="owned-brand">{{ 'ownedProduct.common.brand' | t }}</label>
+            <input id="owned-brand" formControlName="brand_name" />
+          </div>
+          <div>
+            <label for="owned-model">{{ 'ownedProduct.common.model' | t }}</label>
+            <input id="owned-model" formControlName="model_name" />
+          </div>
+          <div>
+            <label for="owned-condition">{{ 'ownedProduct.common.condition' | t }}</label>
+            <select id="owned-condition" formControlName="condition">
+              <option value="unknown">{{ 'ownedProduct.condition.unknown' | t }}</option>
+              <option value="new">{{ 'ownedProduct.condition.new' | t }}</option>
+              <option value="like_new">{{ 'ownedProduct.condition.like_new' | t }}</option>
+              <option value="used_good">{{ 'ownedProduct.condition.used_good' | t }}</option>
+              <option value="used_fair">{{ 'ownedProduct.condition.used_fair' | t }}</option>
+              <option value="used_poor">{{ 'ownedProduct.condition.used_poor' | t }}</option>
+              <option value="broken">{{ 'ownedProduct.condition.broken' | t }}</option>
+            </select>
+          </div>
+          <div>
+            <label for="owned-age">{{ 'ownedProduct.intake.ageMonths' | t }}</label>
+            <input
+              id="owned-age"
+              type="number"
+              min="0"
+              max="1200"
+              formControlName="age_months"
+              [placeholder]="'ownedProduct.intake.agePlaceholder' | t"
+            />
+            <small>{{ 'ownedProduct.intake.zeroAgeHint' | t }}</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ 'ownedProduct.intake.conditionEyebrow' | t }}</p>
+            <h2>{{ 'ownedProduct.intake.conditionTitle' | t }}</h2>
+          </div>
+        </div>
+
+        <div class="known-grid">
+          <div>
+            <label class="check">
+              <input type="checkbox" formControlName="accessories_known" />
+              <span>{{ 'ownedProduct.intake.accessoriesKnown' | t }}</span>
+            </label>
+            <textarea
+              rows="6"
+              formControlName="accessories"
+              [placeholder]="'ownedProduct.intake.onePerLine' | t"
+              [readOnly]="!form.controls.accessories_known.value"
+            ></textarea>
+            <small>{{ 'ownedProduct.intake.emptyListMeaning' | t }}</small>
+          </div>
+          <div>
+            <label class="check">
+              <input type="checkbox" formControlName="defects_known" />
+              <span>{{ 'ownedProduct.intake.defectsKnown' | t }}</span>
+            </label>
+            <textarea
+              rows="6"
+              formControlName="defects"
+              [placeholder]="'ownedProduct.intake.onePerLine' | t"
+              [readOnly]="!form.controls.defects_known.value"
+            ></textarea>
+            <small>{{ 'ownedProduct.intake.emptyListMeaning' | t }}</small>
+          </div>
+        </div>
+
+        <label class="check history-check">
+          <input type="checkbox" formControlName="purchase_history_known" />
+          <span>{{ 'ownedProduct.intake.purchaseKnown' | t }}</span>
+        </label>
+        <textarea
+          rows="5"
+          formControlName="purchase_history"
+          [placeholder]="'ownedProduct.intake.purchasePlaceholder' | t"
+          [readOnly]="!form.controls.purchase_history_known.value"
+        ></textarea>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ 'ownedProduct.intake.marketEyebrow' | t }}</p>
+            <h2>{{ 'ownedProduct.intake.marketTitle' | t }}</h2>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label for="owned-continent">{{ 'ownedProduct.intake.targetContinent' | t }}</label>
+            <select
+              id="owned-continent"
+              formControlName="target_continent_code"
+              (change)="changeContinent()"
+            >
+              <option value="">{{ 'ownedProduct.intake.chooseContinent' | t }}</option>
+              @for (continent of catalog()?.continents ?? []; track continent.code) {
+                <option [value]="continent.code">
+                  {{ continentName(continent.code, continent.name) }}
+                </option>
+              }
+            </select>
+          </div>
+          <div class="countries">
+            <label for="owned-countries">{{ 'ownedProduct.intake.targetCountries' | t }}</label>
+            <select
+              id="owned-countries"
+              multiple
+              size="7"
+              formControlName="target_country_codes"
+            >
+              @for (country of countriesForSelectedContinent(); track country.code) {
+                <option [value]="country.code">
+                  {{ countryName(country) }} ({{ country.code }})
+                </option>
+              }
+            </select>
+            <small>{{ 'ownedProduct.intake.countryHint' | t }}</small>
+          </div>
+          <div>
+            <label for="owned-border">{{ 'ownedProduct.intake.crossBorder' | t }}</label>
+            <select id="owned-border" formControlName="cross_border_preference">
+              <option value="unknown">{{ 'ownedProduct.border.unknown' | t }}</option>
+              <option value="domestic_only">{{ 'ownedProduct.border.domestic_only' | t }}</option>
+              <option value="cross_border_allowed">{{ 'ownedProduct.border.cross_border_allowed' | t }}</option>
+              <option value="cross_border_preferred">{{ 'ownedProduct.border.cross_border_preferred' | t }}</option>
+            </select>
+          </div>
+          <div>
+            <label for="owned-speed">{{ 'ownedProduct.intake.saleSpeed' | t }}</label>
+            <select id="owned-speed" formControlName="desired_sale_speed">
+              <option value="unknown">{{ 'ownedProduct.speed.unknown' | t }}</option>
+              <option value="fast">{{ 'ownedProduct.speed.fast' | t }}</option>
+              <option value="balanced">{{ 'ownedProduct.speed.balanced' | t }}</option>
+              <option value="maximum_value">{{ 'ownedProduct.speed.maximum_value' | t }}</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ 'ownedProduct.intake.imagesEyebrow' | t }}</p>
+            <h2>{{ 'ownedProduct.intake.imagesTitle' | t }}</h2>
+          </div>
+          <span>{{ 'ownedProduct.intake.optional' | t }}</span>
+        </div>
+
+        <div class="form-grid">
+          <div>
+            <label for="owned-image-kind">{{ 'ownedProduct.intake.imageKind' | t }}</label>
+            <select id="owned-image-kind" formControlName="image_kind">
+              <option value="product">{{ 'ownedProduct.image.product' | t }}</option>
+              <option value="serial_label">{{ 'ownedProduct.image.serial_label' | t }}</option>
+              <option value="defect">{{ 'ownedProduct.image.defect' | t }}</option>
+              <option value="proof_of_purchase">{{ 'ownedProduct.image.proof_of_purchase' | t }}</option>
+            </select>
+          </div>
+          <div>
+            <label for="owned-images">{{ 'ownedProduct.intake.files' | t }}</label>
+            <input
+              id="owned-images"
+              type="file"
+              multiple
+              accept="image/jpeg,image/png,image/webp"
+              (change)="selectFiles($event)"
+            />
+            <small>
+              {{ 'ownedProduct.intake.selectedFiles' | t: { count: selectedFiles().length } }}
+            </small>
+          </div>
+        </div>
+
+        <label for="owned-notes">{{ 'ownedProduct.common.privateNotes' | t }}</label>
+        <textarea id="owned-notes" rows="5" formControlName="notes"></textarea>
+      </section>
+
+      <section class="boundary">
+        <strong>{{ 'ownedProduct.intake.boundaryTitle' | t }}</strong>
+        <p>{{ 'ownedProduct.intake.boundaryDescription' | t }}</p>
+      </section>
+
+      <div class="actions">
+        <a class="button button-quiet" routerLink="/app/sell">{{ 'common.cancel' | t }}</a>
+        <button
+          class="button button-primary"
+          type="submit"
+          [disabled]="saving() || !canManage()"
+        >
+          {{
+            (saving()
+              ? 'ownedProduct.intake.saving'
+              : createdOwnedProductId()
+                ? 'ownedProduct.intake.retryUpload'
+                : 'ownedProduct.intake.save'
+            ) | t
+          }}
+        </button>
+      </div>
+    </form>
+  }
+</div>

@@ -107,3 +107,35 @@ Each source may have:
 - transaction-price indicator.
 
 Price calculations should weight sources accordingly.
+
+## 8. Current implemented boundary
+
+The connector registry and the organization-authorized CSV connector are implemented. The CSV
+connector supports normalization only, reports that automated search is unsupported, and never
+performs a network request.
+
+Every upload:
+
+- is tenant-scoped and uses the existing listing-management permission,
+- requires a user source-rights attestation,
+- is stored on a private configurable disk under a server-generated path,
+- is deduplicated by organization, connector, content hash, and UUID idempotency key,
+- is processed on the isolated `connectors` queue,
+- validates the complete bounded file before creating any listing,
+- records one immutable outcome per non-blank CSV row,
+- creates a listing plus immutable `connector_import` snapshot only for valid unique identities,
+- quarantines invalid rows and links duplicates to the existing tenant listing,
+- replays safely after a stale processing lease without repeating completed rows.
+
+Schema v1 requires `external_id`, `marketplace_name`, `title`, and `source_country_code`.
+`target_country_code` is required either in each row or as the explicit import default. A price
+requires integer `asking_price_minor` and an active ISO currency code. Optional fields are defined
+by the downloadable first-party template.
+
+Production is fail-closed through `MARKETPLACE_CSV_IMPORT_ENABLED=false`. Storage, worker,
+scheduler, monitoring, retention, compliance approval, activation, and rollback are governed only
+by `docs/19-production-go-live.md`.
+
+Email, partner-feed, official API, URL-assisted, and browser-extension connectors remain
+unimplemented. Their capabilities and compliance records require independent approval; none may
+reuse CSV activation as authorization.

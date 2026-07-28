@@ -1,0 +1,232 @@
+<div class="page">
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'privacy.eyebrow' | t }}</p>
+      <h1>{{ 'privacy.title' | t }}</h1>
+      <p>{{ 'privacy.description' | t }}</p>
+    </div>
+    <span class="boundary">{{ 'privacy.auditBoundary' | t }}</span>
+  </header>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+  @if (success()) {
+    <div class="alert success" role="status">{{ success() }}</div>
+  }
+
+  <section class="boundary-card">
+    <div aria-hidden="true">ⓘ</div>
+    <div>
+      <strong>{{ 'privacy.boundaryTitle' | t }}</strong>
+      <p>{{ 'privacy.boundaryDescription' | t }}</p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">{{ 'privacy.newRequestEyebrow' | t }}</p>
+        <h2>{{ 'privacy.newRequestTitle' | t }}</h2>
+      </div>
+      <span>{{ 'privacy.oneActivePerType' | t }}</span>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-grid">
+        <div>
+          <label for="privacy-type">{{ 'privacy.requestType' | t }}</label>
+          <select id="privacy-type" formControlName="type">
+            <option value="data_export">{{ 'privacy.type.data_export' | t }}</option>
+            <option value="account_deletion">
+              {{ 'privacy.type.account_deletion' | t }}
+            </option>
+          </select>
+          <small>{{
+            (form.controls.type.value === 'data_export'
+              ? 'privacy.type.dataExportHelp'
+              : 'privacy.type.accountDeletionHelp')
+              | t
+          }}</small>
+        </div>
+
+        <div>
+          <label for="privacy-country">{{ 'privacy.residenceCountry' | t }}</label>
+          <select id="privacy-country" formControlName="residence_country_code">
+            <option value="">{{ 'common.notSet' | t }}</option>
+            @for (continent of catalog()?.continents ?? []; track continent.code) {
+              <optgroup [label]="continent.name">
+                @for (country of continent.countries; track country.code) {
+                  <option [value]="country.code">
+                    {{ countryName(country.code, country.name) }} ({{ country.code }})
+                  </option>
+                }
+              </optgroup>
+            }
+          </select>
+          <small>{{ 'privacy.residenceCountryHelp' | t }}</small>
+        </div>
+      </div>
+
+      <div>
+        <label for="privacy-reason">{{ 'privacy.reason' | t }}</label>
+        <textarea
+          id="privacy-reason"
+          formControlName="reason"
+          rows="4"
+          maxlength="1000"
+          [placeholder]="'privacy.reasonPlaceholder' | t"
+        ></textarea>
+        <small>{{ 'privacy.reasonHelp' | t }}</small>
+      </div>
+
+      @if (form.controls.type.value === 'account_deletion') {
+        <div class="deletion-warning" role="note">
+          <strong>{{ 'privacy.deletionWarningTitle' | t }}</strong>
+          <p>{{ 'privacy.deletionWarningDescription' | t }}</p>
+        </div>
+      }
+
+      <label class="confirmation">
+        <input type="checkbox" formControlName="privacy_notice_confirmed" />
+        <span>{{ 'privacy.confirmNotice' | t }}</span>
+      </label>
+
+      <footer>
+        <span>{{ 'privacy.responseTargetDisclosure' | t }}</span>
+        <button class="primary" type="submit" [disabled]="submitting()">
+          {{ (submitting() ? 'privacy.submitting' : 'privacy.submit') | t }}
+        </button>
+      </footer>
+    </form>
+  </section>
+
+  <section class="history">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">{{ 'privacy.historyEyebrow' | t }}</p>
+        <h2>{{ 'privacy.historyTitle' | t }}</h2>
+      </div>
+      <span>{{ 'privacy.historyCount' | t: { count: requests().length } }}</span>
+    </div>
+
+    @if (loading()) {
+      <div class="loading">{{ 'privacy.loading' | t }}</div>
+    } @else if (requests().length === 0) {
+      <div class="empty">
+        <strong>{{ 'privacy.emptyTitle' | t }}</strong>
+        <p>{{ 'privacy.emptyDescription' | t }}</p>
+      </div>
+    } @else {
+      <div class="request-list">
+        @for (request of requests(); track request.id) {
+          <article class="request-card">
+            <div class="request-head">
+              <div>
+                <span class="type">{{ typeLabel(request.type) }}</span>
+                <h3>{{ statusLabel(request.status) }}</h3>
+                <small>{{ request.id }}</small>
+              </div>
+              <span class="status" [attr.data-status]="request.status">
+                {{ statusLabel(request.status) }}
+              </span>
+            </div>
+
+            <dl>
+              <div>
+                <dt>{{ 'privacy.requestedAt' | t }}</dt>
+                <dd>{{ date(request.requested_at) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'privacy.responseTarget' | t }}</dt>
+                <dd>{{ date(request.response_target_at) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'privacy.workflowVersion' | t }}</dt>
+                <dd>{{ request.workflow_version }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'privacy.eventCount' | t }}</dt>
+                <dd>{{ request.event_sequence }}</dd>
+              </div>
+            </dl>
+
+            @if (request.reason) {
+              <div class="request-reason">
+                <strong>{{ 'privacy.yourReason' | t }}</strong>
+                <p>{{ request.reason }}</p>
+              </div>
+            }
+
+            @if (request.blocking_reason_codes.length > 0) {
+              <div class="blockers">
+                <strong>{{ 'privacy.blockersTitle' | t }}</strong>
+                <p>{{ 'privacy.blockersDescription' | t }}</p>
+                <ul>
+                  @for (blocker of request.blocking_reason_codes; track blocker) {
+                    <li>{{ blockerLabel(blocker) }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            <div class="timeline">
+              <h4>{{ 'privacy.timeline' | t }}</h4>
+              @for (event of request.events; track event.id) {
+                <div class="event">
+                  <span>{{ event.sequence }}</span>
+                  <div>
+                    <strong>{{ eventReason(event) }}</strong>
+                    <p>
+                      {{ actorLabel(event.actor_type) }} · {{ date(event.occurred_at) }}
+                    </p>
+                    @if (event.note) {
+                      <p>{{ event.note }}</p>
+                    }
+                    @if (event.evidence_reference) {
+                      <code>{{ event.evidence_reference }}</code>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (request.can_cancel) {
+              <div class="cancel-area">
+                @if (cancelConfirmationId() === request.id) {
+                  <p>{{ 'privacy.cancelConfirmation' | t }}</p>
+                  <div>
+                    <button type="button" class="secondary" (click)="keepRequest()">
+                      {{ 'privacy.keepRequest' | t }}
+                    </button>
+                    <button
+                      type="button"
+                      class="danger"
+                      [disabled]="cancellingId() !== null"
+                      (click)="cancel(request)"
+                    >
+                      {{
+                        (cancellingId() === request.id
+                          ? 'privacy.cancelling'
+                          : 'privacy.confirmCancel')
+                          | t
+                      }}
+                    </button>
+                  </div>
+                } @else {
+                  <button
+                    type="button"
+                    class="secondary"
+                    (click)="askToCancel(request.id)"
+                  >
+                    {{ 'privacy.cancelRequest' | t }}
+                  </button>
+                }
+              </div>
+            }
+          </article>
+        }
+      </div>
+    }
+  </section>
+</div>

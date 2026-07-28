@@ -1,0 +1,92 @@
+<div class="dashboard">
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'dashboard.eyebrow' | t }}</p>
+      <h1>{{ 'dashboard.greeting' | t: { name: user()?.name ?? 'Procura' } }}</h1>
+      <p>
+        {{
+          'dashboard.context'
+            | t
+              : {
+                  workspace:
+                    activeOrganization()?.name ?? ('dashboard.workspaceFallback' | t),
+                }
+        }}
+      </p>
+    </div>
+    <span class="environment">
+      <i [class.error]="healthError()"></i>
+      @if (health()) {
+        {{ 'dashboard.apiOperational' | t: { version: health()?.version ?? 'v1' } }}
+      } @else if (healthError()) {
+        {{ 'dashboard.apiUnavailable' | t }}
+      } @else {
+        {{ 'dashboard.apiChecking' | t }}
+      }
+    </span>
+  </header>
+
+  <section class="readiness" aria-labelledby="readiness-title">
+    <div class="section-title">
+      <div>
+        <span>{{ 'dashboard.foundationStatus' | t }}</span>
+        <h2 id="readiness-title">{{ 'dashboard.domainOperational' | t }}</h2>
+      </div>
+      <strong>06 / 06</strong>
+    </div>
+
+    <div class="status-grid">
+      <article>
+        <span class="check">✓</span>
+        <div>
+          <strong>{{ 'dashboard.angularTitle' | t }}</strong>
+          <p>{{ 'dashboard.angularDescription' | t }}</p>
+        </div>
+      </article>
+      <article>
+        <span class="check">✓</span>
+        <div>
+          <strong>{{ 'dashboard.authTitle' | t }}</strong>
+          <p>{{ 'dashboard.authDescription' | t }}</p>
+        </div>
+      </article>
+      <article>
+        <span class="check">✓</span>
+        <div>
+          <strong>{{ 'dashboard.apiTitle' | t }}</strong>
+          <p>{{ 'dashboard.apiDescription' | t }}</p>
+        </div>
+      </article>
+      <article>
+        <span class="check">✓</span>
+        <div>
+          <strong>{{ 'dashboard.tenantTitle' | t }}</strong>
+          <p>{{ 'dashboard.tenantDescription' | t }}</p>
+        </div>
+      </article>
+      <article>
+        <span class="check">✓</span>
+        <div>
+          <strong>{{ 'dashboard.globalTitle' | t }}</strong>
+          <p>{{ 'dashboard.globalDescription' | t }}</p>
+        </div>
+      </article>
+      <article>
+        <span class="check">✓</span>
+        <div>
+          <strong>{{ 'dashboard.listingTitle' | t }}</strong>
+          <p>{{ 'dashboard.listingDescription' | t }}</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="next-slice">
+    <span>{{ 'dashboard.nextSlice' | t }}</span>
+    <div>
+      <h2>{{ 'dashboard.nextTitle' | t }}</h2>
+      <p>{{ 'dashboard.nextDescription' | t }}</p>
+    </div>
+    <strong>04</strong>
+  </section>
+</div>

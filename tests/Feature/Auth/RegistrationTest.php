@@ -1,13 +1,14 @@
 <?php
 
+use App\Enums\Organizations\OrganizationRole;
+use App\Enums\Organizations\OrganizationType;
 use App\Models\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\Notification;
 
-test('registration screen can be rendered', function () {
+test('registration screen redirects to the Angular application', function () {
     $this->get(route('register'))
-        ->assertOk()
-        ->assertSee('Create your account');
+        ->assertRedirect(config('app.frontend_url').'/register');
 });
 
 test('new users can register and receive a verification email', function () {
@@ -22,11 +23,15 @@ test('new users can register and receive a verification email', function () {
 
     $user = User::query()->sole();
 
-    $response->assertRedirect('/dashboard');
+    $response->assertRedirect(config('fortify.redirects.register'));
     $this->assertAuthenticatedAs($user);
     expect($user->name)->toBe('Milan Stankovic')
         ->and($user->email)->toBe('milan@example.com')
-        ->and($user->email_verified_at)->toBeNull();
+        ->and($user->email_verified_at)->toBeNull()
+        ->and($user->personalOrganization)->not->toBeNull()
+        ->and($user->personalOrganization->type)->toBe(OrganizationType::Personal)
+        ->and($user->current_organization_id)->toBe($user->personalOrganization->getKey())
+        ->and($user->memberships()->sole()->role)->toBe(OrganizationRole::Owner);
     Notification::assertSentTo($user, VerifyEmail::class);
 });
 

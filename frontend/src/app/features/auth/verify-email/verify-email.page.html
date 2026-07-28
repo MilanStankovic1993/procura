@@ -1,0 +1,83 @@
+<main class="auth-page">
+  <a class="brand" routerLink="/" [attr.aria-label]="'common.backToProcura' | t">
+    <span class="brand-mark" aria-hidden="true">P</span>
+    <span>Procura</span>
+  </a>
+  <app-language-switcher class="auth-language" />
+
+  <section class="auth-card" aria-labelledby="verify-email-title">
+    <div class="heading">
+      <p class="eyebrow">{{ 'verify.eyebrow' | t }}</p>
+      <h1 id="verify-email-title">
+        @if (verified()) {
+          {{ 'verify.verifiedTitle' | t }}
+        } @else {
+          {{ 'verify.pendingTitle' | t }}
+        }
+      </h1>
+      <p>
+        @if (verified()) {
+          {{ 'verify.verifiedDescription' | t }}
+        } @else {
+          {{
+            'verify.pendingDescription'
+              | t
+                : {
+                    email: email ? ('verify.toEmail' | t: { email }) : '',
+                  }
+          }}
+        }
+      </p>
+    </div>
+
+    @if (isVerifying()) {
+      <div class="success" role="status">{{ 'verify.verifying' | t }}</div>
+    }
+    @if (generalError()) {
+      <div class="alert" role="alert">{{ generalError() }}</div>
+    }
+    @if (successMessage()) {
+      <div class="success" role="status">{{ successMessage() }}</div>
+    }
+
+    <div class="actions">
+      @if (verified()) {
+        <button class="button button-primary" type="button" (click)="continueToWorkspace()">
+          {{ 'verify.continue' | t }} <span>→</span>
+        </button>
+      } @else {
+        <button
+          class="button button-primary"
+          type="button"
+          [disabled]="isResending() || isVerifying()"
+          (click)="resend()"
+        >
+          @if (isResending()) {
+            {{ 'verify.sending' | t }}
+          } @else {
+            {{ 'verify.sendNew' | t }}
+          }
+        </button>
+      }
+
+      <button
+        class="button button-quiet"
+        type="button"
+        [disabled]="isSigningOut()"
+        (click)="signOut()"
+      >
+        @if (isSigningOut()) {
+          {{ 'common.signingOut' | t }}
+        } @else {
+          {{ 'common.signOut' | t }}
+        }
+      </button>
+    </div>
+
+    <p class="security-note">
+      {{ 'verify.security' | t }}
+    </p>
+  </section>
+
+  <p class="footer-copy">{{ 'common.footer' | t }}</p>
+</main>

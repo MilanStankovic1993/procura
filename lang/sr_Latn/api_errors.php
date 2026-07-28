@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'billing_checkout_expired' => 'Ovaj zahtev za plaćanje je istekao. Pokrenite ga ponovo sa novim ključem idempotentnosti.',
+    'billing_manual_assignment' => 'Ovom radnom prostoru je administrator dodelio paket.',
+    'billing_not_configured' => 'Naplata nije podešena za ovaj paket i interval.',
+    'billing_operation_in_progress' => 'Druga operacija naplate je već u toku za ovaj radni prostor.',
+    'billing_portal_unavailable' => 'Portal za naplatu nije dostupan za ovaj radni prostor.',
+    'billing_provider_invalid_response' => 'Pružalac platnih usluga je vratio neispravno odredište.',
+    'billing_provider_unavailable' => 'Pružalac platnih usluga trenutno nije dostupan.',
+    'billing_subscription_exists' => 'Upravljajte postojećom pretplatom preko portala za naplatu.',
+    'buyer_decision_idempotency_conflict' => 'Ključ idempotentnosti je već upotrebljen za drugačiju komandu odluke o kupovini.',
+    'buyer_decision_stale_state' => 'Odluka o kupovini je promenjena. Osvežite analizu pre beleženja druge odluke.',
+    'idempotency_payload_mismatch' => 'Ključ idempotentnosti je već upotrebljen za drugu datoteku za uvoz.',
+    'privacy_request_idempotency_conflict' => 'Ključ idempotentnosti je već upotrebljen za drugačiju komandu zahteva za privatnost.',
+    'privacy_request_stale_state' => 'Zahtev za privatnost je promenjen. Osvežite ga pre beleženja drugog prelaza.',
+    'sale_portfolio_idempotency_conflict' => 'Ključ idempotentnosti je već upotrebljen za drugačiju komandu prodajnog portfolija.',
+    'sale_portfolio_stale_state' => 'Stanje prodajnog portfolija je promenjeno. Osvežite ga pre beleženja drugog događaja.',
+    'actual_cost_stale_state' => 'Dokazi o stvarnim troškovima su promenjeni. Osvežite ih pre beleženja ispravke.',
+    'actual_purchase_stale_state' => 'Dokazi o stvarnoj kupovini su promenjeni. Osvežite ih pre beleženja ispravke.',
+    'actual_sale_stale_portfolio_state' => 'Stanje prodajnog portfolija je promenjeno. Osvežite ga pre beleženja ishoda.',
+    'actual_sale_stale_state' => 'Dokazi o stvarnoj prodaji su promenjeni. Osvežite ih pre beleženja drugog ishoda.',
+    'estimate_accuracy_report_stale_state' => 'Izveštaj o tačnosti procene je promenjen. Osvežite ga pre beleženja.',
+    'estimate_attribution_stale_state' => 'Atribucija procene je promenjena. Osvežite je pre beleženja.',
+    'outcome_idempotency_conflict' => 'Ključ idempotentnosti je već upotrebljen za drugačiju komandu ishoda.',
+];

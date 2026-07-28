@@ -5,10 +5,9 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 
-test('forgot password screen can be rendered', function () {
+test('forgot password screen redirects to the Angular application', function () {
     $this->get(route('password.request'))
-        ->assertOk()
-        ->assertSee('Reset your password');
+        ->assertRedirect(config('app.frontend_url').'/forgot-password');
 });
 
 test('users can request and complete a password reset', function () {
@@ -27,8 +26,10 @@ test('users can request and complete a password reset', function () {
     });
 
     $this->get(route('password.reset', ['token' => $token, 'email' => $user->email]))
-        ->assertOk()
-        ->assertSee('Choose a new password');
+        ->assertRedirect(config('app.frontend_url').'/reset-password?'.http_build_query([
+            'token' => $token,
+            'email' => $user->email,
+        ], '', '&', PHP_QUERY_RFC3986));
 
     $response = $this->post(route('password.update'), [
         'token' => $token,
@@ -37,7 +38,7 @@ test('users can request and complete a password reset', function () {
         'password_confirmation' => 'NewSecurePass456!',
     ]);
 
-    $response->assertRedirect(route('login'))
+    $response->assertRedirect(config('fortify.redirects.password-reset'))
         ->assertSessionHasNoErrors();
     expect(Hash::check('NewSecurePass456!', $user->fresh()->password))->toBeTrue();
 });

@@ -109,7 +109,10 @@ The user adds all acquisition and sale costs.
 
 ### UC-05 Track actual purchase and sale outcome
 
-The user records actual purchase price, sale price, costs, and sale duration.
+The user records immutable actual purchase evidence, an eight-category known/unknown cost snapshot,
+and a sold, cancelled, or no-sale result against the exact current sale-portfolio event. The system
+shows actual profit and sale duration only when the realized evidence chain is complete and uses
+one reporting currency; otherwise it shows explicit unknowns.
 
 ### UC-06 Create a saved search
 

@@ -1,0 +1,2499 @@
+import { TranslationDictionary } from './en';
+
+export const FR_TRANSLATIONS = {
+  'common.backToProcura': 'Retour à Procura',
+  'common.footer': 'Intelligence globale. Contexte de marché local.',
+  'common.signIn': 'Se connecter',
+  'common.signOut': 'Se déconnecter',
+  'common.signingOut': 'Déconnexion…',
+  'common.retry': 'Réessayer',
+  'common.emailAddress': 'Adresse e-mail',
+  'common.emailRequired': "L'adresse e-mail est obligatoire.",
+  'common.emailInvalid': 'Saisissez une adresse e-mail valide.',
+  'common.password': 'Mot de passe',
+  'common.passwordRequired': 'Le mot de passe est obligatoire.',
+  'common.passwordPolicy':
+    'Utilisez au moins 12 caractères avec majuscules, minuscules, un chiffre et un symbole.',
+  'common.passwordsMatch': 'Les mots de passe doivent correspondre.',
+  'language.label': 'Langue',
+  'language.saving': 'Enregistrement de la langue…',
+  'language.error': "La préférence de langue n'a pas pu être enregistrée.",
+  'route.landing': 'Intelligence de marché globale',
+  'route.login': 'Se connecter',
+  'route.register': 'Créer un compte',
+  'route.forgotPassword': 'Mot de passe oublié',
+  'route.resetPassword': 'Réinitialiser le mot de passe',
+  'route.verifyEmail': "Vérifier l'e-mail",
+  'route.confirmPassword': 'Confirmer le mot de passe',
+  'route.workspaceUnavailable': 'Espace de travail indisponible',
+  'route.acceptInvitation': "Accepter l'invitation",
+  'route.overview': "Vue d'ensemble",
+  'route.organization': 'Organisation',
+  'route.buyListings': "Annonces d'approvisionnement",
+  'route.addSourceListing': "Ajouter une annonce d'approvisionnement",
+  'route.buyAnalysis': "État de l'analyse d'achat",
+  'route.listingDetail': "Détail de l'annonce",
+  'route.markets': 'Marchés',
+  'route.subscription': 'Offre et utilisation',
+  'route.privacy': 'Demandes de confidentialité',
+  'shell.workspace': 'Espace de travail',
+  'shell.switchingWorkspace': "Changement d'espace de travail…",
+  'shell.workspaceKind': 'Espace de travail {{type}}',
+  'shell.navigation': "Navigation de l'espace de travail",
+  'shell.overview': "Vue d'ensemble",
+  'shell.organization': 'Organisation',
+  'shell.buyAnalysis': "Analyse d'achat",
+  'shell.sellAnalysis': 'Analyse de vente',
+  'shell.soon': 'Bientôt',
+  'shell.markets': 'Marchés',
+  'shell.planUsage': 'Offre et utilisation',
+  'shell.privacy': 'Confidentialité',
+  'organization.type.personal': 'personnel',
+  'organization.type.business': 'professionnel',
+  'organization.role.owner': 'Propriétaire',
+  'organization.role.administrator': 'Administrateur',
+  'organization.role.analyst': 'Analyste',
+  'organization.role.viewer': 'Lecteur',
+  'dashboard.eyebrow': "Vue d'ensemble de l'espace",
+  'dashboard.greeting': 'Ravi de vous revoir, {{name}}.',
+  'dashboard.context':
+    "Vous travaillez dans {{workspace}}. Les annonces d'approvisionnement et les preuves privées héritent de cette frontière de tenant vérifiée.",
+  'dashboard.workspaceFallback': 'votre espace Procura',
+  'dashboard.apiOperational': 'API {{version}} opérationnelle',
+  'dashboard.apiUnavailable': 'API indisponible',
+  'dashboard.apiChecking': "Vérification de l'API",
+  'dashboard.foundationStatus': 'État de la plateforme',
+  'dashboard.domainOperational': 'Le cycle de décision principal est opérationnel',
+  'dashboard.angularTitle': 'Application Angular',
+  'dashboard.angularDescription': 'Stricte, autonome, routée, localisée et contrôlée',
+  'dashboard.authTitle': 'Authentification de session',
+  'dashboard.authDescription': 'Fortify, Sanctum, CSRF et protection des routes',
+  'dashboard.apiTitle': 'API versionnée',
+  'dashboard.apiDescription': 'Frontière contractuelle stable `/api/v1`',
+  'dashboard.tenantTitle': 'Contexte du tenant',
+  'dashboard.tenantDescription': "Résolution indexée de l'adhésion et changement protégé",
+  'dashboard.globalTitle': 'Architecture globale',
+  'dashboard.globalDescription': 'Aucun pays codé en dur dans les frontières produit',
+  'dashboard.listingTitle': 'Provenance des annonces',
+  'dashboard.listingDescription': 'Isolation, snapshots et preuves privées signées',
+  'dashboard.nextSlice': 'Feuille de route d’intégration',
+  'dashboard.nextTitle': 'Frontière de facturation et d’abonnement Stripe',
+  'dashboard.nextDescription':
+    "Définissez des contrats approuvés séparément pour le paiement, l’authenticité des webhooks, l’idempotence des débits, le cycle d’abonnement, le rapprochement et l’audit avant d’activer la facturation.",
+  'landing.primaryNavigation': 'Navigation principale',
+  'landing.platform': 'Plateforme',
+  'landing.approach': 'Approche',
+  'landing.eyebrow': 'Intelligence de marché globale',
+  'landing.title': 'Prenez chaque décision de marché sur la base de preuves.',
+  'landing.lead':
+    "Procura transforme des annonces, prix, coûts et signaux de risque dispersés en une décision claire d'achat ou de vente, au-delà des frontières et des plateformes.",
+  'landing.openWorkspace': "Ouvrir l'espace de travail",
+  'landing.explorePlatform': 'Découvrir la plateforme',
+  'landing.platformPrinciples': 'Principes de la plateforme',
+  'landing.countryAware': 'Adapté au pays',
+  'landing.evidenceBacked': 'Fondé sur des preuves',
+  'landing.humanReadable': 'Facile à comprendre',
+  'landing.exampleSignal': 'Exemple de signal de marché',
+  'landing.opportunitySignal': "Signal d'opportunité",
+  'landing.exampleProduct': 'Kit de perceuse professionnel',
+  'landing.sourceMarket': "Marché d'origine",
+  'landing.targetMarket': 'Marché cible',
+  'landing.germanyEur': 'Allemagne · EUR',
+  'landing.canadaCad': 'Canada · CAD',
+  'landing.expectedMargin': 'Marge nette attendue',
+  'landing.afterCosts': 'Après frais, livraison et risque de marché',
+  'landing.highConfidence': 'Signal de confiance élevée · 37 annonces comparables',
+  'landing.decisionLayer': 'La couche de décision',
+  'landing.defensibleAnswer': 'De données dispersées à une réponse défendable.',
+  'landing.buyLabel': "Intelligence d'achat",
+  'landing.buyTitle': 'Connaissez le coût réel avant de vous engager.',
+  'landing.buyDescription':
+    'Comparez prix du marché, coût total, risque et confiance dans une seule décision.',
+  'landing.sellLabel': 'Intelligence de vente',
+  'landing.sellTitle': "Fixez le prix selon la marge, pas à l'intuition.",
+  'landing.sellDescription':
+    'Comprenez la demande, les frais, la concurrence et le bénéfice net probable sur plusieurs marchés.',
+  'landing.globalLabel': 'Graphe de marché global',
+  'landing.globalTitle': 'Un produit, tous les marchés pertinents.',
+  'landing.globalDescription':
+    'Pays, devises, langues, limites de livraison et conditions locales.',
+  'landing.wholeMarket':
+    'Conçu pour le marché entier, pas pour un seul pays ou une seule plateforme.',
+  'landing.start': 'Commencer avec Procura',
+  'login.eyebrow': 'Espace de travail sécurisé',
+  'login.title': 'Bon retour.',
+  'login.description': 'Connectez-vous pour poursuivre votre analyse de marché.',
+  'login.emailPlaceholder': 'vous@entreprise.fr',
+  'login.forgotPassword': 'Mot de passe oublié ?',
+  'login.passwordPlaceholder': 'Votre mot de passe',
+  'login.remember': 'Rester connecté sur cet appareil',
+  'login.submitting': 'Connexion…',
+  'login.newToProcura': 'Nouveau sur Procura ?',
+  'login.createAccount': 'Créer un compte',
+  'login.security':
+    'Protégé par validation CSRF et une session serveur chiffrée.',
+  'login.error': 'Connexion impossible. Veuillez réessayer dans un instant.',
+  'authError.validation': 'Vérifiez les champs mis en évidence.',
+  'authError.sessionExpired': 'Votre session sécurisée a expiré. Veuillez réessayer.',
+  'authError.tooManyAttempts':
+    'Trop de tentatives. Patientez un instant avant de réessayer.',
+  'register.eyebrow': 'Créez votre espace de travail',
+  'register.title': 'Commencez avec un compte sécurisé.',
+  'register.description':
+    "Votre organisation personnelle est créée automatiquement et peut devenir un espace d'équipe.",
+  'register.fullName': 'Nom complet',
+  'register.nameRequired': 'Votre nom est obligatoire.',
+  'register.workEmail': 'E-mail professionnel',
+  'register.confirmPassword': 'Confirmer le mot de passe',
+  'register.submitting': 'Création du compte…',
+  'register.createAccount': 'Créer le compte',
+  'register.alreadyAccount': 'Vous avez déjà un compte ?',
+  'register.security':
+    "La vérification de l'e-mail est requise avant l'accès aux données du tenant.",
+  'register.error': 'Création du compte impossible. Veuillez réessayer dans un instant.',
+  'forgot.eyebrow': 'Récupération du compte',
+  'forgot.title': 'Réinitialisez votre mot de passe.',
+  'forgot.description':
+    "Saisissez l'e-mail du compte. Si un compte correspondant existe, nous enverrons un lien sécurisé.",
+  'forgot.submitting': 'Envoi du lien sécurisé…',
+  'forgot.submit': 'Envoyer le lien',
+  'forgot.remember': 'Vous vous souvenez du mot de passe ?',
+  'forgot.back': 'Retour à la connexion',
+  'forgot.security':
+    'La réponse est volontairement identique pour les e-mails connus et inconnus.',
+  'forgot.error': 'La demande ne peut pas être traitée. Veuillez réessayer dans un instant.',
+  'reset.eyebrow': 'Réinitialisation sécurisée',
+  'reset.title': 'Choisissez un nouveau mot de passe.',
+  'reset.description':
+    'Définissez un nouveau mot de passe pour {{email}}. Le jeton ne peut être utilisé qu’une fois.',
+  'reset.missingDescription':
+    "Le lien doit contenir un jeton valide et l'e-mail du compte.",
+  'reset.incomplete':
+    'Ce lien est incomplet. Demandez un nouvel e-mail de récupération.',
+  'reset.requestNew': 'Demander un nouveau lien',
+  'reset.continue': 'Continuer vers la connexion',
+  'reset.newPassword': 'Nouveau mot de passe',
+  'reset.confirmPassword': 'Confirmer le nouveau mot de passe',
+  'reset.submitting': 'Mise à jour du mot de passe…',
+  'reset.submit': 'Mettre à jour le mot de passe',
+  'reset.back': 'Retour à la connexion',
+  'reset.security':
+    'Les liens expirent et sont invalidés après une modification réussie.',
+  'reset.invalidError': 'Ce lien de réinitialisation est incomplet ou invalide.',
+  'reset.expiredError':
+    'Ce lien est invalide ou expiré. Demandez un nouveau lien pour continuer.',
+  'verify.eyebrow': 'Protégez votre espace de travail',
+  'verify.verifiedTitle': 'E-mail vérifié.',
+  'verify.pendingTitle': 'Consultez votre boîte de réception.',
+  'verify.verifiedDescription':
+    'Votre identité est confirmée et les données du tenant sont disponibles.',
+  'verify.pendingDescription':
+    'Nous avons envoyé un lien signé et à durée limitée{{email}}.',
+  'verify.toEmail': ' à {{email}}',
+  'verify.verifying': 'Vérification du lien sécurisé…',
+  'verify.continue': "Continuer vers l'espace de travail",
+  'verify.sending': 'Envoi…',
+  'verify.sendNew': 'Envoyer un nouveau lien de vérification',
+  'verify.security':
+    "Les API de l'espace restent verrouillées jusqu'à la vérification de l'e-mail.",
+  'verify.stateError': "Impossible de confirmer l'état vérifié du compte.",
+  'verify.success': 'Votre adresse e-mail a été vérifiée.',
+  'verify.sent': 'Un nouveau lien de vérification a été envoyé à votre adresse.',
+  'verify.tooManyRequests': 'Trop de demandes. Attendez avant de demander un autre e-mail.',
+  'verify.sendError': "Impossible d'envoyer l'e-mail de vérification. Veuillez réessayer.",
+  'verify.invalidLink':
+    'Ce lien est invalide ou expiré. Demandez un nouveau lien ci-dessous.',
+  'verify.tooManyAttempts': 'Trop de tentatives. Attendez puis réessayez.',
+  'verify.error': "Impossible de vérifier votre e-mail. Veuillez réessayer dans un instant.",
+  'confirm.eyebrow': 'Action sensible',
+  'confirm.title': 'Confirmez votre identité.',
+  'confirm.description':
+    "Saisissez à nouveau votre mot de passe avant de poursuivre l'opération protégée.",
+  'confirm.checking': "Vérification de l'état de confirmation…",
+  'confirm.currentPassword': 'Mot de passe actuel',
+  'confirm.passwordRequired': 'Votre mot de passe actuel est obligatoire.',
+  'confirm.submitting': 'Confirmation…',
+  'confirm.submit': 'Confirmer le mot de passe',
+  'confirm.return': "Retour à l'espace de travail",
+  'confirm.security': 'La confirmation du mot de passe expire automatiquement.',
+  'confirm.statusError':
+    "Impossible de vérifier l'état. Actualisez la page puis réessayez.",
+  'confirm.error': 'Impossible de confirmer votre mot de passe. Veuillez réessayer.',
+  'workspace.eyebrow': "Récupération de l'espace",
+  'workspace.title': "Votre compte nécessite un espace de travail d'organisation.",
+  'workspace.fallback':
+    "Procura n'a trouvé aucune adhésion valide à une organisation pour cette session.",
+  'workspace.support':
+    "Aucune donnée du tenant n'a été ouverte. Réessayez après le rétablissement de votre adhésion ou déconnectez-vous en sécurité.",
+  'workspace.checking': 'Vérification…',
+  'workspace.retry': "Réessayer l'espace",
+  'invitation.eyebrow': "Invitation à l'espace de travail",
+  'invitation.title': 'Rejoignez votre équipe.',
+  'invitation.description':
+    "L'acceptation ajoutera votre compte à l'espace et le rendra actif.",
+  'invitation.accepting': 'Acceptation…',
+  'invitation.accept': "Accepter l'invitation",
+  'invitation.return': "Retour à l'espace de travail",
+  'invitation.incomplete': "Ce lien d'invitation est incomplet.",
+  'invitation.unavailable': "Cette invitation n'est pas disponible.",
+  'invitation.error': "L'invitation n'a pas pu être acceptée.",
+  'common.priceNotProvided': 'Prix non renseigné',
+  'common.notSet': 'Non défini',
+  'common.save': 'Enregistrer',
+  'common.saving': 'Enregistrement…',
+  'common.loading': 'Chargement…',
+  'common.search': 'Rechercher',
+  'common.clear': 'Effacer',
+  'common.included': 'Inclus',
+  'common.unavailable': 'Indisponible',
+  'common.unlimited': 'Illimité',
+  'common.used': 'Utilisé',
+  'common.limit': 'Limite',
+  'common.member': 'Membre',
+  'common.system': 'Système',
+  'common.total': '{{count}} au total',
+  'common.expires': 'expire le {{date}}',
+  'privacy.eyebrow': 'Confidentialité et droits sur les données',
+  'privacy.title': 'Centre des demandes de confidentialité',
+  'privacy.description':
+    "Demandez un export portable de vos données ou lancez un processus contrôlé de suppression de compte avec une piste d'audit complète.",
+  'privacy.auditBoundary': 'Processus audité',
+  'privacy.boundaryTitle':
+    "Une demande ne supprime ni n'exporte automatiquement les données",
+  'privacy.boundaryDescription':
+    "Procura enregistre la demande exacte, l'objectif opérationnel, les blocages, les décisions et les preuves d'exécution. La conservation, la propriété, la facturation et les contrôles juridiques restent obligatoires.",
+  'privacy.newRequestEyebrow': 'Nouvelle demande',
+  'privacy.newRequestTitle': 'Exercer un droit sur les données',
+  'privacy.oneActivePerType': 'Une demande active par type',
+  'privacy.requestType': 'Type de demande',
+  'privacy.type.data_export': 'Export de données',
+  'privacy.type.account_deletion': 'Suppression du compte',
+  'privacy.type.dataExportHelp':
+    'Demande une copie portable via le processus de remise contrôlé.',
+  'privacy.type.accountDeletionHelp':
+    'Lance la vérification du compte, de la propriété, de la facturation, de la conservation et des obligations de suppression.',
+  'privacy.residenceCountry': 'Pays de résidence',
+  'privacy.residenceCountryHelp':
+    "Contexte juridictionnel facultatif. Il ne détermine pas à lui seul l'éligibilité juridique.",
+  'privacy.reason': 'Contexte de la demande',
+  'privacy.reasonPlaceholder':
+    'Ajoutez une portée ou un contexte pertinent sans inclure de secrets.',
+  'privacy.reasonHelp':
+    "Facultatif, de 10 à 1 000 caractères. N'incluez jamais de mots de passe ni de jetons.",
+  'privacy.deletionWarningTitle':
+    'La suppression du compte nécessite une vérification opérationnelle',
+  'privacy.deletionWarningDescription':
+    "La propriété d'entreprise, la facturation active, la conservation légale, la prévention de la fraude et les preuves d'audit peuvent nécessiter une action avant exécution.",
+  'privacy.confirmNotice':
+    "Je confirme soumettre cette demande pour mon propre compte Procura authentifié et avoir lu l'avis sur le processus de confidentialité.",
+  'privacy.responseTargetDisclosure':
+    "L'objectif affiché est opérationnel et ne constitue pas une détermination juridique propre à une juridiction.",
+  'privacy.submitting': 'Envoi de la demande…',
+  'privacy.submit': 'Envoyer la demande de confidentialité',
+  'privacy.historyEyebrow': 'Registre de preuves',
+  'privacy.historyTitle': 'Vos demandes de confidentialité',
+  'privacy.historyCount': '{{count}} demandes',
+  'privacy.loading': 'Chargement des demandes de confidentialité…',
+  'privacy.emptyTitle': 'Aucune demande de confidentialité',
+  'privacy.emptyDescription':
+    "Les nouvelles demandes d'export et de suppression apparaîtront ici avec leur historique complet.",
+  'privacy.requestedAt': 'Demandée',
+  'privacy.responseTarget': 'Objectif opérationnel de réponse',
+  'privacy.workflowVersion': 'Version du processus',
+  'privacy.eventCount': 'Événements enregistrés',
+  'privacy.yourReason': 'Contexte de votre demande',
+  'privacy.blockersTitle': "Action requise avant l'exécution",
+  'privacy.blockersDescription':
+    'Ces contrôles sont calculés côté serveur et ne peuvent pas être contournés depuis le navigateur.',
+  'privacy.timeline': 'Chronologie du statut',
+  'privacy.cancelConfirmation':
+    'Annuler cette demande active ? Son historique enregistré restera immuable.',
+  'privacy.keepRequest': 'Conserver la demande',
+  'privacy.cancelling': 'Annulation…',
+  'privacy.confirmCancel': "Confirmer l'annulation",
+  'privacy.cancelRequest': 'Annuler la demande',
+  'privacy.loadError': "Impossible de charger les demandes de confidentialité.",
+  'privacy.createError': "Impossible d'envoyer la demande de confidentialité.",
+  'privacy.created': 'Demande de confidentialité enregistrée.',
+  'privacy.cancelError': "Impossible d'annuler la demande de confidentialité.",
+  'privacy.cancelled': 'Demande de confidentialité annulée.',
+  'privacy.status.requested': 'Demandée',
+  'privacy.status.in_review': 'En cours de vérification',
+  'privacy.status.action_required': 'Action requise',
+  'privacy.status.approved': 'Approuvée',
+  'privacy.status.fulfilled': 'Exécutée',
+  'privacy.status.rejected': 'Rejetée',
+  'privacy.status.cancelled': 'Annulée',
+  'privacy.actor.subject': 'Titulaire du compte',
+  'privacy.actor.operator': 'Opérateur confidentialité',
+  'privacy.actor.system': 'Système',
+  'privacy.blocker.retention_review_required':
+    'Vérification de conservation requise',
+  'privacy.blocker.business_ownership_transfer_required':
+    "La propriété de l'entreprise doit être transférée",
+  'privacy.blocker.active_subscription_resolution_required':
+    "L'abonnement actif doit être résolu",
+  'privacy.blocker.super_admin_reassignment_required':
+    "L'accès super-administrateur doit être réattribué",
+  'privacy.event.privacy_request_submitted': 'Demande envoyée',
+  'privacy.event.cancelled_by_subject': 'Annulée par le titulaire',
+  'privacy.event.review_started': 'Vérification opérationnelle lancée',
+  'privacy.event.export_approved': 'Export de données approuvé',
+  'privacy.event.export_delivered': 'Export de données remis',
+  'market.eyebrow': 'Contexte du marché mondial',
+  'market.title': 'Marchés',
+  'market.description':
+    "Définissez les valeurs par défaut de l'organisation. Chaque analyse conservera son périmètre de marché explicite.",
+  'market.loading': 'Chargement des données de référence mondiales…',
+  'market.homeCountry': "Pays d'origine",
+  'market.reportingCurrency': 'Devise de reporting',
+  'market.locale': 'Paramètre régional BCP 47',
+  'market.timezone': 'Fuseau horaire IANA',
+  'market.useDevice': "Utiliser l'appareil",
+  'market.measurement': 'Système de mesure',
+  'market.measurement.metric': 'Métrique',
+  'market.measurement.usCustomary': 'Unités américaines',
+  'market.measurement.ukMixed': 'Unités britanniques mixtes',
+  'market.crossBorder': 'Activer les marchés transfrontaliers par défaut',
+  'market.coverage': 'Couverture par défaut',
+  'market.countries': 'Pays',
+  'market.selected': '{{count}} sélectionnés',
+  'market.searchPlaceholder': 'Rechercher un pays ou un code',
+  'market.toggleAll': 'Tout basculer',
+  'market.permission':
+    "Seuls les propriétaires et administrateurs de l'espace peuvent modifier les valeurs par défaut.",
+  'market.save': 'Enregistrer les valeurs du marché',
+  'market.saving': 'Enregistrement des valeurs du marché…',
+  'market.loadError': "Les données de référence du marché n'ont pas pu être chargées.",
+  'market.countryRequired': 'Sélectionnez au moins un pays.',
+  'market.saved': 'Valeurs du marché enregistrées.',
+  'market.saveError': "Les valeurs du marché n'ont pas pu être enregistrées.",
+  'market.continent.africa': 'Afrique',
+  'market.continent.antarctica': 'Antarctique',
+  'market.continent.asia': 'Asie',
+  'market.continent.europe': 'Europe',
+  'market.continent.northAmerica': 'Amérique du Nord',
+  'market.continent.oceania': 'Océanie',
+  'market.continent.southAmerica': 'Amérique du Sud',
+  'subscription.eyebrow': "Contrôles d'abonnement",
+  'subscription.title': 'Forfait et utilisation',
+  'subscription.description':
+    "Droits imposés par le backend pour l'espace de travail actif.",
+  'subscription.loadError':
+    "Les données du forfait et de l'utilisation n'ont pas pu être chargées.",
+  'subscription.loading': 'Chargement du forfait et de l’utilisation…',
+  'subscription.currentPlan': 'Forfait actuel',
+  'subscription.period': "Période d'utilisation actuelle",
+  'subscription.enforcement': 'Application côté backend',
+  'subscription.entitlements': 'Droits',
+  'subscription.clientBoundary': 'Les limites ne peuvent pas être contournées par le client',
+  'subscription.billingNote':
+    "Checkout ne fait que démarrer une session du prestataire. Les droits payants ne sont activés qu'après un webhook Stripe vérifié.",
+  'subscription.billing.eyebrow': 'Facturation sécurisée',
+  'subscription.billing.title': "Facturation de l'abonnement",
+  'subscription.billing.secureBoundary':
+    'Checkout hébergé par Stripe · accès piloté par webhook',
+  'subscription.billing.ownerOnly':
+    "Seul le propriétaire de l'espace peut gérer la facturation.",
+  'subscription.billing.notConfiguredTitle':
+    "La facturation n'est pas configurée dans cet environnement",
+  'subscription.billing.notConfiguredDescription':
+    "Checkout reste désactivé jusqu'à ce que les clés Stripe, le webhook signé, les identifiants de prix et les montants affichés valident la liste d'activation en production.",
+  'subscription.billing.providerStatus': 'État du prestataire',
+  'subscription.billing.endsAt': "Fin de la période d'accès",
+  'subscription.billing.openingPortal': 'Ouverture du portail…',
+  'subscription.billing.manage': 'Gérer la facturation',
+  'subscription.billing.choosePlan':
+    'Choisissez une période de facturation. Stripe traite les données de paiement de façon sécurisée.',
+  'subscription.billing.interval.monthly': 'Mensuel',
+  'subscription.billing.interval.yearly': 'Annuel',
+  'subscription.billing.pricePending': 'Configuration du prix en attente',
+  'subscription.billing.openingCheckout': 'Ouverture de Checkout…',
+  'subscription.billing.continueToCheckout': 'Continuer vers Checkout',
+  'subscription.billing.priceDisclosure':
+    'Le montant récurrent exact et la période sont confirmés à nouveau dans Stripe Checkout avant le paiement.',
+  'subscription.billing.actionError':
+    "La session de facturation sécurisée n'a pas pu être ouverte. Réessayez ou contactez l'assistance.",
+  'subscription.billing.status.active': 'Actif',
+  'subscription.billing.status.trialing': "Période d'essai active",
+  'subscription.billing.status.pastDue': 'Paiement en retard',
+  'subscription.billing.status.incomplete': 'Confirmation du paiement requise',
+  'subscription.billing.status.unpaid': 'Impayé',
+  'subscription.billing.status.canceled': 'Annulé',
+  'subscription.billing.status.none': 'Aucun abonnement prestataire',
+  'subscription.billing.status.attention': 'Action requise',
+  'subscription.feature.analysesMonthly': 'Analyses mensuelles',
+  'subscription.feature.savedSearches': 'Recherches enregistrées',
+  'subscription.feature.teamMembers': "Membres de l'équipe",
+  'subscription.feature.emailNotifications': 'Notifications par e-mail',
+  'subscription.feature.telegramNotifications': 'Notifications Telegram',
+  'subscription.feature.basicPriceHistory': 'Historique de prix simple',
+  'subscription.feature.fullRiskReport': 'Rapport de risque complet',
+  'subscription.feature.priorityAnalysis': 'Analyse prioritaire',
+  'subscription.feature.profitTracking': 'Suivi des bénéfices',
+  'subscription.feature.organizationReporting': "Rapports d'organisation",
+  'subscription.feature.brokerRequestsMonthly': 'Demandes mensuelles aux courtiers',
+  'subscription.feature.exportsMonthly': 'Exports mensuels',
+  'subscription.feature.prioritySupport': 'Assistance prioritaire',
+  'organizationManagement.eyebrow': "Administration de l'espace",
+  'organizationManagement.title': 'Organisation',
+  'organizationManagement.description':
+    "Gérez le périmètre, les accès et les adhésions auditables de votre espace de travail.",
+  'organizationManagement.businessWorkspace': "Espace d'entreprise",
+  'organizationManagement.createTitle': 'Créer une organisation partagée',
+  'organizationManagement.createDescription':
+    "Votre espace personnel reste privé. Un espace d'entreprise ajoute des rôles et des invitations.",
+  'organizationManagement.name': "Nom de l'organisation",
+  'organizationManagement.creating': 'Création…',
+  'organizationManagement.create': "Créer l'espace",
+  'organizationManagement.loading': "Chargement des contrôles de l'organisation…",
+  'organizationManagement.settings': 'Paramètres',
+  'organizationManagement.identity': "Identité de l'espace",
+  'organizationManagement.shortName': 'Nom',
+  'organizationManagement.invitation': 'Invitation',
+  'organizationManagement.addMember': 'Ajouter un membre',
+  'organizationManagement.email': 'E-mail',
+  'organizationManagement.role': 'Rôle',
+  'organizationManagement.sendInvitation': "Envoyer l'invitation",
+  'organizationManagement.access': 'Accès',
+  'organizationManagement.members': 'Membres',
+  'organizationManagement.makeOwner': 'Nommer propriétaire',
+  'organizationManagement.remove': 'Supprimer',
+  'organizationManagement.pending': 'En attente',
+  'organizationManagement.invitations': 'Invitations',
+  'organizationManagement.revoke': 'Révoquer',
+  'organizationManagement.noInvitations': 'Aucune invitation en attente.',
+  'organizationManagement.audit': 'Audit',
+  'organizationManagement.activity': 'Activité récente',
+  'organizationManagement.noActivity': "Aucun événement d'audit pour le moment.",
+  'organizationManagement.created': "Espace d'entreprise créé.",
+  'organizationManagement.renamed': "Nom de l'espace mis à jour.",
+  'organizationManagement.invited': 'Invitation envoyée.',
+  'organizationManagement.roleUpdated': 'Rôle du membre mis à jour.',
+  'organizationManagement.removed': 'Membre supprimé.',
+  'organizationManagement.transferred': 'Propriété transférée.',
+  'organizationManagement.revoked': 'Invitation révoquée.',
+  'organizationManagement.formError': 'Vérifiez le formulaire.',
+  'organizationManagement.operationError':
+    "L'opération sur l'espace de travail n'a pas pu être effectuée.",
+  'organizationManagement.confirmRemove': 'Supprimer {{name}} de cet espace ?',
+  'organizationManagement.confirmTransfer':
+    "Transférer la propriété de l'espace à {{name}} ? Vous deviendrez administrateur.",
+  'organizationManagement.event.organizationCreated': 'Organisation créée',
+  'organizationManagement.event.organizationRenamed': 'Organisation renommée',
+  'organizationManagement.event.invitationCreated': 'Invitation créée',
+  'organizationManagement.event.invitationRevoked': 'Invitation révoquée',
+  'organizationManagement.event.invitationAccepted': 'Invitation acceptée',
+  'organizationManagement.event.memberRoleChanged': 'Rôle du membre modifié',
+  'organizationManagement.event.memberRemoved': 'Membre supprimé',
+  'organizationManagement.event.ownershipTransferred': 'Propriété transférée',
+  'subscription.plan.free.name': 'Gratuit',
+  'subscription.plan.free.description':
+    'Outils essentiels pour évaluer les opportunités occasionnelles.',
+  'subscription.plan.starter.name': 'Débutant',
+  'subscription.plan.starter.description':
+    'Davantage d’analyses et de suivi pour les acheteurs et vendeurs actifs.',
+  'subscription.plan.pro.name': 'Pro',
+  'subscription.plan.pro.description':
+    'Intelligence avancée et limites supérieures pour les professionnels.',
+  'subscription.plan.business.name': 'Entreprise',
+  'subscription.plan.business.description':
+    "Contrôles d'équipe, rapports, exports et limites configurables.",
+  'common.notProvided': 'Non renseigné',
+  'common.unknownDate': 'Date inconnue',
+  'common.files': '{{count}} fichiers',
+  'common.snapshots': '{{count}} instantanés',
+  'common.selectedCount': '{{count}} sélectionnés',
+  'listing.status.active': 'Actif',
+  'listing.status.reserved': 'Réservé',
+  'listing.status.sold': 'Vendu',
+  'listing.status.removed': 'Retiré',
+  'listing.status.expired': 'Expiré',
+  'listing.status.unknown': 'Inconnu',
+  'analysis.status.draft': 'Brouillon',
+  'analysis.status.queued': "Dans la file d'attente",
+  'analysis.status.processing': 'En cours',
+  'analysis.status.needsInput': 'Données requises',
+  'analysis.status.completed': 'Terminé',
+  'analysis.status.failed': 'Échec',
+  'analysis.status.archived': 'Archivé',
+  'listing.image.product': 'Image du produit',
+  'listing.image.screenshot': 'Capture de la place de marché',
+  'listingList.eyebrow': "Saisie de l'analyse d'achat",
+  'listingList.title': 'Annonces sources',
+  'listingList.description':
+    "Faits d'origine de la place de marché, preuves privées et historique des modifications traçable.",
+  'listingList.add': 'Ajouter une annonce',
+  'listingList.searchPlaceholder': 'Titre, place de marché ou ID externe',
+  'listingList.lifecycle': 'État du cycle de vie',
+  'listingList.allStatuses': 'Tous les états',
+  'listingList.apply': 'Appliquer les filtres',
+  'listingList.loading': 'Chargement des annonces sources…',
+  'listingList.loadError':
+    "Les annonces n'ont pas pu être chargées. Réessayez.",
+  'listingList.emptyTitle': 'Aucune annonce dans cet espace',
+  'listingList.emptyDescription':
+    "Capturez les données sources d'origine avant de lancer une analyse.",
+  'listingList.addFirst': 'Ajouter la première annonce',
+  'listingList.readOnly':
+    "Votre rôle dispose d'un accès en lecture seule aux annonces.",
+  'listingList.aria': 'Annonces sources',
+  'listingList.marketRoute': 'Parcours de marché',
+  'listingList.evidence': 'Preuves',
+  'listingList.history': 'Historique',
+  'listingList.loadMore': 'Charger plus',
+  'listingList.loadingMore': 'Chargement…',
+  'listingIntake.back': '← Annonces sources',
+  'listingIntake.eyebrow': 'Connecteur manuel',
+  'listingIntake.title': 'Ajouter une annonce source',
+  'listingIntake.description':
+    "Enregistrez ce que la place de marché affiche réellement. Procura conserve l'instantané d'origine.",
+  'listingIntake.scope': 'Espace actif uniquement',
+  'listingIntake.readOnlyTitle': 'Accès aux annonces en lecture seule',
+  'listingIntake.readOnlyDescription':
+    'Votre rôle peut consulter les annonces, mais pas les créer ni les modifier.',
+  'listingIntake.return': 'Retour aux annonces',
+  'listingIntake.loading': 'Chargement des marchés et de la politique de source…',
+  'listingIntake.referenceTitle': 'Données de référence indisponibles',
+  'listingIntake.referenceDescription':
+    'Une annonce ne peut pas être enregistrée sans connecteur actif et références mondiales de marché.',
+  'listingIntake.savedUploadPending':
+    "L'annonce est stockée en sécurité. Seuls les envois en attente seront réessayés.",
+  'listingIntake.sourceIdentity': 'Identité de la source',
+  'listingIntake.provenance': "Provenance d'origine",
+  'listingIntake.connector': 'Connecteur',
+  'listingIntake.marketplaceName': 'Nom de la place de marché *',
+  'listingIntake.externalId': "ID externe de l'annonce",
+  'listingIntake.sourceUrl': 'URL source',
+  'listingIntake.facts': "Faits de l'annonce",
+  'listingIntake.noAi': "Aucune normalisation par IA à cette étape",
+  'listingIntake.titleField': 'Titre *',
+  'listingIntake.descriptionField': 'Description',
+  'listingIntake.askingPrice': 'Prix demandé',
+  'listingIntake.priceHelp':
+    'Stocké exactement dans la plus petite unité de la devise.',
+  'listingIntake.currency': 'Devise',
+  'listingIntake.chooseCurrency': 'Choisir une devise',
+  'listingIntake.lifecycle': 'État du cycle de vie *',
+  'listingIntake.location': "Emplacement de l'annonce",
+  'listingIntake.seller': 'Informations sur le vendeur',
+  'listingIntake.marketRoute': 'Parcours de marché',
+  'listingIntake.explicitRoute': 'Origine et destination explicites',
+  'listingIntake.sourceCountry': "Pays d'origine *",
+  'listingIntake.targetCountry': 'Pays du marché cible *',
+  'listingIntake.chooseCountry': 'Choisir un pays',
+  'listingIntake.notes': "Notes privées de l'espace",
+  'listingIntake.evidence': 'Preuves privées',
+  'listingIntake.evidencePolicy': 'JPEG, PNG, WebP · 10 Mo chacun',
+  'listingIntake.productImages': 'Images du produit',
+  'listingIntake.productImageLimit':
+    "Jusqu'à 10 photos originales de l'article",
+  'listingIntake.screenshots': 'Captures de la place de marché',
+  'listingIntake.screenshotLimit':
+    "Jusqu'à 5 captures préservant le contexte",
+  'listingIntake.footer':
+    "L'enregistrement crée un instantané source immuable. L'analyse et l'utilisation du quota commencent à une étape ultérieure.",
+  'listingIntake.retryUploads': 'Réessayer les envois en attente',
+  'listingIntake.save': "Enregistrer l'annonce source",
+  'listingIntake.imageLimit':
+    'Sélectionnez au maximum {{maximum}} images de type {{kind}}.',
+  'listingIntake.imagePolicyError':
+    'Les images doivent être des fichiers JPEG, PNG ou WebP de 10 Mo maximum chacune.',
+  'listingIntake.roleError':
+    'Votre rôle ne permet pas de créer des annonces.',
+  'listingIntake.requiredError':
+    'Renseignez les champs obligatoires de source et de marché.',
+  'listingIntake.choosePriceCurrency':
+    'Choisissez une devise pour le prix demandé.',
+  'listingIntake.priceInvalid': 'Saisissez un prix demandé valide.',
+  'listingIntake.priceReview': 'Vérifiez le prix demandé avant d’enregistrer.',
+  'listingIntake.saveError': "L'annonce n'a pas pu être enregistrée.",
+  'listingIntake.referenceError':
+    "Les données de référence de l'annonce n'ont pas pu être chargées. Réessayez.",
+  'listingIntake.uploadError':
+    "L'annonce a été enregistrée, mais certains fichiers n'ont pas été envoyés. Réessayez en toute sécurité ci-dessous.",
+  'listingDetail.back': '← Annonces sources',
+  'listingDetail.loading': "Chargement de la provenance de l'annonce…",
+  'listingDetail.captured': 'Capturée {{date}}',
+  'listingDetail.factsEyebrow': "Faits de la source d'origine",
+  'listingDetail.record': "Fiche de l'annonce",
+  'listingDetail.marketplace': 'Place de marché',
+  'listingDetail.externalId': 'ID externe',
+  'listingDetail.location': 'Emplacement',
+  'listingDetail.marketRoute': 'Parcours de marché',
+  'listingDetail.openSource': "Ouvrir la source d'origine ↗",
+  'listingDetail.description': 'Description',
+  'listingDetail.noDescription': "Aucune description n'a été fournie.",
+  'listingDetail.seller': 'Informations sur le vendeur',
+  'listingDetail.noSeller':
+    "Aucune information sur le vendeur n'a été fournie.",
+  'listingDetail.privateStorage': 'Stockage privé',
+  'listingDetail.evidence': 'Preuves',
+  'listingDetail.noEvidence':
+    "Aucune image de produit ni capture de place de marché n'a été envoyée.",
+  'listingDetail.removeAria': 'Supprimer {{filename}}',
+  'listingDetail.removing': 'Suppression…',
+  'listingDetail.remove': 'Supprimer',
+  'listingDetail.evidenceType': 'Type de preuve',
+  'listingDetail.productImages': 'Images du produit',
+  'listingDetail.screenshots': 'Captures de la place de marché',
+  'listingDetail.filePolicy': 'JPEG, PNG ou WebP · 10 Mo chacun',
+  'listingDetail.uploading': 'Envoi…',
+  'listingDetail.uploadFiles': 'Envoyer {{count}} fichiers',
+  'listingDetail.refreshLinks': "Actualiser les liens d'images expirants",
+  'listingDetail.analysisEyebrow': 'Flux tenant compte du quota',
+  'listingDetail.analysisTitle': "Demandes d'analyse d'achat",
+  'listingDetail.recent': '{{count}} récentes',
+  'listingDetail.analysisIntro':
+    "La création d'un brouillon fige cet instantané et le parcours de marché. Le quota n'est consommé que lorsqu'un utilisateur autorisé soumet explicitement le brouillon.",
+  'listingDetail.analysisLoading': "Chargement des demandes d'analyse…",
+  'listingDetail.noAnalysis':
+    "Aucune demande d'analyse n'a été créée à partir de cette annonce.",
+  'listingDetail.creatingDraft': 'Création du brouillon…',
+  'listingDetail.createDraft': "Créer un brouillon d'analyse",
+  'listingDetail.analysisReadOnly':
+    "Votre rôle dispose d'un accès en lecture seule aux analyses.",
+  'listingDetail.openingDraft': 'Ouverture du brouillon…',
+  'listingDetail.continueDraft': 'Continuer le brouillon ouvert',
+  'listingDetail.createAnotherDraft': 'Créer un autre brouillon',
+  'listingDetail.provenance': 'Provenance',
+  'listingDetail.snapshotHistory': 'Historique des instantanés',
+  'listingDetail.lifecycle': 'Cycle de vie',
+  'listingDetail.sourceStatus': 'État de la source',
+  'listingDetail.observedStatus': 'État observé sur la place de marché',
+  'listingDetail.privateNotes': 'Notes privées',
+  'listingDetail.saveSnapshot': 'Enregistrer un nouvel instantané',
+  'listingDetail.aggregateBoundary': "Limite d'agrégation",
+  'listingDetail.boundaryTitle': 'Les faits sources restent séparés',
+  'listingDetail.boundaryDescription':
+    "Les demandes d'analyse copient un instantané immuable. L'état du traitement et l'utilisation du quota ne réécrivent jamais cette annonce ni son historique.",
+  'listingDetail.noChanges': 'Aucune modification du cycle de vie à enregistrer.',
+  'listingDetail.lifecycleSaved':
+    'Cycle de vie mis à jour et nouvel instantané enregistré.',
+  'listingDetail.lifecycleError':
+    "La modification du cycle de vie n'a pas pu être enregistrée.",
+  'listingDetail.draftError':
+    "Le brouillon d'analyse immuable n'a pas pu être créé.",
+  'listingDetail.fileSelectionError':
+    "Sélectionnez jusqu'à 10 images JPEG, PNG ou WebP de 10 Mo maximum chacune.",
+  'listingDetail.uploaded': 'Preuves privées envoyées.',
+  'listingDetail.uploadError':
+    "Les fichiers sélectionnés n'ont pas pu être envoyés.",
+  'listingDetail.removed': 'Preuve privée supprimée.',
+  'listingDetail.removeError': "Le fichier n'a pas pu être supprimé.",
+  'listingDetail.idMissing': "L'identifiant de l'annonce est manquant.",
+  'listingDetail.loadError':
+    "Cette annonce n'a pas pu être chargée dans l'espace actif.",
+  'listingDetail.analysisLoadError':
+    "Les demandes d'analyse n'ont pas pu être chargées.",
+  'common.notCalculated': 'Non calculé',
+  'common.notYet': 'Pas encore',
+  'common.pending': 'En attente',
+  'common.unknown': 'Inconnu',
+  'common.none': 'Aucun',
+  'common.notRecorded': 'non enregistré',
+  'common.noneRecorded': 'aucun enregistré',
+  'common.notSpecified': 'Non précisé',
+  'common.current': 'actuel',
+  'priceEstimate.eyebrow': 'Preuve statistique reproductible',
+  'priceEstimate.title': 'Estimation du prix',
+  'priceEstimate.lowerBand': 'Borne basse observée',
+  'priceEstimate.center': 'Centre de marché estimé',
+  'priceEstimate.upperBand': 'Borne haute observée',
+  'priceEstimate.targetMarket': 'Marché cible',
+  'priceEstimate.usedEvidence': 'Preuves utilisées',
+  'priceEstimate.outliers': 'Valeurs aberrantes',
+  'priceEstimate.unresolved': 'Conversions non résolues',
+  'priceEstimate.confidence': 'Confiance',
+  'priceEstimate.algorithm': 'Algorithme',
+  'priceEstimate.rateResolver': 'Résolveur de taux',
+  'priceEstimate.run': "Exécution de l'estimation",
+  'priceEstimate.calculated': 'Calculé',
+  'priceEstimate.median': 'Médiane',
+  'priceEstimate.weightedMedian': 'Médiane pondérée',
+  'priceEstimate.quartiles': 'Q1 / Q3',
+  'priceEstimate.deviation': 'Écart absolu médian',
+  'priceEstimate.dispersion': 'Dispersion relative',
+  'priceEstimate.confidenceComponents': 'Composantes de confiance',
+  'priceEstimate.calculationEvidence': 'Preuves du calcul',
+  'priceEstimate.selector': 'sélecteur n° {{rank}}',
+  'priceEstimate.excluded': 'exclu',
+  'priceEstimate.weight': 'poids {{weight}}',
+  'priceEstimate.noRate': 'Aucun taux externe requis',
+  'priceEstimate.effective': 'effectif le {{date}}',
+  'priceEstimate.warning':
+    "Ces bornes décrivent les preuves de prix demandé sélectionnées. L'expédition, les taxes, les douanes, les ajustements d'état, les résultats de transaction et le bénéfice ne sont pas déduits ici.",
+  'risk.eyebrow': 'Incertitude de transaction fondée sur les preuves',
+  'risk.title': 'Évaluation des risques',
+  'risk.level': 'Niveau de risque',
+  'risk.confidence': 'Confiance des preuves',
+  'risk.signals': 'Signaux enregistrés',
+  'risk.unknownFacts': 'Faits inconnus',
+  'risk.evaluator': 'Évaluateur',
+  'risk.run': "Exécution de l'évaluation",
+  'risk.calculated': 'Calculé',
+  'risk.status': 'État',
+  'risk.coverage': 'Couverture de confiance',
+  'risk.actions': 'Actions de vérification requises',
+  'risk.source': 'Source : {{source}}',
+  'risk.unknown': 'inconnu',
+  'risk.points': '+{{points}} points',
+  'risk.warning':
+    "Ce score décrit l'incertitude de transaction enregistrée, pas un verdict de fraude. Les faits inconnus réduisent la confiance des preuves et restent des vérifications explicites ; ils ne sont pas silencieusement considérés comme sûrs et n'ajoutent pas de points de risque sans fondement.",
+  'dealScore.eyebrow': 'Classement explicable des opportunités',
+  'dealScore.title': 'DealScore final',
+  'dealScore.description':
+    'Cinq composantes de preuve immuables sont pondérées de manière déterministe. La recommandation utilise le score final plafonné.',
+  'dealScore.final': 'Score final',
+  'dealScore.uncapped': 'Sans plafond',
+  'dealScore.cap': 'Plafond applicable',
+  'dealScore.confidence': 'Confiance',
+  'dealScore.runVersion': 'Exécution / version',
+  'dealScore.components': 'Composantes pondérées',
+  'dealScore.totalWeight': 'Poids total exact : 100 %',
+  'dealScore.weight': 'poids {{value}}',
+  'dealScore.input': 'Entrée enregistrée',
+  'dealScore.normalized': 'Normalisé',
+  'dealScore.contribution': 'Contribution pondérée',
+  'dealScore.evidenceConfidence': 'Confiance des preuves',
+  'dealScore.increasing': 'Facteurs augmentant le score',
+  'dealScore.noIncreasing':
+    "Aucune composante n'a franchi le seuil documenté de renforcement.",
+  'dealScore.reducing': 'Facteurs réduisant le score',
+  'dealScore.noReducing':
+    "Aucune composante n'a franchi le seuil documenté de réduction.",
+  'dealScore.capDecisions': 'Décisions de plafond',
+  'dealScore.safeguards': 'Toutes les protections documentées sont évaluées',
+  'dealScore.maximum': 'Maximum {{score}} / 100',
+  'dealScore.capApplied': 'Appliqué',
+  'dealScore.capBelow': 'Déclenché, score déjà inférieur au plafond',
+  'dealScore.capNotTriggered': 'Non déclenché',
+  'dealScore.assumptions': 'Hypothèses',
+  'dealScore.nextChecks': 'Prochaines vérifications recommandées',
+  'dealScore.insufficient': 'Données insuffisantes',
+  'dealScore.risk': '{{value}} / 100 de risque',
+  'dealScore.points': '{{value}} pts',
+  'dealScore.disclaimer':
+    "DealScore classe les preuves enregistrées de l'opportunité. Il ne garantit ni prix de revente, bénéfice réalisé, livraison, état du produit, légitimité du vendeur, traitement fiscal ou sécurité de la transaction.",
+  'buyerDecision.eyebrow': "Flux de l'acheteur",
+  'buyerDecision.title': 'État de la décision',
+  'buyerDecision.description':
+    "Chaque changement est un événement immuable lié à l'exécution DealScore n° {{run}}. Un score plus récent démarre un nouvel état de décision tout en conservant l'historique complet.",
+  'buyerDecision.none': 'Aucune décision',
+  'buyerDecision.boundary': "Limite de l'évaluation",
+  'buyerDecision.score': 'Score {{score}} / 100 · {{recommendation}}',
+  'buyerDecision.recordedBy': 'Enregistré par',
+  'buyerDecision.recordedAt': 'Enregistré le',
+  'buyerDecision.sequence': "Séquence de l'événement",
+  'buyerDecision.reason': 'Motif',
+  'buyerDecision.emptyCurrent':
+    "Aucune décision d'acheteur n'a été enregistrée pour ce DealScore précis.",
+  'buyerDecision.nextState': 'État suivant *',
+  'buyerDecision.chooseState': 'Choisir une transition autorisée',
+  'buyerDecision.transitionHelp':
+    "Le serveur fournit les transitions autorisées depuis l'événement actuel.",
+  'buyerDecision.reasonCode': 'Code du motif',
+  'buyerDecision.reasonPlaceholder': 'p. ex. seller_contacted',
+  'buyerDecision.reasonHelp':
+    'Identifiant facultatif en minuscules avec des traits de soulignement.',
+  'buyerDecision.note': 'Note interne',
+  'buyerDecision.notePlaceholder':
+    "Consignez une preuve concise ou la prochaine action de suivi.",
+  'buyerDecision.expected': 'Événement attendu :',
+  'buyerDecision.recording': 'Enregistrement…',
+  'buyerDecision.record': "Enregistrer l'événement de décision",
+  'buyerDecision.readOnly':
+    "Votre rôle dispose d'un accès en lecture seule aux décisions d'acheteur.",
+  'buyerDecision.noTransitions':
+    "Les transitions deviennent disponibles uniquement lorsque le DealScore actuel est entièrement évalué.",
+  'buyerDecision.warning':
+    '« Acheté » est uniquement un état du flux acheteur. Il ne crée ni achat, paiement, article de stock, bénéfice réalisé ni enregistrement de résultat financier.',
+  'buyerDecision.history': 'Historique des décisions',
+  'buyerDecision.showing': 'Affichage de {{shown}} événements sur {{total}}',
+  'buyerDecision.emptyHistory':
+    "Aucun événement de décision n'a été enregistré.",
+  'buyerDecision.scoreRun': 'Exécution DealScore n° {{run}}',
+  'buyerDecision.eventSummary':
+    '{{actor}} · {{date}} · score {{score}} / 100',
+  'buyerDecision.formError':
+    "Choisissez un état autorisé et vérifiez le motif et la note facultatifs.",
+  'buyerDecision.staleState':
+    "Cet état n'est plus disponible. Actualisez l'analyse.",
+  'buyerDecision.created':
+    "Décision d'acheteur enregistrée comme événement immuable.",
+  'buyerDecision.duplicate':
+    "La même décision était déjà enregistrée ; aucun doublon n'a été créé.",
+  'buyerDecision.saveError':
+    "La décision n'a pas pu être enregistrée. Actualisez si l'état actuel ou le DealScore a changé.",
+  'buyerDecision.state.watchlist': 'À surveiller',
+  'buyerDecision.state.interested': 'Intéressé',
+  'buyerDecision.state.negotiating': 'En négociation',
+  'buyerDecision.state.purchased': 'Acheté',
+  'buyerDecision.state.rejected': 'Rejeté',
+  'buyerDecision.state.archived': 'Archivé',
+  'buyerDecision.state.contacted': 'Contacté',
+  'analysisLabel.low': 'Faible',
+  'analysisLabel.medium': 'Moyen',
+  'analysisLabel.high': 'Élevé',
+  'analysisLabel.critical': 'Critique',
+  'analysisLabel.estimated': 'Estimé',
+  'analysisLabel.lowConfidence': 'Confiance faible',
+  'analysisLabel.needsInput': 'Données requises',
+  'analysisLabel.assessed': 'Évalué',
+  'analysisLabel.included': 'Inclus',
+  'analysisLabel.outlier': 'Valeur aberrante',
+  'analysisLabel.missingRate': 'Taux manquant',
+  'analysisLabel.staleRate': 'Taux obsolète',
+  'analysisLabel.invalidAmount': 'Montant invalide',
+  'analysisLabel.unresolved': 'Non résolu',
+  'analysisLabel.identity': 'Même devise',
+  'analysisLabel.direct': 'Taux direct',
+  'analysisLabel.inverse': 'Taux inverse',
+  'analysisLabel.strongOpportunity': 'Forte opportunité',
+  'analysisLabel.potentialOpportunity': 'Opportunité potentielle',
+  'analysisLabel.needsVerification': 'Vérification requise',
+  'analysisLabel.weakOpportunity': 'Faible opportunité',
+  'analysisLabel.avoid': 'À éviter',
+  'analysisLabel.insufficientData': 'Données insuffisantes',
+  'analysisLabel.estimatedNetMargin': 'Marge nette estimée',
+  'analysisLabel.priceConfidence': 'Confiance du prix',
+  'analysisLabel.resaleDemand': 'Demande de revente',
+  'analysisLabel.inverseRisk': 'Risque inversé',
+  'analysisLabel.logisticsSimplicity': 'Simplicité logistique',
+  'analysisLabel.strengthens': 'Renforce',
+  'analysisLabel.neutral': 'Neutre',
+  'analysisLabel.reduces': 'Réduit',
+  'analysisLabel.unknown': 'Inconnu',
+  'analysisLabel.listing': 'Annonce',
+  'analysisLabel.seller': 'Vendeur',
+  'analysisLabel.product': 'Produit',
+  'analysisLabel.transaction': 'Transaction',
+  'verification.listingSellerProduct':
+    "Vérifiez l'annonce, le vendeur, l'identité et l'état du produit avant paiement.",
+  'verification.priceConversion':
+    "Enregistrez un prix demandé positif dans la devise d'estimation ou fournissez une preuve de conversion vérifiée.",
+  'verification.moreComparables':
+    "Collectez d'autres comparables vérifiés avant de vous fier à la fourchette de marché.",
+  'verification.crossBorder':
+    "Vérifiez l'expédition, les douanes, les taxes, les retours et la compatibilité régionale avant l'achat.",
+  'verification.seller':
+    "Vérifiez l'identité, l'historique, la propriété et les coordonnées du vendeur.",
+  'verification.location':
+    "Confirmez l'emplacement physique du produit et du vendeur.",
+  'verification.images':
+    "Obtenez des images actuelles et originales du produit et du numéro de série.",
+  'verification.condition':
+    "Inspectez et documentez l'état, les défauts, les pièces incluses et le fonctionnement.",
+  'verification.ownership':
+    'Vérifiez la preuve de propriété, le numéro de série, les verrouillages et les listes noires.',
+  'verification.payment':
+    'Utilisez un moyen de paiement traçable avec protection de l’acheteur.',
+  'verification.shipping':
+    "Confirmez l'expédition assurée, la preuve de remise et les conditions de retour.",
+  'common.yes': 'Oui',
+  'common.no': 'Non',
+  'common.recorded': 'enregistré',
+  'costProfit.eyebrow': "Limite monétaire exacte confirmée par l'utilisateur",
+  'costProfit.title': 'Coûts et bénéfice attendu',
+  'costProfit.description':
+    "La valeur de vente attendue provient de l'exécution d'estimation n° {{run}}. Chaque montant est enregistré en {{currency}} sans conversion déduite.",
+  'costProfit.awaiting': 'En attente de données',
+  'costProfit.blankUnknown':
+    "Vide signifie inconnu. Saisissez 0 uniquement si vous confirmez explicitement l'absence de coût.",
+  'costProfit.unknownEffect':
+    'Les montants inconnus sont conservés et empêchent un résultat de bénéfice net faussement précis.',
+  'costProfit.purchasePrice': "Prix d'achat",
+  'costProfit.transport': 'Transport',
+  'costProfit.repair': 'Réparation',
+  'costProfit.platformFees': 'Frais de plateforme',
+  'costProfit.paymentFees': 'Frais de paiement',
+  'costProfit.customs': 'Douanes',
+  'costProfit.tax': 'Taxes',
+  'costProfit.otherCosts': 'Autres coûts',
+  'costProfit.safetyReserve': 'Réserve de sécurité',
+  'costProfit.compatibility':
+    "J'ai confirmé la compatibilité régionale pour {{source}} → {{target}}. Le transport, les douanes et les taxes doivent aussi être explicites.",
+  'costProfit.versionHelp':
+    "L'enregistrement crée une nouvelle version immuable. Les valeurs modifiées n'écrasent jamais une exécution antérieure.",
+  'costProfit.calculating': 'Calcul…',
+  'costProfit.submit': 'Confirmer les coûts et calculer le bénéfice',
+  'costProfit.readOnly':
+    'Votre rôle peut consulter les preuves de coûts et bénéfice, mais pas créer une nouvelle version.',
+  'costProfit.expectedSale': 'Valeur de vente attendue',
+  'costProfit.grossMargin': 'Marge brute',
+  'costProfit.totalCost': 'Coût total',
+  'costProfit.netProfit': 'Bénéfice net attendu',
+  'costProfit.profitMargin': 'Marge bénéficiaire',
+  'costProfit.returnCapital': 'Rendement du capital investi',
+  'costProfit.calculation': 'Calcul',
+  'costProfit.run': 'Exécution',
+  'costProfit.confidence': 'Confiance',
+  'costProfit.unknownInputs': 'Entrées inconnues',
+  'costProfit.formulaEvidence': 'Preuves de la formule',
+  'costProfit.confidenceComponents': 'Composantes de confiance',
+  'costProfit.reasonCodes': 'Codes de motif',
+  'costProfit.disclaimer':
+    "Cette estimation du bénéfice attendu repose uniquement sur les preuves enregistrées. Elle ne garantit ni coût d'achat, prix de revente, traitement fiscal ou bénéfice réalisé.",
+  'costProfit.formError':
+    "Vérifiez les champs monétaires exacts avant d'enregistrer.",
+  'costProfit.amountError': 'Saisissez des montants non négatifs valides.',
+  'costProfit.created':
+    'Preuves de coûts immuables enregistrées et bénéfice attendu calculé.',
+  'costProfit.duplicate':
+    "La même entrée existe déjà ; le calcul est resté idempotent.",
+  'costProfit.saveError':
+    "Les preuves de coûts n'ont pas pu être enregistrées. Actualisez si les preuves amont ont changé.",
+  'opportunity.eyebrow': "Preuves d'opportunité enregistrées",
+  'opportunity.title': 'Logistique et demande de revente',
+  'opportunity.description':
+    "Ce sont des entrées séparées et enregistrées pour le DealScore final. Les comparables de prix demandé restent des preuves de marché, mais ne constituent pas une preuve de ventes réalisées.",
+  'opportunity.evidenceRun': 'Exécution des preuves n° {{run}}',
+  'opportunity.awaiting': 'En attente de preuves',
+  'opportunity.unknownTitle': "L'inconnu reste inconnu.",
+  'opportunity.unknownDescription':
+    "Sélectionnez « Non » uniquement pour un fait négatif vérifié. Laissez un champ inconnu s'il n'a pas été contrôlé. Procura calcule DealScore uniquement à partir des composantes enregistrées.",
+  'opportunity.logisticsWeight': 'Composante 10 %',
+  'opportunity.logisticsEvidence': 'Preuves de simplicité logistique',
+  'opportunity.shippingMethod': "Mode d'expédition",
+  'opportunity.localPickup': 'Retrait sur place',
+  'opportunity.parcel': 'Colis',
+  'opportunity.sellerArranged': 'Organisé par le vendeur',
+  'opportunity.freight': 'Fret',
+  'opportunity.distance': "Distance d'expédition (km)",
+  'opportunity.pickup': 'Retrait disponible',
+  'opportunity.tracking': 'Suivi disponible',
+  'opportunity.insurance': 'Assurance disponible',
+  'opportunity.packaging': 'Emballage confirmé',
+  'opportunity.crossBorder': 'Gestion transfrontalière confirmée',
+  'opportunity.demandWeight': 'Composante 15 %',
+  'opportunity.demandEvidence': 'Preuves observées de demande de revente',
+  'opportunity.manualObservation': 'Observation manuelle et attribuable',
+  'opportunity.soldCount': 'Comparables vendus observés',
+  'opportunity.medianDays': 'Médiane des jours avant vente',
+  'opportunity.window': "Fenêtre d'observation (jours)",
+  'opportunity.observedAt': 'Preuve observée le',
+  'opportunity.source': 'Source / référence de la preuve',
+  'opportunity.sourcePlaceholder':
+    'Filtre des ventes, rapport ou référence auditable',
+  'opportunity.versionHelp':
+    "Les identifiants actuels de comparables, prix, risque, coûts et bénéfice sont soumis ensemble. Les preuves obsolètes sont rejetées ; les faits modifiés ajoutent des exécutions de composante et DealScore.",
+  'opportunity.assessing': 'Évaluation…',
+  'opportunity.submit': 'Confirmer les preuves et calculer DealScore',
+  'opportunity.readOnly':
+    'Votre rôle peut consulter ces preuves, mais pas créer une nouvelle version.',
+  'opportunity.independent': 'Composante indépendante',
+  'opportunity.logistics': 'Simplicité logistique',
+  'opportunity.demand': 'Demande de revente',
+  'opportunity.status': 'État',
+  'opportunity.run': 'Exécution',
+  'opportunity.confidence': 'Confiance',
+  'opportunity.unknowns': 'Inconnues',
+  'opportunity.disclaimer':
+    'Ces évaluations décrivent la logistique enregistrée et les preuves de marché observées. Elles ne garantissent ni livraison, vitesse de revente, volume de ventes réalisées ou résultat classé par le panneau DealScore séparé.',
+  'opportunity.formError':
+    "Vérifiez les champs bornés de logistique et de demande avant d'enregistrer.",
+  'opportunity.integerError':
+    '{{field}} doit être un nombre entier non négatif.',
+  'opportunity.rangeError':
+    '{{field}} se trouve hors de la plage prise en charge.',
+  'opportunity.medianRequired':
+    'La médiane des jours avant vente est requise lorsque des comparables vendus ont été observés.',
+  'opportunity.created':
+    "Les preuves d'opportunité immuables et leur DealScore final ont été évalués.",
+  'opportunity.duplicate':
+    'Les mêmes preuves existent déjà ; les évaluations et DealScore sont restés idempotents.',
+  'opportunity.saveError':
+    "Les preuves d'opportunité n'ont pas pu être enregistrées. Actualisez si les preuves amont ont changé.",
+  'analysisDetail.backListing': "← Détail de l'annonce",
+  'analysisDetail.backListings': '← Annonces sources',
+  'analysisDetail.loading': "Chargement de la demande d'analyse…",
+  'analysisDetail.createdAt': 'Créée {{date}}',
+  'analysisDetail.refreshing': 'Actualisation…',
+  'analysisDetail.refresh': "Actualiser l'état",
+  'analysisDetail.quotaEyebrow': 'Limite de quota explicite',
+  'analysisDetail.ready': 'Prêt à soumettre',
+  'analysisDetail.quotaDescription':
+    "La demande est immuable, mais aucun quota n'a été consommé. La soumission consomme atomiquement un droit d'analyse mensuel et crée un enregistrement de file idempotent.",
+  'analysisDetail.submitting': 'Soumission…',
+  'analysisDetail.submit': "Soumettre à la file d'analyse",
+  'analysisDetail.readOnly':
+    "Votre rôle dispose d'un accès en lecture seule aux analyses.",
+  'analysisDetail.resultEyebrow': 'Sortie structurée validée',
+  'analysisDetail.extraction': 'Extraction normalisée',
+  'analysisDetail.confidenceValue': '{{value}} de confiance',
+  'analysisDetail.titleField': 'Titre',
+  'analysisDetail.marketplace': 'Place de marché',
+  'analysisDetail.askingMinor': 'Prix demandé en unité mineure',
+  'analysisDetail.currency': 'Devise',
+  'analysisDetail.sourceCountry': "Pays d'origine",
+  'analysisDetail.targetCountry': 'Pays cible',
+  'analysisDetail.evidenceFiles': 'Fichiers de preuve',
+  'analysisDetail.additionalInput': 'Données supplémentaires requises',
+  'analysisDetail.completedSteps': "Étapes d'analyse terminées",
+  'analysisDetail.pendingSteps': "Étapes d'analyse en attente",
+  'analysisDetail.catalogEyebrow': 'Limite du catalogue canonique',
+  'analysisDetail.productMatch': 'Correspondance du produit',
+  'analysisDetail.brand': 'Marque',
+  'analysisDetail.model': 'Modèle',
+  'analysisDetail.modelNumber': 'Numéro de modèle',
+  'analysisDetail.variant': 'Variante',
+  'analysisDetail.modelLevel': 'Niveau du modèle',
+  'analysisDetail.category': 'Catégorie',
+  'analysisDetail.canonicalKey': 'Clé canonique',
+  'analysisDetail.noProduct':
+    "Aucun produit canonique n'a été sélectionné silencieusement. Les preuves des candidats sont conservées pour confirmation.",
+  'analysisDetail.method': 'Méthode',
+  'analysisDetail.matcherVersion': 'Version du moteur de correspondance',
+  'analysisDetail.confidence': 'Confiance',
+  'analysisDetail.review': 'Révision',
+  'analysisDetail.decisionEvidence': 'Preuves de la décision',
+  'analysisDetail.alias': 'Alias « {{alias}} »',
+  'analysisDetail.comparablesEyebrow': 'Preuves de marché immuables',
+  'analysisDetail.comparableSelection': 'Sélection des comparables',
+  'analysisDetail.selected': 'Sélectionnés',
+  'analysisDetail.minimum': '{{count}} minimum',
+  'analysisDetail.excluded': 'Exclus',
+  'analysisDetail.candidatePool': 'Ensemble de candidats',
+  'analysisDetail.marketBoundary': 'Limite du marché',
+  'analysisDetail.currencyMissing': 'Devise manquante',
+  'analysisDetail.selector': 'Sélecteur',
+  'analysisDetail.run': 'Exécution',
+  'analysisDetail.selectionState': 'État de la sélection',
+  'analysisDetail.noComparables':
+    "Aucune preuve comparable n'existe pour ce tenant et ce modèle canonique. Aucun prix n'a été déduit.",
+  'analysisDetail.observed': 'observé le {{date}}',
+  'analysisDetail.relevance': '{{value}} de pertinence',
+  'analysisDetail.selectionWarning':
+    'Cette étape classe uniquement les preuves sources. Elle ne calcule pas la valeur de marché et ne mélange pas pays et devises sans conversion vérifiée et contexte de marché.',
+  'analysisDetail.comparableEyebrow': 'Connecteur manuel approuvé',
+  'analysisDetail.addComparable': 'Ajouter une preuve comparable',
+  'analysisDetail.appendOnly': 'Ajout uniquement · espace actif',
+  'analysisDetail.marketplaceRequired': 'Place de marché *',
+  'analysisDetail.externalId': "ID externe de l'annonce",
+  'analysisDetail.sourceUrl': 'URL source',
+  'analysisDetail.sourceIdentityRequired':
+    "Une URL ou un ID externe d'annonce est requis.",
+  'analysisDetail.originalTitle': "Titre d'origine *",
+  'analysisDetail.originalDescription': "Description d'origine",
+  'analysisDetail.askingPrice': 'Prix demandé *',
+  'analysisDetail.originalCurrency': "Devise d'origine *",
+  'analysisDetail.chooseCurrency': 'Choisir une devise',
+  'analysisDetail.listingCountry': "Pays de l'annonce *",
+  'analysisDetail.chooseCountry': 'Choisir un pays',
+  'analysisDetail.location': 'Emplacement',
+  'analysisDetail.listingType': "Type d'annonce *",
+  'analysisDetail.type.product': 'Produit',
+  'analysisDetail.type.sparePart': 'Pièce détachée',
+  'analysisDetail.type.brokenOnly': 'En panne uniquement',
+  'analysisDetail.type.wanted': 'Annonce de recherche',
+  'analysisDetail.type.rental': 'Location',
+  'analysisDetail.type.bundle': 'Lot incertain',
+  'analysisDetail.condition': 'État *',
+  'analysisDetail.condition.new': 'Neuf',
+  'analysisDetail.condition.likeNew': 'Comme neuf',
+  'analysisDetail.condition.usedGood': 'Occasion · bon',
+  'analysisDetail.condition.usedFair': 'Occasion · correct',
+  'analysisDetail.condition.usedPoor': 'Occasion · mauvais',
+  'analysisDetail.condition.broken': 'En panne',
+  'analysisDetail.sellerType': 'Type de vendeur *',
+  'analysisDetail.seller.private': 'Particulier',
+  'analysisDetail.seller.business': 'Professionnel',
+  'analysisDetail.observedAt': 'Observé le *',
+  'analysisDetail.publishedAt': 'Publié le',
+  'analysisDetail.includedAccessories': 'Accessoires inclus',
+  'analysisDetail.includedPlaceholder': 'mallette, chargeur, deux batteries',
+  'analysisDetail.commaFacts': 'Faits sources séparés par des virgules.',
+  'analysisDetail.missingAccessories': 'Accessoires manquants',
+  'analysisDetail.missingPlaceholder': 'batterie, poignée latérale',
+  'analysisDetail.immutableComparable':
+    "Le montant, la devise, l'identité de la source et les horodatages d'origine ne peuvent pas être modifiés après enregistrement.",
+  'analysisDetail.savingEvidence': 'Enregistrement de la preuve…',
+  'analysisDetail.saveEvidence': 'Enregistrer la preuve comparable',
+  'analysisDetail.loadingReferences': 'Chargement des références de pays et devises…',
+  'analysisDetail.requestEyebrow': 'Demande immuable',
+  'analysisDetail.provenance': 'Provenance de la source',
+  'analysisDetail.listingSnapshot': "Instantané de l'annonce",
+  'analysisDetail.snapshotHash': "Empreinte de l'instantané",
+  'analysisDetail.marketRoute': 'Parcours de marché',
+  'analysisDetail.evidenceCaptured': 'Preuves capturées',
+  'analysisDetail.missing': 'Manquant',
+  'analysisDetail.processingEyebrow': 'Traitement observable',
+  'analysisDetail.attemptHistory': 'Historique des tentatives',
+  'analysisDetail.attempts': '{{count}} tentatives',
+  'analysisDetail.noAttempts': "Aucune tentative de worker n'a démarré.",
+  'analysisDetail.validation': 'validation {{status}}',
+  'analysisDetail.confidenceInline': 'confiance {{value}}',
+  'analysisDetail.requestState': 'État de la demande',
+  'analysisDetail.submitted': 'Soumise',
+  'analysisDetail.finished': 'Terminée',
+  'analysisDetail.processingAttempts': 'Tentatives de traitement',
+  'analysisDetail.nextRetry': 'Prochaine tentative',
+  'analysisDetail.queueOutbox': 'Boîte de sortie de file',
+  'analysisDetail.queue': 'File',
+  'analysisDetail.dispatchAttempts': "Tentatives d'envoi",
+  'analysisDetail.maxAttempts': 'Tentatives worker maximales',
+  'analysisDetail.dispatched': 'Envoyée',
+  'analysisDetail.queued':
+    "Analyse mise en file. Un droit mensuel a été consommé exactement une fois.",
+  'analysisDetail.submitError':
+    "L'analyse n'a pas pu être soumise à la file.",
+  'analysisDetail.matchRequired':
+    "Un produit canonique confirmé et l'autorisation de gérer les analyses sont requis.",
+  'analysisDetail.comparableFields':
+    'Renseignez les champs obligatoires de source et de marché du comparable.',
+  'analysisDetail.sourceRequired':
+    "Fournissez une URL source ou un ID externe d'annonce.",
+  'analysisDetail.positivePrice':
+    'Saisissez un prix demandé comparable positif.',
+  'analysisDetail.validPrice': 'Saisissez un prix comparable valide.',
+  'analysisDetail.reviewPrice': 'Vérifiez le prix demandé comparable.',
+  'analysisDetail.timestamps':
+    "Saisissez des horodatages d'observation valides.",
+  'analysisDetail.comparableCreated':
+    'Preuve comparable immuable enregistrée et sélection recalculée.',
+  'analysisDetail.comparableDuplicate':
+    'La même preuve existe déjà ; la sélection est restée idempotente.',
+  'analysisDetail.comparableSaveError':
+    "La preuve comparable n'a pas pu être enregistrée.",
+  'analysisDetail.normalization.eyebrow': 'Preuve inter-marchés',
+  'analysisDetail.normalization.title': 'Normalisation de marché',
+  'analysisDetail.normalization.missing': 'Preuve requise',
+  'analysisDetail.normalization.sourceValue': 'Valeur source d’origine',
+  'analysisDetail.normalization.normalizedValue': 'Valeur cible normalisée',
+  'analysisDetail.normalization.convertedValue': 'Valeur convertie en devise',
+  'analysisDetail.normalization.marketFactor': 'Facteur de marché régional',
+  'analysisDetail.normalization.marketAdjustedValue': 'Valeur ajustée au marché',
+  'analysisDetail.normalization.rate': 'Taux de change',
+  'analysisDetail.normalization.rateEffective': 'Date d’effet du taux',
+  'analysisDetail.normalization.rateProvider': 'Fournisseur du taux',
+  'analysisDetail.normalization.rateReference': 'Référence du fournisseur',
+  'analysisDetail.normalization.reference': 'Référence de preuve',
+  'analysisDetail.normalization.observedAt': 'Observé le',
+  'analysisDetail.normalization.version': 'Version du calcul',
+  'analysisDetail.normalization.evidenceHash': 'Empreinte de preuve',
+  'analysisDetail.normalization.explanation':
+    'Ce comparable reste exclu tant que la compatibilité régionale, le taux daté et les ajustements explicites du marché cible ne sont pas confirmés.',
+  'analysisDetail.normalization.record': 'Enregistrer ou remplacer la preuve',
+  'analysisDetail.normalization.compatibility': 'Compatibilité régionale *',
+  'analysisDetail.normalization.marketFactorPercent': 'Facteur du marché cible (%) *',
+  'analysisDetail.normalization.factorHint':
+    'Plage autorisée : 50,00–150,00. Utilisez 100,00 sans ajustement de niveau de prix démontré.',
+  'analysisDetail.normalization.shipping': 'Frais de livraison',
+  'analysisDetail.normalization.importDuty': 'Droits d’importation',
+  'analysisDetail.normalization.tax': 'Coût fiscal',
+  'analysisDetail.normalization.otherCost': 'Autre coût de marché',
+  'analysisDetail.normalization.compatibilityNote': 'Note de compatibilité *',
+  'analysisDetail.normalization.attestation':
+    'Je confirme que la compatibilité, le taux, le facteur et les coûts proviennent de preuves vérifiées.',
+  'analysisDetail.normalization.formula':
+    'Valeur normalisée = prix converti × facteur de marché + livraison + droits + taxes + autres coûts explicites.',
+  'analysisDetail.normalization.targetCurrencyRequired':
+    'Une devise cible confirmée est requise.',
+  'analysisDetail.normalization.invalidForm':
+    'Vérifiez les preuves obligatoires de normalisation du marché.',
+  'analysisDetail.normalization.invalidFactor':
+    'Saisissez un facteur de 50,00 % à 150,00 % avec deux décimales au maximum.',
+  'analysisDetail.normalization.invalidCost':
+    'Saisissez des coûts valides et non négatifs dans la devise cible.',
+  'analysisDetail.normalization.save': 'Enregistrer la preuve immuable',
+  'analysisDetail.normalization.saving': 'Enregistrement…',
+  'analysisDetail.normalization.saved':
+    'La preuve immuable de normalisation a été enregistrée et l’analyse recalculée.',
+  'analysisDetail.normalization.replayed':
+    'La même preuve existe déjà ; le résultat actuel a été conservé.',
+  'analysisDetail.normalization.saveError':
+    'La preuve de normalisation de marché n’a pas pu être enregistrée.',
+  'analysisDetail.normalization.code.targetCurrencyUnavailable':
+    'Devise cible indisponible',
+  'analysisDetail.normalization.code.currencyUnavailable':
+    'Preuve de normalisation monétaire indisponible',
+  'analysisDetail.normalization.code.crossCountryUnavailable':
+    'Preuve de normalisation entre pays indisponible',
+  'analysisDetail.normalization.code.compatibilityRejected':
+    'Compatibilité régionale rejetée',
+  'analysisDetail.normalization.code.invalidEvidence':
+    'Preuve de normalisation de marché invalide',
+  'analysisDetail.normalization.code.invalidAmount':
+    'Montant normalisé invalide',
+  'analysisDetail.normalization.code.crossCountryNormalized':
+    'Preuve entre pays normalisée',
+  'analysisDetail.normalization.code.currencyNormalized':
+    'Devise normalisée avec une preuve datée',
+  'analysisDetail.normalization.code.compatibilityConfirmed':
+    'Compatibilité régionale confirmée',
+  'analysisDetail.normalization.code.rateResolved':
+    'Taux de change daté résolu',
+  'analysisDetail.normalization.code.identityRate':
+    'Aucune conversion monétaire requise',
+  'analysisDetail.normalization.code.marketFactorApplied':
+    'Facteur de marché régional appliqué',
+  'analysisDetail.normalization.code.shippingApplied':
+    'Frais de livraison appliqués',
+  'analysisDetail.normalization.code.importDutyApplied':
+    'Droits d’importation appliqués',
+  'analysisDetail.normalization.code.taxApplied': 'Coût fiscal appliqué',
+  'analysisDetail.normalization.code.otherCostApplied':
+    'Autre coût explicite de marché appliqué',
+  'analysisDetail.normalization.code.normalizationApplied':
+    'Normalisation inter-marchés appliquée',
+  'analysisDetail.normalization.code.datedRatesApplied':
+    'Taux de change datés appliqués',
+  'analysisDetail.status.draft':
+    "Demande immuable capturée. Le quota n'a pas été utilisé.",
+  'analysisDetail.status.queued':
+    "Enregistrée dans la boîte de sortie et en attente d'un worker.",
+  'analysisDetail.status.processing':
+    'Une tentative de traitement bornée et observable est en cours.',
+  'analysisDetail.status.needsInput':
+    'Le traitement est terminé, mais des données sources ou une confirmation du produit sont requises.',
+  'analysisDetail.status.completed':
+    "Le pipeline d'analyse enregistré est terminé.",
+  'analysisDetail.status.failed':
+    "Le traitement a échoué après une tentative enregistrée. Les métadonnées de nouvelle tentative sont conservées.",
+  'analysisDetail.status.archived':
+    'Cette demande est archivée et ne peut pas être soumise.',
+  'analysisDetail.routeError': "La route de l'analyse est incomplète.",
+  'analysisDetail.listingMismatch':
+    "Cette analyse n'appartient pas à l'annonce de la route actuelle.",
+  'analysisDetail.loadError':
+    "Cette analyse n'a pas pu être chargée dans l'espace actif.",
+  'analysisDetail.marketError':
+    "Les références de marché sont indisponibles ; les preuves comparables ne peuvent pas être ajoutées.",
+  'analysisLabel.draft': 'Brouillon',
+  'analysisLabel.queued': "Dans la file d'attente",
+  'analysisLabel.processing': 'En cours',
+  'analysisLabel.completed': 'Terminé',
+  'analysisLabel.failed': 'Échec',
+  'analysisLabel.archived': 'Archivé',
+  'analysisLabel.pending': 'En attente',
+  'analysisLabel.dispatching': 'En cours d’envoi',
+  'analysisLabel.dispatched': 'Envoyé',
+  'analysisLabel.valid': 'Valide',
+  'analysisLabel.invalid': 'Invalide',
+  'analysisLabel.matched': 'Correspondant',
+  'analysisLabel.reviewRequired': 'Révision requise',
+  'analysisLabel.unmatched': 'Sans correspondance',
+  'analysisLabel.notRequired': 'Non requis',
+  'analysisLabel.confirmed': 'Confirmé',
+  'analysisLabel.rejected': 'Rejeté',
+  'analysisLabel.compatible': 'Compatible',
+  'analysisLabel.incompatible': 'Incompatible',
+  'analysisLabel.unspecified': 'Non précisé',
+  'analysisLabel.ready': 'Prêt',
+  'analysisLabel.insufficient': 'Insuffisant',
+  'analysisLabel.excluded': 'Exclu',
+  'common.cancel': 'Annuler',
+  'route.ownedProducts': 'Produits possédés',
+  'route.addOwnedProduct': 'Ajouter un produit possédé',
+  'route.ownedProductDetail': 'Produit possédé',
+  'ownedProduct.status.draft': 'Brouillon',
+  'ownedProduct.status.ready': 'Prêt',
+  'ownedProduct.status.archived': 'Archivé',
+  'ownedProduct.condition.unknown': 'Inconnu',
+  'ownedProduct.condition.new': 'Neuf',
+  'ownedProduct.condition.like_new': 'Comme neuf',
+  'ownedProduct.condition.used_good': 'Occasion · bon état',
+  'ownedProduct.condition.used_fair': 'Occasion · état correct',
+  'ownedProduct.condition.used_poor': 'Occasion · mauvais état',
+  'ownedProduct.condition.broken': 'En panne',
+  'ownedProduct.border.unknown': 'Inconnue',
+  'ownedProduct.border.domestic_only': 'Marché national uniquement',
+  'ownedProduct.border.cross_border_allowed': 'Vente transfrontalière autorisée',
+  'ownedProduct.border.cross_border_preferred': 'Vente transfrontalière privilégiée',
+  'ownedProduct.speed.unknown': 'Inconnue',
+  'ownedProduct.speed.fast': 'Vente rapide',
+  'ownedProduct.speed.balanced': 'Équilibrée',
+  'ownedProduct.speed.maximum_value': 'Valeur maximale',
+  'ownedProduct.image.product': 'Produit',
+  'ownedProduct.image.serial_label': 'Étiquette de série',
+  'ownedProduct.image.defect': 'Défaut',
+  'ownedProduct.image.proof_of_purchase': "Preuve d'achat",
+  'ownedProduct.common.unknownProduct': 'Produit inconnu',
+  'ownedProduct.common.categoryUnknown': 'Catégorie inconnue',
+  'ownedProduct.common.category': 'Catégorie',
+  'ownedProduct.common.brand': 'Marque',
+  'ownedProduct.common.model': 'Modèle',
+  'ownedProduct.common.condition': 'État',
+  'ownedProduct.common.targetMarket': 'Marché cible',
+  'ownedProduct.common.evidence': 'Éléments privés',
+  'ownedProduct.common.history': 'Historique',
+  'ownedProduct.common.lifecycle': 'Cycle de vie',
+  'ownedProduct.common.privateNotes': 'Notes privées',
+  'ownedProduct.common.readOnly':
+    'Vous disposez uniquement d’un accès en lecture aux produits possédés.',
+  'ownedProduct.common.unknownHint':
+    'Les faits inconnus restent explicitement inconnus',
+  'ownedProduct.common.noneConfirmed': 'Aucun, confirmé',
+  'ownedProduct.list.eyebrow': 'Saisie de vente',
+  'ownedProduct.list.title': 'Produits possédés',
+  'ownedProduct.list.description':
+    'Enregistrez vos produits avant toute estimation, génération d’annonce ou suivi de vente.',
+  'ownedProduct.list.add': 'Ajouter un produit possédé',
+  'ownedProduct.list.searchPlaceholder': 'Rechercher marque, modèle ou notes privées',
+  'ownedProduct.list.allStatuses': 'Tous les statuts',
+  'ownedProduct.list.apply': 'Appliquer les filtres',
+  'ownedProduct.list.loading': 'Chargement des produits possédés…',
+  'ownedProduct.list.loadError':
+    'Les produits possédés n’ont pas pu être chargés pour l’espace actif.',
+  'ownedProduct.list.emptyTitle': 'Aucun produit possédé',
+  'ownedProduct.list.emptyDescription':
+    'Créez le premier dossier de preuve pour un produit que vous pourriez vendre.',
+  'ownedProduct.list.addFirst': 'Ajouter le premier produit',
+  'ownedProduct.list.aria': 'Produits possédés',
+  'ownedProduct.list.loadingMore': 'Chargement…',
+  'ownedProduct.list.loadMore': 'Charger plus',
+  'ownedProduct.intake.back': '← Produits possédés',
+  'ownedProduct.intake.eyebrow': 'Phase 3 · saisie du produit possédé',
+  'ownedProduct.intake.title': 'Enregistrer un produit que vous possédez',
+  'ownedProduct.intake.description':
+    'Saisissez identité, état, provenance et marché cible sans inventer les preuves manquantes.',
+  'ownedProduct.intake.loading': 'Chargement du catalogue et des marchés…',
+  'ownedProduct.intake.identityEyebrow': 'Identité du produit',
+  'ownedProduct.intake.identityTitle': 'Quel produit possédez-vous ?',
+  'ownedProduct.intake.ageMonths': 'Âge en mois',
+  'ownedProduct.intake.agePlaceholder': 'Vide signifie inconnu',
+  'ownedProduct.intake.zeroAgeHint':
+    'Vide signifie inconnu. Zéro confirme un âge de zéro mois.',
+  'ownedProduct.intake.conditionEyebrow': 'Preuves sur l’état',
+  'ownedProduct.intake.conditionTitle': "Accessoires, défauts et historique d'achat",
+  'ownedProduct.intake.accessoriesKnown': 'Les accessoires ont été vérifiés',
+  'ownedProduct.intake.defectsKnown': 'Les défauts ont été vérifiés',
+  'ownedProduct.intake.onePerLine': 'Un fait enregistré par ligne',
+  'ownedProduct.intake.emptyListMeaning':
+    'Vérifié sans ligne signifie aucun confirmé ; non vérifié signifie inconnu.',
+  'ownedProduct.intake.purchaseKnown': "L'historique d'achat a été vérifié",
+  'ownedProduct.intake.purchasePlaceholder':
+    "Date, source, contexte du prix ou preuve de propriété",
+  'ownedProduct.intake.marketEyebrow': 'Marché de vente',
+  'ownedProduct.intake.marketTitle': 'Où et à quelle vitesse doit-il être vendu ?',
+  'ownedProduct.intake.targetContinent': 'Continent cible *',
+  'ownedProduct.intake.chooseContinent': 'Choisir un continent',
+  'ownedProduct.intake.targetCountries': 'Pays cibles *',
+  'ownedProduct.intake.countryHint':
+    'Sélectionnez un ou plusieurs pays du continent choisi.',
+  'ownedProduct.intake.crossBorder': 'Préférence transfrontalière *',
+  'ownedProduct.intake.saleSpeed': 'Vitesse de vente souhaitée *',
+  'ownedProduct.intake.imagesEyebrow': 'Éléments privés',
+  'ownedProduct.intake.imagesTitle': 'Ajouter des images originales du produit',
+  'ownedProduct.intake.optional': 'Facultatif lors de la saisie initiale',
+  'ownedProduct.intake.imageKind': 'Type de preuve visuelle',
+  'ownedProduct.intake.files': 'JPEG, PNG ou WebP · 10 Mo maximum chacun',
+  'ownedProduct.intake.selectedFiles': '{{count}} fichiers sélectionnés',
+  'ownedProduct.intake.boundaryTitle': 'Saisie uniquement',
+  'ownedProduct.intake.boundaryDescription':
+    'Cette étape ne calcule aucun prix, ne génère ni ne publie d’annonce, ne crée aucune entrée de portefeuille et n’enregistre aucun montant.',
+  'ownedProduct.intake.save': 'Enregistrer le produit',
+  'ownedProduct.intake.saving': 'Enregistrement…',
+  'ownedProduct.intake.retryUpload': 'Réessayer le transfert en attente',
+  'ownedProduct.intake.roleError':
+    'Votre rôle ne permet pas de créer des produits possédés.',
+  'ownedProduct.intake.requiredError':
+    'Vérifiez les champs obligatoires du produit et du marché.',
+  'ownedProduct.intake.ageError':
+    'L’âge doit être un nombre entier de mois compris entre 0 et 1200.',
+  'ownedProduct.intake.imagePolicyError':
+    'Choisissez au maximum 10 images JPEG, PNG ou WebP de 10 Mo chacune.',
+  'ownedProduct.intake.referenceError':
+    'Le catalogue ou les références de marché n’ont pas pu être chargés.',
+  'ownedProduct.intake.saveError': 'Le produit possédé n’a pas pu être enregistré.',
+  'ownedProduct.intake.uploadError':
+    'Le produit a été enregistré, mais pas ses images. Réessayez pour terminer le transfert.',
+  'ownedProduct.detail.back': '← Produits possédés',
+  'ownedProduct.detail.loading': 'Chargement des preuves du produit…',
+  'ownedProduct.detail.idMissing': 'La route du produit possédé est incomplète.',
+  'ownedProduct.detail.loadError':
+    'Ce produit n’a pas pu être chargé dans l’espace actif.',
+  'ownedProduct.detail.factsEyebrow': 'Faits sources enregistrés',
+  'ownedProduct.detail.factsTitle': 'Saisie du produit possédé',
+  'ownedProduct.detail.intakeOnly': 'Aucun prix ni vente déduit',
+  'ownedProduct.detail.age': 'Âge',
+  'ownedProduct.detail.months': '{{count}} mois',
+  'ownedProduct.detail.crossBorder': 'Préférence transfrontalière',
+  'ownedProduct.detail.saleSpeed': 'Vitesse de vente souhaitée',
+  'ownedProduct.detail.accessories': 'Accessoires',
+  'ownedProduct.detail.defects': 'Défauts',
+  'ownedProduct.detail.purchaseHistory': "Historique d'achat",
+  'ownedProduct.detail.privateStorage': 'Stockage privé signé',
+  'ownedProduct.detail.noEvidence': 'Aucune preuve visuelle privée n’a été ajoutée.',
+  'ownedProduct.detail.evidenceType': 'Type de preuve',
+  'ownedProduct.detail.filePolicy':
+    'JPEG, PNG ou WebP · jusqu’à 10 fichiers par transfert',
+  'ownedProduct.detail.uploading': 'Transfert…',
+  'ownedProduct.detail.uploadFiles': 'Transférer {{count}} fichiers',
+  'ownedProduct.detail.refreshLinks': 'Actualiser les liens temporaires',
+  'ownedProduct.detail.fileSelectionError':
+    'Choisissez au maximum 10 images JPEG, PNG ou WebP de 10 Mo chacune.',
+  'ownedProduct.detail.uploaded': 'Les preuves visuelles privées ont été ajoutées.',
+  'ownedProduct.detail.uploadError': 'Les images n’ont pas pu être transférées.',
+  'ownedProduct.detail.remove': 'Supprimer',
+  'ownedProduct.detail.removing': 'Suppression…',
+  'ownedProduct.detail.removeAria': 'Supprimer {{filename}}',
+  'ownedProduct.detail.removed': 'L’image privée a été supprimée.',
+  'ownedProduct.detail.removeError': 'L’image privée n’a pas pu être supprimée.',
+  'ownedProduct.detail.provenance': 'Provenance immuable',
+  'ownedProduct.detail.snapshotHistory': 'Historique des instantanés de saisie',
+  'ownedProduct.detail.lifecycleTitle': 'Statut de saisie',
+  'ownedProduct.detail.status': 'Statut',
+  'ownedProduct.detail.saveSnapshot': 'Enregistrer un nouvel instantané',
+  'ownedProduct.detail.saved': 'Un nouvel instantané du produit a été enregistré.',
+  'ownedProduct.detail.saveError': 'Le statut du produit n’a pas pu être enregistré.',
+  'ownedProduct.detail.archivedReadOnly':
+    'Les produits archivés sont définitifs et en lecture seule.',
+  'ownedProduct.detail.boundaryEyebrow': 'Limite de l’agrégat',
+  'ownedProduct.detail.boundaryTitle': 'Des preuves, pas une recommandation de vente',
+  'ownedProduct.detail.boundaryDescription':
+    'Les fourchettes de prix, le contenu généré, la publication, le portefeuille et les résultats financiers restent des étapes futures distinctes.',
+  'ownedProduct.assessment.eyebrow': 'Identification et état',
+  'ownedProduct.assessment.title': 'Évaluation liée aux preuves',
+  'ownedProduct.assessment.description':
+    'Rapproche l’identité enregistrée du catalogue canonique et évalue les preuves d’état sans calculer de prix.',
+  'ownedProduct.assessment.staleTitle': 'La dernière évaluation est historique',
+  'ownedProduct.assessment.staleDescription':
+    'L’instantané de saisie ou les images privées ont changé. Lancez une nouvelle évaluation avant d’utiliser ce résultat.',
+  'ownedProduct.assessment.historical':
+    'Résultat historique affiché. Il ne représente pas les preuves actuelles.',
+  'ownedProduct.assessment.notAssessedTitle': 'Aucune évaluation enregistrée',
+  'ownedProduct.assessment.notAssessedDescription':
+    'Marquez la saisie comme prête, puis évaluez le dernier instantané et ses images.',
+  'ownedProduct.assessment.readyRequired':
+    'La saisie doit être marquée comme prête avant son évaluation.',
+  'ownedProduct.assessment.run': 'Lancer l’évaluation',
+  'ownedProduct.assessment.reassess': 'Lancer une nouvelle évaluation',
+  'ownedProduct.assessment.running': 'Évaluation en cours…',
+  'ownedProduct.assessment.recorded':
+    'Une nouvelle évaluation immuable a été enregistrée.',
+  'ownedProduct.assessment.error': 'Le produit possédé n’a pas pu être évalué.',
+  'ownedProduct.assessment.matchStatus': 'Correspondance catalogue',
+  'ownedProduct.assessment.confidence': 'Confiance',
+  'ownedProduct.assessment.completeness': 'Complétude des preuves',
+  'ownedProduct.assessment.assessed': 'Évalué',
+  'ownedProduct.assessment.runNumber': 'Exécution',
+  'ownedProduct.assessment.snapshot': 'Instantané de saisie',
+  'ownedProduct.assessment.evaluator': 'Évaluateur',
+  'ownedProduct.assessment.identifiedProduct': 'Produit identifié',
+  'ownedProduct.assessment.noCatalogProduct':
+    'Aucun produit canonique du catalogue n’a été sélectionné.',
+  'ownedProduct.assessment.includedAccessories': 'Accessoires inclus',
+  'ownedProduct.assessment.missingAccessories': 'Accessoires manquants',
+  'ownedProduct.assessment.defects': 'Défauts enregistrés',
+  'ownedProduct.assessment.candidates': 'Candidats du catalogue à examiner',
+  'ownedProduct.assessment.regionCompatibility':
+    'Compatibilité avec le marché cible',
+  'ownedProduct.assessment.reasons': 'Motifs',
+  'ownedProduct.assessment.unknownFacts': 'Faits inconnus',
+  'ownedProduct.assessment.actions': 'Actions de vérification requises',
+  'ownedProduct.assessment.none': 'Aucun',
+  'ownedProduct.assessment.boundary':
+    'Cette évaluation enregistre uniquement l’identité et l’état. Elle ne crée ni fourchette de prix, ni annonce, ni publication, ni mouvement financier.',
+  'ownedProduct.assessment.code.exactCatalogAlias':
+    'Alias exact du catalogue trouvé',
+  'ownedProduct.assessment.code.searchableProductTextMissing':
+    'L’identité de produit recherchable est manquante',
+  'ownedProduct.assessment.code.catalogAliasNotFound':
+    'Aucun alias du catalogue trouvé',
+  'ownedProduct.assessment.code.multipleCloseCatalogCandidates':
+    'Plusieurs candidats proches nécessitent un examen',
+  'ownedProduct.assessment.code.targetMarketVariantIncompatible':
+    'La variante est incompatible avec le marché cible',
+  'ownedProduct.assessment.code.catalogMatchBelowAutoThreshold':
+    'La correspondance est sous le seuil de sélection automatique',
+  'ownedProduct.assessment.code.accessoriesUnchecked':
+    'Les accessoires inclus n’ont pas été vérifiés',
+  'ownedProduct.assessment.code.expectedAccessoryBaselineUnavailable':
+    'La référence des accessoires attendus est indisponible',
+  'ownedProduct.assessment.code.expectedAccessoriesMissing':
+    'Des accessoires attendus semblent manquer',
+  'ownedProduct.assessment.code.conditionUnknown': 'L’état est inconnu',
+  'ownedProduct.assessment.code.defectsUnchecked':
+    'Les défauts n’ont pas été vérifiés',
+  'ownedProduct.assessment.code.productImagesMissing':
+    'Les images originales du produit sont manquantes',
+  'ownedProduct.assessment.code.serialLabelMissing':
+    'L’image de l’étiquette de série est manquante',
+  'ownedProduct.assessment.code.checkAccessories':
+    'Vérifier et enregistrer tous les accessoires inclus',
+  'ownedProduct.assessment.code.verifyExpectedAccessories':
+    'Vérifier les accessoires attendus pour cette variante de marché',
+  'ownedProduct.assessment.code.confirmMissingAccessories':
+    'Confirmer chaque accessoire qui semble manquer',
+  'ownedProduct.assessment.code.confirmCatalogCandidate':
+    'Confirmer le bon candidat du catalogue',
+  'ownedProduct.assessment.code.provideIdentifyingModelEvidence':
+    'Fournir une preuve du modèle ou de l’étiquette de série',
+  'ownedProduct.assessment.code.confirmCondition':
+    'Inspecter et confirmer l’état du produit',
+  'ownedProduct.assessment.code.inspectDefects':
+    'Inspecter et enregistrer les défauts',
+  'ownedProduct.assessment.code.addProductPhotos':
+    'Ajouter des photos originales et actuelles du produit',
+  'ownedProduct.assessment.code.addSerialLabelPhoto':
+    'Ajouter une photo nette de l’étiquette de série',
+  'ownedProduct.assessment.code.category': 'Catégorie',
+  'ownedProduct.assessment.code.brand': 'Marque',
+  'ownedProduct.assessment.code.model': 'Modèle',
+  'ownedProduct.assessment.code.condition': 'État',
+  'ownedProduct.assessment.code.includedAccessories': 'Accessoires inclus',
+  'ownedProduct.assessment.code.missingAccessories': 'Accessoires manquants',
+  'ownedProduct.assessment.code.defects': 'Défauts',
+  'ownedProduct.pricing.eyebrow': 'Données du marché de vente',
+  'ownedProduct.pricing.title': 'Comparables et fourchettes de prix',
+  'ownedProduct.pricing.description':
+    'Enregistre des prix affichés approuvés pour un produit évalué et produit une indication reproductible sur le même marché.',
+  'ownedProduct.pricing.loading': 'Chargement des données de prix de vente…',
+  'ownedProduct.pricing.refresh': 'Actualiser les données de prix',
+  'ownedProduct.pricing.loadError':
+    'Les comparables de vente n’ont pas pu être chargés.',
+  'ownedProduct.pricing.marketReferenceError':
+    'Les références de devise et de marché n’ont pas pu être chargées.',
+  'ownedProduct.pricing.staleTitle': 'Le résultat de prix est historique',
+  'ownedProduct.pricing.staleDescription':
+    'La saisie, les images, l’évaluation ou la version du calcul ont changé. Les données historiques restent visibles mais ne sont plus actuelles.',
+  'ownedProduct.pricing.noCurrentTitle': 'Aucune fourchette actuelle',
+  'ownedProduct.pricing.noCurrentDescription':
+    'Enregistrez au moins trois comparables admissibles pour un pays et une devise.',
+  'ownedProduct.pricing.quickSale': 'Fourchette de vente rapide',
+  'ownedProduct.pricing.quickSaleHint':
+    'Du quartile inférieur au repère de marché pondéré.',
+  'ownedProduct.pricing.recommended': 'Fourchette de marché recommandée',
+  'ownedProduct.pricing.recommendedHint':
+    'Intervalle interquartile des prix affichés admissibles.',
+  'ownedProduct.pricing.ambitious': 'Fourchette ambitieuse',
+  'ownedProduct.pricing.ambitiousHint':
+    'Du repère de marché pondéré au quartile supérieur.',
+  'ownedProduct.pricing.confidence': 'Confiance',
+  'ownedProduct.pricing.completeness': 'Complétude de l’évaluation',
+  'ownedProduct.pricing.included': 'Données incluses',
+  'ownedProduct.pricing.calculated': 'Calculé',
+  'ownedProduct.pricing.reasons': 'Méthode et motifs',
+  'ownedProduct.pricing.unknownFacts': 'Faits inconnus',
+  'ownedProduct.pricing.actions': 'Actions de vérification',
+  'ownedProduct.pricing.selectionSummary':
+    '{{included}} inclus · {{excluded}} exclus',
+  'ownedProduct.pricing.askingOnly':
+    'Indication fondée sur les prix affichés, pas un prix de transaction garanti.',
+  'ownedProduct.pricing.provenance': 'Provenance en ajout seul',
+  'ownedProduct.pricing.evidenceHistory': 'Historique des comparables',
+  'ownedProduct.pricing.noEvidence':
+    'Aucune donnée comparable de vente n’est enregistrée.',
+  'ownedProduct.pricing.openSource': 'Ouvrir la source',
+  'ownedProduct.pricing.historicalRuns':
+    'Historique des fourchettes · {{count}} exécutions',
+  'ownedProduct.pricing.manualEvidence': 'Source manuelle approuvée',
+  'ownedProduct.pricing.addComparable': 'Enregistrer un comparable',
+  'ownedProduct.pricing.appendOnly': 'Immuable après enregistrement',
+  'ownedProduct.pricing.marketplace': 'Nom de la place de marché *',
+  'ownedProduct.pricing.externalId': 'ID externe de l’annonce',
+  'ownedProduct.pricing.sourceUrl': 'URL source',
+  'ownedProduct.pricing.urlPlaceholder': 'https://marche.example/article/…',
+  'ownedProduct.pricing.sourceIdentityHelp':
+    'Indiquez une URL source, un ID externe ou les deux.',
+  'ownedProduct.pricing.originalTitle': 'Titre original de l’annonce *',
+  'ownedProduct.pricing.originalDescription': 'Description originale',
+  'ownedProduct.pricing.askingPrice': 'Prix affiché *',
+  'ownedProduct.pricing.currency': 'Devise *',
+  'ownedProduct.pricing.chooseCurrency': 'Choisir une devise',
+  'ownedProduct.pricing.marketCountry': 'Pays du marché *',
+  'ownedProduct.pricing.chooseCountry': 'Choisir un pays cible',
+  'ownedProduct.pricing.location': 'Lieu',
+  'ownedProduct.pricing.listingType': 'Classification de l’annonce *',
+  'ownedProduct.pricing.type.product': 'Produit complet',
+  'ownedProduct.pricing.type.sparePart': 'Pièce détachée',
+  'ownedProduct.pricing.type.brokenOnly': 'Uniquement en panne',
+  'ownedProduct.pricing.type.wanted': 'Annonce de recherche',
+  'ownedProduct.pricing.type.rental': 'Location',
+  'ownedProduct.pricing.type.bundle': 'Lot imprécis',
+  'ownedProduct.pricing.condition': 'État du comparable *',
+  'ownedProduct.pricing.sellerType': 'Type de vendeur *',
+  'ownedProduct.pricing.seller.private': 'Vendeur particulier',
+  'ownedProduct.pricing.seller.business': 'Vendeur professionnel',
+  'ownedProduct.pricing.publishedAt': 'Publié le',
+  'ownedProduct.pricing.observedAt': 'Observé le *',
+  'ownedProduct.pricing.includedAccessories': 'Accessoires inclus',
+  'ownedProduct.pricing.missingAccessories': 'Accessoires manquants',
+  'ownedProduct.pricing.onePerLine': 'Un fait conservé par ligne',
+  'ownedProduct.pricing.saving': 'Enregistrement des données…',
+  'ownedProduct.pricing.recordEvidence': 'Enregistrer et recalculer',
+  'ownedProduct.pricing.currentAssessmentRequired':
+    'Une évaluation actuelle et prête est requise.',
+  'ownedProduct.pricing.requiredFields':
+    'Vérifiez les champs obligatoires du comparable.',
+  'ownedProduct.pricing.sourceIdentityRequired':
+    'Indiquez une URL source ou un ID externe.',
+  'ownedProduct.pricing.positivePrice':
+    'Saisissez un prix affiché supérieur à zéro.',
+  'ownedProduct.pricing.validPrice':
+    'Saisissez un montant valide selon la précision de la devise.',
+  'ownedProduct.pricing.validTimestamps':
+    'Vérifiez les dates de publication et d’observation.',
+  'ownedProduct.pricing.comparableRecorded':
+    'Le comparable immuable a été enregistré et le résultat recalculé.',
+  'ownedProduct.pricing.comparableReplayed':
+    'Les mêmes données ont été réutilisées sans créer de doublon.',
+  'ownedProduct.pricing.saveError':
+    'Les données comparables n’ont pas pu être enregistrées.',
+  'ownedProduct.pricing.intakeUnavailableTitle':
+    'La saisie des comparables est indisponible',
+  'ownedProduct.pricing.intakeUnavailableDescription':
+    'Un gestionnaire doit d’abord créer une évaluation actuelle et prête pour un produit non archivé.',
+  'ownedProduct.pricing.boundary':
+    'Cette étape ne génère aucun texte d’annonce, ne publie rien, ne crée aucune entrée de portefeuille de vente et n’enregistre aucune transaction réelle.',
+  'ownedProduct.pricing.code.sameMarketCurrencyOnly':
+    'Seuls le même marché et la même devise sont admissibles',
+  'ownedProduct.pricing.code.explicitMarketNormalizationOnly':
+    'Les preuves inter-marchés exigent une normalisation explicite',
+  'ownedProduct.pricing.code.nativeMarketAmountUsed':
+    'Montant du marché natif utilisé',
+  'ownedProduct.pricing.code.sufficientEligibleComparables':
+    'Assez de comparables natifs ou explicitement normalisés',
+  'ownedProduct.pricing.code.noEligibleSellComparables':
+    'Aucun comparable de vente admissible',
+  'ownedProduct.pricing.code.insufficientSellComparables':
+    'Pas assez de comparables de vente admissibles',
+  'ownedProduct.pricing.code.candidatePoolTruncated':
+    'Le groupe limité de candidats a été tronqué',
+  'ownedProduct.pricing.code.supersededSourceObservation':
+    'Observation remplacée de la même annonce',
+  'ownedProduct.pricing.code.sparePartListing': 'Annonce de pièce détachée',
+  'ownedProduct.pricing.code.brokenOnlyListing': 'Annonce uniquement en panne',
+  'ownedProduct.pricing.code.wantedListing': 'Annonce de recherche',
+  'ownedProduct.pricing.code.rentalListing': 'Annonce de location',
+  'ownedProduct.pricing.code.unclearBundleListing': 'Annonce de lot imprécis',
+  'ownedProduct.pricing.code.brokenCondition': 'État en panne',
+  'ownedProduct.pricing.code.currencyConversionNotAuthorized':
+    'La conversion de devise n’est pas autorisée',
+  'ownedProduct.pricing.code.crossMarketNormalizationNotAuthorized':
+    'La normalisation entre marchés n’est pas autorisée',
+  'ownedProduct.pricing.code.incompatibleVariant':
+    'Variante de produit incompatible',
+  'ownedProduct.pricing.code.regionIncompatibleVariant':
+    'La variante est incompatible avec ce marché',
+  'ownedProduct.pricing.code.selectionLimitReached':
+    'Limite de sélection des comparables atteinte',
+  'ownedProduct.pricing.code.exactModel': 'Modèle canonique exact',
+  'ownedProduct.pricing.code.sameMarket': 'Même marché',
+  'ownedProduct.pricing.code.sameCurrency': 'Même devise',
+  'ownedProduct.pricing.code.exactVariant': 'Variante exacte',
+  'ownedProduct.pricing.code.variantUnspecified': 'Variante non précisée',
+  'ownedProduct.pricing.code.variantNotRequired':
+    'L’évaluation n’exigeait pas de variante exacte',
+  'ownedProduct.pricing.code.targetConditionUnavailable':
+    'L’état cible est indisponible',
+  'ownedProduct.pricing.code.exactCondition': 'État exact',
+  'ownedProduct.pricing.code.conditionDiffers': 'L’état diffère',
+  'ownedProduct.pricing.code.targetAccessoriesUnavailable':
+    'Les accessoires cibles sont indisponibles',
+  'ownedProduct.pricing.code.accessoriesCompared': 'Accessoires comparés',
+  'ownedProduct.pricing.code.askingPriceOnly':
+    'Les données contiennent des offres, pas des transactions conclues',
+  'ownedProduct.pricing.code.minimumEvidenceMet':
+    'Minimum de données de vente atteint',
+  'ownedProduct.pricing.code.weightedMedianRecorded':
+    'Médiane pondérée enregistrée',
+  'ownedProduct.pricing.code.interquartileRangeRecorded':
+    'Intervalle interquartile enregistré',
+  'ownedProduct.pricing.code.dataDerivedBands':
+    'Les trois fourchettes dérivent des données sélectionnées',
+  'ownedProduct.pricing.code.noMarketMixing':
+    'Aucun mélange de devises ou de marchés',
+  'ownedProduct.pricing.code.extremeOutliersExcluded':
+    'Les valeurs aberrantes extrêmes ont été exclues',
+  'ownedProduct.pricing.code.highPriceDispersion': 'Forte dispersion des prix',
+  'ownedProduct.pricing.code.lowConfidence':
+    'Faible confiance du prix de vente',
+  'ownedProduct.pricing.code.realizedPrices': 'Prix de transaction réalisés',
+  'ownedProduct.pricing.code.saleDuration': 'Durée de vente attendue',
+  'ownedProduct.pricing.code.sourceDiversity':
+    'Diversité des sources indépendantes',
+  'ownedProduct.pricing.code.sufficientComparables':
+    'Assez de comparables du même marché',
+  'ownedProduct.pricing.code.confirmOutcomes':
+    'Confirmer les résultats de vente réalisés',
+  'ownedProduct.pricing.code.addIndependentSource':
+    'Ajouter des données d’une place de marché indépendante',
+  'ownedProduct.pricing.code.addSameMarketComparables':
+    'Ajouter des comparables du même marché et de la même devise',
+  'ownedProduct.pricing.code.addEligibleSellComparables':
+    'Ajouter des comparables natifs ou explicitement normalisés',
+  'ownedProduct.pricing.code.selectedComparable': 'Comparable sélectionné',
+  'ownedProduct.pricing.code.madOutlier':
+    'Valeur aberrante par écart absolu médian',
+  'ownedProduct.pricing.code.insufficientAfterOutliers':
+    'Trop peu de données subsistent après exclusion des valeurs aberrantes',
+  'ownedProduct.pricing.code.comparableCount': 'Nombre de comparables',
+  'ownedProduct.pricing.code.productMatchQuality':
+    'Qualité de correspondance du produit',
+  'ownedProduct.pricing.code.conditionCompleteness':
+    'Complétude de l’état',
+  'ownedProduct.pricing.code.priceConsistency': 'Cohérence des prix',
+  'ownedProduct.pricing.code.freshness': 'Actualité des données',
+  'language.en': 'Anglais',
+  'language.de': 'Allemand',
+  'language.es': 'Espagnol',
+  'language.fr': 'Français',
+  'language.sr-Latn': 'Serbe (latin)',
+  'ownedProduct.listing.marketReferenceError':
+    'Les données de référence des devises n’ont pas pu être chargées.',
+  'ownedProduct.listing.eyebrow': 'Préparation de l’annonce',
+  'ownedProduct.listing.title':
+    'Brouillon d’annonce et préparation des photos',
+  'ownedProduct.listing.description':
+    'Générez un texte versionné à partir des faits évalués, d’une fourchette de prix explicitement choisie et du manifeste actuel des images privées.',
+  'ownedProduct.listing.refresh': 'Actualiser les brouillons',
+  'ownedProduct.listing.loading': 'Chargement des brouillons…',
+  'ownedProduct.listing.loadError':
+    'Les brouillons d’annonce n’ont pas pu être chargés.',
+  'ownedProduct.listing.staleTitle': 'Les preuves en amont sont historiques',
+  'ownedProduct.listing.staleDescription':
+    'Créez une évaluation actuelle et prête avant de générer un nouveau brouillon. Les anciens brouillons restent visibles dans l’historique.',
+  'ownedProduct.listing.noBandTitle':
+    'Aucune fourchette de prix actuelle complète',
+  'ownedProduct.listing.noBandDescription':
+    'Enregistrez suffisamment de comparables du même marché avant de choisir le contenu et le prix cible.',
+  'ownedProduct.listing.status.ready': 'Brouillon prêt',
+  'ownedProduct.listing.status.review_required': 'Révision requise',
+  'ownedProduct.listing.photoStatus.ready': 'Photos prêtes',
+  'ownedProduct.listing.photoStatus.needs_photos':
+    'Photos supplémentaires requises',
+  'ownedProduct.listing.photoStatus.review_required':
+    'Révision des photos requise',
+  'ownedProduct.listing.checkStatus.satisfied': 'Satisfait',
+  'ownedProduct.listing.checkStatus.missing': 'Manquant',
+  'ownedProduct.listing.checkStatus.review_required': 'À vérifier',
+  'ownedProduct.listing.checkStatus.not_applicable': 'Sans objet',
+  'ownedProduct.listing.targetPrice': 'Prix de vente cible',
+  'ownedProduct.listing.strategyLabel': 'Stratégie de prix',
+  'ownedProduct.listing.photoReadiness': 'Préparation des photos',
+  'ownedProduct.listing.completeness': 'Complétude globale',
+  'ownedProduct.listing.generatedDescription': 'Description générée',
+  'ownedProduct.listing.warnings': 'Avertissements',
+  'ownedProduct.listing.unknowns': 'Faits inconnus',
+  'ownedProduct.listing.actions': 'Actions de vérification',
+  'ownedProduct.listing.photoChecklist': 'Liste de contrôle des photos',
+  'ownedProduct.listing.photoCount':
+    '{{observed}} observées · {{required}} requises',
+  'ownedProduct.listing.sourceFacts': 'Faits sources divulgués',
+  'ownedProduct.listing.emptyTitle': 'Aucun brouillon pour le moment',
+  'ownedProduct.listing.emptyDescription':
+    'Choisissez explicitement la preuve de prix, le prix cible et la langue de l’annonce.',
+  'ownedProduct.listing.generatorEyebrow': 'Générateur déterministe',
+  'ownedProduct.listing.generatorTitle': 'Générer un brouillon immuable',
+  'ownedProduct.listing.explicitChoice':
+    'Ni le prix, ni la stratégie, ni la langue ne sont choisis automatiquement',
+  'ownedProduct.listing.priceBand': 'Fourchette actuelle du pays et de la devise',
+  'ownedProduct.listing.chooseBand': 'Choisir une fourchette de prix',
+  'ownedProduct.listing.chooseStrategy': 'Choisir une stratégie de prix',
+  'ownedProduct.listing.strategy.quick_sale': 'Vente rapide',
+  'ownedProduct.listing.strategy.recommended': 'Recommandée',
+  'ownedProduct.listing.strategy.ambitious': 'Ambitieuse',
+  'ownedProduct.listing.language': 'Langue de l’annonce',
+  'ownedProduct.listing.chooseLanguage': 'Choisir la langue de l’annonce',
+  'ownedProduct.listing.selectedRange': 'Fourchette choisie : {{range}}',
+  'ownedProduct.listing.overrideReason': 'Motif de dérogation au prix',
+  'ownedProduct.listing.overrideReasonHint':
+    'Requis uniquement si le prix cible se trouve hors de la fourchette choisie.',
+  'ownedProduct.listing.requiredFields':
+    'Choisissez une fourchette, une stratégie et une langue, puis saisissez le prix cible.',
+  'ownedProduct.listing.upstreamRequired':
+    'Une évaluation actuelle prête et une fourchette actuelle complète sont requises.',
+  'ownedProduct.listing.positivePrice':
+    'Saisissez un prix cible supérieur à zéro.',
+  'ownedProduct.listing.validPrice':
+    'Saisissez un montant valide avec la précision de la devise choisie.',
+  'ownedProduct.listing.overrideReasonRequired':
+    'Expliquez pourquoi le prix cible est hors de la fourchette choisie.',
+  'ownedProduct.listing.created':
+    'Un nouveau brouillon immuable a été généré.',
+  'ownedProduct.listing.replayed':
+    'La saisie identique a été rejouée sans créer de doublon.',
+  'ownedProduct.listing.saveError':
+    'Le brouillon d’annonce n’a pas pu être généré.',
+  'ownedProduct.listing.generating': 'Génération…',
+  'ownedProduct.listing.generate': 'Générer le brouillon',
+  'ownedProduct.listing.history':
+    'Historique des brouillons · {{count}} exécutions',
+  'ownedProduct.listing.current': 'Actuel',
+  'ownedProduct.listing.historical': 'Historique',
+  'ownedProduct.listing.boundary':
+    'Brouillon uniquement : à cette étape, Procura ne publie pas sur une marketplace, ne crée pas d’entrée de portefeuille de vente et n’enregistre aucune transaction réelle.',
+  'ownedProduct.listing.check.product_overview':
+    'Vue d’ensemble claire du produit',
+  'ownedProduct.listing.check.multiple_product_angles':
+    'Plusieurs angles du produit',
+  'ownedProduct.listing.check.high_resolution_product_photos':
+    'Photos du produit en haute résolution',
+  'ownedProduct.listing.check.serial_label':
+    'Étiquette de série ou de modèle lisible',
+  'ownedProduct.listing.check.defect_documentation':
+    'Chaque défaut déclaré est documenté',
+  'ownedProduct.listing.check.accessory_visibility':
+    'Accessoires inclus visibles',
+  'ownedProduct.listing.check.private_proof_exclusion':
+    'Les images de preuve d’achat restent privées',
+  'ownedProduct.listing.code.askingGuidance':
+    'Le prix demandé est indicatif, pas un prix de transaction garanti',
+  'ownedProduct.listing.code.photoIncomplete':
+    'Les preuves photo requises sont incomplètes',
+  'ownedProduct.listing.code.photoReview':
+    'Le contenu des photos exige une vérification humaine',
+  'ownedProduct.listing.code.lowConfidenceBand':
+    'La fourchette choisie a un faible niveau de confiance',
+  'ownedProduct.listing.code.priceOutsideBand':
+    'Le prix cible se trouve hors de la fourchette choisie',
+  'ownedProduct.listing.code.realizedSalePrice': 'Prix de vente réalisé',
+  'ownedProduct.listing.code.timeToSale': 'Délai de vente réel',
+  'ownedProduct.listing.code.provideOverview':
+    'Ajouter une photo d’ensemble claire du produit',
+  'ownedProduct.listing.code.provideAngles':
+    'Ajouter des photos du produit sous plusieurs angles',
+  'ownedProduct.listing.code.provideHighResolution':
+    'Ajouter des photos du produit avec une résolution suffisante',
+  'ownedProduct.listing.code.provideSerial':
+    'Ajouter une photo lisible de l’étiquette de série ou de modèle',
+  'ownedProduct.listing.code.provideDefects':
+    'Ajouter une photo pour chaque défaut déclaré',
+  'ownedProduct.listing.code.provideAccessories':
+    'Ajouter une photo montrant les accessoires inclus',
+  'ownedProduct.listing.code.confirmAccessories':
+    'Confirmer que chaque accessoire inclus est visible',
+  'ownedProduct.listing.code.confirmDefects':
+    'Confirmer que chaque défaut déclaré est clairement visible',
+  'ownedProduct.listing.code.keepProofPrivate':
+    'Conserver les images de preuve d’achat privées',
+  'ownedProduct.listing.code.reviewPriceOverride':
+    'Vérifier la dérogation de prix et son motif',
+  'ownedProduct.listing.code.reviewLowConfidence':
+    'Vérifier la fourchette à faible confiance avant d’utiliser le brouillon',
+  'ownedProduct.portfolio.eyebrow': 'Opérations de vente',
+  'ownedProduct.portfolio.title': 'Portefeuille de vente et historique de publication',
+  'ownedProduct.portfolio.description':
+    'Ajoutez un brouillon entièrement vérifié au portefeuille et consignez manuellement les événements externes de la marketplace.',
+  'ownedProduct.portfolio.refresh': 'Actualiser le portefeuille',
+  'ownedProduct.portfolio.loading': 'Chargement du portefeuille de vente…',
+  'ownedProduct.portfolio.loadError': 'Le portefeuille de vente n’a pas pu être chargé.',
+  'ownedProduct.portfolio.marketReferenceError':
+    'Les données de référence des devises n’ont pas pu être chargées.',
+  'ownedProduct.portfolio.staleTitle': 'Les preuves sources ont changé',
+  'ownedProduct.portfolio.staleDescription':
+    'Les entrées historiques restent visibles, mais un brouillon actuel entièrement vérifié est requis avant toute publication ou remise en ligne.',
+  'ownedProduct.portfolio.emptyTitle': 'Aucune entrée de portefeuille',
+  'ownedProduct.portfolio.emptyDescription':
+    'Choisissez un brouillon actuel entièrement vérifié pour démarrer un parcours de vente traçable.',
+  'ownedProduct.portfolio.untitledDraft': 'Brouillon d’annonce sans titre',
+  'ownedProduct.portfolio.status.draft': 'Brouillon',
+  'ownedProduct.portfolio.status.listed': 'Publié',
+  'ownedProduct.portfolio.status.reserved': 'Réservé',
+  'ownedProduct.portfolio.status.withdrawn': 'Retiré',
+  'ownedProduct.portfolio.status.expired': 'Expiré',
+  'ownedProduct.portfolio.event.published': 'Publié',
+  'ownedProduct.portfolio.event.price_changed': 'Prix modifié',
+  'ownedProduct.portfolio.event.reserved': 'Réservé',
+  'ownedProduct.portfolio.event.withdrawn': 'Retiré',
+  'ownedProduct.portfolio.event.expired': 'Expiré',
+  'ownedProduct.portfolio.event.relisted': 'Remis en ligne',
+  'ownedProduct.portfolio.evidenceCurrent': 'Preuves sources actuelles',
+  'ownedProduct.portfolio.evidenceHistorical': 'Preuves sources historiques',
+  'ownedProduct.portfolio.initialPrice': 'Prix cible initial',
+  'ownedProduct.portfolio.currentPrice': 'Prix affiché actuel',
+  'ownedProduct.portfolio.enteredAt': 'Ajouté au portefeuille',
+  'ownedProduct.portfolio.marketplace': 'Marketplace',
+  'ownedProduct.portfolio.openListing': 'Ouvrir l’annonce externe',
+  'ownedProduct.portfolio.history': 'Historique · {{count}} événements',
+  'ownedProduct.portfolio.entryEyebrow': 'Entrée en portefeuille',
+  'ownedProduct.portfolio.entryTitle': 'Créer une entrée de portefeuille',
+  'ownedProduct.portfolio.reviewCompleteOnly': 'Brouillons entièrement vérifiés',
+  'ownedProduct.portfolio.listingDraft': 'Brouillon d’annonce',
+  'ownedProduct.portfolio.chooseDraft': 'Choisir un brouillon',
+  'ownedProduct.portfolio.entering': 'Ajout en cours…',
+  'ownedProduct.portfolio.enter': 'Ajouter au portefeuille de vente',
+  'ownedProduct.portfolio.entryRequired':
+    'Choisissez un brouillon actuel entièrement vérifié.',
+  'ownedProduct.portfolio.entryCreated':
+    'Une entrée de portefeuille immuable a été créée.',
+  'ownedProduct.portfolio.entryReplayed':
+    'La commande identique a été rejouée sans doublon.',
+  'ownedProduct.portfolio.entrySaveError':
+    'L’entrée de portefeuille n’a pas pu être créée.',
+  'ownedProduct.portfolio.eventEyebrow': 'Preuve manuelle de marketplace',
+  'ownedProduct.portfolio.eventTitle': 'Consigner un événement du cycle de vie',
+  'ownedProduct.portfolio.manualOnly': 'Aucun appel à l’API marketplace',
+  'ownedProduct.portfolio.entry': 'Entrée de portefeuille',
+  'ownedProduct.portfolio.chooseEntry': 'Choisir une entrée',
+  'ownedProduct.portfolio.eventType': 'Événement',
+  'ownedProduct.portfolio.chooseEvent': 'Choisir un événement autorisé',
+  'ownedProduct.portfolio.occurredAt': 'Heure de l’événement',
+  'ownedProduct.portfolio.marketplaceName': 'Nom de la marketplace',
+  'ownedProduct.portfolio.marketplaceKey': 'Clé de la marketplace',
+  'ownedProduct.portfolio.marketplaceKeyExample': 'marche-exemple',
+  'ownedProduct.portfolio.externalId': 'ID externe de l’annonce',
+  'ownedProduct.portfolio.externalUrl': 'URL externe de l’annonce',
+  'ownedProduct.portfolio.advertisedPrice': 'Prix affiché',
+  'ownedProduct.portfolio.currency': 'Devise',
+  'ownedProduct.portfolio.currencyExample': 'EUR',
+  'ownedProduct.portfolio.withdrawalReason': 'Code du motif de retrait',
+  'ownedProduct.portfolio.reasonExample': 'vendeur_change_plan',
+  'ownedProduct.portfolio.note': 'Note interne',
+  'ownedProduct.portfolio.recording': 'Enregistrement…',
+  'ownedProduct.portfolio.recordEvent': 'Enregistrer l’événement',
+  'ownedProduct.portfolio.eventRequired':
+    'Choisissez une entrée, un événement autorisé et son heure.',
+  'ownedProduct.portfolio.publicationRequired':
+    'Le nom et la clé de la marketplace, l’ID externe et l’URL HTTPS sont requis.',
+  'ownedProduct.portfolio.withdrawalReasonRequired':
+    'Consignez un code de motif limité avant de retirer l’annonce.',
+  'ownedProduct.portfolio.priceRequired':
+    'Saisissez un prix affiché positif et un code de devise actif.',
+  'ownedProduct.portfolio.eventTimeRequired':
+    'Saisissez une heure valide qui n’est pas dans le futur.',
+  'ownedProduct.portfolio.eventCreated':
+    'L’événement de vente immuable a été enregistré.',
+  'ownedProduct.portfolio.eventReplayed':
+    'La commande d’événement identique a été rejouée sans doublon.',
+  'ownedProduct.portfolio.eventSaveError':
+    'L’événement de vente n’a pas pu être enregistré.',
+  'ownedProduct.portfolio.boundary':
+    'Suivi manuel uniquement : Procura ne publie pas sur les marketplaces et ne considère pas les prix affichés comme de l’argent reçu ou des ventes conclues.',
+  'ownedProduct.outcomes.eyebrow': 'Résultat financier vérifié',
+  'ownedProduct.outcomes.title': 'Achat, coûts et vente réels',
+  'ownedProduct.outcomes.description':
+    'Enregistrez des preuves immuables des montants réalisés, séparées des estimations, prix affichés et décisions de workflow.',
+  'ownedProduct.outcomes.refresh': 'Actualiser les résultats',
+  'ownedProduct.outcomes.loading': 'Chargement des résultats financiers…',
+  'ownedProduct.outcomes.loadError':
+    'L’historique des résultats financiers n’a pas pu être chargé.',
+  'ownedProduct.outcomes.marketReferenceError':
+    'Les données de référence des devises n’ont pas pu être chargées.',
+  'ownedProduct.outcomes.profitEyebrow': 'Chaîne de preuves complète',
+  'ownedProduct.outcomes.profitTitle': 'Bénéfice net réalisé',
+  'ownedProduct.outcomes.incompleteEyebrow': 'Inconnues explicites',
+  'ownedProduct.outcomes.incompleteTitle':
+    'Le bénéfice réalisé n’est pas encore disponible',
+  'ownedProduct.outcomes.incompleteDescription':
+    'Procura ne présentera pas un résultat partiel comme un bénéfice précis. Complétez les preuves manquantes.',
+  'ownedProduct.outcomes.purchase': 'Achat réel',
+  'ownedProduct.outcomes.costs': 'Coûts supplémentaires réels',
+  'ownedProduct.outcomes.salePrice': 'Vente réelle',
+  'ownedProduct.outcomes.margin': 'Marge bénéficiaire',
+  'ownedProduct.outcomes.return': 'Rendement du capital investi',
+  'ownedProduct.outcomes.saleDuration': 'Durée de vente',
+  'ownedProduct.outcomes.durationDays': '{{count}} jours',
+  'ownedProduct.outcomes.purchaseEvidence': 'Preuve d’achat actuelle',
+  'ownedProduct.outcomes.costEvidence': 'Preuve de coûts actuelle',
+  'ownedProduct.outcomes.saleEvidence': 'Résultats de vente enregistrés',
+  'ownedProduct.outcomes.reportingValue': 'Valeur de reporting',
+  'ownedProduct.outcomes.noPurchase':
+    'Aucun montant d’achat réel n’a encore été enregistré.',
+  'ownedProduct.outcomes.noCosts':
+    'Aucun instantané des coûts réels n’a encore été enregistré.',
+  'ownedProduct.outcomes.noSale':
+    'Aucun résultat vendu, annulé ou sans vente n’a encore été enregistré.',
+  'ownedProduct.outcomes.costCompleteness':
+    '{{known}} connus · {{unknown}} inconnus',
+  'ownedProduct.outcomes.purchaseFormEyebrow': 'Preuve d’achat',
+  'ownedProduct.outcomes.purchaseFormTitle': 'Enregistrer l’achat réel',
+  'ownedProduct.outcomes.costFormEyebrow': 'Preuve de coûts',
+  'ownedProduct.outcomes.costFormTitle':
+    'Enregistrer un instantané des coûts réels',
+  'ownedProduct.outcomes.saleFormEyebrow': 'Résultat du portefeuille',
+  'ownedProduct.outcomes.saleFormTitle':
+    'Enregistrer le résultat réel de la vente',
+  'ownedProduct.outcomes.immutableVersion': 'Nouvelle version immuable',
+  'ownedProduct.outcomes.blankMeansUnknown':
+    'Vide signifie explicitement inconnu ; zéro est un zéro connu',
+  'ownedProduct.outcomes.exactPortfolioOnly':
+    'Chaîne de publication actuelle exacte uniquement',
+  'ownedProduct.outcomes.actualAmount': 'Montant réel',
+  'ownedProduct.outcomes.sourceCurrency': 'Devise source',
+  'ownedProduct.outcomes.reportingCurrency': 'Devise de reporting',
+  'ownedProduct.outcomes.chooseCurrency': 'Choisir une devise',
+  'ownedProduct.outcomes.occurredAt': 'Date de survenue',
+  'ownedProduct.outcomes.evidenceKind': 'Type de preuve',
+  'ownedProduct.outcomes.chooseEvidence': 'Choisir une preuve',
+  'ownedProduct.outcomes.evidenceReference': 'Référence de preuve',
+  'ownedProduct.outcomes.correctionReason': 'Code du motif de correction',
+  'ownedProduct.outcomes.correctionExample': 'recu_corrige',
+  'ownedProduct.outcomes.note': 'Note interne',
+  'ownedProduct.outcomes.portfolioEntry': 'Entrée du portefeuille de vente',
+  'ownedProduct.outcomes.chooseEntry': 'Choisir une entrée du portefeuille',
+  'ownedProduct.outcomes.outcomeType': 'Résultat',
+  'ownedProduct.outcomes.chooseOutcome': 'Choisir un résultat autorisé',
+  'ownedProduct.outcomes.outcomeReason': 'Motif d’annulation / sans vente',
+  'ownedProduct.outcomes.noSaleReasonExample': 'annonce_fermee_sans_vente',
+  'ownedProduct.outcomes.recording': 'Enregistrement…',
+  'ownedProduct.outcomes.recordPurchase': 'Enregistrer l’achat réel',
+  'ownedProduct.outcomes.recordCosts': 'Enregistrer les coûts',
+  'ownedProduct.outcomes.recordSale': 'Enregistrer le résultat de vente',
+  'ownedProduct.outcomes.purchaseRequired':
+    'Saisissez le montant exact, les devises, la date et la preuve d’achat. Les corrections exigent un motif.',
+  'ownedProduct.outcomes.costRequired':
+    'Choisissez une devise de reporting. Chaque coût saisi exige une devise source, une date et une preuve ; les corrections, un motif.',
+  'ownedProduct.outcomes.saleRequired':
+    'Choisissez une entrée, un résultat autorisé, une date et une preuve. Les corrections exigent un motif.',
+  'ownedProduct.outcomes.saleMoneyRequired':
+    'Une vente exige un montant réel positif et les deux devises.',
+  'ownedProduct.outcomes.saleReasonRequired':
+    'Un résultat annulé ou sans vente exige un code de motif.',
+  'ownedProduct.outcomes.purchaseRecorded':
+    'La preuve immuable de l’achat réel a été enregistrée.',
+  'ownedProduct.outcomes.costsRecorded':
+    'L’instantané immuable des coûts réels a été enregistré.',
+  'ownedProduct.outcomes.saleRecorded':
+    'Le résultat de vente immuable a été enregistré.',
+  'ownedProduct.outcomes.commandReplayed':
+    'La commande identique a été rejouée sans créer de doublon.',
+  'ownedProduct.outcomes.purchaseSaveError':
+    'La preuve d’achat réel n’a pas pu être enregistrée.',
+  'ownedProduct.outcomes.costSaveError':
+    'L’instantané des coûts réels n’a pas pu être enregistré.',
+  'ownedProduct.outcomes.saleSaveError':
+    'Le résultat réel de la vente n’a pas pu être enregistré.',
+  'ownedProduct.outcomes.evidence.receipt': 'Reçu',
+  'ownedProduct.outcomes.evidence.invoice': 'Facture',
+  'ownedProduct.outcomes.evidence.bank_statement': 'Relevé bancaire',
+  'ownedProduct.outcomes.evidence.marketplace_record':
+    'Enregistrement de transaction de la marketplace',
+  'ownedProduct.outcomes.evidence.manual_confirmation':
+    'Confirmation manuelle',
+  'ownedProduct.outcomes.evidence.other': 'Autre preuve',
+  'ownedProduct.outcomes.cost.transport': 'Transport',
+  'ownedProduct.outcomes.cost.repair': 'Réparation',
+  'ownedProduct.outcomes.cost.platform_fees': 'Frais de plateforme',
+  'ownedProduct.outcomes.cost.payment_fees': 'Frais de paiement',
+  'ownedProduct.outcomes.cost.customs': 'Douane',
+  'ownedProduct.outcomes.cost.tax': 'Taxes',
+  'ownedProduct.outcomes.cost.marketing': 'Marketing',
+  'ownedProduct.outcomes.cost.other_costs': 'Autres coûts',
+  'ownedProduct.outcomes.sale.sold': 'Vendu',
+  'ownedProduct.outcomes.sale.cancelled': 'Annulé',
+  'ownedProduct.outcomes.sale.no_sale': 'Sans vente',
+  'ownedProduct.outcomes.unknown.actualPurchase':
+    'La preuve d’achat réel est manquante.',
+  'ownedProduct.outcomes.unknown.costSnapshot':
+    'Un instantané des coûts réels est manquant.',
+  'ownedProduct.outcomes.unknown.costsIncomplete':
+    'Une ou plusieurs catégories de coûts réels sont inconnues.',
+  'ownedProduct.outcomes.unknown.actualSale':
+    'Un résultat de vente réalisé est manquant.',
+  'ownedProduct.outcomes.unknown.purchaseCostCurrency':
+    'L’achat et les coûts utilisent des devises de reporting différentes.',
+  'ownedProduct.outcomes.unknown.saleCostCurrency':
+    'La vente et les coûts utilisent des devises de reporting différentes.',
+  'ownedProduct.outcomes.unknown.profitUnavailable':
+    'La chaîne complète du bénéfice réalisé est indisponible.',
+  'ownedProduct.outcomes.unknown.unmapped':
+    'Preuve non résolue : {{code}}',
+  'ownedProduct.outcomes.accuracyEyebrow': 'Vérification de l’estimation',
+  'ownedProduct.outcomes.accuracyTitle': 'Précision de l’estimation',
+  'ownedProduct.outcomes.accuracyDescription':
+    'Comparez l’estimation d’achat originale exacte aux montants réels immuables. Procura affiche les erreurs par métrique, jamais un score global trompeur.',
+  'ownedProduct.outcomes.accuracyUnknownSource':
+    'Source de l’estimation inconnue',
+  'ownedProduct.outcomes.accuracyMissing':
+    'Un résultat complet existe, mais il n’est pas encore lié à l’estimation exacte ayant guidé l’achat.',
+  'ownedProduct.outcomes.accuracyNeedsOutcome':
+    'Complétez la chaîne d’achat, de coûts et de vente réalisée avant de mesurer la précision.',
+  'ownedProduct.outcomes.accuracyAttributionEyebrow':
+    'Attribution explicite',
+  'ownedProduct.outcomes.accuracyAttributionTitle':
+    'Lier l’estimation d’achat originale',
+  'ownedProduct.outcomes.accuracyAttributionDescription':
+    'Sélectionnez l’analyse exacte utilisée pour cette transaction. Les noms de produits et états du workflow ne servent jamais à déduire cette relation.',
+  'ownedProduct.outcomes.accuracySearchLabel':
+    'Rechercher dans les estimations historiques',
+  'ownedProduct.outcomes.accuracySearchPlaceholder':
+    'Titre de l’annonce ou identifiant d’analyse',
+  'ownedProduct.outcomes.accuracySearchAction': 'Rechercher',
+  'ownedProduct.outcomes.accuracyNoCandidates':
+    'Aucune estimation admissible ne correspond à cette recherche.',
+  'ownedProduct.outcomes.accuracyEstimate': 'Estimation d’achat originale',
+  'ownedProduct.outcomes.accuracyChooseEstimate':
+    'Choisir une estimation exacte',
+  'ownedProduct.outcomes.accuracyLoadingCandidates':
+    'Chargement des estimations admissibles…',
+  'ownedProduct.outcomes.accuracyReasonCode':
+    'Code de motif d’attribution',
+  'ownedProduct.outcomes.accuracyCorrectionExample':
+    'mauvaise_estimation_corrigee',
+  'ownedProduct.outcomes.accuracyRecord':
+    'Enregistrer l’attribution et calculer la précision',
+  'ownedProduct.outcomes.accuracyRequired':
+    'Choisissez une estimation exacte admissible et complétez la preuve d’attribution. Toute correction exige un motif.',
+  'ownedProduct.outcomes.accuracyRecorded':
+    'L’attribution immuable et le rapport de précision ont été enregistrés.',
+  'ownedProduct.outcomes.accuracyCandidatesError':
+    'Les estimations d’achat admissibles n’ont pas pu être chargées.',
+  'ownedProduct.outcomes.accuracySaveError':
+    'L’attribution et le rapport de précision n’ont pas pu être enregistrés.',
+  'ownedProduct.outcomes.accuracy.expected': 'Attendu',
+  'ownedProduct.outcomes.accuracy.actual': 'Réel',
+  'ownedProduct.outcomes.accuracy.signedError': 'Erreur signée',
+  'ownedProduct.outcomes.accuracy.absoluteError': 'Erreur absolue',
+  'ownedProduct.outcomes.accuracy.percentageError': 'Erreur en pourcentage',
+  'ownedProduct.outcomes.accuracy.sourceExpected':
+    'Valeur attendue originale',
+  'ownedProduct.outcomes.accuracy.notes': 'Notes de comparabilité',
+  'ownedProduct.outcomes.accuracy.purchase': 'Prix d’achat',
+  'ownedProduct.outcomes.accuracy.costs': 'Coûts supplémentaires',
+  'ownedProduct.outcomes.accuracy.sale': 'Produit de la vente',
+  'ownedProduct.outcomes.accuracy.profit': 'Bénéfice net',
+  'ownedProduct.outcomes.accuracy.unknownMetric': 'Métrique : {{code}}',
+  'ownedProduct.outcomes.accuracy.status.calculated': 'Calculé',
+  'ownedProduct.outcomes.accuracy.status.partial':
+    'Partiellement comparable',
+  'ownedProduct.outcomes.accuracy.status.unavailable': 'Indisponible',
+  'ownedProduct.outcomes.accuracy.reason.identity':
+    'L’estimation et le résultat utilisent la même devise.',
+  'ownedProduct.outcomes.accuracy.reason.datedRate':
+    'Les valeurs attendues utilisent la preuve exacte du taux de change disponible lors de l’estimation.',
+  'ownedProduct.outcomes.accuracy.reason.calculated':
+    'Toutes les métriques monétaires comparables ont été calculées.',
+  'ownedProduct.outcomes.accuracy.reason.exchangeRateMissing':
+    'Aucune preuve exacte et datée du taux de change n’existe ; les comparaisons converties sont indisponibles.',
+  'ownedProduct.outcomes.accuracy.reason.exchangeRateStale':
+    'Le taux de change daté disponible est obsolète ; les comparaisons converties sont indisponibles.',
+  'ownedProduct.outcomes.accuracy.reason.costCategories':
+    'Les coûts supplémentaires ne sont pas comparés, car la réserve attendue et le marketing réel sont des catégories différentes.',
+  'ownedProduct.outcomes.accuracy.reason.durationUnavailable':
+    'La durée réelle de vente est conservée, mais l’estimation originale ne contenait aucune durée attendue.',
+  'ownedProduct.outcomes.accuracy.reason.zeroDenominator':
+    'L’erreur en pourcentage est indisponible, car la valeur attendue est nulle.',
+  'ownedProduct.outcomes.accuracy.reason.percentageRange':
+    'L’erreur en pourcentage dépasse la plage de reporting prise en charge.',
+  'ownedProduct.outcomes.accuracy.reason.unmapped':
+    'Preuve de calcul : {{code}}',
+  'ownedProduct.outcomes.boundary':
+    'Preuves réalisées uniquement : prix affichés, estimations, réservations et décisions « acheté » ne sont jamais traités comme de l’argent réel. Procura ne traite aucun paiement et ne modifie aucune annonce externe.',
+  'common.edit': 'Modifier',
+  'common.archive': 'Archiver',
+  'route.savedSearches': 'Recherches enregistrées',
+  'route.createSavedSearch': 'Créer une recherche enregistrée',
+  'route.editSavedSearch': 'Modifier la recherche enregistrée',
+  'route.savedSearchDetail': 'Détail de la recherche enregistrée',
+  'route.notifications': 'Notifications',
+  'shell.savedSearches': 'Recherches enregistrées',
+  'shell.notifications': 'Notifications',
+  'savedSearch.state.active': 'Active',
+  'savedSearch.state.paused': 'En pause',
+  'savedSearch.state.archived': 'Archivée',
+  'savedSearch.match.matched': 'Correspondance',
+  'savedSearch.match.notMatched': 'Aucune correspondance',
+  'savedSearch.match.insufficient': 'Preuves requises',
+  'savedSearch.notConfigured': 'Non configuré',
+  'savedSearch.anyPrice': 'Tout prix demandé',
+  'savedSearch.upToPrice': 'Jusqu’à {{price}}',
+  'savedSearch.fromPrice': 'À partir de {{price}}',
+  'savedSearch.priceRange': '{{minimum}} – {{maximum}}',
+  'savedSearch.anyMarket': 'Tout marché',
+  'savedSearchList.eyebrow': 'Suivi des opportunités',
+  'savedSearchList.title': 'Recherches enregistrées',
+  'savedSearchList.description':
+    'Définissez des seuils explicites de marché et de décision, puis examinez les correspondances déterministes sans franchir les limites de l’espace de travail.',
+  'savedSearchList.create': 'Créer une recherche enregistrée',
+  'savedSearchList.searchPlaceholder': 'Rechercher dans les recherches enregistrées',
+  'savedSearchList.state': 'État',
+  'savedSearchList.apply': 'Appliquer',
+  'savedSearchList.loadError':
+    'Impossible de charger les recherches enregistrées.',
+  'savedSearchList.loading': 'Chargement des recherches enregistrées…',
+  'savedSearchList.emptyTitle': 'Aucune recherche enregistrée dans cette vue',
+  'savedSearchList.emptyDescription':
+    'Créez une règle de suivi ou choisissez un autre filtre d’état.',
+  'savedSearchList.createFirst': 'Créer la première recherche enregistrée',
+  'savedSearchList.readOnly':
+    'Votre rôle peut consulter les recherches enregistrées, mais pas les modifier.',
+  'savedSearchList.aria': 'Recherches enregistrées',
+  'savedSearchList.matches': 'Correspondances',
+  'savedSearchList.evaluations': 'Évaluations',
+  'savedSearchList.version': 'Version',
+  'savedSearchList.loadingMore': 'Chargement…',
+  'savedSearchList.loadMore': 'Charger davantage',
+  'savedSearchForm.back': 'Retour aux recherches enregistrées',
+  'savedSearchForm.eyebrow': 'Règle de suivi',
+  'savedSearchForm.createTitle': 'Créer une recherche enregistrée',
+  'savedSearchForm.editTitle': 'Modifier la recherche enregistrée',
+  'savedSearchForm.description':
+    'Chaque modification enregistrée crée une version immuable des critères. Les preuves financières ou géographiques manquantes sont signalées comme inconnues, jamais inventées.',
+  'savedSearchForm.loading': 'Chargement de la configuration du suivi…',
+  'savedSearchForm.loadError':
+    'Impossible de charger la configuration de la recherche enregistrée.',
+  'savedSearchForm.identityTitle': 'Identité et état',
+  'savedSearchForm.identityDescription':
+    'Utilisez un nom qui décrit l’opportunité suivie par cette règle.',
+  'savedSearchForm.name': 'Nom de la recherche enregistrée',
+  'savedSearchForm.namePlaceholder': 'Perceuses professionnelles en Allemagne',
+  'savedSearchForm.activeImmediately': 'Évaluer cette recherche immédiatement',
+  'savedSearchForm.catalogTitle': 'Périmètre produit canonique',
+  'savedSearchForm.catalogDescription':
+    'Utilisez le catalogue lorsque la règle doit cibler une catégorie, une marque ou un modèle précis.',
+  'savedSearchForm.catalogScope': 'Périmètre de correspondance',
+  'savedSearchForm.scopeCategory': 'Catégorie de produit',
+  'savedSearchForm.scopeBrand': 'Marque',
+  'savedSearchForm.scopeModel': 'Modèle précis',
+  'savedSearchForm.category': 'Catégorie',
+  'savedSearchForm.anyCategory': 'Toute catégorie',
+  'savedSearchForm.productSearch': 'Trouver un produit canonique',
+  'savedSearchForm.productPlaceholder':
+    'Rechercher par marque, modèle ou numéro de modèle',
+  'savedSearchForm.productSearchAction': 'Rechercher dans le catalogue',
+  'savedSearchForm.productSearching': 'Recherche…',
+  'savedSearchForm.productQueryMinimum':
+    'Saisissez au moins deux caractères exploitables.',
+  'savedSearchForm.productSearchError':
+    'Impossible d’interroger le catalogue de produits.',
+  'savedSearchForm.selectCatalogResult':
+    'Sélectionnez un résultat du catalogue pour une correspondance par marque ou modèle précis.',
+  'savedSearchForm.selectedCatalog': 'Périmètre de catalogue sélectionné',
+  'savedSearchForm.marketTitle': 'Marché et distance',
+  'savedSearchForm.marketDescription':
+    'Limitez la recherche par continent, pays, ville et intention transfrontalière.',
+  'savedSearchForm.continent': 'Continent',
+  'savedSearchForm.anyContinent': 'Tout continent',
+  'savedSearchForm.countries': 'Pays',
+  'savedSearchForm.countriesHelp':
+    'Utilisez Ctrl ou Command pour sélectionner plusieurs pays.',
+  'savedSearchForm.city': 'Ville',
+  'savedSearchForm.cityPlaceholder': 'Berlin',
+  'savedSearchForm.radius': 'Rayon (km)',
+  'savedSearchForm.radiusEvidence':
+    'Le rayon reste en attente jusqu’à disponibilité des coordonnées ; Procura n’invente aucune distance.',
+  'savedSearchForm.crossBorder': 'Inclure les annonces transfrontalières',
+  'savedSearchForm.priceTitle': 'Fourchette de prix demandé',
+  'savedSearchForm.priceDescription':
+    'Les comparaisons exigent exactement la même devise ; aucune conversion implicite n’est effectuée.',
+  'savedSearchForm.minimumPrice': 'Prix minimum',
+  'savedSearchForm.maximumPrice': 'Prix maximum',
+  'savedSearchForm.currency': 'Devise du prix',
+  'savedSearchForm.chooseCurrency': 'Choisir une devise',
+  'savedSearchForm.moneyPlaceholder': '0,00',
+  'savedSearchForm.qualityTitle':
+    'Seuils de bénéfice, marge, qualité de l’affaire et risque',
+  'savedSearchForm.qualityDescription':
+    'Les seuils facultatifs utilisent les preuves d’analyse immuables actuelles de chaque instantané d’annonce.',
+  'savedSearchForm.minimumProfit': 'Bénéfice attendu minimum',
+  'savedSearchForm.profitCurrency': 'Devise du bénéfice',
+  'savedSearchForm.minimumMargin': 'Marge minimale (%)',
+  'savedSearchForm.minimumDealScore': 'Score d’affaire minimum (0–100)',
+  'savedSearchForm.maximumRisk': 'Score de risque maximum (0–100)',
+  'savedSearchForm.evidenceBoundary':
+    'Si un résultat d’analyse requis manque, l’évaluation est marquée « preuves requises » et aucune alerte n’est envoyée.',
+  'savedSearchForm.keywordsTitle': 'Mots-clés et diffusion',
+  'savedSearchForm.keywordsDescription':
+    'Utilisez des termes requis et exclus séparés par des virgules pour conserver une correspondance textuelle vérifiable.',
+  'savedSearchForm.requiredKeywords': 'Mots-clés requis',
+  'savedSearchForm.requiredPlaceholder': 'bosch, batterie, chargeur',
+  'savedSearchForm.excludedKeywords': 'Mots-clés exclus',
+  'savedSearchForm.excludedPlaceholder': 'cassé, pièces uniquement',
+  'savedSearchForm.deliveryTitle': 'Canaux de livraison',
+  'savedSearchForm.inAppDelivery':
+    'Une annonce correspondante est diffusée dans le centre de notifications Procura du propriétaire.',
+  'savedSearchForm.emailDelivery':
+    'Envoyer aussi un e-mail localisé lorsque cette recherche correspond.',
+  'savedSearchForm.emailUnavailable':
+    'La livraison par e-mail n’est pas activée pour le forfait actif.',
+  'savedSearchForm.telegramDelivery':
+    'Envoyer aussi un message Telegram localisé lorsque cette recherche correspond.',
+  'savedSearchForm.telegramUnavailable':
+    'Telegram nécessite un forfait autorisé et une connexion personnelle vérifiée.',
+  'savedSearchForm.telegramManage': 'Gérer la connexion Telegram',
+  'savedSearchForm.deliveryBoundary':
+    'L’e-mail et Telegram utilisent des files indépendantes sûres en cas de nouvelle tentative et des registres de livraison immuables.',
+  'savedSearchForm.roleError':
+    'Votre rôle ne peut pas gérer les recherches enregistrées.',
+  'savedSearchForm.validationError':
+    'Vérifiez les champs obligatoires de la recherche enregistrée.',
+  'savedSearchForm.numberError':
+    'Vérifiez les valeurs de prix, pourcentage, rayon, score d’affaire et risque.',
+  'savedSearchForm.priceRangeError':
+    'Le prix minimum ne peut pas être supérieur au prix maximum.',
+  'savedSearchForm.currencyError':
+    'Choisissez la devise exacte pour chaque seuil monétaire.',
+  'savedSearchForm.saveError':
+    'Impossible d’enregistrer la recherche.',
+  'savedSearchForm.saving': 'Enregistrement…',
+  'savedSearchForm.saveChanges': 'Enregistrer une nouvelle version',
+  'savedSearchForm.createAction': 'Créer la recherche enregistrée',
+  'savedSearchDetail.back': 'Retour aux recherches enregistrées',
+  'savedSearchDetail.eyebrow': 'Contrôle de la recherche enregistrée',
+  'savedSearchDetail.loading': 'Chargement des preuves de la recherche…',
+  'savedSearchDetail.loadError':
+    'Impossible de charger la recherche enregistrée.',
+  'savedSearchDetail.updateError':
+    'Impossible de modifier l’état de la recherche enregistrée.',
+  'savedSearchDetail.archiveError':
+    'Impossible d’archiver la recherche enregistrée.',
+  'savedSearchDetail.matchesError':
+    'Impossible de charger les évaluations de correspondance.',
+  'savedSearchDetail.version': 'Version {{version}}',
+  'savedSearchDetail.updated': 'Mise à jour {{date}}',
+  'savedSearchDetail.pause': 'Mettre en pause',
+  'savedSearchDetail.resume': 'Reprendre',
+  'savedSearchDetail.archiveConfirmTitle':
+    'Archiver cette recherche enregistrée ?',
+  'savedSearchDetail.archiveConfirmDescription':
+    'L’archivage est définitif. Les versions, évaluations et notifications historiques restent vérifiables.',
+  'savedSearchDetail.archiveConfirmAction': 'Archiver définitivement',
+  'savedSearchDetail.matchedListings': 'Annonces correspondantes',
+  'savedSearchDetail.totalEvaluations': 'Total des évaluations',
+  'savedSearchDetail.delivery': 'Canal de diffusion',
+  'savedSearchDetail.inApp': 'Dans l’application',
+  'savedSearchDetail.inAppEmail': 'Dans l’application + e-mail',
+  'savedSearchDetail.inAppTelegram': 'Dans l’application + Telegram',
+  'savedSearchDetail.inAppEmailTelegram':
+    'Dans l’application + e-mail + Telegram',
+  'savedSearchDetail.criteriaTitle': 'Critères actuels',
+  'savedSearchDetail.criteriaDescription':
+    'Il s’agit des critères exacts utilisés par la version actuelle du moteur de correspondance.',
+  'savedSearchDetail.catalog': 'Périmètre produit',
+  'savedSearchDetail.anyProduct': 'Tout produit',
+  'savedSearchDetail.market': 'Marché',
+  'savedSearchDetail.price': 'Prix demandé',
+  'savedSearchDetail.minimumProfit': 'Bénéfice minimum',
+  'savedSearchDetail.minimumMargin': 'Marge minimale',
+  'savedSearchDetail.dealScore': 'Score d’affaire minimum',
+  'savedSearchDetail.maximumRisk': 'Risque maximum',
+  'savedSearchDetail.requiredKeywords': 'Mots-clés requis',
+  'savedSearchDetail.matchesTitle': 'Journal des évaluations',
+  'savedSearchDetail.matchesDescription':
+    'Chaque ligne est liée à un instantané immuable de l’annonce et aux preuves exactes disponibles au moment de l’évaluation.',
+  'savedSearchDetail.matchFilter': 'Résultat',
+  'savedSearchDetail.allEvaluations': 'Toutes les évaluations',
+  'savedSearchDetail.noMatchesTitle': 'Aucune évaluation pour le moment',
+  'savedSearchDetail.noMatchesDescription':
+    'Les annonces actives et les nouvelles preuves seront évaluées par la file.',
+  'savedSearchDetail.unknownListing': 'Annonce inconnue',
+  'savedSearchDetail.historyTitle': 'Historique des critères',
+  'savedSearchDetail.historyDescription':
+    'Les versions ajoutées uniquement préservent qui a modifié la règle, quand et pourquoi.',
+  'notificationList.eyebrow': 'Diffusion dans l’application',
+  'notificationList.title': 'Notifications',
+  'notificationList.description':
+    'Consultez les correspondances de recherches enregistrées diffusées uniquement à votre compte dans l’espace de travail actif.',
+  'notificationList.unread': 'Non lues',
+  'notificationList.filter': 'Afficher',
+  'notificationList.all': 'Toutes les notifications actuelles',
+  'notificationList.unreadOnly': 'Non lues uniquement',
+  'notificationList.readOnly': 'Lues uniquement',
+  'notificationList.loadError':
+    'Impossible de charger les notifications.',
+  'notificationList.stateError':
+    'Impossible de modifier l’état de la notification.',
+  'notificationList.loading': 'Chargement des notifications…',
+  'notificationList.emptyTitle': 'Aucune notification dans cette vue',
+  'notificationList.emptyDescription':
+    'Les nouvelles correspondances déterministes apparaîtront ici.',
+  'notificationList.aria': 'Notifications dans l’application',
+  'notificationList.savedSearchMatch':
+    'Correspondance de recherche enregistrée',
+  'notificationList.emailDelivery': 'Livraison par e-mail',
+  'notificationList.emailQueued': 'En file',
+  'notificationList.emailAttempting': 'Envoi en cours',
+  'notificationList.emailDelivered': 'Livré',
+  'notificationList.emailFailed': 'Nouvelle tentative planifiée',
+  'notificationList.emailExhausted': 'Échec de livraison',
+  'notificationList.emailSuppressed': 'Non envoyé',
+  'notificationList.telegramEyebrow': 'Connexion personnelle de livraison',
+  'notificationList.telegramTitle': 'Connexion Telegram',
+  'notificationList.telegramDescription':
+    'Connectez votre compte Telegram privé pour recevoir les alertes de recherches enregistrées autorisées par le forfait.',
+  'notificationList.telegramLoading':
+    'Chargement de l’état de la connexion Telegram.',
+  'notificationList.telegramConnected': 'Connecté',
+  'notificationList.telegramPending':
+    'En attente de confirmation Telegram',
+  'notificationList.telegramDisconnected': 'Non connecté',
+  'notificationList.telegramExpires': 'Le lien sécurisé expire {{date}}',
+  'notificationList.telegramProviderUnavailable':
+    'Le fournisseur Telegram n’est pas configuré dans cet environnement.',
+  'notificationList.telegramPlanUnavailable':
+    'La livraison Telegram n’est pas activée pour le forfait actif.',
+  'notificationList.telegramCreateLink': 'Créer un lien sécurisé',
+  'notificationList.telegramOpen': 'Ouvrir Telegram',
+  'notificationList.telegramRefresh': 'Actualiser le statut',
+  'notificationList.telegramRevoke': 'Révoquer la connexion',
+  'notificationList.telegramSecurity':
+    'Le lien à usage unique et les identifiants Telegram sont chiffrés au repos. La révocation supprime immédiatement les livraisons en attente.',
+  'notificationList.telegramConnectError':
+    'Le lien Telegram sécurisé n’a pas pu être créé.',
+  'notificationList.telegramRevokeError':
+    'La connexion Telegram n’a pas pu être révoquée.',
+  'notificationList.telegramLoadError':
+    'Le statut de la connexion Telegram n’a pas pu être chargé.',
+  'notificationList.telegramDelivery': 'Livraison Telegram',
+  'notificationList.telegramQueued': 'En file',
+  'notificationList.telegramAttempting': 'Envoi en cours',
+  'notificationList.telegramDelivered': 'Livré',
+  'notificationList.telegramFailed': 'Nouvelle tentative planifiée',
+  'notificationList.telegramExhausted': 'Échec de livraison',
+  'notificationList.telegramSuppressed': 'Non envoyé',
+  'notificationList.matchTitle': 'Nouvelle correspondance pour {{search}}',
+  'notificationList.matchBody': '{{listing}} est proposé à {{price}}.',
+  'notificationList.unknownSearch': 'recherche enregistrée',
+  'notificationList.openListing': 'Ouvrir l’annonce',
+  'notificationList.markRead': 'Marquer comme lue',
+  'notificationList.markUnread': 'Marquer comme non lue',
+  'route.marketplaceImports': 'Imports marketplace',
+  'listingList.importCsv': 'Importer un CSV',
+  'marketplaceImport.back': 'Retour aux annonces sources',
+  'marketplaceImport.eyebrow': 'Connecteurs de données approuvés',
+  'marketplaceImport.title': 'Import CSV contrôlé',
+  'marketplaceImport.description':
+    'Importez des preuves sources autorisées via un connecteur privé, traçable et asynchrone.',
+  'marketplaceImport.downloadTemplate': 'Télécharger le modèle CSV',
+  'marketplaceImport.loading': 'Chargement de la politique et de l’historique…',
+  'marketplaceImport.controlledBoundary': 'Périmètre contrôlé',
+  'marketplaceImport.uploadTitle': 'Mettre un fichier autorisé en file',
+  'marketplaceImport.privateEvidence': 'Preuve privée · schéma v1',
+  'marketplaceImport.connectorUnavailable':
+    'Le connecteur CSV autorisé n’est pas approuvé ou actif dans cet environnement.',
+  'marketplaceImport.file': 'Fichier source CSV',
+  'marketplaceImport.filePolicy': 'Un fichier .csv, maximum 5 Mo et 10 000 lignes.',
+  'marketplaceImport.filePolicyError': 'Choisissez un fichier .csv de 5 Mo maximum.',
+  'marketplaceImport.delimiter': 'Séparateur de colonnes',
+  'marketplaceImport.delimiterComma': 'Virgule (,)',
+  'marketplaceImport.delimiterSemicolon': 'Point-virgule (;)',
+  'marketplaceImport.delimiterTab': 'Tabulation',
+  'marketplaceImport.defaultTarget': 'Marché cible par défaut',
+  'marketplaceImport.targetFromFile': 'Lire le pays cible dans chaque ligne',
+  'marketplaceImport.schemaTitle': 'Colonnes requises',
+  'marketplaceImport.schemaColumns':
+    'external_id, marketplace_name, title, source_country_code',
+  'marketplaceImport.schemaDescription':
+    'Le prix exige asking_price_minor et currency_code. target_country_code peut venir de la ligne ou de la valeur par défaut.',
+  'marketplaceImport.attestation':
+    'Je confirme que l’organisation peut traiter et conserver ces données et qu’elles ne proviennent pas de scraping ou d’automatisation de compte interdits.',
+  'marketplaceImport.attestationRequired': 'L’autorisation de la source doit être confirmée.',
+  'marketplaceImport.queueNote':
+    'Le traitement utilise la file des connecteurs. Les lignes invalides sont mises en quarantaine.',
+  'marketplaceImport.submit': 'Mettre l’import en file',
+  'marketplaceImport.submitting': 'Sécurisation du fichier…',
+  'marketplaceImport.roleError': 'Votre rôle ne permet pas d’importer des annonces sources.',
+  'marketplaceImport.requiredError': 'Choisissez un CSV valide et confirmez l’autorisation.',
+  'marketplaceImport.queued': 'L’import a été accepté avec une preuve immuable.',
+  'marketplaceImport.submitError': 'L’import n’a pas pu être mis en file.',
+  'marketplaceImport.loadError': 'La politique ou l’historique n’a pas pu être chargé.',
+  'marketplaceImport.detailsError': 'Les preuves des lignes n’ont pas pu être chargées.',
+  'marketplaceImport.historyEyebrow': 'Registre d’import du tenant',
+  'marketplaceImport.historyTitle': 'Imports récents',
+  'marketplaceImport.refresh': 'Actualiser le statut',
+  'marketplaceImport.refreshing': 'Actualisation…',
+  'marketplaceImport.empty': 'Aucun import CSV dans cet espace.',
+  'marketplaceImport.total': 'Total',
+  'marketplaceImport.imported': 'Importées',
+  'marketplaceImport.rejected': 'Rejetées',
+  'marketplaceImport.duplicates': 'Doublons',
+  'marketplaceImport.reviewRows': 'Examiner les preuves des lignes',
+  'marketplaceImport.rowEvidenceEyebrow': '100 derniers résultats immuables',
+  'marketplaceImport.latestRows': 'Les preuves restent isolées par tenant',
+  'marketplaceImport.noProcessedRows': 'Aucune ligne traitée pour le moment.',
+  'marketplaceImport.rowNumber': 'Ligne CSV',
+  'marketplaceImport.rowStatus': 'Résultat',
+  'marketplaceImport.rowIdentity': 'ID externe',
+  'marketplaceImport.rowErrors': 'Champs invalides',
+  'marketplaceImport.status.pending': 'En attente',
+  'marketplaceImport.status.processing': 'En traitement',
+  'marketplaceImport.status.completed': 'Terminé',
+  'marketplaceImport.status.completedWithErrors': 'Terminé avec des erreurs',
+  'marketplaceImport.status.failed': 'Échec',
+  'marketplaceImport.row.imported': 'Importée',
+  'marketplaceImport.row.rejected': 'Rejetée',
+  'marketplaceImport.row.duplicate': 'Doublon',
+} satisfies TranslationDictionary;

@@ -1,0 +1,119 @@
+<div class="page">
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'savedSearchList.eyebrow' | t }}</p>
+      <h1>{{ 'savedSearchList.title' | t }}</h1>
+      <p>{{ 'savedSearchList.description' | t }}</p>
+    </div>
+    @if (canManage()) {
+      <a class="button button-primary" routerLink="/app/saved-searches/new">
+        {{ 'savedSearchList.create' | t }}
+      </a>
+    }
+  </header>
+
+  <form class="filters" [formGroup]="filters" (ngSubmit)="applyFilters()">
+    <div>
+      <label for="saved-search-query">{{ 'common.search' | t }}</label>
+      <input
+        id="saved-search-query"
+        type="search"
+        formControlName="q"
+        [placeholder]="'savedSearchList.searchPlaceholder' | t"
+      />
+    </div>
+    <div>
+      <label for="saved-search-state">{{ 'savedSearchList.state' | t }}</label>
+      <select id="saved-search-state" formControlName="state">
+        <option value="active">{{ 'savedSearch.state.active' | t }}</option>
+        <option value="paused">{{ 'savedSearch.state.paused' | t }}</option>
+        <option value="archived">{{ 'savedSearch.state.archived' | t }}</option>
+      </select>
+    </div>
+    <button class="button button-primary" type="submit">
+      {{ 'savedSearchList.apply' | t }}
+    </button>
+    <button class="button button-quiet" type="button" (click)="clearFilters()">
+      {{ 'common.clear' | t }}
+    </button>
+  </form>
+
+  @if (error()) {
+    <div class="alert" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" (click)="retry()">{{ 'common.retry' | t }}</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <section class="loading" aria-live="polite">
+      <span></span>
+      <p>{{ 'savedSearchList.loading' | t }}</p>
+    </section>
+  } @else if (records().length === 0 && !error()) {
+    <section class="empty">
+      <span aria-hidden="true">⌕</span>
+      <h2>{{ 'savedSearchList.emptyTitle' | t }}</h2>
+      <p>{{ 'savedSearchList.emptyDescription' | t }}</p>
+      @if (canManage()) {
+        <a class="button button-primary" routerLink="/app/saved-searches/new">
+          {{ 'savedSearchList.createFirst' | t }}
+        </a>
+      } @else {
+        <small>{{ 'savedSearchList.readOnly' | t }}</small>
+      }
+    </section>
+  } @else {
+    <section class="search-grid" [attr.aria-label]="'savedSearchList.aria' | t">
+      @for (search of records(); track search.id) {
+        <a
+          class="search-card"
+          [routerLink]="['/app/saved-searches', search.id]"
+          [attr.data-state]="search.archived ? 'archived' : search.active ? 'active' : 'paused'"
+        >
+          <div class="card-top">
+            <span class="status">{{ state(search) }}</span>
+            <small>{{ date(search.updated_at) }}</small>
+          </div>
+          <div>
+            <h2>{{ search.title }}</h2>
+            <p>{{ market(search) }}</p>
+          </div>
+          <strong>{{ priceRange(search) }}</strong>
+          <dl>
+            <div>
+              <dt>{{ 'savedSearchList.matches' | t }}</dt>
+              <dd>{{ search.matched_count ?? 0 }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'savedSearchList.evaluations' | t }}</dt>
+              <dd>{{ search.match_count }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'savedSearchList.version' | t }}</dt>
+              <dd>{{ search.version_sequence }}</dd>
+            </div>
+          </dl>
+        </a>
+      }
+    </section>
+
+    @if (nextCursor()) {
+      <div class="pagination">
+        <button
+          class="button button-quiet"
+          type="button"
+          [disabled]="loadingMore()"
+          (click)="loadMore()"
+        >
+          {{
+            (loadingMore()
+              ? 'savedSearchList.loadingMore'
+              : 'savedSearchList.loadMore'
+            ) | t
+          }}
+        </button>
+      </div>
+    }
+  }
+</div>

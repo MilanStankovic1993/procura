@@ -1,0 +1,327 @@
+<section class="listing-panel">
+  <header class="section-heading">
+    <div>
+      <p class="eyebrow">{{ 'ownedProduct.listing.eyebrow' | t }}</p>
+      <h2>{{ 'ownedProduct.listing.title' | t }}</h2>
+      <p>{{ 'ownedProduct.listing.description' | t }}</p>
+    </div>
+    <button class="quiet" type="button" [disabled]="loading()" (click)="reload()">
+      {{ 'ownedProduct.listing.refresh' | t }}
+    </button>
+  </header>
+
+  @if (error()) {
+    <div class="notice error" role="alert">{{ error() }}</div>
+  }
+  @if (success()) {
+    <div class="notice success" role="status">{{ success() }}</div>
+  }
+  @if (loading() && !projection()) {
+    <div class="notice" aria-live="polite">
+      {{ 'ownedProduct.listing.loading' | t }}
+    </div>
+  } @else if (projection(); as data) {
+    @if (!data.assessment_current) {
+      <div class="notice warning">
+        <strong>{{ 'ownedProduct.listing.staleTitle' | t }}</strong>
+        <span>{{ 'ownedProduct.listing.staleDescription' | t }}</span>
+      </div>
+    } @else if (data.available_price_bands.length === 0) {
+      <div class="notice warning">
+        <strong>{{ 'ownedProduct.listing.noBandTitle' | t }}</strong>
+        <span>{{ 'ownedProduct.listing.noBandDescription' | t }}</span>
+      </div>
+    }
+
+    @if (data.current_drafts.length > 0) {
+      <div class="draft-grid">
+        @for (draft of data.current_drafts; track draft.id) {
+          <article class="draft" [attr.data-status]="draft.status">
+            <header>
+              <div>
+                <p class="market">
+                  {{ countryName(draft.target_country_code) }} ·
+                  {{ draft.target_currency_code }} ·
+                  {{ languageLabel(draft.listing_language) }}
+                </p>
+                <h3>{{ draft.title }}</h3>
+              </div>
+              <span class="run">#{{ draft.run_number }}</span>
+            </header>
+
+            <div class="draft-badges">
+              <span [attr.data-status]="draft.status">
+                {{ draftStatus(draft.status) }}
+              </span>
+              <span [attr.data-status]="draft.photo_readiness_status">
+                {{ photoStatus(draft.photo_readiness_status) }}
+              </span>
+            </div>
+
+            <dl class="metrics">
+              <div>
+                <dt>{{ 'ownedProduct.listing.targetPrice' | t }}</dt>
+                <dd>
+                  {{
+                    money(
+                      draft.target_asking_price_minor,
+                      draft.target_currency_code
+                    )
+                  }}
+                </dd>
+              </div>
+              <div>
+                <dt>{{ 'ownedProduct.listing.strategyLabel' | t }}</dt>
+                <dd>{{ strategyLabel(draft.price_strategy) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'ownedProduct.listing.photoReadiness' | t }}</dt>
+                <dd>{{ percentage(draft.photo_readiness_basis_points) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'ownedProduct.listing.completeness' | t }}</dt>
+                <dd>{{ percentage(draft.completeness_basis_points) }}</dd>
+              </div>
+            </dl>
+
+            <section class="copy">
+              <h4>{{ 'ownedProduct.listing.generatedDescription' | t }}</h4>
+              <pre>{{ draft.description }}</pre>
+            </section>
+
+            <div class="explanations">
+              <section>
+                <h4>{{ 'ownedProduct.listing.warnings' | t }}</h4>
+                @if (draft.warnings.length === 0) {
+                  <p>{{ 'common.none' | t }}</p>
+                } @else {
+                  <ul>
+                    @for (warning of draft.warnings; track $index) {
+                      <li>{{ code(warning) }}</li>
+                    }
+                  </ul>
+                }
+              </section>
+              <section>
+                <h4>{{ 'ownedProduct.listing.unknowns' | t }}</h4>
+                @if (draft.unknown_facts.length === 0) {
+                  <p>{{ 'common.none' | t }}</p>
+                } @else {
+                  <ul>
+                    @for (unknown of draft.unknown_facts; track $index) {
+                      <li>{{ code(unknown) }}</li>
+                    }
+                  </ul>
+                }
+              </section>
+              <section>
+                <h4>{{ 'ownedProduct.listing.actions' | t }}</h4>
+                @if (draft.verification_actions.length === 0) {
+                  <p>{{ 'common.none' | t }}</p>
+                } @else {
+                  <ul>
+                    @for (action of draft.verification_actions; track $index) {
+                      <li>{{ code(action) }}</li>
+                    }
+                  </ul>
+                }
+              </section>
+            </div>
+
+            <details>
+              <summary>{{ 'ownedProduct.listing.photoChecklist' | t }}</summary>
+              <div class="checklist">
+                @for (item of draft.photo_checklist; track item.id) {
+                  <div class="check" [attr.data-status]="item.status">
+                    <div>
+                      <strong>{{ checkLabel(item) }}</strong>
+                      <span>
+                        {{
+                          'ownedProduct.listing.photoCount'
+                            | t
+                              : {
+                                  observed: item.observed_count,
+                                  required: item.minimum_count,
+                                }
+                        }}
+                      </span>
+                    </div>
+                    <span>{{ checkStatus(item.status) }}</span>
+                  </div>
+                }
+              </div>
+            </details>
+
+            <details>
+              <summary>{{ 'ownedProduct.listing.sourceFacts' | t }}</summary>
+              <div class="facts">
+                @for (fact of draft.facts; track fact.id) {
+                  <div>
+                    <strong>{{ fact.disclosure }}</strong>
+                    <small>
+                      {{ fact.source_kind }} · {{ fact.source_field }}
+                      @if (fact.is_unknown) {
+                        · {{ 'common.unknown' | t }}
+                      }
+                    </small>
+                  </div>
+                }
+              </div>
+            </details>
+
+            <footer>
+              <span>{{ date(draft.generated_at) }}</span>
+              <code [title]="draft.input_hash">{{ shortHash(draft.input_hash) }}</code>
+            </footer>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="empty">
+        <strong>{{ 'ownedProduct.listing.emptyTitle' | t }}</strong>
+        <span>{{ 'ownedProduct.listing.emptyDescription' | t }}</span>
+      </div>
+    }
+
+    @if (canManage()) {
+      <section class="generator">
+        <div class="subheading">
+          <div>
+            <p class="eyebrow">{{ 'ownedProduct.listing.generatorEyebrow' | t }}</p>
+            <h3>{{ 'ownedProduct.listing.generatorTitle' | t }}</h3>
+          </div>
+          <span>{{ 'ownedProduct.listing.explicitChoice' | t }}</span>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+            <div class="wide">
+              <label for="listing-price-band">
+                {{ 'ownedProduct.listing.priceBand' | t }}
+              </label>
+              <select id="listing-price-band" formControlName="price_band_id">
+                <option value="">{{ 'ownedProduct.listing.chooseBand' | t }}</option>
+                @for (band of data.available_price_bands; track band.id) {
+                  <option [value]="band.id">{{ bandLabel(band) }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="listing-strategy">
+                {{ 'ownedProduct.listing.strategyLabel' | t }}
+              </label>
+              <select id="listing-strategy" formControlName="price_strategy">
+                <option value="">
+                  {{ 'ownedProduct.listing.chooseStrategy' | t }}
+                </option>
+                <option value="quick_sale">
+                  {{ 'ownedProduct.listing.strategy.quick_sale' | t }}
+                </option>
+                <option value="recommended">
+                  {{ 'ownedProduct.listing.strategy.recommended' | t }}
+                </option>
+                <option value="ambitious">
+                  {{ 'ownedProduct.listing.strategy.ambitious' | t }}
+                </option>
+              </select>
+            </div>
+            <div>
+              <label for="listing-language">
+                {{ 'ownedProduct.listing.language' | t }}
+              </label>
+              <select id="listing-language" formControlName="listing_language">
+                <option value="">{{ 'ownedProduct.listing.chooseLanguage' | t }}</option>
+                <option value="en">{{ 'language.en' | t }}</option>
+                <option value="de">{{ 'language.de' | t }}</option>
+                <option value="es">{{ 'language.es' | t }}</option>
+                <option value="fr">{{ 'language.fr' | t }}</option>
+                <option value="sr-Latn">{{ 'language.sr-Latn' | t }}</option>
+              </select>
+            </div>
+            <div>
+              <label for="listing-target-price">
+                {{ 'ownedProduct.listing.targetPrice' | t }}
+              </label>
+              <input
+                id="listing-target-price"
+                type="text"
+                inputmode="decimal"
+                formControlName="target_price"
+                autocomplete="off"
+              />
+              @if (selectedBand()) {
+                <small>
+                  {{
+                    'ownedProduct.listing.selectedRange'
+                      | t: { range: selectedRange() }
+                  }}
+                </small>
+              }
+              @if (priceError()) {
+                <small class="field-error">{{ priceError() }}</small>
+              }
+            </div>
+            <div class="wide">
+              <label for="listing-override-reason">
+                {{ 'ownedProduct.listing.overrideReason' | t }}
+              </label>
+              <textarea
+                id="listing-override-reason"
+                rows="3"
+                formControlName="price_override_reason"
+              ></textarea>
+              <small>{{ 'ownedProduct.listing.overrideReasonHint' | t }}</small>
+            </div>
+          </div>
+
+          @if (formError()) {
+            <div class="notice error" role="alert">{{ formError() }}</div>
+          }
+          <button
+            class="primary"
+            type="submit"
+            [disabled]="saving() || !canGenerate()"
+          >
+            {{
+              (saving()
+                ? 'ownedProduct.listing.generating'
+                : 'ownedProduct.listing.generate'
+              ) | t
+            }}
+          </button>
+        </form>
+      </section>
+    }
+
+    @if (data.drafts.length > 0) {
+      <details class="history">
+        <summary>
+          {{
+            'ownedProduct.listing.history'
+              | t: { count: data.drafts.length }
+          }}
+        </summary>
+        <div>
+          @for (draft of data.drafts; track draft.id) {
+            <div>
+              <strong>#{{ draft.run_number }} · {{ draft.title }}</strong>
+              <span>
+                {{ languageLabel(draft.listing_language) }} ·
+                {{ date(draft.generated_at) }}
+              </span>
+              <span>
+                {{
+                  currentDraftIds().has(draft.id)
+                    ? ('ownedProduct.listing.current' | t)
+                    : ('ownedProduct.listing.historical' | t)
+                }}
+              </span>
+            </div>
+          }
+        </div>
+      </details>
+    }
+  }
+
+  <p class="boundary">{{ 'ownedProduct.listing.boundary' | t }}</p>
+</section>

@@ -1,0 +1,166 @@
+<article class="panel">
+  <div class="heading">
+    <div>
+      <p class="eyebrow">{{ 'buyerDecision.eyebrow' | t }}</p>
+      <h2>{{ 'buyerDecision.title' | t }}</h2>
+      <p>{{ 'buyerDecision.description' | t: { run: dealScore().run_number } }}</p>
+    </div>
+    @if (currentDecision(); as current) {
+      <span class="current-state" [attr.data-state]="current.next_state">
+        {{ label(current.next_state) }}
+      </span>
+    } @else {
+      <span class="current-state" data-state="none">{{ 'buyerDecision.none' | t }}</span>
+    }
+  </div>
+
+  <section class="summary">
+    <div>
+      <span>{{ 'buyerDecision.boundary' | t }}</span>
+      <strong>
+        {{ 'buyerDecision.score' | t: {
+          score: dealScore().score ?? ('common.unknown' | t),
+          recommendation: label(dealScore().recommendation)
+        } }}
+      </strong>
+    </div>
+    @if (currentDecision(); as current) {
+      <dl>
+        <div>
+          <dt>{{ 'buyerDecision.recordedBy' | t }}</dt>
+          <dd>{{ current.actor.name }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'buyerDecision.recordedAt' | t }}</dt>
+          <dd>{{ date(current.decided_at) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'buyerDecision.sequence' | t }}</dt>
+          <dd>#{{ current.sequence }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'buyerDecision.reason' | t }}</dt>
+          <dd>{{ current.reason_code ? label(current.reason_code) : ('common.notSpecified' | t) }}</dd>
+        </div>
+      </dl>
+    } @else {
+      <p>{{ 'buyerDecision.emptyCurrent' | t }}</p>
+    }
+  </section>
+
+  @if (error()) {
+    <p class="message error" role="alert">{{ error() }}</p>
+  }
+  @if (success()) {
+    <p class="message success" role="status">{{ success() }}</p>
+  }
+
+  @if (allowedTransitions().length > 0) {
+    @if (canManage()) {
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <fieldset [disabled]="saving()">
+          <div class="fields">
+            <div>
+              <label for="buyer-decision-state">{{ 'buyerDecision.nextState' | t }}</label>
+              <select id="buyer-decision-state" formControlName="next_state">
+                <option value="">{{ 'buyerDecision.chooseState' | t }}</option>
+                @for (state of allowedTransitions(); track state) {
+                  <option [value]="state">{{ label(state) }}</option>
+                }
+              </select>
+              <small>
+                {{ 'buyerDecision.transitionHelp' | t }}
+              </small>
+            </div>
+            <div>
+              <label for="buyer-decision-reason">{{ 'buyerDecision.reasonCode' | t }}</label>
+              <input
+                id="buyer-decision-reason"
+                formControlName="reason_code"
+                [placeholder]="'buyerDecision.reasonPlaceholder' | t"
+                autocomplete="off"
+              />
+              <small>{{ 'buyerDecision.reasonHelp' | t }}</small>
+            </div>
+            <div class="wide">
+              <label for="buyer-decision-note">{{ 'buyerDecision.note' | t }}</label>
+              <textarea
+                id="buyer-decision-note"
+                formControlName="note"
+                rows="3"
+                maxlength="1000"
+                [placeholder]="'buyerDecision.notePlaceholder' | t"
+              ></textarea>
+            </div>
+          </div>
+          <div class="actions">
+            <span>
+              {{ 'buyerDecision.expected' | t }}
+              <code>{{ currentDecision()?.id ?? ('common.none' | t) }}</code>
+            </span>
+            <button class="save" type="submit" [disabled]="saving()">
+              {{ (saving() ? 'buyerDecision.recording' : 'buyerDecision.record') | t }}
+            </button>
+          </div>
+        </fieldset>
+      </form>
+    } @else {
+      <p class="readonly">{{ 'buyerDecision.readOnly' | t }}</p>
+    }
+  } @else {
+    <p class="readonly">
+      {{ 'buyerDecision.noTransitions' | t }}
+    </p>
+  }
+
+  <p class="outcome-warning">
+    {{ 'buyerDecision.warning' | t }}
+  </p>
+
+  <section class="history">
+    <div class="section-title">
+      <h3>{{ 'buyerDecision.history' | t }}</h3>
+      <span>{{ 'buyerDecision.showing' | t: { shown: history().length, total: historyCount() } }}</span>
+    </div>
+
+    @if (history().length === 0) {
+      <p class="empty">{{ 'buyerDecision.emptyHistory' | t }}</p>
+    } @else {
+      <ol>
+        @for (event of history(); track event.id) {
+          <li [attr.data-current-score]="event.deal_score_id === dealScore().id">
+            <div class="event-heading">
+              <div>
+                <span>#{{ event.sequence }}</span>
+                <strong>
+                  {{ event.prior_state ? label(event.prior_state) : ('buyerDecision.none' | t) }}
+                  <b aria-hidden="true">→</b>
+                  {{ label(event.next_state) }}
+                </strong>
+              </div>
+              <span>
+                {{ 'buyerDecision.scoreRun' | t: { run: event.deal_score.run_number } }}
+                @if (event.deal_score_id === dealScore().id) {
+                  · {{ 'common.current' | t }}
+                }
+              </span>
+            </div>
+            <p>
+              {{ 'buyerDecision.eventSummary' | t: {
+                actor: event.actor.name,
+                date: date(event.decided_at),
+                score: event.deal_score.score ?? ('common.unknown' | t)
+              } }}
+            </p>
+            @if (event.reason_code) {
+              <span class="reason">{{ label(event.reason_code) }}</span>
+            }
+            @if (event.note) {
+              <blockquote>{{ event.note }}</blockquote>
+            }
+          </li>
+        }
+      </ol>
+    }
+  </section>
+</article>

@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'billing_checkout_expired' => 'This Checkout request has expired. Start again with a new idempotency key.',
+    'billing_manual_assignment' => 'This workspace has an administrator-managed plan assignment.',
+    'billing_not_configured' => 'Billing Checkout is not configured for this plan and interval.',
+    'billing_operation_in_progress' => 'Another billing operation is already in progress for this workspace.',
+    'billing_portal_unavailable' => 'The billing portal is not available for this workspace.',
+    'billing_provider_invalid_response' => 'The billing provider returned an invalid destination.',
+    'billing_provider_unavailable' => 'The billing provider is temporarily unavailable.',
+    'billing_subscription_exists' => 'Manage the existing subscription through the billing portal.',
+    'buyer_decision_idempotency_conflict' => 'The idempotency key was already used with a different buyer decision command.',
+    'buyer_decision_stale_state' => 'The buyer decision changed. Refresh the analysis before recording another decision.',
+    'idempotency_payload_mismatch' => 'The idempotency key was already used for a different import file.',
+    'privacy_request_idempotency_conflict' => 'The idempotency key was already used with a different privacy request command.',
+    'privacy_request_stale_state' => 'The privacy request changed. Refresh it before recording another transition.',
+    'sale_portfolio_idempotency_conflict' => 'The idempotency key was already used with a different sale portfolio command.',
+    'sale_portfolio_stale_state' => 'The sale portfolio state changed. Refresh before recording another event.',
+    'actual_cost_stale_state' => 'The actual cost evidence changed. Refresh before recording a correction.',
+    'actual_purchase_stale_state' => 'The actual purchase evidence changed. Refresh before recording a correction.',
+    'actual_sale_stale_portfolio_state' => 'The sale portfolio state changed. Refresh before recording the outcome.',
+    'actual_sale_stale_state' => 'The actual sale evidence changed. Refresh before recording another outcome.',
+    'estimate_accuracy_report_stale_state' => 'The estimate accuracy report changed. Refresh before recording.',
+    'estimate_attribution_stale_state' => 'The estimate attribution changed. Refresh before recording.',
+    'outcome_idempotency_conflict' => 'The idempotency key was already used with a different outcome command.',
+];

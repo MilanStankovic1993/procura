@@ -1,0 +1,610 @@
+<div class="page">
+  @if (analysis(); as record) {
+    <a class="back" [routerLink]="['/app/buy', record.listing.id]">{{ 'analysisDetail.backListing' | t }}</a>
+  } @else {
+    <a class="back" routerLink="/app/buy">{{ 'analysisDetail.backListings' | t }}</a>
+  }
+
+  @if (error()) {
+    <div class="alert error" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" (click)="refresh()">{{ 'common.retry' | t }}</button>
+    </div>
+  }
+  @if (success()) {
+    <div class="alert success" role="status">{{ success() }}</div>
+  }
+
+  @if (loading() && !analysis()) {
+    <section class="loading" aria-live="polite">{{ 'analysisDetail.loading' | t }}</section>
+  } @else if (analysis(); as record) {
+    <header>
+      <div>
+        <div class="title-meta">
+          <span class="status" [attr.data-status]="record.status">{{ stepLabel(record.status) }}</span>
+          <span>{{ record.pipeline_version }}</span>
+          <span>{{ 'analysisDetail.createdAt' | t: { date: date(record.created_at) } }}</span>
+        </div>
+        <h1>{{ record.listing.title }}</h1>
+        <p>{{ statusCopy(record.status) }}</p>
+      </div>
+      <button
+        class="button button-quiet"
+        type="button"
+        [disabled]="refreshing()"
+        (click)="refresh()"
+      >
+        {{ (refreshing() ? 'analysisDetail.refreshing' : 'analysisDetail.refresh') | t }}
+      </button>
+    </header>
+
+    <section class="layout">
+      <div class="main-column">
+        @if (record.status === 'draft') {
+          <article class="panel submit-panel">
+            <div>
+              <p class="eyebrow">{{ 'analysisDetail.quotaEyebrow' | t }}</p>
+              <h2>{{ 'analysisDetail.ready' | t }}</h2>
+              <p>{{ 'analysisDetail.quotaDescription' | t }}</p>
+            </div>
+            @if (canManage()) {
+              <button
+                class="button button-primary"
+                type="button"
+                [disabled]="submitting()"
+                (click)="submit()"
+              >
+                {{ (submitting() ? 'analysisDetail.submitting' : 'analysisDetail.submit') | t }}
+              </button>
+            } @else {
+              <span class="readonly">{{ 'analysisDetail.readOnly' | t }}</span>
+            }
+          </article>
+        }
+
+        @if (record.result_payload; as result) {
+          <article class="panel result">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">{{ 'analysisDetail.resultEyebrow' | t }}</p>
+                <h2>{{ 'analysisDetail.extraction' | t }}</h2>
+              </div>
+              <strong>{{ 'analysisDetail.confidenceValue' | t: { value: confidence(result.confidence_basis_points) } }}</strong>
+            </div>
+            <dl>
+              <div><dt>{{ 'analysisDetail.titleField' | t }}</dt><dd>{{ resultValue('title') }}</dd></div>
+              <div><dt>{{ 'analysisDetail.marketplace' | t }}</dt><dd>{{ resultValue('marketplace_name') }}</dd></div>
+              <div><dt>{{ 'analysisDetail.askingMinor' | t }}</dt><dd>{{ resultValue('asking_price_minor') }}</dd></div>
+              <div><dt>{{ 'analysisDetail.currency' | t }}</dt><dd>{{ resultValue('currency_code') }}</dd></div>
+              <div><dt>{{ 'analysisDetail.sourceCountry' | t }}</dt><dd>{{ resultValue('source_country_code') }}</dd></div>
+              <div><dt>{{ 'analysisDetail.targetCountry' | t }}</dt><dd>{{ resultValue('target_country_code') }}</dd></div>
+              <div><dt>{{ 'analysisDetail.evidenceFiles' | t }}</dt><dd>{{ resultValue('evidence_count') }}</dd></div>
+            </dl>
+
+            @if (result.needs_input.length > 0) {
+              <div class="result-group needs-input">
+                <h3>{{ 'analysisDetail.additionalInput' | t }}</h3>
+                <ul>
+                  @for (item of result.needs_input; track $index) {
+                    <li>{{ stepLabel(item) }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            <div class="result-group">
+              <h3>{{ 'analysisDetail.completedSteps' | t }}</h3>
+              <div class="chips">
+                @for (step of result.completed_steps; track $index) {
+                  <span>{{ stepLabel(step) }}</span>
+                }
+              </div>
+            </div>
+            @if (result.pending_steps.length > 0) {
+              <div class="result-group pending">
+                <h3>{{ 'analysisDetail.pendingSteps' | t }}</h3>
+                <div class="chips">
+                  @for (step of result.pending_steps; track $index) {
+                    <span>{{ stepLabel(step) }}</span>
+                  }
+                </div>
+              </div>
+            }
+            @for (warning of result.warnings; track $index) {
+              <p class="warning">{{ warning }}</p>
+            }
+          </article>
+        }
+
+        @if (record.product_match; as match) {
+          <article class="panel product-match">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">{{ 'analysisDetail.catalogEyebrow' | t }}</p>
+                <h2>{{ 'analysisDetail.productMatch' | t }}</h2>
+              </div>
+              <strong class="match-status" [attr.data-status]="match.status">
+                {{ stepLabel(match.status) }}
+              </strong>
+            </div>
+
+            @if (match.product; as product) {
+              <dl>
+                <div><dt>{{ 'analysisDetail.brand' | t }}</dt><dd>{{ product.brand }}</dd></div>
+                <div><dt>{{ 'analysisDetail.model' | t }}</dt><dd>{{ product.model }}</dd></div>
+                <div><dt>{{ 'analysisDetail.modelNumber' | t }}</dt><dd>{{ product.model_number }}</dd></div>
+                <div><dt>{{ 'analysisDetail.variant' | t }}</dt><dd>{{ product.variant ?? ('analysisDetail.modelLevel' | t) }}</dd></div>
+                <div><dt>{{ 'analysisDetail.category' | t }}</dt><dd>{{ product.category }}</dd></div>
+                <div><dt>{{ 'analysisDetail.canonicalKey' | t }}</dt><dd><code>{{ product.canonical_key }}</code></dd></div>
+              </dl>
+            } @else {
+              <p class="empty">
+                {{ 'analysisDetail.noProduct' | t }}
+              </p>
+            }
+
+            <dl class="match-metadata">
+              <div><dt>{{ 'analysisDetail.method' | t }}</dt><dd>{{ stepLabel(match.method) }}</dd></div>
+              <div><dt>{{ 'analysisDetail.matcherVersion' | t }}</dt><dd>{{ match.matcher_version }}</dd></div>
+              <div><dt>{{ 'analysisDetail.confidence' | t }}</dt><dd>{{ confidence(match.confidence_basis_points) }}</dd></div>
+              <div><dt>{{ 'analysisDetail.review' | t }}</dt><dd>{{ stepLabel(match.review_status) }}</dd></div>
+            </dl>
+
+            @if (match.reason_codes.length > 0) {
+              <div class="result-group pending">
+                <h3>{{ 'analysisDetail.decisionEvidence' | t }}</h3>
+                <div class="chips">
+                  @for (reason of match.reason_codes; track $index) {
+                    <span>{{ stepLabel(reason) }}</span>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (match.candidates.length > 0) {
+              <div class="candidate-list">
+                @for (candidate of match.candidates; track candidate.product_model_id + ':' + (candidate.product_variant_id ?? 'model')) {
+                  <div class="candidate">
+                    <div>
+                      <strong>{{ candidate.brand }} · {{ candidate.model }}</strong>
+                      <small>
+                        {{ 'analysisDetail.alias' | t: { alias: candidate.matched_alias } }} ·
+                        {{ stepLabel(candidate.region_compatibility) }}
+                      </small>
+                    </div>
+                    <span>{{ candidate.score }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </article>
+        }
+
+        @if (record.comparable_set; as set) {
+          <article class="panel comparables">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">{{ 'analysisDetail.comparablesEyebrow' | t }}</p>
+                <h2>{{ 'analysisDetail.comparableSelection' | t }}</h2>
+              </div>
+              <strong class="match-status" [attr.data-status]="set.status">
+                {{ stepLabel(set.status) }}
+              </strong>
+            </div>
+
+            <dl>
+              <div>
+                <dt>{{ 'analysisDetail.selected' | t }}</dt>
+                <dd>{{ set.included_count }} / {{ 'analysisDetail.minimum' | t: { count: set.minimum_required } }}</dd>
+              </div>
+              <div><dt>{{ 'analysisDetail.excluded' | t }}</dt><dd>{{ set.excluded_count }}</dd></div>
+              <div><dt>{{ 'analysisDetail.candidatePool' | t }}</dt><dd>{{ set.candidate_count }}</dd></div>
+              <div>
+                <dt>{{ 'analysisDetail.marketBoundary' | t }}</dt>
+                <dd>{{ set.target_country_code }} · {{ set.target_currency_code ?? ('analysisDetail.currencyMissing' | t) }}</dd>
+              </div>
+              <div><dt>{{ 'analysisDetail.selector' | t }}</dt><dd>{{ set.selector_version }}</dd></div>
+              <div><dt>{{ 'analysisDetail.run' | t }}</dt><dd>#{{ set.run_number }}</dd></div>
+            </dl>
+
+            <div class="result-group pending">
+              <h3>{{ 'analysisDetail.selectionState' | t }}</h3>
+              <div class="chips">
+                @for (reason of set.reason_codes; track $index) {
+                  <span>{{ stepLabel(reason) }}</span>
+                }
+              </div>
+            </div>
+
+            @if (set.items.length === 0) {
+              <p class="empty">
+                {{ 'analysisDetail.noComparables' | t }}
+              </p>
+            } @else {
+              <div class="comparable-list">
+                @for (item of set.items; track item.id) {
+                  <section class="comparable" [attr.data-decision]="item.decision">
+                    <div class="comparable-title">
+                      <div>
+                        <span>{{ item.decision }}</span>
+                        <strong>{{ item.evidence.title }}</strong>
+                        <small>
+                          {{ item.evidence.marketplace_name }} ·
+                          {{ item.evidence.country_code }} ·
+                          {{ 'analysisDetail.observed' | t: { date: date(item.evidence.observed_at) } }}
+                        </small>
+                      </div>
+                      <div class="comparable-score">
+                        <strong>{{ comparableMoney(item.evidence) }}</strong>
+                        <small>
+                          @if (item.rank) { #{{ item.rank }} · }
+                          {{ 'analysisDetail.relevance' | t: { value: confidence(item.score_basis_points) } }}
+                        </small>
+                      </div>
+                    </div>
+                    @if (factorEntries(item.factor_scores).length > 0) {
+                      <div class="factor-list">
+                        @for (factor of factorEntries(item.factor_scores); track factor.key) {
+                          <span>{{ stepLabel(factor.key) }} +{{ factor.value }}</span>
+                        }
+                      </div>
+                    }
+                    <div class="reason-list">
+                      @for (reason of item.reason_codes; track $index) {
+                        <span>{{ stepLabel(reason) }}</span>
+                      }
+                    </div>
+                    <app-comparable-market-normalization
+                      [analysisId]="record.id"
+                      [item]="item"
+                      [targetCountryCode]="set.target_country_code"
+                      [targetCurrencyCode]="set.target_currency_code"
+                      [catalog]="marketCatalog()"
+                      [canManage]="canManage()"
+                      (saved)="normalizationSaved()"
+                    />
+                  </section>
+                }
+              </div>
+            }
+
+            <p class="selection-warning">
+              {{ 'analysisDetail.selectionWarning' | t }}
+            </p>
+          </article>
+        }
+
+        @if (record.price_estimate; as estimate) {
+          <app-price-estimate-panel
+            [record]="estimate"
+            [catalog]="marketCatalog()"
+          />
+        }
+
+        @if (record.risk_assessment; as assessment) {
+          <app-risk-assessment-panel [record]="assessment" />
+        }
+
+        @if (record.price_estimate; as estimate) {
+          @if (record.risk_assessment; as assessment) {
+            <app-cost-profit-panel
+              [analysisId]="record.id"
+              [sourceCountryCode]="record.source_country_code"
+              [targetCountryCode]="record.target_country_code"
+              [listingAskingPriceMinor]="record.listing.asking_price_minor"
+              [listingCurrencyCode]="record.listing.currency_code"
+              [priceEstimate]="estimate"
+              [riskAssessment]="assessment"
+              [costInput]="record.cost_input"
+              [profitEstimate]="record.profit_estimate"
+              [catalog]="marketCatalog()"
+              [canManage]="canManage()"
+              (analysisUpdated)="applyCostResult($event)"
+            />
+          }
+        }
+
+        @if (record.deal_score; as dealScore) {
+          <app-deal-score-panel [record]="dealScore" />
+          <app-buyer-decision-panel
+            [analysisId]="record.id"
+            [dealScore]="dealScore"
+            [currentDecision]="record.buyer_decision"
+            [allowedTransitions]="record.buyer_decision_allowed_transitions"
+            [history]="record.buyer_decision_history"
+            [historyCount]="record.buyer_decision_history_count"
+            [canManage]="canManage()"
+            (analysisUpdated)="applyCostResult($event)"
+          />
+        }
+
+        @if (
+          record.comparable_set;
+          as comparableSet
+        ) {
+          @if (record.price_estimate; as estimate) {
+            @if (record.risk_assessment; as assessment) {
+              @if (record.cost_input; as costInput) {
+                @if (record.profit_estimate; as profitEstimate) {
+                  @if (profitEstimate.status !== 'needs_input') {
+                    <app-opportunity-evidence-panel
+                      [analysisId]="record.id"
+                      [sourceCountryCode]="record.source_country_code"
+                      [targetCountryCode]="record.target_country_code"
+                      [comparableSet]="comparableSet"
+                      [priceEstimate]="estimate"
+                      [riskAssessment]="assessment"
+                      [costInput]="costInput"
+                      [profitEstimate]="profitEstimate"
+                      [opportunityInput]="record.opportunity_input"
+                      [logisticsAssessment]="record.logistics_assessment"
+                      [demandAssessment]="record.demand_assessment"
+                      [canManage]="canManage()"
+                      (analysisUpdated)="applyCostResult($event)"
+                    />
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        @if (
+          record.product_match?.status === 'matched' &&
+          canManage()
+        ) {
+          <article class="panel comparable-intake">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">{{ 'analysisDetail.comparableEyebrow' | t }}</p>
+                <h2>{{ 'analysisDetail.addComparable' | t }}</h2>
+              </div>
+              <span>{{ 'analysisDetail.appendOnly' | t }}</span>
+            </div>
+
+            @if (comparableError()) {
+              <p class="failure" role="alert">{{ comparableError() }}</p>
+            }
+
+            @if (marketCatalog()) {
+              <form [formGroup]="comparableForm" (ngSubmit)="submitComparable()">
+                <div class="comparable-fields">
+                  <div>
+                    <label for="comparable-marketplace">{{ 'analysisDetail.marketplaceRequired' | t }}</label>
+                    <input id="comparable-marketplace" formControlName="marketplace_name" />
+                  </div>
+                  <div>
+                    <label for="comparable-external-id">{{ 'analysisDetail.externalId' | t }}</label>
+                    <input id="comparable-external-id" formControlName="external_id" />
+                  </div>
+                  <div class="wide">
+                    <label for="comparable-url">{{ 'analysisDetail.sourceUrl' | t }}</label>
+                    <input
+                      id="comparable-url"
+                      type="url"
+                      formControlName="source_url"
+                      placeholder="https://marketplace.example/listing/…"
+                    />
+                    <small>{{ 'analysisDetail.sourceIdentityRequired' | t }}</small>
+                  </div>
+                  <div class="wide">
+                    <label for="comparable-title">{{ 'analysisDetail.originalTitle' | t }}</label>
+                    <input id="comparable-title" formControlName="title" />
+                  </div>
+                  <div class="wide">
+                    <label for="comparable-description">{{ 'analysisDetail.originalDescription' | t }}</label>
+                    <textarea
+                      id="comparable-description"
+                      rows="3"
+                      formControlName="description"
+                    ></textarea>
+                  </div>
+                  <div>
+                    <label for="comparable-price">{{ 'analysisDetail.askingPrice' | t }}</label>
+                    <input
+                      id="comparable-price"
+                      inputmode="decimal"
+                      formControlName="price"
+                      placeholder="199.99"
+                    />
+                    @if (comparablePriceError()) {
+                      <small class="field-error">{{ comparablePriceError() }}</small>
+                    }
+                  </div>
+                  <div>
+                    <label for="comparable-currency">{{ 'analysisDetail.originalCurrency' | t }}</label>
+                    <select id="comparable-currency" formControlName="currency_code">
+                      <option value="">{{ 'analysisDetail.chooseCurrency' | t }}</option>
+                      @for (currency of marketCatalog()?.currencies ?? []; track currency.code) {
+                        <option [value]="currency.code">
+                          {{ currency.code }} · {{ currencyName(currency.code, currency.name) }}
+                        </option>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label for="comparable-country">{{ 'analysisDetail.listingCountry' | t }}</label>
+                    <select id="comparable-country" formControlName="country_code">
+                      <option value="">{{ 'analysisDetail.chooseCountry' | t }}</option>
+                      @for (continent of marketCatalog()?.continents ?? []; track continent.code) {
+                        <optgroup [label]="continentName(continent.code, continent.name)">
+                          @for (country of continent.countries; track country.code) {
+                            <option [value]="country.code">
+                              {{ countryName(country.code, country.name) }} ({{ country.code }})
+                            </option>
+                          }
+                        </optgroup>
+                      }
+                    </select>
+                  </div>
+                  <div>
+                    <label for="comparable-location">{{ 'analysisDetail.location' | t }}</label>
+                    <input id="comparable-location" formControlName="location" />
+                  </div>
+                  <div>
+                    <label for="comparable-type">{{ 'analysisDetail.listingType' | t }}</label>
+                    <select id="comparable-type" formControlName="listing_type">
+                      <option value="product">{{ 'analysisDetail.type.product' | t }}</option>
+                      <option value="spare_part">{{ 'analysisDetail.type.sparePart' | t }}</option>
+                      <option value="broken_only">{{ 'analysisDetail.type.brokenOnly' | t }}</option>
+                      <option value="wanted">{{ 'analysisDetail.type.wanted' | t }}</option>
+                      <option value="rental">{{ 'analysisDetail.type.rental' | t }}</option>
+                      <option value="unclear_bundle">{{ 'analysisDetail.type.bundle' | t }}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="comparable-condition">{{ 'analysisDetail.condition' | t }}</label>
+                    <select id="comparable-condition" formControlName="condition_code">
+                      <option value="new">{{ 'analysisDetail.condition.new' | t }}</option>
+                      <option value="like_new">{{ 'analysisDetail.condition.likeNew' | t }}</option>
+                      <option value="used_good">{{ 'analysisDetail.condition.usedGood' | t }}</option>
+                      <option value="used_fair">{{ 'analysisDetail.condition.usedFair' | t }}</option>
+                      <option value="used_poor">{{ 'analysisDetail.condition.usedPoor' | t }}</option>
+                      <option value="broken">{{ 'analysisDetail.condition.broken' | t }}</option>
+                      <option value="unknown">{{ 'common.unknown' | t }}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="comparable-seller">{{ 'analysisDetail.sellerType' | t }}</label>
+                    <select id="comparable-seller" formControlName="seller_type">
+                      <option value="private">{{ 'analysisDetail.seller.private' | t }}</option>
+                      <option value="business">{{ 'analysisDetail.seller.business' | t }}</option>
+                      <option value="unknown">{{ 'common.unknown' | t }}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="comparable-observed">{{ 'analysisDetail.observedAt' | t }}</label>
+                    <input
+                      id="comparable-observed"
+                      type="datetime-local"
+                      formControlName="observed_at"
+                    />
+                  </div>
+                  <div>
+                    <label for="comparable-published">{{ 'analysisDetail.publishedAt' | t }}</label>
+                    <input
+                      id="comparable-published"
+                      type="datetime-local"
+                      formControlName="published_at"
+                    />
+                  </div>
+                  <div class="wide">
+                    <label for="comparable-included">{{ 'analysisDetail.includedAccessories' | t }}</label>
+                    <input
+                      id="comparable-included"
+                      formControlName="included_accessories"
+                      [placeholder]="'analysisDetail.includedPlaceholder' | t"
+                    />
+                    <small>{{ 'analysisDetail.commaFacts' | t }}</small>
+                  </div>
+                  <div class="wide">
+                    <label for="comparable-missing">{{ 'analysisDetail.missingAccessories' | t }}</label>
+                    <input
+                      id="comparable-missing"
+                      formControlName="missing_accessories"
+                      [placeholder]="'analysisDetail.missingPlaceholder' | t"
+                    />
+                  </div>
+                </div>
+                <footer class="comparable-footer">
+                  <p>
+                    {{ 'analysisDetail.immutableComparable' | t }}
+                  </p>
+                  <button
+                    class="button button-primary"
+                    type="submit"
+                    [disabled]="savingComparable()"
+                  >
+                    {{ (savingComparable() ? 'analysisDetail.savingEvidence' : 'analysisDetail.saveEvidence') | t }}
+                  </button>
+                </footer>
+              </form>
+            } @else {
+              <p class="empty">{{ 'analysisDetail.loadingReferences' | t }}</p>
+            }
+          </article>
+        }
+
+        <article class="panel provenance">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{{ 'analysisDetail.requestEyebrow' | t }}</p>
+              <h2>{{ 'analysisDetail.provenance' | t }}</h2>
+            </div>
+            <code [title]="record.request_hash">{{ record.request_hash.slice(0, 12) }}…</code>
+          </div>
+          <dl>
+            <div><dt>{{ 'analysisDetail.listingSnapshot' | t }}</dt><dd>#{{ record.request_payload.listing.snapshot_sequence }}</dd></div>
+            <div><dt>{{ 'analysisDetail.snapshotHash' | t }}</dt><dd><code>{{ record.request_payload.listing.snapshot_content_hash.slice(0, 12) }}…</code></dd></div>
+            <div><dt>{{ 'analysisDetail.marketRoute' | t }}</dt><dd>{{ record.source_country_code }} → {{ record.target_country_code }}</dd></div>
+            <div><dt>{{ 'analysisDetail.evidenceCaptured' | t }}</dt><dd>{{ 'common.files' | t: { count: record.request_payload.evidence.length } }}</dd></div>
+            <div><dt>{{ 'analysisDetail.askingMinor' | t }}</dt><dd>{{ record.request_payload.listing.asking_price_minor ?? ('analysisDetail.missing' | t) }}</dd></div>
+            <div><dt>{{ 'analysisDetail.currency' | t }}</dt><dd>{{ record.request_payload.listing.currency_code ?? ('analysisDetail.missing' | t) }}</dd></div>
+          </dl>
+        </article>
+
+        <article class="panel attempts">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{{ 'analysisDetail.processingEyebrow' | t }}</p>
+              <h2>{{ 'analysisDetail.attemptHistory' | t }}</h2>
+            </div>
+            <span>{{ 'analysisDetail.attempts' | t: { count: record.attempts.length } }}</span>
+          </div>
+          @if (record.attempts.length === 0) {
+            <p class="empty">{{ 'analysisDetail.noAttempts' | t }}</p>
+          } @else {
+            <div class="timeline">
+              @for (attempt of record.attempts; track attempt.id) {
+                <div class="attempt">
+                  <span>#{{ attempt.attempt_number }}</span>
+                  <div>
+                    <strong>{{ stepLabel(attempt.status) }} · {{ attempt.provider }} / {{ attempt.model }}</strong>
+                    <p>
+                      {{ attempt.prompt_version }} ·
+                      {{ 'analysisDetail.validation' | t: { status: stepLabel(attempt.validation_status) } }} ·
+                      {{ 'analysisDetail.confidenceInline' | t: { value: confidence(attempt.confidence_basis_points) } }}
+                    </p>
+                    <small>{{ date(attempt.started_at) }} → {{ date(attempt.completed_at) }}</small>
+                    @if (attempt.error) {
+                      <pre>{{ attempt.error }}</pre>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </article>
+      </div>
+
+      <aside>
+        <section class="panel">
+          <p class="eyebrow">{{ 'analysisDetail.requestState' | t }}</p>
+          <h2>{{ stepLabel(record.status) }}</h2>
+          <dl class="vertical">
+            <div><dt>{{ 'analysisDetail.submitted' | t }}</dt><dd>{{ date(record.submitted_at) }}</dd></div>
+            <div><dt>{{ 'analysisDetail.finished' | t }}</dt><dd>{{ date(record.finished_at) }}</dd></div>
+            <div><dt>{{ 'analysisDetail.processingAttempts' | t }}</dt><dd>{{ record.processing_attempts }}</dd></div>
+            <div><dt>{{ 'analysisDetail.nextRetry' | t }}</dt><dd>{{ date(record.next_retry_at) }}</dd></div>
+          </dl>
+          @if (record.last_error_message) {
+            <p class="failure">{{ record.last_error_message }}</p>
+          }
+        </section>
+
+        @if (record.current_dispatch; as dispatch) {
+          <section class="panel">
+            <p class="eyebrow">{{ 'analysisDetail.queueOutbox' | t }}</p>
+            <h2>{{ stepLabel(dispatch.status) }}</h2>
+            <dl class="vertical">
+              <div><dt>{{ 'analysisDetail.queue' | t }}</dt><dd>{{ dispatch.queue_name }}</dd></div>
+              <div><dt>{{ 'analysisDetail.dispatchAttempts' | t }}</dt><dd>{{ dispatch.dispatch_attempts }}</dd></div>
+              <div><dt>{{ 'analysisDetail.maxAttempts' | t }}</dt><dd>{{ dispatch.max_processing_attempts }}</dd></div>
+              <div><dt>{{ 'analysisDetail.dispatched' | t }}</dt><dd>{{ date(dispatch.dispatched_at) }}</dd></div>
+            </dl>
+          </section>
+        }
+      </aside>
+    </section>
+  }
+</div>

@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'billing_checkout_expired' => 'Esta solicitud de pago ha caducado. Iníciala de nuevo con una clave de idempotencia nueva.',
+    'billing_manual_assignment' => 'Este espacio de trabajo tiene un plan asignado por un administrador.',
+    'billing_not_configured' => 'El proceso de pago no está configurado para este plan e intervalo.',
+    'billing_operation_in_progress' => 'Ya hay otra operación de facturación en curso para este espacio de trabajo.',
+    'billing_portal_unavailable' => 'El portal de facturación no está disponible para este espacio de trabajo.',
+    'billing_provider_invalid_response' => 'El proveedor de pagos ha devuelto un destino no válido.',
+    'billing_provider_unavailable' => 'El proveedor de pagos no está disponible temporalmente.',
+    'billing_subscription_exists' => 'Gestiona la suscripción existente desde el portal de facturación.',
+    'buyer_decision_idempotency_conflict' => 'La clave de idempotencia ya se utilizó con un comando de decisión de compra diferente.',
+    'buyer_decision_stale_state' => 'La decisión de compra ha cambiado. Actualiza el análisis antes de registrar otra decisión.',
+    'idempotency_payload_mismatch' => 'La clave de idempotencia ya se utilizó para otro archivo de importación.',
+    'privacy_request_idempotency_conflict' => 'La clave de idempotencia ya se utilizó con un comando de solicitud de privacidad diferente.',
+    'privacy_request_stale_state' => 'La solicitud de privacidad ha cambiado. Actualízala antes de registrar otra transición.',
+    'sale_portfolio_idempotency_conflict' => 'La clave de idempotencia ya se utilizó con un comando de cartera de ventas diferente.',
+    'sale_portfolio_stale_state' => 'El estado de la cartera de ventas ha cambiado. Actualízalo antes de registrar otro evento.',
+    'actual_cost_stale_state' => 'La evidencia de costes reales ha cambiado. Actualízala antes de registrar una corrección.',
+    'actual_purchase_stale_state' => 'La evidencia de compra real ha cambiado. Actualízala antes de registrar una corrección.',
+    'actual_sale_stale_portfolio_state' => 'El estado de la cartera de ventas ha cambiado. Actualízalo antes de registrar el resultado.',
+    'actual_sale_stale_state' => 'La evidencia de venta real ha cambiado. Actualízala antes de registrar otro resultado.',
+    'estimate_accuracy_report_stale_state' => 'El informe de precisión de la estimación ha cambiado. Actualízalo antes de registrar.',
+    'estimate_attribution_stale_state' => 'La atribución de la estimación ha cambiado. Actualízala antes de registrar.',
+    'outcome_idempotency_conflict' => 'La clave de idempotencia ya se utilizó con un comando de resultado diferente.',
+];

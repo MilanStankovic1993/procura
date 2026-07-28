@@ -1,0 +1,176 @@
+<article class="panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">{{ 'ownedProduct.assessment.eyebrow' | t }}</p>
+      <h2>{{ 'ownedProduct.assessment.title' | t }}</h2>
+    </div>
+    @if (assessment(); as result) {
+      <strong class="status" [attr.data-status]="result.status">
+        {{ label(result.status) }}
+      </strong>
+    }
+  </div>
+
+  <p class="description">{{ 'ownedProduct.assessment.description' | t }}</p>
+
+  @if (stale()) {
+    <div class="notice stale" role="status">
+      <strong>{{ 'ownedProduct.assessment.staleTitle' | t }}</strong>
+      <span>{{ 'ownedProduct.assessment.staleDescription' | t }}</span>
+    </div>
+  }
+  @if (error()) {
+    <div class="notice error" role="alert">{{ error() }}</div>
+  }
+  @if (success()) {
+    <div class="notice success" role="status">
+      {{ 'ownedProduct.assessment.recorded' | t }}
+    </div>
+  }
+
+  @if (assessment(); as result) {
+    @if (isHistorical(result)) {
+      <p class="historical">{{ 'ownedProduct.assessment.historical' | t }}</p>
+    }
+    <dl>
+      <div>
+        <dt>{{ 'ownedProduct.assessment.matchStatus' | t }}</dt>
+        <dd>{{ label(result.matcher_status) }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'ownedProduct.assessment.confidence' | t }}</dt>
+        <dd>{{ percentage(result.confidence_basis_points) }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'ownedProduct.assessment.completeness' | t }}</dt>
+        <dd>{{ percentage(result.completeness_basis_points) }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'ownedProduct.assessment.assessed' | t }}</dt>
+        <dd>{{ date(result.assessed_at) }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'ownedProduct.assessment.runNumber' | t }}</dt>
+        <dd>#{{ result.run_number }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'ownedProduct.assessment.snapshot' | t }}</dt>
+        <dd>#{{ result.snapshot_sequence }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'ownedProduct.assessment.evaluator' | t }}</dt>
+        <dd>{{ result.evaluator_version }}</dd>
+      </div>
+    </dl>
+
+    <section class="group">
+      <h3>{{ 'ownedProduct.assessment.identifiedProduct' | t }}</h3>
+      @if (result.product; as product) {
+        <p>
+          <strong>{{ product.brand }} {{ product.model }}</strong>
+          @if (product.variant) {
+            <span>{{ product.variant }}</span>
+          }
+          <small>{{ product.category }} · {{ product.canonical_key }}</small>
+        </p>
+      } @else {
+        <p>{{ 'ownedProduct.assessment.noCatalogProduct' | t }}</p>
+      }
+    </section>
+
+    <section class="facts">
+      <div>
+        <h3>{{ 'ownedProduct.assessment.includedAccessories' | t }}</h3>
+        <p>{{ list(result.included_accessories) }}</p>
+      </div>
+      <div>
+        <h3>{{ 'ownedProduct.assessment.missingAccessories' | t }}</h3>
+        <p>{{ list(result.missing_accessories) }}</p>
+      </div>
+      <div>
+        <h3>{{ 'ownedProduct.assessment.defects' | t }}</h3>
+        <p>{{ list(result.defects) }}</p>
+      </div>
+    </section>
+
+    @if (result.candidates.length > 0 && result.product === null) {
+      <section class="group">
+        <h3>{{ 'ownedProduct.assessment.candidates' | t }}</h3>
+        <div class="candidates">
+          @for (candidate of result.candidates; track candidate.product_model_id) {
+            <div>
+              <strong>{{ candidate.brand }} {{ candidate.model }}</strong>
+              <span>{{ candidate.variant ?? candidate.model_number }}</span>
+              <small>
+                {{ 'ownedProduct.assessment.regionCompatibility' | t }}:
+                {{ label(candidate.region_compatibility) }}
+              </small>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="code-groups">
+      <div>
+        <h3>{{ 'ownedProduct.assessment.reasons' | t }}</h3>
+        <ul>
+          @for (code of result.reason_codes; track code) {
+            <li>{{ label(code) }}</li>
+          }
+        </ul>
+      </div>
+      <div>
+        <h3>{{ 'ownedProduct.assessment.unknownFacts' | t }}</h3>
+        @if (result.unknown_facts.length === 0) {
+          <p>{{ 'ownedProduct.assessment.none' | t }}</p>
+        } @else {
+          <ul>
+            @for (code of result.unknown_facts; track code) {
+              <li>{{ label(code) }}</li>
+            }
+          </ul>
+        }
+      </div>
+      <div>
+        <h3>{{ 'ownedProduct.assessment.actions' | t }}</h3>
+        @if (result.verification_actions.length === 0) {
+          <p>{{ 'ownedProduct.assessment.none' | t }}</p>
+        } @else {
+          <ol>
+            @for (code of result.verification_actions; track code) {
+              <li>{{ label(code) }}</li>
+            }
+          </ol>
+        }
+      </div>
+    </section>
+  } @else {
+    <div class="empty">
+      <strong>{{ 'ownedProduct.assessment.notAssessedTitle' | t }}</strong>
+      <span>{{ 'ownedProduct.assessment.notAssessedDescription' | t }}</span>
+    </div>
+  }
+
+  @if (canAssess()) {
+    <button
+      class="button button-primary"
+      type="button"
+      [disabled]="assessing()"
+      (click)="assess()"
+    >
+      {{
+        (assessing()
+          ? 'ownedProduct.assessment.running'
+          : assessment() === null
+            ? 'ownedProduct.assessment.run'
+            : 'ownedProduct.assessment.reassess'
+        ) | t
+      }}
+    </button>
+  } @else if (record().status === 'draft') {
+    <p class="ready-required">{{ 'ownedProduct.assessment.readyRequired' | t }}</p>
+  }
+
+  <p class="boundary">{{ 'ownedProduct.assessment.boundary' | t }}</p>
+</article>

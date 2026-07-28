@@ -12,6 +12,7 @@ Before implementing a module, Codex must read:
 - testing strategy.
 - global market model.
 - current development handoff.
+- production go-live register.
 
 ## 2. Existing repository
 
@@ -26,6 +27,12 @@ Before changing code:
 
 Do not overwrite working code without reason.
 
+Any change that adds an environment variable, secret, external provider, webhook, worker, scheduled
+command, migration/backfill, production-only manual step, monitoring requirement, or rollback
+condition must update `19-production-go-live.md` in the same task. An integration is not complete
+until its configuration, external activation, verification, monitoring, rotation, and rollback are
+recorded there without committing secret values.
+
 ## 3. Implementation style
 
 - Use strict typing where practical.
@@ -38,6 +45,17 @@ Do not overwrite working code without reason.
 - Use transactions for multi-record state changes.
 - Use Pest tests.
 - Run Pint.
+- Every new FormRequest field and every newly used Laravel validation rule must update
+  `validation_attributes.php` and `validation.php` for EN/DE/ES/FR/sr-Latn in the same change.
+- Every expected public API conflict must use `ApiErrorCode`; the same change must add one safe,
+  non-empty `api_errors.php` message in all five locales. API renderers must never expose a raw
+  exception message.
+- Every expected application-service `422` must use `ApplicationValidationCode` and
+  `ApplicationValidation`; the same change must add one safe, non-empty
+  `application_validation.php` message in all five locales. Do not add new ad hoc
+  `ValidationException::withMessages` presentation strings outside that boundary.
+  Presentation text may be translated; stored codes, tenant boundaries, market scope, money, and
+  authorization decisions must remain language-neutral.
 
 ## 4. Completion report
 
@@ -69,7 +87,10 @@ Implement only the project foundation:
 11. organization market preferences,
 12. tests.
 
-Do not implement AI, Stripe, Telegram, marketplace automation, or browser extensions yet.
+This was the initial bootstrap gate. Later phases may implement only the boundaries marked approved
+in `15-delivery-roadmap.md` and `18-development-handoff.md`. The Stripe application boundary was
+later separately approved and implemented; live activation, broader payment processing,
+marketplace automation, and browser extensions still require their own approved boundary.
 
 ## 6. First Codex prompt
 

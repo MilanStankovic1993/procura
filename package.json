@@ -1,16 +1,16 @@
 {
     "private": true,
     "type": "module",
-    "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+    "engines": {
+        "node": ">=22.22.3 <23 || >=24.15.0 <25 || >=26.0.0"
     },
-    "devDependencies": {
-        "@tailwindcss/vite": "^4.0.0",
-        "axios": "^1.7.4",
-        "concurrently": "^9.0.1",
-        "laravel-vite-plugin": "^1.2.0",
-        "tailwindcss": "^4.0.0",
-        "vite": "^6.0.11"
+    "scripts": {
+        "build": "npm run build:frontend",
+        "build:frontend": "npm --prefix frontend run build && npm run verify:production-serving",
+        "dev": "npm --prefix frontend start",
+        "lint:frontend": "npm --prefix frontend run check:i18n && npm --prefix frontend run lint",
+        "check:i18n": "npm --prefix frontend run check:i18n",
+        "test:frontend": "npm --prefix frontend run test -- --watch=false",
+        "verify:production-serving": "node tools/verify-production-serving.mjs"
     }
 }

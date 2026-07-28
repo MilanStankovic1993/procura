@@ -1,0 +1,406 @@
+<article class="pricing-panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">{{ 'ownedProduct.pricing.eyebrow' | t }}</p>
+      <h2>{{ 'ownedProduct.pricing.title' | t }}</h2>
+      <p>{{ 'ownedProduct.pricing.description' | t }}</p>
+    </div>
+    <button type="button" class="quiet" (click)="reload()" [disabled]="loading()">
+      {{ (loading() ? 'ownedProduct.pricing.loading' : 'ownedProduct.pricing.refresh') | t }}
+    </button>
+  </div>
+
+  @if (error()) {
+    <p class="notice error" role="alert">{{ error() }}</p>
+  }
+  @if (success()) {
+    <p class="notice success" role="status">{{ success() }}</p>
+  }
+
+  @if (loading() && !intelligence()) {
+    <div class="empty">{{ 'ownedProduct.pricing.loading' | t }}</div>
+  } @else if (intelligence(); as data) {
+    @if (!data.assessment_current && data.price_bands.length > 0) {
+      <section class="notice warning">
+        <strong>{{ 'ownedProduct.pricing.staleTitle' | t }}</strong>
+        <span>{{ 'ownedProduct.pricing.staleDescription' | t }}</span>
+      </section>
+    }
+
+    @if (data.current_price_bands.length === 0) {
+      <section class="empty">
+        <strong>{{ 'ownedProduct.pricing.noCurrentTitle' | t }}</strong>
+        <span>{{ 'ownedProduct.pricing.noCurrentDescription' | t }}</span>
+      </section>
+    } @else {
+      <div class="band-grid">
+        @for (band of data.current_price_bands; track band.id) {
+          <section class="band-result">
+            <header>
+              <div>
+                <span class="market">
+                  {{ countryName(band.target_country_code) }} ·
+                  {{ band.target_currency_code }}
+                </span>
+                <h3>{{ code(band.status) }}</h3>
+              </div>
+              <span class="run">#{{ band.run_number }}</span>
+            </header>
+
+            <div class="bands">
+              <div>
+                <span>{{ 'ownedProduct.pricing.quickSale' | t }}</span>
+                <strong>
+                  {{
+                    bandRange(
+                      band,
+                      band.bands.quick_sale.low_minor,
+                      band.bands.quick_sale.high_minor
+                    )
+                  }}
+                </strong>
+                <small>{{ 'ownedProduct.pricing.quickSaleHint' | t }}</small>
+              </div>
+              <div class="recommended">
+                <span>{{ 'ownedProduct.pricing.recommended' | t }}</span>
+                <strong>
+                  {{
+                    bandRange(
+                      band,
+                      band.bands.recommended.low_minor,
+                      band.bands.recommended.high_minor
+                    )
+                  }}
+                </strong>
+                <small>{{ 'ownedProduct.pricing.recommendedHint' | t }}</small>
+              </div>
+              <div>
+                <span>{{ 'ownedProduct.pricing.ambitious' | t }}</span>
+                <strong>
+                  {{
+                    bandRange(
+                      band,
+                      band.bands.ambitious.low_minor,
+                      band.bands.ambitious.high_minor
+                    )
+                  }}
+                </strong>
+                <small>{{ 'ownedProduct.pricing.ambitiousHint' | t }}</small>
+              </div>
+            </div>
+
+            <dl class="metrics">
+              <div>
+                <dt>{{ 'ownedProduct.pricing.confidence' | t }}</dt>
+                <dd>{{ percentage(band.confidence_basis_points) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'ownedProduct.pricing.completeness' | t }}</dt>
+                <dd>{{ percentage(band.completeness_basis_points) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'ownedProduct.pricing.included' | t }}</dt>
+                <dd>{{ band.included_count }} / {{ band.input_count }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'ownedProduct.pricing.calculated' | t }}</dt>
+                <dd>{{ date(band.calculated_at) }}</dd>
+              </div>
+            </dl>
+
+            @if (band.confidence_components; as components) {
+              <div class="components">
+                @for (entry of entries(components); track entry.key) {
+                  <span>
+                    {{ code(entry.key) }}
+                    <strong>{{ percentage(entry.value) }}</strong>
+                  </span>
+                }
+              </div>
+            }
+
+            <div class="explanations">
+              <section>
+                <h4>{{ 'ownedProduct.pricing.reasons' | t }}</h4>
+                <ul>
+                  @for (reason of band.reason_codes; track $index) {
+                    <li>{{ code(reason) }}</li>
+                  }
+                </ul>
+              </section>
+              <section>
+                <h4>{{ 'ownedProduct.pricing.unknownFacts' | t }}</h4>
+                <ul>
+                  @for (fact of band.unknown_facts; track $index) {
+                    <li>{{ code(fact) }}</li>
+                  }
+                </ul>
+              </section>
+              <section>
+                <h4>{{ 'ownedProduct.pricing.actions' | t }}</h4>
+                <ul>
+                  @for (action of band.verification_actions; track $index) {
+                    <li>{{ code(action) }}</li>
+                  }
+                </ul>
+              </section>
+            </div>
+
+            @if (band.selection; as selection) {
+              <details>
+                <summary>
+                  {{
+                    'ownedProduct.pricing.selectionSummary'
+                      | t
+                        : {
+                            included: selection.included_count,
+                            excluded: selection.excluded_count
+                          }
+                  }}
+                </summary>
+                <div class="selection-items">
+                  @for (item of selection.items; track item.id) {
+                    <div class="selection-item" [attr.data-decision]="item.decision">
+                      <div>
+                        <strong>{{ item.evidence.title }}</strong>
+                        <span>
+                          {{ itemMoney(item) }} ·
+                          {{ countryName(item.evidence.country_code) }} ·
+                          {{ code(item.decision) }}
+                        </span>
+                      </div>
+                      <span>{{ percentage(item.score_basis_points) }}</span>
+                      <ul>
+                        @for (reason of item.reason_codes; track $index) {
+                          <li>{{ code(reason) }}</li>
+                        }
+                      </ul>
+                      <app-sell-comparable-market-normalization
+                        [ownedProductId]="record().id"
+                        [item]="item"
+                        [targetCountryCode]="selection.target_country_code"
+                        [targetCurrencyCode]="selection.target_currency_code"
+                        [catalog]="marketCatalog()"
+                        [canManage]="canManage()"
+                        (saved)="reload()"
+                      />
+                    </div>
+                  }
+                </div>
+              </details>
+            }
+
+            <footer>
+              <code>{{ band.algorithm_version }}</code>
+              <span>{{ 'ownedProduct.pricing.askingOnly' | t }}</span>
+            </footer>
+          </section>
+        }
+      </div>
+    }
+
+    <section class="history">
+      <div class="subheading">
+        <div>
+          <p class="eyebrow">{{ 'ownedProduct.pricing.provenance' | t }}</p>
+          <h3>{{ 'ownedProduct.pricing.evidenceHistory' | t }}</h3>
+        </div>
+        <span>{{ 'common.total' | t: { count: data.records.length } }}</span>
+      </div>
+
+      @if (data.records.length === 0) {
+        <div class="empty">{{ 'ownedProduct.pricing.noEvidence' | t }}</div>
+      } @else {
+        <div class="record-list">
+          @for (comparable of data.records; track comparable.id) {
+            <div class="record">
+              <div>
+                <strong>{{ comparable.title }}</strong>
+                <span>
+                  {{ comparable.source.marketplace_name }} ·
+                  {{ recordMoney(comparable) }} ·
+                  {{ countryName(comparable.country_code) }}
+                </span>
+                <small>
+                  {{ conditionLabel(comparable.condition) }} ·
+                  {{ date(comparable.observed_at) }}
+                </small>
+              </div>
+              @if (comparable.source.source_url) {
+                <a
+                  [href]="comparable.source.source_url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ 'ownedProduct.pricing.openSource' | t }}
+                </a>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (data.price_bands.length > data.current_price_bands.length) {
+        <details class="run-history">
+          <summary>
+            {{ 'ownedProduct.pricing.historicalRuns' | t: { count: data.price_bands.length } }}
+          </summary>
+          @for (band of data.price_bands; track band.id) {
+            <div>
+              <span>
+                #{{ band.run_number }} · {{ countryName(band.target_country_code) }}
+                · {{ band.target_currency_code }}
+              </span>
+              <strong>{{ code(band.status) }}</strong>
+              <time>{{ date(band.calculated_at) }}</time>
+            </div>
+          }
+        </details>
+      }
+    </section>
+
+    @if (canAdd() && marketCatalog()) {
+      <section class="intake">
+        <div class="subheading">
+          <div>
+            <p class="eyebrow">{{ 'ownedProduct.pricing.manualEvidence' | t }}</p>
+            <h3>{{ 'ownedProduct.pricing.addComparable' | t }}</h3>
+          </div>
+          <span>{{ 'ownedProduct.pricing.appendOnly' | t }}</span>
+        </div>
+
+        @if (formError()) {
+          <p class="notice error" role="alert">{{ formError() }}</p>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-grid">
+            <div>
+              <label for="sell-marketplace">{{ 'ownedProduct.pricing.marketplace' | t }}</label>
+              <input id="sell-marketplace" formControlName="marketplace_name" />
+            </div>
+            <div>
+              <label for="sell-external-id">{{ 'ownedProduct.pricing.externalId' | t }}</label>
+              <input id="sell-external-id" formControlName="external_id" />
+            </div>
+            <div class="wide">
+              <label for="sell-source-url">{{ 'ownedProduct.pricing.sourceUrl' | t }}</label>
+              <input
+                id="sell-source-url"
+                type="url"
+                formControlName="source_url"
+                [placeholder]="'ownedProduct.pricing.urlPlaceholder' | t"
+              />
+              <small>{{ 'ownedProduct.pricing.sourceIdentityHelp' | t }}</small>
+            </div>
+            <div class="wide">
+              <label for="sell-title">{{ 'ownedProduct.pricing.originalTitle' | t }}</label>
+              <input id="sell-title" formControlName="title" />
+            </div>
+            <div class="wide">
+              <label for="sell-description">{{ 'ownedProduct.pricing.originalDescription' | t }}</label>
+              <textarea id="sell-description" rows="3" formControlName="description"></textarea>
+            </div>
+            <div>
+              <label for="sell-price">{{ 'ownedProduct.pricing.askingPrice' | t }}</label>
+              <input id="sell-price" inputmode="decimal" formControlName="price" />
+              @if (priceError()) {
+                <small class="field-error">{{ priceError() }}</small>
+              }
+            </div>
+            <div>
+              <label for="sell-currency">{{ 'ownedProduct.pricing.currency' | t }}</label>
+              <select id="sell-currency" formControlName="currency_code">
+                <option value="">{{ 'ownedProduct.pricing.chooseCurrency' | t }}</option>
+                @for (currency of marketCatalog()?.currencies ?? []; track currency.code) {
+                  <option [value]="currency.code">
+                    {{ currency.code }} · {{ currencyName(currency.code, currency.name) }}
+                  </option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="sell-country">{{ 'ownedProduct.pricing.marketCountry' | t }}</label>
+              <select id="sell-country" formControlName="country_code">
+                <option value="">{{ 'ownedProduct.pricing.chooseCountry' | t }}</option>
+                @for (country of record().target_countries; track country.code) {
+                  <option [value]="country.code">
+                    {{ countryName(country.code) }} ({{ country.code }})
+                  </option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="sell-location">{{ 'ownedProduct.pricing.location' | t }}</label>
+              <input id="sell-location" formControlName="location" />
+            </div>
+            <div>
+              <label for="sell-type">{{ 'ownedProduct.pricing.listingType' | t }}</label>
+              <select id="sell-type" formControlName="listing_type">
+                <option value="product">{{ 'ownedProduct.pricing.type.product' | t }}</option>
+                <option value="spare_part">{{ 'ownedProduct.pricing.type.sparePart' | t }}</option>
+                <option value="broken_only">{{ 'ownedProduct.pricing.type.brokenOnly' | t }}</option>
+                <option value="wanted">{{ 'ownedProduct.pricing.type.wanted' | t }}</option>
+                <option value="rental">{{ 'ownedProduct.pricing.type.rental' | t }}</option>
+                <option value="unclear_bundle">{{ 'ownedProduct.pricing.type.bundle' | t }}</option>
+              </select>
+            </div>
+            <div>
+              <label for="sell-condition">{{ 'ownedProduct.pricing.condition' | t }}</label>
+              <select id="sell-condition" formControlName="condition_code">
+                <option value="new">{{ 'ownedProduct.condition.new' | t }}</option>
+                <option value="like_new">{{ 'ownedProduct.condition.like_new' | t }}</option>
+                <option value="used_good">{{ 'ownedProduct.condition.used_good' | t }}</option>
+                <option value="used_fair">{{ 'ownedProduct.condition.used_fair' | t }}</option>
+                <option value="used_poor">{{ 'ownedProduct.condition.used_poor' | t }}</option>
+                <option value="broken">{{ 'ownedProduct.condition.broken' | t }}</option>
+                <option value="unknown">{{ 'ownedProduct.condition.unknown' | t }}</option>
+              </select>
+            </div>
+            <div>
+              <label for="sell-seller">{{ 'ownedProduct.pricing.sellerType' | t }}</label>
+              <select id="sell-seller" formControlName="seller_type">
+                <option value="private">{{ 'ownedProduct.pricing.seller.private' | t }}</option>
+                <option value="business">{{ 'ownedProduct.pricing.seller.business' | t }}</option>
+                <option value="unknown">{{ 'common.unknown' | t }}</option>
+              </select>
+            </div>
+            <div>
+              <label for="sell-published">{{ 'ownedProduct.pricing.publishedAt' | t }}</label>
+              <input id="sell-published" type="datetime-local" formControlName="published_at" />
+            </div>
+            <div>
+              <label for="sell-observed">{{ 'ownedProduct.pricing.observedAt' | t }}</label>
+              <input id="sell-observed" type="datetime-local" formControlName="observed_at" />
+            </div>
+            <div class="wide">
+              <label for="sell-included">{{ 'ownedProduct.pricing.includedAccessories' | t }}</label>
+              <textarea id="sell-included" rows="3" formControlName="included_accessories"></textarea>
+              <small>{{ 'ownedProduct.pricing.onePerLine' | t }}</small>
+            </div>
+            <div class="wide">
+              <label for="sell-missing">{{ 'ownedProduct.pricing.missingAccessories' | t }}</label>
+              <textarea id="sell-missing" rows="3" formControlName="missing_accessories"></textarea>
+              <small>{{ 'ownedProduct.pricing.onePerLine' | t }}</small>
+            </div>
+          </div>
+          <button class="primary" type="submit" [disabled]="saving()">
+            {{
+              (saving()
+                ? 'ownedProduct.pricing.saving'
+                : 'ownedProduct.pricing.recordEvidence'
+              ) | t
+            }}
+          </button>
+        </form>
+      </section>
+    } @else {
+      <section class="notice neutral">
+        <strong>{{ 'ownedProduct.pricing.intakeUnavailableTitle' | t }}</strong>
+        <span>{{ 'ownedProduct.pricing.intakeUnavailableDescription' | t }}</span>
+      </section>
+    }
+
+    <p class="boundary">{{ 'ownedProduct.pricing.boundary' | t }}</p>
+  }
+</article>

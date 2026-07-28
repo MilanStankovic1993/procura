@@ -1,0 +1,19 @@
+<div class="language-switcher">
+  <label for="procura-language">{{ 'language.label' | t }}</label>
+  <select
+    id="procura-language"
+    [disabled]="saving()"
+    (change)="changeLocale($event)"
+  >
+    @for (option of locales; track option.code) {
+      <option [value]="option.code" [selected]="option.code === locale()">
+        {{ option.label }}
+      </option>
+    }
+  </select>
+  @if (saving()) {
+    <span class="status" aria-live="polite">{{ 'language.saving' | t }}</span>
+  } @else if (failed()) {
+    <span class="error" role="alert">{{ 'language.error' | t }}</span>
+  }
+</div>

@@ -2,7 +2,10 @@
 
 namespace App\Actions\Fortify;
 
+use App\Actions\Organizations\CreatePersonalOrganization;
+use App\Enums\Localization\SupportedLocale;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -13,6 +16,10 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules;
+
+    public function __construct(
+        private readonly CreatePersonalOrganization $createPersonalOrganization,
+    ) {}
 
     /**
      * @param  array<string, string>  $input
@@ -33,13 +40,28 @@ class CreateNewUser implements CreatesNewUsers
                 'max:255',
                 Rule::unique(User::class),
             ],
+            'preferred_locale' => [
+                'sometimes',
+                'string',
+                'max:35',
+                Rule::enum(SupportedLocale::class),
+            ],
             'password' => $this->passwordRules(),
         ])->validate();
 
-        return User::create([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'password' => Hash::make($input['password']),
-        ]);
+        return DB::transaction(function () use ($input): User {
+            $user = User::create([
+                'name' => $input['name'],
+                'email' => $input['email'],
+                'preferred_locale' => SupportedLocale::tryFrom(
+                    $input['preferred_locale'] ?? '',
+                ) ?? SupportedLocale::English,
+                'password' => Hash::make($input['password']),
+            ]);
+
+            $this->createPersonalOrganization->createFor($user);
+
+            return $user;
+        });
     }
 }

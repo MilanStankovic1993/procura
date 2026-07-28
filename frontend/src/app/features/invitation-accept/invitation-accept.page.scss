@@ -1,0 +1,17 @@
+:host { display: block; min-height: 100dvh; }
+main { display: grid; min-height: 100dvh; place-items: center; padding: 2rem; }
+.brand { position: absolute; top: 2rem; left: 2rem; color: var(--color-text); font-weight: 800; text-decoration: none; }
+.invitation-language { position: absolute; top: 2rem; right: 2rem; }
+section { width: min(100%, 520px); padding: 2.5rem; border: 1px solid var(--color-border); border-radius: 1rem; background: var(--color-surface); text-align: center; }
+section > p:first-child { color: var(--color-accent); font-size: .7rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+h1 { margin: .5rem 0; font-size: 2.5rem; }
+section > p { color: var(--color-muted); }
+button { width: 100%; margin: 1rem 0; }
+section > a { color: var(--color-muted); font-size: .75rem; }
+.error { margin: 1rem 0; padding: .8rem; border-radius: .6rem; background: rgba(255,116,116,.1); color: var(--color-danger); font-size: .8rem; }
+@media (max-width: 520px) {
+  main { padding: 5.5rem 1rem 1rem; }
+  .brand { top: 1rem; left: 1rem; }
+  .invitation-language { top: 1rem; right: 1rem; }
+  section { padding: 1.5rem; }
+}

@@ -1,0 +1,288 @@
+<div class="page">
+  <a class="back" routerLink="/app/sell">{{ 'ownedProduct.detail.back' | t }}</a>
+
+  @if (error()) {
+    <div class="alert error" role="alert">
+      <span>{{ error() }}</span>
+      @if (!record()) {
+        <button type="button" (click)="retry()">{{ 'common.retry' | t }}</button>
+      }
+    </div>
+  }
+  @if (success()) {
+    <div class="alert success" role="status">{{ success()! | t }}</div>
+  }
+
+  @if (loading() && !record()) {
+    <section class="loading" aria-live="polite">
+      {{ 'ownedProduct.detail.loading' | t }}
+    </section>
+  } @else if (record(); as product) {
+    <header>
+      <div>
+        <div class="title-meta">
+          <span class="status" [attr.data-status]="product.status">
+            {{ statusLabel(product.status) }}
+          </span>
+          <span>{{ product.category?.name ?? ('ownedProduct.common.categoryUnknown' | t) }}</span>
+          <span>{{ date(product.created_at) }}</span>
+        </div>
+        <h1>{{ title(product) }}</h1>
+        <p>
+          {{ product.target_continent_code }} ·
+          {{ targetCountries(product.target_country_codes) }}
+        </p>
+      </div>
+    </header>
+
+    <section class="layout">
+      <div class="main-column">
+        <app-owned-product-assessment-panel
+          [record]="product"
+          [canManage]="canManage()"
+          (assessmentRecorded)="retry()"
+        />
+
+        <app-owned-product-price-intelligence-panel
+          [record]="product"
+          [canManage]="canManage()"
+        />
+
+        <app-owned-product-listing-draft-panel
+          [record]="product"
+          [canManage]="canManage()"
+        />
+
+        <app-owned-product-sale-portfolio-panel
+          [record]="product"
+          [canManage]="canManage()"
+        />
+
+        <app-owned-product-outcome-panel
+          [record]="product"
+          [canManage]="canManage()"
+        />
+
+        <article class="panel facts">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{{ 'ownedProduct.detail.factsEyebrow' | t }}</p>
+              <h2>{{ 'ownedProduct.detail.factsTitle' | t }}</h2>
+            </div>
+            <span>{{ 'ownedProduct.detail.intakeOnly' | t }}</span>
+          </div>
+          <dl>
+            <div>
+              <dt>{{ 'ownedProduct.common.brand' | t }}</dt>
+              <dd>{{ product.brand_name ?? ('common.unknown' | t) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'ownedProduct.common.model' | t }}</dt>
+              <dd>{{ product.model_name ?? ('common.unknown' | t) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'ownedProduct.common.condition' | t }}</dt>
+              <dd>{{ conditionLabel(product.condition) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'ownedProduct.detail.age' | t }}</dt>
+              <dd>
+                {{
+                  product.age_months === null
+                    ? ('common.unknown' | t)
+                    : ('ownedProduct.detail.months' | t: { count: product.age_months })
+                }}
+              </dd>
+            </div>
+            <div>
+              <dt>{{ 'ownedProduct.detail.crossBorder' | t }}</dt>
+              <dd>{{ borderLabel(product.cross_border_preference) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'ownedProduct.detail.saleSpeed' | t }}</dt>
+              <dd>{{ speedLabel(product.desired_sale_speed) }}</dd>
+            </div>
+          </dl>
+
+          <div class="text-block">
+            <h3>{{ 'ownedProduct.detail.accessories' | t }}</h3>
+            <p>{{ listLabel(product.accessories) }}</p>
+          </div>
+          <div class="text-block">
+            <h3>{{ 'ownedProduct.detail.defects' | t }}</h3>
+            <p>{{ listLabel(product.defects) }}</p>
+          </div>
+          <div class="text-block">
+            <h3>{{ 'ownedProduct.detail.purchaseHistory' | t }}</h3>
+            <p>{{ purchaseHistory(product) }}</p>
+          </div>
+        </article>
+
+        <article class="panel evidence">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{{ 'ownedProduct.detail.privateStorage' | t }}</p>
+              <h2>{{ 'ownedProduct.common.evidence' | t }}</h2>
+            </div>
+            <span>{{ 'common.files' | t: { count: product.image_count } }}</span>
+          </div>
+
+          @if ((product.images?.length ?? 0) === 0) {
+            <div class="empty-evidence">{{ 'ownedProduct.detail.noEvidence' | t }}</div>
+          } @else {
+            <div class="image-grid">
+              @for (image of product.images ?? []; track image.id) {
+                <figure>
+                  <a [href]="image.content_url" target="_blank" rel="noopener">
+                    <img
+                      [src]="image.content_url"
+                      [alt]="imageKindLabel(image.kind) + ': ' + image.filename"
+                      loading="lazy"
+                    />
+                  </a>
+                  <figcaption>
+                    <div>
+                      <strong>{{ imageKindLabel(image.kind) }}</strong>
+                      <span>
+                        {{ image.width }} × {{ image.height }} ·
+                        {{ fileSize(image.size_bytes) }}
+                      </span>
+                    </div>
+                    @if (canMutate()) {
+                      <button
+                        type="button"
+                        [disabled]="removingImageIds().has(image.id)"
+                        (click)="removeImage(image)"
+                        [attr.aria-label]="'ownedProduct.detail.removeAria' | t: { filename: image.filename }"
+                      >
+                        {{
+                          (removingImageIds().has(image.id)
+                            ? 'ownedProduct.detail.removing'
+                            : 'ownedProduct.detail.remove'
+                          ) | t
+                        }}
+                      </button>
+                    }
+                  </figcaption>
+                </figure>
+              }
+            </div>
+          }
+
+          @if (canMutate()) {
+            <form class="upload-form" [formGroup]="uploadForm" (ngSubmit)="upload()">
+              <div>
+                <label for="owned-evidence-kind">{{ 'ownedProduct.detail.evidenceType' | t }}</label>
+                <select id="owned-evidence-kind" formControlName="kind">
+                  <option value="product">{{ 'ownedProduct.image.product' | t }}</option>
+                  <option value="serial_label">{{ 'ownedProduct.image.serial_label' | t }}</option>
+                  <option value="defect">{{ 'ownedProduct.image.defect' | t }}</option>
+                  <option value="proof_of_purchase">{{ 'ownedProduct.image.proof_of_purchase' | t }}</option>
+                </select>
+              </div>
+              <div class="file-input">
+                <label for="owned-evidence-files">{{ 'ownedProduct.detail.filePolicy' | t }}</label>
+                <input
+                  id="owned-evidence-files"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  (change)="selectFiles($event)"
+                />
+              </div>
+              <button
+                class="button button-quiet"
+                type="submit"
+                [disabled]="uploading() || selectedFiles().length === 0"
+              >
+                {{
+                  (uploading()
+                    ? 'ownedProduct.detail.uploading'
+                    : 'ownedProduct.detail.uploadFiles'
+                  ) | t: { count: selectedFiles().length }
+                }}
+              </button>
+            </form>
+          }
+          <button class="refresh" type="button" (click)="retry()">
+            {{ 'ownedProduct.detail.refreshLinks' | t }}
+          </button>
+        </article>
+
+        <article class="panel history">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{{ 'ownedProduct.detail.provenance' | t }}</p>
+              <h2>{{ 'ownedProduct.detail.snapshotHistory' | t }}</h2>
+            </div>
+            <span>{{ 'common.total' | t: { count: product.snapshot_count } }}</span>
+          </div>
+          <div class="timeline">
+            @for (snapshot of product.snapshots ?? []; track snapshot.id) {
+              <div class="snapshot">
+                <span class="sequence">#{{ snapshot.sequence }}</span>
+                <div>
+                  <strong>
+                    {{ statusLabel(snapshot.status) }} · {{ date(snapshot.captured_at) }}
+                  </strong>
+                  <p>
+                    {{ conditionLabel(snapshot.condition) }} ·
+                    {{ targetCountries(snapshot.target_country_codes) }}
+                  </p>
+                  <code [title]="snapshot.content_hash">
+                    {{ shortHash(snapshot.content_hash) }}
+                  </code>
+                </div>
+              </div>
+            }
+          </div>
+        </article>
+      </div>
+
+      <aside>
+        <section class="panel lifecycle">
+          <p class="eyebrow">{{ 'ownedProduct.common.lifecycle' | t }}</p>
+          <h2>{{ 'ownedProduct.detail.lifecycleTitle' | t }}</h2>
+          @if (canMutate()) {
+            <form [formGroup]="lifecycleForm" (ngSubmit)="saveLifecycle()">
+              <label for="owned-lifecycle-status">{{ 'ownedProduct.detail.status' | t }}</label>
+              <select id="owned-lifecycle-status" formControlName="status">
+                <option value="draft">{{ 'ownedProduct.status.draft' | t }}</option>
+                <option value="ready">{{ 'ownedProduct.status.ready' | t }}</option>
+                <option value="archived">{{ 'ownedProduct.status.archived' | t }}</option>
+              </select>
+              <label for="owned-lifecycle-notes">{{ 'ownedProduct.common.privateNotes' | t }}</label>
+              <textarea id="owned-lifecycle-notes" rows="6" formControlName="notes"></textarea>
+              <button class="button button-primary" type="submit" [disabled]="saving()">
+                {{
+                  (saving()
+                    ? 'common.saving'
+                    : 'ownedProduct.detail.saveSnapshot'
+                  ) | t
+                }}
+              </button>
+            </form>
+          } @else {
+            <p class="readonly">
+              {{
+                (product.status === 'archived'
+                  ? 'ownedProduct.detail.archivedReadOnly'
+                  : 'ownedProduct.common.readOnly'
+                ) | t
+              }}
+            </p>
+            @if (product.notes) {
+              <p class="notes">{{ product.notes }}</p>
+            }
+          }
+        </section>
+
+        <section class="panel boundary">
+          <p class="eyebrow">{{ 'ownedProduct.detail.boundaryEyebrow' | t }}</p>
+          <h2>{{ 'ownedProduct.detail.boundaryTitle' | t }}</h2>
+          <p>{{ 'ownedProduct.detail.boundaryDescription' | t }}</p>
+        </section>
+      </aside>
+    </section>
+  }
+</div>

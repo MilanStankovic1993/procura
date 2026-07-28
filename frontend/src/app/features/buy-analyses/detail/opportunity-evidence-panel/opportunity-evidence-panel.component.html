@@ -1,0 +1,256 @@
+<article class="panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">{{ 'opportunity.eyebrow' | t }}</p>
+      <h2>{{ 'opportunity.title' | t }}</h2>
+      <p>{{ 'opportunity.description' | t }}</p>
+    </div>
+    @if (opportunityInput(); as evidence) {
+      <span class="status">{{ 'opportunity.evidenceRun' | t: { run: evidence.run_number } }}</span>
+    } @else {
+      <span class="status">{{ 'opportunity.awaiting' | t }}</span>
+    }
+  </div>
+
+  <div class="boundary">
+    <strong>{{ 'opportunity.unknownTitle' | t }}</strong>
+    <span>{{ 'opportunity.unknownDescription' | t }}</span>
+  </div>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+  @if (success()) {
+    <div class="alert success" role="status">{{ success() }}</div>
+  }
+
+  @if (canManage()) {
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <section class="input-section">
+        <div class="subheading">
+          <div>
+            <p class="eyebrow">{{ 'opportunity.logisticsWeight' | t }}</p>
+            <h3>{{ 'opportunity.logisticsEvidence' | t }}</h3>
+          </div>
+          <span>{{ sourceCountryCode() }} → {{ targetCountryCode() }}</span>
+        </div>
+        <div class="fields">
+          <label>
+            <span>{{ 'opportunity.shippingMethod' | t }}</span>
+            <select formControlName="shipping_method">
+              <option value="">{{ 'common.unknown' | t }}</option>
+              <option value="local_pickup">{{ 'opportunity.localPickup' | t }}</option>
+              <option value="parcel">{{ 'opportunity.parcel' | t }}</option>
+              <option value="seller_arranged">{{ 'opportunity.sellerArranged' | t }}</option>
+              <option value="freight">{{ 'opportunity.freight' | t }}</option>
+            </select>
+          </label>
+          <label>
+            <span>{{ 'opportunity.distance' | t }}</span>
+            <input
+              formControlName="shipping_distance_km"
+              inputmode="numeric"
+              [placeholder]="'common.unknown' | t"
+            />
+          </label>
+          <label>
+            <span>{{ 'opportunity.pickup' | t }}</span>
+            <select formControlName="pickup_available">
+              <option value="">{{ 'common.unknown' | t }}</option>
+              <option value="true">{{ 'common.yes' | t }}</option>
+              <option value="false">{{ 'common.no' | t }}</option>
+            </select>
+          </label>
+          <label>
+            <span>{{ 'opportunity.tracking' | t }}</span>
+            <select formControlName="tracking_available">
+              <option value="">{{ 'common.unknown' | t }}</option>
+              <option value="true">{{ 'common.yes' | t }}</option>
+              <option value="false">{{ 'common.no' | t }}</option>
+            </select>
+          </label>
+          <label>
+            <span>{{ 'opportunity.insurance' | t }}</span>
+            <select formControlName="insurance_available">
+              <option value="">{{ 'common.unknown' | t }}</option>
+              <option value="true">{{ 'common.yes' | t }}</option>
+              <option value="false">{{ 'common.no' | t }}</option>
+            </select>
+          </label>
+          <label>
+            <span>{{ 'opportunity.packaging' | t }}</span>
+            <select formControlName="packaging_confirmed">
+              <option value="">{{ 'common.unknown' | t }}</option>
+              <option value="true">{{ 'common.yes' | t }}</option>
+              <option value="false">{{ 'common.no' | t }}</option>
+            </select>
+          </label>
+          @if (crossBorder()) {
+            <label>
+              <span>{{ 'opportunity.crossBorder' | t }}</span>
+              <select formControlName="cross_border_handling_confirmed">
+                <option value="">{{ 'common.unknown' | t }}</option>
+                <option value="true">{{ 'common.yes' | t }}</option>
+                <option value="false">{{ 'common.no' | t }}</option>
+              </select>
+            </label>
+          }
+        </div>
+      </section>
+
+      <section class="input-section">
+        <div class="subheading">
+          <div>
+            <p class="eyebrow">{{ 'opportunity.demandWeight' | t }}</p>
+            <h3>{{ 'opportunity.demandEvidence' | t }}</h3>
+          </div>
+          <span>{{ 'opportunity.manualObservation' | t }}</span>
+        </div>
+        <div class="fields">
+          <label>
+            <span>{{ 'opportunity.soldCount' | t }}</span>
+            <input
+              formControlName="sold_comparables_count"
+              inputmode="numeric"
+              [placeholder]="'common.unknown' | t"
+            />
+          </label>
+          <label>
+            <span>{{ 'opportunity.medianDays' | t }}</span>
+            <input
+              formControlName="median_days_to_sale"
+              inputmode="numeric"
+              [placeholder]="'common.unknown' | t"
+            />
+          </label>
+          <label>
+            <span>{{ 'opportunity.window' | t }}</span>
+            <input
+              formControlName="observation_window_days"
+              inputmode="numeric"
+              [placeholder]="'common.unknown' | t"
+            />
+          </label>
+          <label>
+            <span>{{ 'opportunity.observedAt' | t }}</span>
+            <input type="datetime-local" formControlName="demand_evidence_observed_at" />
+          </label>
+          <label class="wide">
+            <span>{{ 'opportunity.source' | t }}</span>
+            <input
+              formControlName="demand_evidence_source"
+              [placeholder]="'opportunity.sourcePlaceholder' | t"
+            />
+          </label>
+        </div>
+      </section>
+
+      <div class="form-footer">
+        <small>
+          {{ 'opportunity.versionHelp' | t }}
+        </small>
+        <button class="button" type="submit" [disabled]="saving()">
+          {{ (saving() ? 'opportunity.assessing' : 'opportunity.submit') | t }}
+        </button>
+      </div>
+    </form>
+  } @else {
+    <p class="readonly">
+      {{ 'opportunity.readOnly' | t }}
+    </p>
+  }
+
+  @if (logisticsAssessment(); as logistics) {
+    <section class="result">
+      <div class="result-heading">
+        <div>
+          <p class="eyebrow">{{ 'opportunity.independent' | t }}</p>
+          <h3>{{ 'opportunity.logistics' | t }}</h3>
+        </div>
+        <strong>{{ score(logistics.score) }}</strong>
+      </div>
+      <dl>
+        <div><dt>{{ 'opportunity.status' | t }}</dt><dd>{{ label(logistics.status) }}</dd></div>
+        <div><dt>{{ 'opportunity.run' | t }}</dt><dd>#{{ logistics.run_number }}</dd></div>
+        <div>
+          <dt>{{ 'opportunity.confidence' | t }}</dt>
+          <dd>{{ confidence(logistics.confidence_basis_points) }} {{ label(logistics.confidence_level) }}</dd>
+        </div>
+        <div><dt>{{ 'opportunity.unknowns' | t }}</dt><dd>{{ logistics.unknown_count }}</dd></div>
+      </dl>
+      <div class="criteria">
+        @for (item of logistics.items; track item.id) {
+          <div class="criterion" [attr.data-known]="item.is_known">
+            <span>{{ label(item.code) }}</span>
+            <strong>
+              {{
+                item.score_contribution === null
+                  ? ('common.unknown' | t)
+                  : item.score_contribution + ' / ' + item.maximum_points
+              }}
+            </strong>
+          </div>
+        }
+      </div>
+      <div class="chips">
+        @for (entry of confidenceEntries(logistics.confidence_components); track entry.key) {
+          <span>{{ label(entry.key) }} · {{ confidence(entry.value) }}</span>
+        }
+      </div>
+      <div class="chips muted">
+        @for (reason of logistics.reason_codes; track $index) {
+          <span>{{ label(reason) }}</span>
+        }
+      </div>
+    </section>
+  }
+
+  @if (demandAssessment(); as demand) {
+    <section class="result">
+      <div class="result-heading">
+        <div>
+          <p class="eyebrow">{{ 'opportunity.independent' | t }}</p>
+          <h3>{{ 'opportunity.demand' | t }}</h3>
+        </div>
+        <strong>{{ score(demand.score) }}</strong>
+      </div>
+      <dl>
+        <div><dt>{{ 'opportunity.status' | t }}</dt><dd>{{ label(demand.status) }}</dd></div>
+        <div><dt>{{ 'opportunity.run' | t }}</dt><dd>#{{ demand.run_number }}</dd></div>
+        <div>
+          <dt>{{ 'opportunity.confidence' | t }}</dt>
+          <dd>{{ confidence(demand.confidence_basis_points) }} {{ label(demand.confidence_level) }}</dd>
+        </div>
+        <div><dt>{{ 'opportunity.unknowns' | t }}</dt><dd>{{ demand.unknown_count }}</dd></div>
+      </dl>
+      <div class="criteria">
+        @for (item of demand.items; track item.id) {
+          <div class="criterion" [attr.data-known]="item.is_known">
+            <span>{{ label(item.code) }}</span>
+            <strong>
+              {{
+                item.score_contribution === null
+                  ? ('common.unknown' | t)
+                  : item.score_contribution + ' / ' + item.maximum_points
+              }}
+            </strong>
+          </div>
+        }
+      </div>
+      <div class="chips">
+        @for (entry of confidenceEntries(demand.confidence_components); track entry.key) {
+          <span>{{ label(entry.key) }} · {{ confidence(entry.value) }}</span>
+        }
+      </div>
+      <div class="chips muted">
+        @for (reason of demand.reason_codes; track $index) {
+          <span>{{ label(reason) }}</span>
+        }
+      </div>
+    </section>
+  }
+
+  <p class="disclaimer">
+    {{ 'opportunity.disclaimer' | t }}
+  </p>
+</article>

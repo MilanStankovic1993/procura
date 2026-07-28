@@ -1,0 +1,371 @@
+<section class="portfolio-panel">
+  <header class="section-heading">
+    <div>
+      <p class="eyebrow">{{ 'ownedProduct.portfolio.eyebrow' | t }}</p>
+      <h2>{{ 'ownedProduct.portfolio.title' | t }}</h2>
+      <p>{{ 'ownedProduct.portfolio.description' | t }}</p>
+    </div>
+    <button class="quiet" type="button" [disabled]="loading()" (click)="reload()">
+      {{ 'ownedProduct.portfolio.refresh' | t }}
+    </button>
+  </header>
+
+  @if (error()) {
+    <div class="notice error" role="alert">{{ error() }}</div>
+  }
+  @if (success()) {
+    <div class="notice success" role="status">{{ success() }}</div>
+  }
+  @if (loading() && !projection()) {
+    <div class="notice" aria-live="polite">
+      {{ 'ownedProduct.portfolio.loading' | t }}
+    </div>
+  } @else if (projection(); as data) {
+    @if (!data.assessment_current) {
+      <div class="notice warning">
+        <strong>{{ 'ownedProduct.portfolio.staleTitle' | t }}</strong>
+        <span>{{ 'ownedProduct.portfolio.staleDescription' | t }}</span>
+      </div>
+    }
+
+    @if (data.entries.length === 0) {
+      <div class="empty">
+        <strong>{{ 'ownedProduct.portfolio.emptyTitle' | t }}</strong>
+        <span>{{ 'ownedProduct.portfolio.emptyDescription' | t }}</span>
+      </div>
+    } @else {
+      <div class="entry-grid">
+        @for (entry of data.entries; track entry.id) {
+          <article class="entry" [attr.data-status]="entry.current_status">
+            <header>
+              <div>
+                <p class="market">
+                  {{ entry.target_country_code }} · {{ entry.target_currency_code }}
+                </p>
+                <h3>{{ entry.listing_title ?? ('ownedProduct.portfolio.untitledDraft' | t) }}</h3>
+              </div>
+              <span class="sequence">#{{ entry.sequence }}</span>
+            </header>
+
+            <div class="badges">
+              <span [attr.data-status]="entry.current_status">
+                {{ statusLabel(entry.current_status) }}
+              </span>
+              <span [attr.data-current]="entry.source_evidence_current">
+                {{
+                  (entry.source_evidence_current
+                    ? 'ownedProduct.portfolio.evidenceCurrent'
+                    : 'ownedProduct.portfolio.evidenceHistorical'
+                  ) | t
+                }}
+              </span>
+            </div>
+
+            <dl>
+              <div>
+                <dt>{{ 'ownedProduct.portfolio.initialPrice' | t }}</dt>
+                <dd>
+                  {{
+                    money(
+                      entry.initial_asking_price_minor,
+                      entry.target_currency_code
+                    )
+                  }}
+                </dd>
+              </div>
+              <div>
+                <dt>{{ 'ownedProduct.portfolio.currentPrice' | t }}</dt>
+                <dd>
+                  {{
+                    money(
+                      entry.current_event?.advertised_price_minor ?? null,
+                      entry.current_event?.advertised_currency_code ?? null
+                    )
+                  }}
+                </dd>
+              </div>
+              <div>
+                <dt>{{ 'ownedProduct.portfolio.enteredAt' | t }}</dt>
+                <dd>{{ date(entry.entered_at) }}</dd>
+              </div>
+              <div>
+                <dt>{{ 'ownedProduct.portfolio.marketplace' | t }}</dt>
+                <dd>
+                  {{
+                    entry.current_event?.marketplace_name ??
+                      ('common.pending' | t)
+                  }}
+                </dd>
+              </div>
+            </dl>
+
+            @if (entry.current_event; as currentEvent) {
+              <div class="publication">
+                <div>
+                  <strong>{{ currentEvent.external_listing_id }}</strong>
+                  <span>
+                    {{ eventLabel(currentEvent.event_type) }} ·
+                    {{ date(currentEvent.occurred_at) }}
+                  </span>
+                </div>
+                @if (currentEvent.external_listing_url) {
+                  <a
+                    [href]="currentEvent.external_listing_url"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {{ 'ownedProduct.portfolio.openListing' | t }}
+                  </a>
+                }
+              </div>
+            }
+
+            <details>
+              <summary>
+                {{
+                  'ownedProduct.portfolio.history'
+                    | t: { count: entry.events.length }
+                }}
+              </summary>
+              <div class="timeline">
+                @for (event of entry.events; track event.id) {
+                  <div>
+                    <span class="event-sequence">#{{ event.sequence }}</span>
+                    <div>
+                      <strong>
+                        {{ eventLabel(event.event_type) }} ·
+                        {{ statusLabel(event.next_status) }}
+                      </strong>
+                      <span>
+                        {{
+                          money(
+                            event.advertised_price_minor,
+                            event.advertised_currency_code
+                          )
+                        }}
+                        · {{ date(event.occurred_at) }}
+                      </span>
+                      @if (event.reason_code) {
+                        <small>{{ event.reason_code }}</small>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </details>
+
+            <footer>
+              <code [title]="entry.listing_draft_input_hash">
+                {{ shortHash(entry.listing_draft_input_hash) }}
+              </code>
+            </footer>
+          </article>
+        }
+      </div>
+    }
+
+    @if (canManage()) {
+      <section class="forms">
+        <form [formGroup]="entryForm" (ngSubmit)="createEntry()">
+          <div class="subheading">
+            <div>
+              <p class="eyebrow">{{ 'ownedProduct.portfolio.entryEyebrow' | t }}</p>
+              <h3>{{ 'ownedProduct.portfolio.entryTitle' | t }}</h3>
+            </div>
+            <span>{{ 'ownedProduct.portfolio.reviewCompleteOnly' | t }}</span>
+          </div>
+          <label for="portfolio-draft">
+            {{ 'ownedProduct.portfolio.listingDraft' | t }}
+          </label>
+          <select
+            id="portfolio-draft"
+            formControlName="sell_listing_draft_id"
+          >
+            <option value="">
+              {{ 'ownedProduct.portfolio.chooseDraft' | t }}
+            </option>
+            @for (draft of data.available_listing_drafts; track draft.id) {
+              <option [value]="draft.id">{{ draftLabel(draft) }}</option>
+            }
+          </select>
+          <button
+            class="primary"
+            type="submit"
+            [disabled]="savingEntry() || !canCreateEntry()"
+          >
+            {{
+              (savingEntry()
+                ? 'ownedProduct.portfolio.entering'
+                : 'ownedProduct.portfolio.enter'
+              ) | t
+            }}
+          </button>
+        </form>
+
+        @if (data.entries.length > 0) {
+          <form [formGroup]="eventForm" (ngSubmit)="recordEvent()">
+            <div class="subheading">
+              <div>
+                <p class="eyebrow">{{ 'ownedProduct.portfolio.eventEyebrow' | t }}</p>
+                <h3>{{ 'ownedProduct.portfolio.eventTitle' | t }}</h3>
+              </div>
+              <span>{{ 'ownedProduct.portfolio.manualOnly' | t }}</span>
+            </div>
+
+            <div class="form-grid">
+              <div class="wide">
+                <label for="portfolio-entry">
+                  {{ 'ownedProduct.portfolio.entry' | t }}
+                </label>
+                <select id="portfolio-entry" formControlName="entry_id">
+                  <option value="">
+                    {{ 'ownedProduct.portfolio.chooseEntry' | t }}
+                  </option>
+                  @for (entry of data.entries; track entry.id) {
+                    <option [value]="entry.id">{{ entryLabel(entry) }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label for="portfolio-event-type">
+                  {{ 'ownedProduct.portfolio.eventType' | t }}
+                </label>
+                <select id="portfolio-event-type" formControlName="event_type">
+                  <option value="">
+                    {{ 'ownedProduct.portfolio.chooseEvent' | t }}
+                  </option>
+                  @for (event of selectedEntry()?.allowed_events ?? []; track event) {
+                    <option [value]="event">{{ eventLabel(event) }}</option>
+                  }
+                </select>
+              </div>
+              <div>
+                <label for="portfolio-occurred-at">
+                  {{ 'ownedProduct.portfolio.occurredAt' | t }}
+                </label>
+                <input
+                  id="portfolio-occurred-at"
+                  type="datetime-local"
+                  formControlName="occurred_at"
+                />
+              </div>
+
+              @if (showPublicationFields()) {
+                <div>
+                  <label for="portfolio-marketplace-name">
+                    {{ 'ownedProduct.portfolio.marketplaceName' | t }}
+                  </label>
+                  <input
+                    id="portfolio-marketplace-name"
+                    type="text"
+                    formControlName="marketplace_name"
+                  />
+                </div>
+                <div>
+                  <label for="portfolio-marketplace-key">
+                    {{ 'ownedProduct.portfolio.marketplaceKey' | t }}
+                  </label>
+                  <input
+                    id="portfolio-marketplace-key"
+                    type="text"
+                    formControlName="marketplace_key"
+                    [placeholder]="'ownedProduct.portfolio.marketplaceKeyExample' | t"
+                  />
+                </div>
+                <div>
+                  <label for="portfolio-external-id">
+                    {{ 'ownedProduct.portfolio.externalId' | t }}
+                  </label>
+                  <input
+                    id="portfolio-external-id"
+                    type="text"
+                    formControlName="external_listing_id"
+                  />
+                </div>
+                <div>
+                  <label for="portfolio-external-url">
+                    {{ 'ownedProduct.portfolio.externalUrl' | t }}
+                  </label>
+                  <input
+                    id="portfolio-external-url"
+                    type="url"
+                    formControlName="external_listing_url"
+                  />
+                </div>
+              }
+
+              @if (showPriceFields()) {
+                <div>
+                  <label for="portfolio-advertised-price">
+                    {{ 'ownedProduct.portfolio.advertisedPrice' | t }}
+                  </label>
+                  <input
+                    id="portfolio-advertised-price"
+                    type="text"
+                    inputmode="decimal"
+                    formControlName="advertised_price"
+                  />
+                </div>
+                <div>
+                  <label for="portfolio-advertised-currency">
+                    {{ 'ownedProduct.portfolio.currency' | t }}
+                  </label>
+                  <input
+                    id="portfolio-advertised-currency"
+                    type="text"
+                    maxlength="3"
+                    formControlName="advertised_currency_code"
+                    [placeholder]="'ownedProduct.portfolio.currencyExample' | t"
+                  />
+                </div>
+              }
+
+              @if (selectedEventType() === 'withdrawn') {
+                <div class="wide">
+                  <label for="portfolio-reason">
+                    {{ 'ownedProduct.portfolio.withdrawalReason' | t }}
+                  </label>
+                  <input
+                    id="portfolio-reason"
+                    type="text"
+                    formControlName="reason_code"
+                    [placeholder]="'ownedProduct.portfolio.reasonExample' | t"
+                  />
+                </div>
+              }
+              <div class="wide">
+                <label for="portfolio-note">
+                  {{ 'ownedProduct.portfolio.note' | t }}
+                </label>
+                <textarea
+                  id="portfolio-note"
+                  rows="3"
+                  formControlName="note"
+                ></textarea>
+              </div>
+            </div>
+
+            <button
+              class="primary"
+              type="submit"
+              [disabled]="savingEvent() || selectedEntry() === null"
+            >
+              {{
+                (savingEvent()
+                  ? 'ownedProduct.portfolio.recording'
+                  : 'ownedProduct.portfolio.recordEvent'
+                ) | t
+              }}
+            </button>
+          </form>
+        }
+      </section>
+    }
+
+    @if (formError()) {
+      <div class="notice error" role="alert">{{ formError() }}</div>
+    }
+  }
+
+  <p class="boundary">{{ 'ownedProduct.portfolio.boundary' | t }}</p>
+</section>

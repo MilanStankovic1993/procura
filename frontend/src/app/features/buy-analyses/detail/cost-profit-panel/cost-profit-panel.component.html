@@ -1,0 +1,180 @@
+<article class="panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">{{ 'costProfit.eyebrow' | t }}</p>
+      <h2>{{ 'costProfit.title' | t }}</h2>
+      <p>{{ 'costProfit.description' | t: {
+        run: priceEstimate().run_number,
+        currency: priceEstimate().target_currency_code
+      } }}</p>
+    </div>
+    @if (profitEstimate(); as estimate) {
+      <span class="estimate-status" [attr.data-status]="estimate.status">
+        {{ label(estimate.status) }}
+      </span>
+    } @else {
+      <span class="estimate-status">{{ 'costProfit.awaiting' | t }}</span>
+    }
+  </div>
+
+  <div class="boundary">
+    <strong>{{ 'costProfit.blankUnknown' | t }}</strong>
+    <span>{{ 'costProfit.unknownEffect' | t }}</span>
+  </div>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+  @if (success()) {
+    <div class="alert success" role="status">{{ success() }}</div>
+  }
+
+  @if (canManage()) {
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="fields">
+        <label>
+          <span>{{ 'costProfit.purchasePrice' | t }}</span>
+          <input formControlName="purchase_price" inputmode="decimal" [placeholder]="'common.unknown' | t" />
+        </label>
+        <label>
+          <span>{{ 'costProfit.transport' | t }}</span>
+          <input formControlName="transport" inputmode="decimal" [placeholder]="'common.unknown' | t" />
+        </label>
+        <label>
+          <span>{{ 'costProfit.repair' | t }}</span>
+          <input formControlName="repair" inputmode="decimal" [placeholder]="'common.unknown' | t" />
+        </label>
+        <label>
+          <span>{{ 'costProfit.platformFees' | t }}</span>
+          <input formControlName="platform_fees" inputmode="decimal" [placeholder]="'common.unknown' | t" />
+        </label>
+        <label>
+          <span>{{ 'costProfit.paymentFees' | t }}</span>
+          <input formControlName="payment_fees" inputmode="decimal" [placeholder]="'common.unknown' | t" />
+        </label>
+        <label>
+          <span>{{ 'costProfit.customs' | t }}</span>
+          <input formControlName="customs" inputmode="decimal" [placeholder]="'common.unknown' | t" />
+        </label>
+        <label>
+          <span>{{ 'costProfit.tax' | t }}</span>
+          <input formControlName="tax" inputmode="decimal" [placeholder]="'common.unknown' | t" />
+        </label>
+        <label>
+          <span>{{ 'costProfit.otherCosts' | t }}</span>
+          <input formControlName="other_costs" inputmode="decimal" [placeholder]="'common.unknown' | t" />
+        </label>
+        <label>
+          <span>{{ 'costProfit.safetyReserve' | t }}</span>
+          <input formControlName="safety_reserve" inputmode="decimal" [placeholder]="'common.unknown' | t" />
+        </label>
+      </div>
+
+      @if (crossBorder()) {
+        <label class="compatibility">
+          <input type="checkbox" formControlName="regional_compatibility_confirmed" />
+          <span>
+            {{ 'costProfit.compatibility' | t: {
+              source: sourceCountryCode(),
+              target: targetCountryCode()
+            } }}
+          </span>
+        </label>
+      }
+
+      <div class="form-footer">
+        <small>
+          {{ 'costProfit.versionHelp' | t }}
+        </small>
+        <button class="button" type="submit" [disabled]="saving()">
+          {{ (saving() ? 'costProfit.calculating' : 'costProfit.submit') | t }}
+        </button>
+      </div>
+    </form>
+  } @else {
+    <p class="readonly">
+      {{ 'costProfit.readOnly' | t }}
+    </p>
+  }
+
+  @if (profitEstimate(); as estimate) {
+    <section class="result">
+      <div class="metrics">
+        <div>
+          <small>{{ 'costProfit.expectedSale' | t }}</small>
+          <strong>{{ money(estimate.expected_sale_price_minor) }}</strong>
+        </div>
+        <div>
+          <small>{{ 'costProfit.grossMargin' | t }}</small>
+          <strong>{{ money(estimate.gross_margin_minor) }}</strong>
+        </div>
+        <div>
+          <small>{{ 'costProfit.totalCost' | t }}</small>
+          <strong>{{ money(estimate.total_cost_minor) }}</strong>
+        </div>
+        <div class="primary" [attr.data-negative]="estimate.expected_net_profit_minor !== null && estimate.expected_net_profit_minor < 0">
+          <small>{{ 'costProfit.netProfit' | t }}</small>
+          <strong>{{ money(estimate.expected_net_profit_minor) }}</strong>
+        </div>
+        <div>
+          <small>{{ 'costProfit.profitMargin' | t }}</small>
+          <strong>{{ percentage(estimate.profit_margin_basis_points) }}</strong>
+        </div>
+        <div>
+          <small>{{ 'costProfit.returnCapital' | t }}</small>
+          <strong>
+            {{ percentage(estimate.return_on_invested_capital_basis_points) }}
+          </strong>
+        </div>
+      </div>
+
+      <dl>
+        <div><dt>{{ 'costProfit.calculation' | t }}</dt><dd>{{ estimate.calculation_version }}</dd></div>
+        <div><dt>{{ 'costProfit.run' | t }}</dt><dd>#{{ estimate.run_number }}</dd></div>
+        <div>
+          <dt>{{ 'costProfit.confidence' | t }}</dt>
+          <dd>
+            {{ confidence(estimate.confidence_basis_points) }}
+            {{ label(estimate.confidence_level) }}
+          </dd>
+        </div>
+        <div><dt>{{ 'costProfit.unknownInputs' | t }}</dt><dd>{{ estimate.unknown_count }}</dd></div>
+      </dl>
+
+      <div class="evidence">
+        <h3>{{ 'costProfit.formulaEvidence' | t }}</h3>
+        <div class="items">
+          @for (item of estimate.items; track item.id) {
+            <div class="item" [attr.data-known]="item.is_known">
+              <span>{{ label(item.category) }}</span>
+              <strong>{{ money(item.amount_minor) }}</strong>
+              <small>{{ label(item.kind) }} · {{ (item.is_known ? 'common.recorded' : 'common.unknown') | t }}</small>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="evidence">
+        <h3>{{ 'costProfit.confidenceComponents' | t }}</h3>
+        <div class="chips">
+          @for (component of confidenceEntries(estimate.confidence_components); track component.key) {
+            <span>{{ label(component.key) }} · {{ confidence(component.value) }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="evidence">
+        <h3>{{ 'costProfit.reasonCodes' | t }}</h3>
+        <div class="chips muted">
+          @for (reason of estimate.reason_codes; track $index) {
+            <span>{{ label(reason) }}</span>
+          }
+        </div>
+      </div>
+
+      <p class="disclaimer">
+        {{ 'costProfit.disclaimer' | t }}
+      </p>
+    </section>
+  }
+</article>
