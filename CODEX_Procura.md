@@ -1593,7 +1593,9 @@ multi-currency comparison, atomic accepted-offer transaction/commission creation
 payment/order/shipping/delivery/completion tracking, independent commission settlement evidence,
 evidence-derived immutable PDF reports with checksum-verified private signed delivery and retention
 purge, a provider-independent immutable refund/dispute investigation ledger with strict reviewed
-outcome rules and safe subject/Admin projections, and complete EN/DE/ES/FR/sr-Latn UI/validation.
+outcome rules and safe subject/Admin projections, bounded single-query lifecycle attention
+monitoring with secret-free CLI alerting and a localized Admin tile, and complete
+EN/DE/ES/FR/sr-Latn UI/validation.
 These records do not execute payment, refunds, chargebacks, commission reversals, or supplier
 operations. Provider communication and actual payment/refund/dispute execution remain separate
 Phase 8 procedures.

@@ -264,7 +264,7 @@ pending**
 
 Application controls now present:
 
-- the eleven non-readiness Filament overview counters use one validated 30-second shared-cache
+- the twelve non-readiness Filament overview counters use one validated 30-second shared-cache
   snapshot with a distributed anti-stampede lock;
 - cache failure falls back to the same fixed cold query path; readiness remains independently live;
 - the tenant Analysis index API and diagnostic harness use the same tenant-scoped, ordered,
@@ -301,7 +301,7 @@ php artisan operations:capacity-baseline \
   --json
 ```
 
-5. Require exit code zero, query counts no greater than `11/1/2`, every duration within the
+5. Require exit code zero, query counts no greater than `12/1/2`, every duration within the
    versioned budgets, a 50-row tenant result when sufficient fixtures exist, and no SQL/error text
    in the retained JSON.
 6. Exercise concurrent cold Admin requests at snapshot expiry and prove only one recomputation
@@ -856,6 +856,23 @@ Release procedure:
    existing read/audit access. Enable `BROKER_OFFERS_ENABLED=true` only after offer-specific
    staging evidence is approved; keep transaction acceptance/operations disabled until the full
    lifecycle evidence below passes.
+
+   Independently review and set the broker lifecycle attention thresholds. The repository defaults
+   are an operational starting point, not an SLA or commercial promise:
+
+```text
+BROKER_MONITOR_REQUEST_AGE_HOURS=48
+BROKER_MONITOR_OFFER_EXPIRY_GRACE_HOURS=1
+BROKER_MONITOR_TRANSACTION_AGE_HOURS=24
+BROKER_MONITOR_COMMISSION_AGE_HOURS=72
+BROKER_MONITOR_REPORT_PURGE_GRACE_HOURS=26
+BROKER_MONITOR_PAYMENT_CASE_AGE_HOURS=48
+```
+
+   Rebuild configuration after any threshold change. Production preflight fails when an effective
+   value is outside its bounded contract. Changes must be recorded with the operational owner,
+   rationale, effective time, affected alert rules, and rollback value; they never rewrite ledger
+   timestamps or historical events.
 6. With a dedicated staging organization, exercise owner/administrator/analyst/viewer access,
    cross-tenant `404`, draft-only edit, exact create/update/submit/cancel replay, changed replay,
    stale expected head, quota exhaustion/rollback, safe timeline projection, five locales, and
@@ -1060,6 +1077,30 @@ quota/conflict/stale rejection, settlement rate, unauthorized attempts, command 
 completeness, database latency, and all six event-history growth rates. Never log product
 notes, supplier references, offer terms, payment data, snapshots, replay keys, hashes, or evidence
 contents.
+
+Procura provides the bounded projection-side monitoring contract:
+
+```text
+php artisan broker-operations:status --json
+php artisan broker-operations:status --json --fail-on-attention
+```
+
+Run the alerting form at least every five minutes from one monitored scheduler or external job. It
+returns non-zero when any aged/past-due request, expired presented offer, delayed non-terminal
+transaction, earned unsettled commission, overdue available report artifact, or aged open payment
+case is present. Alert on command failure separately from a valid `attention_required` report.
+Store the one-line JSON as release/incident evidence only under the approved retention policy. It
+contains counts and thresholds, never tenant/user identifiers, supplier/offer facts, money,
+storage coordinates, payment data, evidence, hashes, snapshots, or replay keys. Use the six
+authoritative read-only Admin resources for reviewed investigation; do not expand the command into
+a customer-data export.
+
+Before production activation, attach one clear-state run and one controlled staging
+`attention_required` run proving the non-zero exit, dashboard tile, alert delivery, operator
+acknowledgement, source-ledger investigation, resolution, and return to clear. Rehearse request,
+offer, transaction, commission, report-purge, and payment-case signals independently. This
+application contract does not replace provider, refund, supplier, carrier, storage, security, or
+database monitoring.
 
 Rollback/incident boundary:
 

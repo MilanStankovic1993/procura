@@ -417,7 +417,7 @@ Filament platform administration now includes:
   active country markets, notification delivery failures, Telegram state, and billing projections
   requiring attention, plus open privacy requests, analyses requiring operator review, and a
   five-language Ready/Core ready/Unavailable operational-readiness projection,
-- a validated 30-second shared-cache snapshot for the eleven non-readiness overview counters with
+- a validated 30-second shared-cache snapshot for the twelve non-readiness overview counters with
   distributed anti-stampede locking, bounded cold fallback, and no cached readiness decision,
 - a transactional, idempotent organization-plan assignment action with a mandatory operational
   reason,
@@ -1038,7 +1038,7 @@ existing development database:
 php artisan operations:capacity-baseline --enforce-duration --json
 ```
 
-The strict local MySQL run passed with the exact eleven-query dashboard budget and one-query
+The strict local MySQL run passed the original eleven-query dashboard budget and one-query
 Analysis Operations budget while the optional tenant probe remained explicitly skipped. The same
 command also passed after Laravel configuration, route, view, icon, and Filament metadata were
 cached.
@@ -1217,6 +1217,13 @@ complete at the provider-independent application boundary:
     execution and supplier communication/integration remain explicit later Phase 8 boundaries.
     Transaction/commission/report/payment-case rows are evidence ledgers and never claim that
     Procura handled funds or executed an external operation.
+14. `BrokerOperationsMonitor` classifies seven bounded attention signals in one SQL query: aged and
+    past-needed-by requests, expired offers, delayed non-terminal transactions, earned commissions,
+    overdue report purges, and aged open payment cases. `broker-operations:status --json` is a
+    secret-free report contract; `--fail-on-attention` adds alerting exit semantics. The cached
+    dashboard exposes the same total in all five Admin locales, production preflight validates the
+    reviewed thresholds, and no tenant, supplier, money, storage, payment, evidence, hash, snapshot,
+    or replay data enters the output.
 
 The Analysis Operations boundary is now complete and production-gated:
 
@@ -1271,15 +1278,15 @@ The production-configuration preflight boundary is now complete:
 
 The first performance/capacity regression boundary is now complete:
 
-1. `PlatformOverviewMetrics` owns eleven global non-readiness counts. A cold snapshot is exactly
-   eleven queries; a warm validated shared-cache snapshot performs zero database queries.
+1. `PlatformOverviewMetrics` owns twelve global non-readiness counts. A cold snapshot is exactly
+   twelve queries; a warm validated shared-cache snapshot performs zero database queries.
 2. A distributed lock prevents concurrent cold Admin requests from stampeding MySQL. Corrupt or
    unavailable cache state falls back to the cold query path, while live readiness independently
    reports cache health.
 3. `AnalysisIndexQuery` is shared by the tenant API and capacity harness, preserving tenant scope,
    deterministic ordering, listing eager loading, filters, and the 50-row hard ceiling.
 4. `operations:capacity-baseline` measures the cold dashboard, Analysis Operations count, and an
-   optional tenant Analysis page. It always enforces versioned `11/1/2` query budgets and can
+   optional tenant Analysis page. It always enforces versioned `12/1/2` query budgets and can
    enforce database/wall duration budgets in staging.
 5. The CI fixture inserts 2,000 synthetic Analysis rows and proves constant query counts, cache
    reuse, strict JSON, invalid-input rejection, production acknowledgement, and fail-closed budget
@@ -1308,7 +1315,7 @@ personal organizations and memberships (complete)
    (complete; production heartbeat switch off)
 -> effective production-config preflight, trusted host/proxy boundary, and analysis submission kill
    switch (complete; external provider and production values pending)
--> deterministic capacity fixture, dashboard snapshot, `11/1/2` query budgets, and guarded staging
+-> deterministic capacity fixture, dashboard snapshot, `12/1/2` query budgets, and guarded staging
    CLI (complete first baseline; concurrent load/soak evidence pending)
 -> central five-language API/Fortify validation and request-locale isolation (complete)
 -> typed five-language API domain-conflict presentation and raw-message exclusion (complete)
@@ -1346,6 +1353,7 @@ personal organizations and memberships (complete)
 -> Phase 8 transaction, fulfillment-evidence, and commission ledgers (complete)
 -> Phase 8 evidence-derived PDF reports and secure retention-bound delivery (complete)
 -> Phase 8 provider-independent refund/dispute investigation ledger (complete)
+-> Phase 8 bounded broker lifecycle monitoring and application acceptance evidence (complete)
 -> Phase 8 payment/refund/chargeback execution and supplier integrations (provider/policy-dependent)
 ```
 

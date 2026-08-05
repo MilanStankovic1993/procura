@@ -370,6 +370,7 @@ operator workflow before any future manual resend. Production deployment must ru
 - rejected billing projections and active-subscription conflicts,
 - open privacy requests and response targets,
 - analyses requiring operator attention,
+- broker lifecycle heads requiring operator attention,
 - operational readiness across the database, shared cache, and configured queue worker pools.
 
 The operational-readiness tile is localized in all five Admin locales. `Ready` means all configured
@@ -378,10 +379,25 @@ active because queue-heartbeat monitoring is disabled. `Unavailable` requires op
 The dashboard never displays queue names, connection names, exceptions, or cache keys.
 
 All non-readiness overview counts share one validated, stampede-protected cache snapshot for at
-most 30 seconds. The cache contains eleven non-negative global counters only. Privacy, failure, and
-Analysis Operations tiles can therefore lag their source ledgers by the configured short TTL;
+most 30 seconds. The cache contains twelve non-negative global counters only. Privacy, failure,
+Analysis Operations, and broker lifecycle tiles can therefore lag their source ledgers by the configured short TTL;
 their underlying resources remain authoritative. A cache outage falls back to the fixed cold query
 path while the readiness tile independently reports the cache failure.
+
+The broker tile is backed by one constant-query classifier. It covers current-state age for
+submitted/reviewing/searching/offers-available requests, past needed-by dates, presented offers
+beyond their expiry grace, non-terminal transactions, earned commissions awaiting settlement,
+available report artifacts beyond purge grace, and open/under-review payment cases. Operators use:
+
+```text
+php artisan broker-operations:status --json
+php artisan broker-operations:status --json --fail-on-attention
+```
+
+The first command is report-only. The second exits non-zero when any attention head exists and is
+the monitoring/alerting contract. Both outputs contain stable counts and effective thresholds only;
+they never contain organization/user identifiers, supplier or offer facts, money, private storage,
+evidence, hashes, snapshots, or replay keys.
 
 For exact internal queue evidence, operators use:
 

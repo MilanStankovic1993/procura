@@ -241,6 +241,7 @@ return [
             'billing_attention' => ['label' => 'Événements de facturation à vérifier', 'description' => 'Projections rejetées ou conflits d’abonnement actif'],
             'privacy_requests' => ['label' => 'Demandes de confidentialité ouvertes', 'description' => "Processus d'export ou de suppression en attente de résolution"],
             'analysis_operations' => ['label' => 'Analyses à vérifier', 'description' => 'Échecs définitifs ou traitements en tête nécessitant une vérification'],
+            'broker_operations' => ['label' => 'Cycle de courtage à vérifier', 'description' => 'Demandes anciennes, offres expirées ou états retardés de transaction, commission, rapport et dossier de paiement'],
         ],
     ],
     'values' => [

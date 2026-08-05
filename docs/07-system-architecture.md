@@ -780,7 +780,7 @@ is disabled by default and must be activated only after shared cache, the single
 every documented worker pool are running.
 
 The global Filament overview aggregates are isolated in `PlatformOverviewMetrics`. A cold snapshot
-has an explicit eleven-query budget; a valid snapshot is stored for 30 seconds in the configured
+has an explicit twelve-query budget; a valid snapshot is stored for 30 seconds in the configured
 shared cache. A distributed lock prevents a dashboard traffic burst from recomputing the same
 global counts concurrently. Cache corruption or unavailability falls back to the bounded database
 query without hiding the separate readiness failure. Readiness itself is never served from this

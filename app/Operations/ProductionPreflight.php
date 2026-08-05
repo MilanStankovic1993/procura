@@ -5,6 +5,7 @@ namespace App\Operations;
 use App\Analysis\Contracts\ListingAiAnalyzer;
 use App\Analysis\Providers\FakeListingAiAnalyzer;
 use App\Billing\BillingConfiguration;
+use App\BrokerRequests\Operations\BrokerOperationsConfiguration;
 use App\Enums\Subscriptions\BillingInterval;
 use App\Enums\Subscriptions\PlanCode;
 use App\Monitoring\Telegram\TelegramConfiguration;
@@ -26,6 +27,7 @@ final class ProductionPreflight
         private readonly BillingConfiguration $billing,
         private readonly TelegramConfiguration $telegram,
         private readonly PrivacyWorkflowConfiguration $privacy,
+        private readonly BrokerOperationsConfiguration $brokerOperations,
     ) {}
 
     public function inspect(bool $allowNonProduction = false): ProductionPreflightReport
@@ -394,10 +396,19 @@ final class ProductionPreflight
         $commissionValid = trim((string) config('broker.commission_rule_version')) !== ''
             && (int) config('broker.commission_rate_basis_points') >= 1
             && (int) config('broker.commission_rate_basis_points') <= 10_000;
+        $brokerMonitoringValid = true;
+
+        try {
+            $this->brokerOperations->thresholds();
+        } catch (Throwable) {
+            $brokerMonitoringValid = false;
+        }
+
         $brokerValid = (! $offers || $requests)
             && (! $transactions || ($offers && $commissionValid))
             && (! $paymentCases || $transactions)
-            && (! $reports || $transactions);
+            && (! $reports || $transactions)
+            && $brokerMonitoringValid;
 
         $privacyValid = true;
 

@@ -241,6 +241,7 @@ return [
             'billing_attention' => ['label' => 'Događaji naplate za proveru', 'description' => 'Odbijene projekcije ili sukobi aktivnih pretplata'],
             'privacy_requests' => ['label' => 'Otvoreni zahtevi za privatnost', 'description' => 'Procesi izvoza ili brisanja koji čekaju razrešenje'],
             'analysis_operations' => ['label' => 'Analize koje zahtevaju pažnju', 'description' => 'Konačni neuspesi ili aktivne obrade koje zahtevaju proveru operatera'],
+            'broker_operations' => ['label' => 'Brokerski tok zahteva pažnju', 'description' => 'Zastareli zahtevi, istekle ponude ili usporena stanja transakcija, provizija, izveštaja i platnih slučajeva'],
         ],
     ],
     'values' => [

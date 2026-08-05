@@ -38,4 +38,30 @@ return [
         5 * 1024 * 1024,
     ),
     'report_purge_batch' => (int) env('BROKER_REPORT_PURGE_BATCH', 100),
+    'monitoring' => [
+        'request_age_hours' => (int) env(
+            'BROKER_MONITOR_REQUEST_AGE_HOURS',
+            48,
+        ),
+        'offer_expiry_grace_hours' => (int) env(
+            'BROKER_MONITOR_OFFER_EXPIRY_GRACE_HOURS',
+            1,
+        ),
+        'transaction_age_hours' => (int) env(
+            'BROKER_MONITOR_TRANSACTION_AGE_HOURS',
+            24,
+        ),
+        'commission_age_hours' => (int) env(
+            'BROKER_MONITOR_COMMISSION_AGE_HOURS',
+            72,
+        ),
+        'report_purge_grace_hours' => (int) env(
+            'BROKER_MONITOR_REPORT_PURGE_GRACE_HOURS',
+            26,
+        ),
+        'payment_case_age_hours' => (int) env(
+            'BROKER_MONITOR_PAYMENT_CASE_AGE_HOURS',
+            48,
+        ),
+    ],
 ];
