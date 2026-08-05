@@ -18,9 +18,10 @@ test('the production database family satisfies the schema and session contract',
             @@collation_connection AS collation_connection
         SQL);
     $tableEngines = DB::table('information_schema.tables')
+        ->selectRaw('ENGINE AS table_engine')
         ->where('table_schema', $database)
         ->where('table_type', 'BASE TABLE')
-        ->pluck('engine');
+        ->pluck('table_engine');
     $oversizedIndexes = DB::table('information_schema.statistics')
         ->where('table_schema', $database)
         ->whereRaw('CHAR_LENGTH(index_name) > 64')
