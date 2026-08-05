@@ -9,6 +9,9 @@ test('continuous integration exercises the production database and cache familie
 
     expect($workflow['concurrency']['cancel-in-progress'])
         ->toBeTrue()
+        ->and($workflow['on']['push']['branches'])
+        ->toContain('main')
+        ->toContain('develop')
         ->and($workflow['jobs']['tests']['timeout-minutes'])
         ->toBe(20)
         ->and($job['timeout-minutes'])

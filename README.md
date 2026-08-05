@@ -45,6 +45,10 @@ Read and implement the documents in this order:
 18. `docs/18-development-handoff.md`
 19. `docs/19-production-go-live.md`
 
+Repository branching, pull-request checks, and release promotion rules are defined in
+[`CONTRIBUTING.md`](CONTRIBUTING.md). `main` contains reviewed production checkpoints, while
+`develop` is the shared integration branch for the next release.
+
 ## Implementation principle
 
 Do not begin broad marketplace automation first.

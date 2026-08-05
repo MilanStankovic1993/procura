@@ -1,6 +1,6 @@
 # 18 - Development Handoff
 
-Last updated: 2026-07-29
+Last updated: 2026-08-05
 
 This document is the persistent handoff for continuing Procura development on another computer or
 in a new Codex task. Read it after the preceding product and architecture documents and verify the
@@ -14,8 +14,14 @@ monitoring, secret rotation, and rollback.
 Repository: https://github.com/MilanStankovic1993/procura
 Default branch: main
 Project name: Procura
-Current development branch: codex/authentication-foundation
+Current development branch: develop
 ```
+
+`main` is the protected production-ready branch. `develop` is the long-lived integration branch.
+New work uses short-lived `feature/*` or `fix/*` branches from `develop`; release promotion enters
+`main` through a green pull request. The complete policy and PR checklist live in
+`CONTRIBUTING.md`. Direct development commits, force pushes, and deletion of long-lived branches
+are prohibited.
 
 Foundation commits preceding the authentication branch:
 
