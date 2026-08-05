@@ -2,11 +2,27 @@
 
 use App\Actions\Administration\AssignOrganizationPlan;
 use App\Actions\Administration\BootstrapSuperAdmin;
+use App\Actions\BrokerRequests\AcceptBrokerRequestOffer;
+use App\Actions\BrokerRequests\CreateBrokerRequest;
+use App\Actions\BrokerRequests\OpenBrokerPaymentCase;
+use App\Actions\BrokerRequests\PresentBrokerRequestOffer;
+use App\Actions\BrokerRequests\TransitionBrokerRequest;
+use App\Actions\BrokerRequests\TransitionBrokerTransaction;
+use App\Actions\Markets\SyncMarketReferenceData;
 use App\Actions\Privacy\CreatePrivacyRequest;
+use App\Enums\BrokerRequests\BrokerPaymentCaseType;
+use App\Enums\BrokerRequests\BrokerRequestStatus;
+use App\Enums\BrokerRequests\BrokerTransactionStatus;
 use App\Enums\Localization\SupportedLocale;
 use App\Filament\Resources\AnalysisOperations\AnalysisOperationResource;
 use App\Filament\Resources\AuditEvents\AuditEventResource;
 use App\Filament\Resources\BillingProviderEvents\BillingProviderEventResource;
+use App\Filament\Resources\BrokerCommissionResource;
+use App\Filament\Resources\BrokerPaymentCaseResource;
+use App\Filament\Resources\BrokerReportResource;
+use App\Filament\Resources\BrokerRequestOfferResource;
+use App\Filament\Resources\BrokerRequestResource;
+use App\Filament\Resources\BrokerTransactionResource;
 use App\Filament\Resources\ComparableMarketNormalizations\ComparableMarketNormalizationResource;
 use App\Filament\Resources\Countries\CountryResource;
 use App\Filament\Resources\Currencies\CurrencyResource;
@@ -21,7 +37,9 @@ use App\Filament\Resources\TelegramConnections\TelegramConnectionResource;
 use App\Filament\Resources\Usages\UsageResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\BillingProviderEvent;
+use App\Models\BrokerRequestEvent;
 use App\Models\Organization;
+use App\Models\OrganizationMembership;
 use App\Models\Plan;
 use App\Models\PlatformAuditEvent;
 use App\Models\PrivacyRequest;
@@ -31,6 +49,7 @@ use Filament\Facades\Filament;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 function superAdmin(array $attributes = []): User
@@ -68,6 +87,12 @@ test('verified super administrators can access operational resources while resou
         ->and(AuditEventResource::canCreate())->toBeFalse()
         ->and(AnalysisOperationResource::canCreate())->toBeFalse()
         ->and(ComparableMarketNormalizationResource::canCreate())->toBeFalse()
+        ->and(BrokerRequestOfferResource::canCreate())->toBeFalse()
+        ->and(BrokerRequestResource::canCreate())->toBeFalse()
+        ->and(BrokerTransactionResource::canCreate())->toBeFalse()
+        ->and(BrokerCommissionResource::canCreate())->toBeFalse()
+        ->and(BrokerPaymentCaseResource::canCreate())->toBeFalse()
+        ->and(BrokerReportResource::canCreate())->toBeFalse()
         ->and(PrivacyRequestResource::canCreate())->toBeFalse();
 
     $this->actingAs($admin)
@@ -91,6 +116,12 @@ test('verified super administrators can access operational resources while resou
         TelegramConnectionResource::class,
         BillingProviderEventResource::class,
         ComparableMarketNormalizationResource::class,
+        BrokerRequestOfferResource::class,
+        BrokerRequestResource::class,
+        BrokerTransactionResource::class,
+        BrokerCommissionResource::class,
+        BrokerPaymentCaseResource::class,
+        BrokerReportResource::class,
         PrivacyRequestResource::class,
     ] as $resource) {
         $this->actingAs($admin)
@@ -125,6 +156,209 @@ test('privacy operations expose workflow evidence without internal request hashe
         ->assertDontSee($privacyRequest->requester_email_hash)
         ->assertDontSee($privacyRequest->payload_hash)
         ->assertDontSee($privacyRequest->idempotency_key);
+});
+
+test('broker operations expose bounded evidence without internal replay data', function () {
+    app(SyncMarketReferenceData::class)->sync();
+    $this->seed(PlanSeeder::class);
+    $requester = User::factory()->create();
+    $organization = Organization::factory()->create([
+        'name' => 'Broker Operations Workspace',
+    ]);
+    OrganizationMembership::factory()->owner()->create([
+        'organization_id' => $organization,
+        'user_id' => $requester,
+    ]);
+    $requester->update([
+        'current_organization_id' => $organization->getKey(),
+    ]);
+    DB::table('organization_plan_assignments')->insert([
+        'organization_id' => $organization->getKey(),
+        'plan_id' => Plan::query()
+            ->where('code', 'business')
+            ->valueOrFail('id'),
+        'starts_at' => now()->subMinute(),
+        'ends_at' => null,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $created = app(CreateBrokerRequest::class)->create(
+        $organization,
+        $requester,
+        [
+            'title' => 'Industrial robot sourcing brief',
+            'product_category_id' => null,
+            'product_description' => (
+                'A production-ready six-axis robot with maintenance records.'
+            ),
+            'brand_preference' => null,
+            'model_preference' => null,
+            'condition_preference' => 'used',
+            'quantity' => 1,
+            'budget_max_minor' => 2500000,
+            'budget_currency_code' => 'EUR',
+            'target_country_codes' => ['DE'],
+            'needed_by' => now()->addMonths(2)->toDateString(),
+            'notes' => null,
+        ],
+        (string) Str::uuid(),
+    );
+    $transition = app(TransitionBrokerRequest::class);
+    $submitted = $transition->submit(
+        $created->brokerRequest,
+        $requester,
+        $created->event->getKey(),
+        (string) Str::uuid(),
+    );
+    $admin = superAdmin();
+    $reviewed = $transition->operatorTransition(
+        $created->brokerRequest->fresh(),
+        $admin,
+        BrokerRequestStatus::Reviewing,
+        $submitted->event->getKey(),
+        (string) Str::uuid(),
+        'operator_review_started',
+        'case:broker-admin-001',
+    );
+    $searching = $transition->operatorTransition(
+        $created->brokerRequest->fresh(),
+        $admin,
+        BrokerRequestStatus::Searching,
+        $reviewed->event->getKey(),
+        (string) Str::uuid(),
+        'operator_search_started',
+        'case:broker-admin-search-001',
+    );
+    config([
+        'broker.offers_enabled' => true,
+        'broker.transactions_enabled' => true,
+        'broker.payment_cases_enabled' => true,
+        'broker.commission_rule_version' => 'broker-commission:v1',
+        'broker.commission_rate_basis_points' => 250,
+    ]);
+    $offer = app(PresentBrokerRequestOffer::class)->execute(
+        request: $created->brokerRequest->fresh(),
+        actor: $admin,
+        expectedRequestEventId: $searching->event->getKey(),
+        idempotencyKey: (string) Str::uuid(),
+        evidenceReference: 'quote:broker-admin-offer-001',
+        input: [
+            'supplier_display_name' => 'Admin-visible supplier alias',
+            'supplier_reference' => 'vault:supplier-ref-001',
+            'item_description' => (
+                'Inspected six-axis industrial robot with loading included.'
+            ),
+            'condition' => 'used',
+            'quantity' => 1,
+            'unit_price_minor' => 2200000,
+            'shipping_cost_minor' => 100000,
+            'tax_duty_cost_minor' => 50000,
+            'other_cost_minor' => 0,
+            'currency_code' => 'EUR',
+            'origin_country_code' => 'DE',
+            'estimated_delivery_date' => now()->addMonth()->toDateString(),
+            'valid_until' => now()->addWeek()->toIso8601String(),
+            'warranty_months' => 3,
+            'return_policy_summary' => 'Documented material mismatch only.',
+        ],
+    );
+    $accepted = app(AcceptBrokerRequestOffer::class)->execute(
+        request: $created->brokerRequest->fresh(),
+        offer: $offer->offer,
+        actor: $requester,
+        expectedRequestEventId: $offer->requestEvent->getKey(),
+        expectedOfferEventId: $offer->offerEvent->getKey(),
+        idempotencyKey: (string) Str::uuid(),
+    );
+    $payment = app(TransitionBrokerTransaction::class)->execute(
+        transaction: $accepted->transaction,
+        actor: $admin,
+        target: BrokerTransactionStatus::PaymentConfirmed,
+        expectedCurrentEventId: $accepted->transaction->current_event_id,
+        idempotencyKey: (string) Str::uuid(),
+        reasonCode: 'external_payment_confirmed',
+        evidenceReference: 'payment-ledger:admin-payment-001',
+    );
+    $paymentCase = app(OpenBrokerPaymentCase::class)->execute(
+        transaction: $payment->transaction,
+        actor: $admin,
+        type: BrokerPaymentCaseType::Refund,
+        requestedAmountMinor: 10000,
+        expectedTransactionEventId: $payment->transactionEvent->getKey(),
+        idempotencyKey: (string) Str::uuid(),
+        externalCaseReference: 'support:admin-refund-001',
+        reasonCode: 'refund_case_opened',
+        evidenceReference: 'case-evidence:admin-refund-001',
+    );
+
+    $this->actingAs(User::factory()->create())
+        ->get(BrokerRequestResource::getUrl())
+        ->assertForbidden();
+    $this->actingAs(User::factory()->create())
+        ->get(BrokerRequestOfferResource::getUrl())
+        ->assertForbidden();
+    $this->actingAs(User::factory()->create())
+        ->get(BrokerTransactionResource::getUrl())
+        ->assertForbidden();
+    $this->actingAs(User::factory()->create())
+        ->get(BrokerCommissionResource::getUrl())
+        ->assertForbidden();
+    $this->actingAs(User::factory()->create())
+        ->get(BrokerReportResource::getUrl())
+        ->assertForbidden();
+    $this->actingAs(User::factory()->create())
+        ->get(BrokerPaymentCaseResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs($admin)
+        ->get(BrokerRequestResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Broker Operations Workspace')
+        ->assertSeeText('Industrial robot sourcing brief')
+        ->assertSeeText('Offer accepted by requester')
+        ->assertDontSee($reviewed->event->payload_hash)
+        ->assertDontSee($reviewed->event->request_hash)
+        ->assertDontSee($reviewed->event->idempotency_key);
+
+    $this->actingAs($admin)
+        ->get(BrokerRequestOfferResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Admin-visible supplier alias')
+        ->assertSeeText('vault:supplier-ref-001')
+        ->assertSeeText('Accepted by requester')
+        ->assertDontSee($offer->offerEvent->payload_hash)
+        ->assertDontSee($offer->offerEvent->offer_hash)
+        ->assertDontSee($offer->offerEvent->idempotency_key);
+
+    $this->actingAs($admin)
+        ->get(BrokerTransactionResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Payment confirmed')
+        ->assertSeeText('Pending')
+        ->assertDontSee($accepted->transaction->currentEvent->payload_hash)
+        ->assertDontSee($accepted->transaction->currentEvent->transaction_hash)
+        ->assertDontSee($accepted->transaction->currentEvent->idempotency_key);
+
+    $this->actingAs($admin)
+        ->get(BrokerCommissionResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('broker-commission:v1')
+        ->assertSeeText('Pending')
+        ->assertDontSee($accepted->commission->currentEvent->payload_hash)
+        ->assertDontSee($accepted->commission->currentEvent->commission_hash)
+        ->assertDontSee($accepted->commission->currentEvent->idempotency_key);
+
+    $this->actingAs($admin)
+        ->get(BrokerPaymentCaseResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Refund')
+        ->assertSeeText('support:admin-refund-001')
+        ->assertSeeText('case-evidence:admin-refund-001')
+        ->assertDontSee($paymentCase->event->payload_hash)
+        ->assertDontSee($paymentCase->event->payment_case_hash)
+        ->assertDontSee($paymentCase->event->idempotency_key);
+
+    expect(BrokerRequestEvent::query()->count())->toBe(6);
 });
 
 test('billing operations expose safe translated events only to verified super administrators', function () {

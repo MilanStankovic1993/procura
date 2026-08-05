@@ -27,6 +27,7 @@ final class PrivacyRequestResource extends ReadOnlyResource
                     'subject:id,name,email',
                     'residenceCountry:code,name',
                     'currentEvent.actor:id,email',
+                    'fulfillment:id,privacy_request_id,data_inventory_version,artifact_expires_at,backup_purge_due_at,completed_at',
                 ]),
             )
             ->columns([
@@ -128,6 +129,27 @@ final class PrivacyRequestResource extends ReadOnlyResource
                     ->dateTime()
                     ->placeholder(__('admin.placeholders.open'))
                     ->sortable(),
+                TextColumn::make('fulfillment.id')
+                    ->label(__('admin.columns.fulfillment_receipt'))
+                    ->placeholder(__('admin.placeholders.not_provided'))
+                    ->copyable()
+                    ->limit(16),
+                TextColumn::make('fulfillment.data_inventory_version')
+                    ->label(__('admin.columns.data_inventory_version'))
+                    ->placeholder(__('admin.placeholders.not_provided'))
+                    ->badge(),
+                TextColumn::make('fulfillment.artifact_expires_at')
+                    ->label(__('admin.columns.artifact_expires_at'))
+                    ->dateTime()
+                    ->placeholder(__('admin.placeholders.not_provided')),
+                TextColumn::make('fulfillment.backup_purge_due_at')
+                    ->label(__('admin.columns.backup_purge_due_at'))
+                    ->dateTime()
+                    ->placeholder(__('admin.placeholders.not_provided')),
+                TextColumn::make('fulfillment.completed_at')
+                    ->label(__('admin.columns.completed_at'))
+                    ->dateTime()
+                    ->placeholder(__('admin.placeholders.open')),
             ])
             ->filters([
                 SelectFilter::make('type')

@@ -5,15 +5,16 @@ namespace App\Actions\OwnedProducts;
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\OwnedProducts\OwnedProductImageKind;
 use App\Enums\OwnedProducts\OwnedProductStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Models\OwnedProduct;
 use App\Models\OwnedProductImage;
 use App\Models\User;
 use App\Support\Uploads\ImageUploadInspector;
+use App\Support\Validation\ApplicationValidation;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use RuntimeException;
 use Throwable;
 
@@ -59,9 +60,10 @@ class StoreOwnedProductImages
                 );
 
                 if ($locked->status === OwnedProductStatus::Archived) {
-                    throw ValidationException::withMessages([
-                        'status' => 'Archived owned products cannot receive images.',
-                    ]);
+                    ApplicationValidation::fail(
+                        'status',
+                        ApplicationValidationCode::ArchivedOwnedProductImmutable,
+                    );
                 }
 
                 $existingCount = $locked->images()
@@ -69,13 +71,11 @@ class StoreOwnedProductImages
                     ->count();
 
                 if ($existingCount + count($files) > $kind->maximumCount()) {
-                    throw ValidationException::withMessages([
-                        'images' => sprintf(
-                            'An owned product may contain at most %d %s images.',
-                            $kind->maximumCount(),
-                            $kind->value,
-                        ),
-                    ]);
+                    ApplicationValidation::fail(
+                        'images',
+                        ApplicationValidationCode::OwnedProductImageLimit,
+                        ['max' => $kind->maximumCount()],
+                    );
                 }
 
                 $position = (int) $locked->images()
@@ -93,9 +93,10 @@ class StoreOwnedProductImages
                         ->where('kind', $kind->value)
                         ->where('checksum_sha256', $metadata['checksum_sha256'])
                         ->exists()) {
-                        throw ValidationException::withMessages([
-                            "images.{$index}" => 'This image has already been uploaded.',
-                        ]);
+                        ApplicationValidation::fail(
+                            "images.{$index}",
+                            ApplicationValidationCode::DuplicateImage,
+                        );
                     }
 
                     $imageId = (string) Str::ulid();

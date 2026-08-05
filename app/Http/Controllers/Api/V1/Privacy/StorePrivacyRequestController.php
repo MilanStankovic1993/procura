@@ -22,6 +22,7 @@ final class StorePrivacyRequestController extends Controller
         );
         $result['privacy_request']->load([
             'residenceCountry',
+            'fulfillment',
             'currentEvent.actor:id,name',
             'events.actor:id,name',
         ]);

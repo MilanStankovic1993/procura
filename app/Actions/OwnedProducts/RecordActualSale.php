@@ -7,6 +7,7 @@ use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\Outcomes\ActualSaleOutcomeType;
 use App\Enums\Sell\SalePortfolioEventType;
 use App\Enums\Sell\SalePortfolioStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Exceptions\OutcomeTrackingConflictException;
 use App\Models\ActualSale;
 use App\Models\Organization;
@@ -15,10 +16,10 @@ use App\Models\SalePortfolioEntry;
 use App\Models\SalePortfolioEvent;
 use App\Models\User;
 use App\OutcomeTracking\OutcomeMoneyNormalizer;
+use App\Support\Validation\ApplicationValidation;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use JsonException;
 
 final class RecordActualSale
@@ -125,21 +126,19 @@ final class RecordActualSale
             )->utc();
 
             if ($occurredAt->lt($currentEvent->occurred_at)) {
-                throw ValidationException::withMessages([
-                    'occurred_at' => [
-                        'The outcome time cannot be earlier than the portfolio event it confirms.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'occurred_at',
+                    ApplicationValidationCode::SaleOutcomeBeforePortfolioEvent,
+                );
             }
 
             $listedAt = $this->listedAt($entry, $currentEvent);
 
             if ($occurredAt->lt($listedAt)) {
-                throw ValidationException::withMessages([
-                    'occurred_at' => [
-                        'The outcome time cannot be earlier than the listing cycle.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'occurred_at',
+                    ApplicationValidationCode::SaleOutcomeBeforeListingCycle,
+                );
             }
 
             $money = $outcomeType->hasRealizedMoney()
@@ -155,11 +154,10 @@ final class RecordActualSale
             if ($sequence > (int) config(
                 'outcome_tracking.maximum_sale_records_per_entry',
             )) {
-                throw ValidationException::withMessages([
-                    'sale_portfolio_entry_id' => [
-                        'The actual sale history limit has been reached.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'sale_portfolio_entry_id',
+                    ApplicationValidationCode::ActualSaleHistoryLimit,
+                );
             }
 
             $evidenceSnapshot = [
@@ -287,11 +285,10 @@ final class RecordActualSale
             $currentSale?->outcome_type === ActualSaleOutcomeType::Sold
             && $outcomeType !== ActualSaleOutcomeType::Sold
         ) {
-            throw ValidationException::withMessages([
-                'outcome_type' => [
-                    'A confirmed sold outcome can only be corrected by another sold evidence version.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'outcome_type',
+                ApplicationValidationCode::SoldOutcomeCorrectionRequired,
+            );
         }
 
         if ($outcomeType === ActualSaleOutcomeType::Sold) {
@@ -299,11 +296,10 @@ final class RecordActualSale
                 SalePortfolioStatus::Listed,
                 SalePortfolioStatus::Reserved,
             ], true)) {
-                throw ValidationException::withMessages([
-                    'outcome_type' => [
-                        'A sold outcome requires a currently listed or reserved portfolio entry.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'outcome_type',
+                    ApplicationValidationCode::SoldOutcomePortfolioStateInvalid,
+                );
             }
 
             $otherSold = ActualSale::query()
@@ -318,11 +314,10 @@ final class RecordActualSale
                 ->exists();
 
             if ($otherSold) {
-                throw ValidationException::withMessages([
-                    'outcome_type' => [
-                        'This product already has a realized sale on another portfolio entry.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'outcome_type',
+                    ApplicationValidationCode::ActualSaleAlreadyRecorded,
+                );
             }
 
             foreach ([
@@ -331,11 +326,10 @@ final class RecordActualSale
                 'reporting_currency_code',
             ] as $field) {
                 if ($attributes[$field] === null) {
-                    throw ValidationException::withMessages([
-                        $field => [
-                            'A sold outcome requires exact realized money.',
-                        ],
-                    ]);
+                    ApplicationValidation::fail(
+                        $field,
+                        ApplicationValidationCode::SoldOutcomeMoneyRequired,
+                    );
                 }
             }
 
@@ -346,11 +340,10 @@ final class RecordActualSale
             SalePortfolioStatus::Withdrawn,
             SalePortfolioStatus::Expired,
         ], true)) {
-            throw ValidationException::withMessages([
-                'outcome_type' => [
-                    'A cancelled or no-sale outcome requires a withdrawn or expired portfolio entry.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'outcome_type',
+                ApplicationValidationCode::UnsuccessfulOutcomePortfolioStateInvalid,
+            );
         }
 
         if (
@@ -358,11 +351,10 @@ final class RecordActualSale
             || $attributes['currency_code'] !== null
             || $attributes['reporting_currency_code'] !== null
         ) {
-            throw ValidationException::withMessages([
-                'amount_minor' => [
-                    'Cancelled and no-sale outcomes cannot contain realized sale money.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'amount_minor',
+                ApplicationValidationCode::UnsuccessfulOutcomeMoneyForbidden,
+            );
         }
     }
 
@@ -382,11 +374,10 @@ final class RecordActualSale
             ->first();
 
         if ($listingEvent === null) {
-            throw ValidationException::withMessages([
-                'sale_portfolio_event_id' => [
-                    'The outcome requires an attributable publication event.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'sale_portfolio_event_id',
+                ApplicationValidationCode::SalePortfolioPublicationRequired,
+            );
         }
 
         return $listingEvent->occurred_at;
@@ -406,11 +397,10 @@ final class RecordActualSale
         }
 
         if ($current !== null && $correctionReason === null) {
-            throw ValidationException::withMessages([
-                'correction_reason' => [
-                    'A correction reason is required for a new sale outcome version.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'correction_reason',
+                ApplicationValidationCode::CorrectionReasonRequired,
+            );
         }
     }
 

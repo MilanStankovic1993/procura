@@ -7,6 +7,7 @@ use App\Enums\Api\ApiErrorCode;
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\Outcomes\ActualSaleOutcomeType;
 use App\Enums\Profit\ProfitEstimateStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\EstimateAccuracy\Contracts\EstimateAccuracyCalculator;
 use App\EstimateAccuracy\Data\EstimateAccuracyReportData;
 use App\Exceptions\OutcomeTrackingConflictException;
@@ -21,10 +22,10 @@ use App\Models\OwnedProduct;
 use App\Models\ProfitEstimate;
 use App\Models\RealizedProfit;
 use App\Models\User;
+use App\Support\Validation\ApplicationValidation;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use JsonException;
 
 final class RecordEstimateAccuracyAttribution
@@ -114,11 +115,10 @@ final class RecordEstimateAccuracyAttribution
             if ($sequence > (int) config(
                 'estimate_accuracy.maximum_records_per_product',
             )) {
-                throw ValidationException::withMessages([
-                    'owned_product' => [
-                        'The estimate-attribution history limit has been reached.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product',
+                    ApplicationValidationCode::EstimateAttributionHistoryLimit,
+                );
             }
 
             $snapshot = [
@@ -282,11 +282,10 @@ final class RecordEstimateAccuracyAttribution
             ->first();
 
         if ($profit === null || $latest?->getKey() !== $profit->getKey()) {
-            throw ValidationException::withMessages([
-                'realized_profit_id' => [
-                    'The selected realized profit is not the current complete outcome.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'realized_profit_id',
+                ApplicationValidationCode::RealizedProfitNotCurrent,
+            );
         }
 
         $purchase = ActualPurchase::query()
@@ -316,11 +315,10 @@ final class RecordEstimateAccuracyAttribution
             || $costs->reporting_currency_code !== $profit->currency_code
             || $sale->reporting_currency_code !== $profit->currency_code
         ) {
-            throw ValidationException::withMessages([
-                'realized_profit_id' => [
-                    'The realized evidence chain changed and must be recalculated.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'realized_profit_id',
+                ApplicationValidationCode::RealizedEvidenceStale,
+            );
         }
 
         return $profit;
@@ -356,11 +354,10 @@ final class RecordEstimateAccuracyAttribution
             || $estimate === null
             || $latest?->getKey() !== $estimate->getKey()
         ) {
-            throw ValidationException::withMessages([
-                'profit_estimate_id' => [
-                    'The selected profit estimate is not a current tenant-owned buy estimate.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'profit_estimate_id',
+                ApplicationValidationCode::ProfitEstimateNotCurrent,
+            );
         }
 
         $analysis->loadMissing([
@@ -382,11 +379,10 @@ final class RecordEstimateAccuracyAttribution
             || $analysis->currentCostInput?->getKey()
                 !== $estimate->cost_input_id
         ) {
-            throw ValidationException::withMessages([
-                'profit_estimate_id' => [
-                    'The selected profit estimate does not have a complete current evidence chain.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'profit_estimate_id',
+                ApplicationValidationCode::ProfitEstimateEvidenceIncomplete,
+            );
         }
 
         return [$analysis, $estimate];
@@ -416,11 +412,10 @@ final class RecordEstimateAccuracyAttribution
         }
 
         if ($currentAttribution !== null && $correctionReason === null) {
-            throw ValidationException::withMessages([
-                'correction_reason' => [
-                    'A correction reason is required for a new attribution version.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'correction_reason',
+                ApplicationValidationCode::CorrectionReasonRequired,
+            );
         }
     }
 

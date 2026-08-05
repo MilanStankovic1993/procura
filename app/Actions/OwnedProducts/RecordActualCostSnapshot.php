@@ -5,16 +5,17 @@ namespace App\Actions\OwnedProducts;
 use App\Enums\Api\ApiErrorCode;
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\Outcomes\ActualCostCategory;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Exceptions\OutcomeTrackingConflictException;
 use App\Models\ActualCostSnapshot;
 use App\Models\Organization;
 use App\Models\OwnedProduct;
 use App\Models\User;
 use App\OutcomeTracking\OutcomeMoneyNormalizer;
+use App\Support\Validation\ApplicationValidation;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use JsonException;
 
 final class RecordActualCostSnapshot
@@ -101,11 +102,10 @@ final class RecordActualCostSnapshot
             if ($sequence > (int) config(
                 'outcome_tracking.maximum_cost_snapshots_per_product',
             )) {
-                throw ValidationException::withMessages([
-                    'owned_product' => [
-                        'The actual cost history limit has been reached.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product',
+                    ApplicationValidationCode::ActualCostHistoryLimit,
+                );
             }
 
             $inputSnapshot = [
@@ -207,11 +207,10 @@ final class RecordActualCostSnapshot
                 ),
             )
         ) {
-            throw ValidationException::withMessages([
-                'items' => [
-                    'Provide exactly one item for every actual cost category.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'items',
+                ApplicationValidationCode::ActualCostCategorySetInvalid,
+            );
         }
 
         return array_map(function (
@@ -252,11 +251,10 @@ final class RecordActualCostSnapshot
                     ! array_key_exists($requiredField, $item)
                     || $item[$requiredField] === null
                 ) {
-                    throw ValidationException::withMessages([
-                        'items' => [
-                            'Every known actual cost requires amount, currency, occurrence time, and evidence kind.',
-                        ],
-                    ]);
+                    ApplicationValidation::fail(
+                        'items',
+                        ApplicationValidationCode::ActualCostKnownEvidenceIncomplete,
+                    );
                 }
             }
 
@@ -339,11 +337,10 @@ final class RecordActualCostSnapshot
         }
 
         if ($current !== null && $correctionReason === null) {
-            throw ValidationException::withMessages([
-                'correction_reason' => [
-                    'A correction reason is required for a new cost evidence version.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'correction_reason',
+                ApplicationValidationCode::CorrectionReasonRequired,
+            );
         }
     }
 

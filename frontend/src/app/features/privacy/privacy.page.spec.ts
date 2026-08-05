@@ -42,6 +42,7 @@ function privacyRequestRecord(
     resolved_at: null,
     current_event: event,
     events: [event],
+    fulfillment: null,
     ...overrides,
   };
 }
@@ -155,6 +156,45 @@ describe('PrivacyPage', () => {
 
     expect(fixture.nativeElement.textContent).toContain(
       TestBed.inject(I18nService).translate('privacy.cancelled'),
+    );
+  });
+
+  it('renders the safe fulfillment projection without private evidence', () => {
+    const fixture = TestBed.createComponent(PrivacyPage);
+    fixture.detectChanges();
+    http.expectOne('/api/v1/me/privacy-requests').flush({
+      data: [
+        privacyRequestRecord({
+          status: 'fulfilled',
+          can_cancel: false,
+          resolved_at: '2026-07-29T12:00:00Z',
+          fulfillment: {
+            id: '01KPRIVACYFULFILLMENT00001',
+            request_type: 'data_export',
+            execution_version: 'privacy-fulfillment:v1',
+            data_inventory_version: 'privacy-data-inventory:v1',
+            artifact_size_bytes: 4096,
+            artifact_expires_at: '2026-08-05T12:00:00Z',
+            backup_purge_due_at: null,
+            completed_at: '2026-07-29T12:00:00Z',
+          },
+        }),
+      ],
+    });
+    http.expectOne('/api/v1/reference/markets').flush({
+      data: {
+        version: 'iso:test',
+        continents: [],
+        currencies: [],
+      },
+    });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain(
+      TestBed.inject(I18nService).translate('privacy.fulfillmentTitle'),
+    );
+    expect(fixture.nativeElement.textContent).toContain(
+      'privacy-data-inventory:v1',
     );
   });
 });

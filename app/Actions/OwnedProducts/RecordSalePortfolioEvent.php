@@ -7,6 +7,7 @@ use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\Outcomes\ActualSaleOutcomeType;
 use App\Enums\Sell\SalePortfolioEventType;
 use App\Enums\Sell\SalePortfolioStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Exceptions\SalePortfolioConflictException;
 use App\Models\ActualSale;
 use App\Models\Organization;
@@ -15,10 +16,10 @@ use App\Models\SalePortfolioEntry;
 use App\Models\SalePortfolioEvent;
 use App\Models\User;
 use App\SalePortfolio\SalePortfolioSourceEvidence;
+use App\Support\Validation\ApplicationValidation;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use JsonException;
 
 final class RecordSalePortfolioEvent
@@ -96,11 +97,10 @@ final class RecordSalePortfolioEvent
                 )
                 ->lockForUpdate()
                 ->exists()) {
-                throw ValidationException::withMessages([
-                    'sale_portfolio_entry_id' => [
-                        'A portfolio lifecycle cannot change after a realized sale has been recorded.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'sale_portfolio_entry_id',
+                    ApplicationValidationCode::SalePortfolioFinalizedBySale,
+                );
             }
 
             $current = SalePortfolioEvent::query()
@@ -129,15 +129,10 @@ final class RecordSalePortfolioEvent
                 $priorStatus,
                 $eventType,
             )) {
-                throw ValidationException::withMessages([
-                    'event_type' => [
-                        sprintf(
-                            'The %s event is not allowed while the portfolio entry is %s.',
-                            $eventType->value,
-                            $priorStatus->value,
-                        ),
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'event_type',
+                    ApplicationValidationCode::SalePortfolioTransitionNotAllowed,
+                );
             }
 
             if (
@@ -150,11 +145,10 @@ final class RecordSalePortfolioEvent
                     lockForUpdate: true,
                 )
             ) {
-                throw ValidationException::withMessages([
-                    'sale_portfolio_entry_id' => [
-                        'The listing-draft evidence is no longer current. Create a new ready portfolio entry before publishing.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'sale_portfolio_entry_id',
+                    ApplicationValidationCode::SalePortfolioDraftEvidenceStale,
+                );
             }
 
             $occurredAt = CarbonImmutable::parse(
@@ -165,11 +159,10 @@ final class RecordSalePortfolioEvent
                 $current !== null
                 && $occurredAt->lt($current->occurred_at)
             ) {
-                throw ValidationException::withMessages([
-                    'occurred_at' => [
-                        'The event time cannot be earlier than the current portfolio event.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'occurred_at',
+                    ApplicationValidationCode::SalePortfolioEventTimeInvalid,
+                );
             }
 
             $publication = $this->publicationSnapshot(
@@ -187,11 +180,10 @@ final class RecordSalePortfolioEvent
             if ($sequence > (int) config(
                 'sale_portfolio.maximum_events_per_entry',
             )) {
-                throw ValidationException::withMessages([
-                    'sale_portfolio_entry_id' => [
-                        'The lifecycle history limit has been reached for this portfolio entry.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'sale_portfolio_entry_id',
+                    ApplicationValidationCode::SalePortfolioEventHistoryLimit,
+                );
             }
 
             $inputSnapshot = [
@@ -293,11 +285,10 @@ final class RecordSalePortfolioEvent
         }
 
         if ($current === null) {
-            throw ValidationException::withMessages([
-                'event_type' => [
-                    'A publication event must be recorded before this lifecycle event.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'event_type',
+                ApplicationValidationCode::SalePortfolioPublicationRequired,
+            );
         }
 
         return [
@@ -341,11 +332,10 @@ final class RecordSalePortfolioEvent
             ->first() !== null;
 
         if ($usedByAnotherEntry) {
-            throw ValidationException::withMessages([
-                'external_listing_id' => [
-                    'This marketplace listing identity is already attached to another sale portfolio entry.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'external_listing_id',
+                ApplicationValidationCode::SalePortfolioListingIdentityInUse,
+            );
         }
     }
 

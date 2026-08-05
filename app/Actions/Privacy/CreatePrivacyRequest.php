@@ -4,8 +4,6 @@ namespace App\Actions\Privacy;
 
 use App\Actions\Administration\RecordPlatformAuditEvent;
 use App\Enums\Api\ApiErrorCode;
-use App\Enums\Organizations\OrganizationRole;
-use App\Enums\Organizations\OrganizationType;
 use App\Enums\Privacy\PrivacyRequestActorType;
 use App\Enums\Privacy\PrivacyRequestStatus;
 use App\Enums\Privacy\PrivacyRequestType;
@@ -13,6 +11,7 @@ use App\Enums\Validation\ApplicationValidationCode;
 use App\Exceptions\PrivacyRequestConflictException;
 use App\Models\PrivacyRequest;
 use App\Models\User;
+use App\Privacy\AccountDeletionBlockerResolver;
 use App\Privacy\PrivacyWorkflowConfiguration;
 use App\Support\Validation\ApplicationValidation;
 use Carbon\CarbonImmutable;
@@ -26,6 +25,7 @@ final class CreatePrivacyRequest
         private readonly PrivacyRequestEventRecorder $events,
         private readonly RecordPlatformAuditEvent $audit,
         private readonly PrivacyWorkflowConfiguration $configuration,
+        private readonly AccountDeletionBlockerResolver $blockers,
     ) {}
 
     /**
@@ -113,7 +113,7 @@ final class CreatePrivacyRequest
             }
 
             $requestedAt = CarbonImmutable::now();
-            $blockingReasonCodes = $this->blockingReasonCodes(
+            $blockingReasonCodes = $this->blockers->snapshot(
                 $lockedSubject,
                 $type,
             );
@@ -201,71 +201,6 @@ final class CreatePrivacyRequest
                 'created' => true,
             ];
         }, attempts: 3);
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function blockingReasonCodes(
-        User $subject,
-        PrivacyRequestType $type,
-    ): array {
-        if ($type !== PrivacyRequestType::AccountDeletion) {
-            return [];
-        }
-
-        $codes = ['retention_review_required'];
-        $ownsBusiness = DB::table('organization_user')
-            ->join(
-                'organizations',
-                'organizations.id',
-                '=',
-                'organization_user.organization_id',
-            )
-            ->where('organization_user.user_id', $subject->getKey())
-            ->where(
-                'organization_user.role',
-                OrganizationRole::Owner->value,
-            )
-            ->where('organizations.type', OrganizationType::Business->value)
-            ->exists();
-
-        if ($ownsBusiness) {
-            $codes[] = 'business_ownership_transfer_required';
-        }
-
-        $ownsActiveSubscription = DB::table('organization_user')
-            ->join(
-                'subscriptions',
-                'subscriptions.organization_id',
-                '=',
-                'organization_user.organization_id',
-            )
-            ->where('organization_user.user_id', $subject->getKey())
-            ->where(
-                'organization_user.role',
-                OrganizationRole::Owner->value,
-            )
-            ->whereNull('subscriptions.ends_at')
-            ->whereIn('subscriptions.stripe_status', [
-                'active',
-                'trialing',
-                'past_due',
-                'unpaid',
-            ])
-            ->exists();
-
-        if ($ownsActiveSubscription) {
-            $codes[] = 'active_subscription_resolution_required';
-        }
-
-        if ($subject->is_super_admin) {
-            $codes[] = 'super_admin_reassignment_required';
-        }
-
-        sort($codes);
-
-        return $codes;
     }
 
     /**

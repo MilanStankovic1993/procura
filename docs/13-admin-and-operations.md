@@ -21,6 +21,10 @@ Phase 1 currently implements:
 - Sell Comparable Market Normalizations
 - Privacy Requests
 - Analysis Operations
+- Broker Requests
+- Broker Offers
+- Broker Transactions
+- Broker Commissions
 
 These resources are read-only except for organization plan assignment and the narrowly scoped
 Analysis Operations manual retry. Both delegate to transactional application actions and require a
@@ -64,7 +68,6 @@ phases:
 - Deal Scores
 - Saved Searches
 - Alerts
-- Broker Requests
 - Settings
 - Audit Logs
 
@@ -101,8 +104,155 @@ hash, and observation time. Raw evidence, credentials, and mutation controls are
 
 The Privacy Requests resource is also read-only. It exposes the subject, request type/status,
 response target, blocker snapshot, bounded reason, current event/evidence reference, workflow
-version, and resolution time without requester-email, payload, active-key, or idempotency hashes.
-The dashboard counts open requests.
+version, resolution time, and safe fulfillment receipt/version/expiry metadata without
+requester-email, payload, active-key, artifact location/checksum, identity evidence, or idempotency
+hashes. The bounded delivery receipt reference remains visible as current-event evidence. The
+dashboard counts open requests.
+
+The Broker Requests resource is a localized read-only operations ledger. It exposes the
+organization, requester, request/status/condition, quantity, bounded budget, target markets,
+needed-by date, current event reason/evidence, actor, sequence, and submit/resolution times. It
+does not expose request snapshots, payload/request hashes, idempotency keys, or any browser
+mutation. Operators start review/search or cancel only through:
+
+```text
+php artisan broker-requests:transition <request-ulid> <reviewing|searching|cancelled> \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<current-event-ulid> \
+  --idempotency=<uuid> \
+  --reason-code=<approved-code> \
+  --evidence=<external-case-reference>
+```
+
+`offers_available`, `accepted`, and `completed` are deliberately rejected by that generic command.
+The first two are owned by the dedicated offer actions. The localized Broker Offers resource is
+also read-only and exposes safe supplier/price/validity/status/current-evidence operations data
+without snapshots, hashes, or replay keys. Present a reviewed supplier quote only through:
+
+```text
+php artisan broker-offers:present <searching-request-ulid> \
+  --actor-email=<verified-super-admin> \
+  --expected-request-event=<current-request-event-ulid> \
+  --idempotency=<uuid> \
+  --supplier-name="<tenant-safe-display-name>" \
+  --supplier-reference=<private-vault-or-case-reference> \
+  --description="<exact included terms>" \
+  --condition=<new|used|refurbished> \
+  --quantity=<whole-number> \
+  --unit-price-minor=<integer-minor-units> \
+  --shipping-minor=<integer-minor-units> \
+  --tax-duty-minor=<integer-minor-units> \
+  --other-cost-minor=<integer-minor-units> \
+  --currency=<ISO-4217> \
+  --valid-until=<future-ISO-8601-time> \
+  --evidence=<external-quote-evidence-reference>
+```
+
+Do not put supplier credentials, quote contents, or personal contact data in command history.
+Retain the UUID only for an exact retry. A corrected quote is a new immutable offer, never an edit.
+
+The Broker Transactions and Broker Commissions resources are separate localized, read-only
+operations ledgers. Transactions expose exact supplier/commission/payable totals, status,
+timestamps, bounded current evidence, actor, and sequence. Commissions expose the immutable rule
+version/rate/base/amount, status, timestamps, bounded current evidence, actor, and sequence. Neither
+resource exposes snapshots, hashes, replay keys, or a browser mutation.
+
+Procura records evidence about externally completed payment and supplier operations; it does not
+execute them. A verified super administrator appends one exact-head transaction step only through:
+
+```text
+php artisan broker-transactions:transition <transaction-ulid> \
+  <payment_confirmed|supplier_ordered|shipped|delivered|completed|cancelled> \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<current-transaction-event-ulid> \
+  --idempotency=<uuid> \
+  --reason-code=<approved-code> \
+  --evidence=<external-ledger-or-case-reference>
+```
+
+The only cancellation path is `awaiting_payment -> cancelled`; after payment confirmation the
+transaction ledger is never overloaded with cancellation. Post-payment refund/dispute exceptions
+use the dedicated payment-case ledger below and do not rewrite transaction or commission history.
+Completion atomically completes the request and earns the commission. Pre-payment cancellation
+atomically cancels the request and waives the commission. An earned commission is settled
+independently:
+
+```text
+php artisan broker-commissions:settle <commission-ulid> \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<current-commission-event-ulid> \
+  --idempotency=<uuid> \
+  --reason-code=<approved-code> \
+  --evidence=<external-settlement-reference>
+```
+
+Retain a UUID only when retrying the exact same target, head, reason, and evidence. A changed
+operation requires a new UUID and a new exact current event. Neither command proves that Procura
+held funds, charged a payment method, placed an order, or transferred commission.
+
+The Broker Payment Cases resource is a fifth localized, verified-super-admin-only, read-only
+ledger. It displays bounded external case/evidence references for operations while the tenant
+projection omits both. Open a case only after reviewed external payment confirmation:
+
+```text
+php artisan broker-payment-cases:open <transaction-ulid> <refund|dispute> \
+  --actor-email=<verified-super-admin> \
+  --expected-transaction-event=<current-transaction-event-ulid> \
+  --idempotency=<uuid> \
+  --amount-minor=<positive-amount-no-greater-than-customer-payable> \
+  --external-case=<approved-support-or-provider-case-reference> \
+  --reason-code=<approved-code> \
+  --evidence=<reviewed-external-evidence-reference>
+
+php artisan broker-payment-cases:transition <payment-case-ulid> under_review \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<current-payment-case-event-ulid> \
+  --idempotency=<new-uuid> \
+  --reason-code=<approved-code> \
+  --evidence=<review-evidence-reference>
+
+php artisan broker-payment-cases:transition <payment-case-ulid> resolved \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<current-payment-case-event-ulid> \
+  --idempotency=<new-uuid> \
+  --outcome=<refund_confirmed|refund_rejected|dispute_won|dispute_lost> \
+  --resolved-amount-minor=<type-compatible-amount> \
+  --reason-code=<approved-code> \
+  --evidence=<reviewed-outcome-evidence-reference>
+```
+
+Refund confirmation and dispute loss require a positive resolved amount no greater than the
+requested amount. Refund rejection and dispute win require exactly zero. `cancelled` is permitted
+from `open` or `under_review` without outcome/amount. These commands do not submit a refund or
+chargeback, move funds, or adjust commission; a real provider operation remains separately gated.
+
+The Broker Reports resource is a sixth localized, verified-super-admin-only, read-only ledger. It
+shows organization/request, availability, locale, sequence, page/size metadata, generator and
+retention times. It deliberately omits private storage coordinates, source heads, evidence,
+snapshots, hashes, and replay keys. Generate a report only after completion through:
+
+```text
+php artisan broker-reports:generate <completed-transaction-ulid> \
+  --actor-email=<verified-super-admin> \
+  --expected-transaction-event=<current-transaction-event-ulid> \
+  --expected-commission-event=<current-commission-event-ulid> \
+  --idempotency=<uuid> \
+  --locale=<en|de|es|fr|sr-Latn> \
+  --reason-code=<approved-code> \
+  --evidence=<external-case-reference>
+```
+
+Retain the UUID for an exact retry. A changed locale, source head, reason, or evidence is a distinct
+reviewed operation; the same logical source/version/locale must reuse its original UUID. Expired
+artifacts are removed by the daily singleton schedule. A controlled manual recovery run is:
+
+```text
+php artisan broker-reports:purge-expired --limit=100
+```
+
+The purge action remains active when report generation is disabled so retention obligations cannot
+be disabled with the generation switch. A failed storage deletion is reported and retried later;
+operators must never mark a report purged or delete its database row manually.
 
 Operators transition a request only through:
 
@@ -116,10 +266,55 @@ php artisan privacy-requests:transition <request-ulid> <status>
   --evidence=<external-evidence-reference>
 ```
 
-The exact UUID must be retained for a retry of the same transition. Terminal approved, fulfilled,
-or rejected transitions require evidence. `fulfilled` is permitted only after the reviewed external
-export-delivery or erasure procedure has completed; the command itself never exports or deletes
-customer data.
+The exact UUID must be retained for a retry of the same transition. Approved and rejected
+transitions require evidence. `fulfilled` is reserved and this generic command rejects it.
+
+After a separately approved export archive has been securely delivered, the operator records its
+completion only through:
+
+```text
+php artisan privacy-requests:complete-export <request-ulid>
+  --actor-email=<verified-super-admin>
+  --expected-event=<approved-event-ulid>
+  --idempotency=<uuid>
+  --inventory-version=<approved-version>
+  --identity-evidence=<external-reference>
+  --artifact-reference=<private-vault-reference>
+  --artifact-sha256=<64-hex>
+  --artifact-size-bytes=<integer>
+  --artifact-expires-at=<ISO-8601>
+  --delivery-evidence=<external-reference>
+  --note="<reviewed completion explanation>"
+```
+
+The command never assembles or delivers the archive. It atomically records the terminal event,
+immutable receipt, and platform audit evidence.
+
+After the approved erasure run has removed every inventoried external/private artifact and resolved
+all blockers, account deletion is completed only through:
+
+```text
+php artisan privacy-requests:complete-erasure <request-ulid>
+  --actor-email=<verified-super-admin>
+  --expected-event=<approved-event-ulid>
+  --idempotency=<uuid>
+  --inventory-version=<approved-erasure-inventory>
+  --identity-evidence=<external-reference>
+  --erasure-evidence=<isolated-run-reference>
+  --storage-evidence=<private-storage-clearance-reference>
+  --processor-evidence=<processor-clearance-reference>
+  --completion-evidence=<subject-safe-receipt-reference>
+  --clearance=<blocker-code>=<evidence-reference>
+  --backup-purge-due-at=<ISO-8601>
+  --note="<reviewed completion explanation>"
+```
+
+Repeat `--clearance` exactly once for every blocker snapshotted on the request. The command still
+recalculates business ownership, active subscriptions and super-admin state; evidence cannot
+override a live blocker. It verifies known private files are absent, then atomically removes the
+personal database boundary and revocable access, creates the tombstone/receipt/audit record, and
+leaves retained business history pseudonymous. It does not perform or imply external
+object-storage, processor, log, analytics, queue or backup deletion.
 
 The Analysis Operations resource is a focused exception queue, not a general tenant Analysis
 browser. It lists terminal failures, stale processing leases, failed dispatch heads, and stale
@@ -199,6 +394,22 @@ The JSON form is intended for deployment automation and emits one JSON document 
 exit code when readiness fails. The public `GET /api/v1/health` projection is deliberately
 language-neutral and topology-free because it is a machine/load-balancer contract, not user copy.
 
+Before switching an inactive release into service, operators use:
+
+```text
+php artisan operations:production-preflight --json
+php artisan operations:production-preflight --strict --json
+```
+
+The first form blocks unsafe effective configuration while allowing explicit warnings for
+disabled/excluded external integrations. The strict form also blocks warnings and is the target for
+the complete advertised feature set. Output contains stable check names and guidance only: it never
+contains application keys, database/storage/provider credentials, webhook secrets, or tokens.
+Checks cover the HTTPS/CORS/Sanctum origin, trusted hosts/proxies, key/debug mode, strict UTC/
+`utf8mb4` MySQL, encrypted Redis cache/queue, queue visibility timeout, secure shared sessions,
+private fail-loud S3 storage, real mail, analysis-provider kill switch, heartbeat pools, broker/
+privacy dependencies, optional integration state, cached release state, and the built Angular shell.
+
 Capacity diagnostics use:
 
 ```text
@@ -228,6 +439,7 @@ Overrides must require:
 Use configurable feature flags for:
 
 - AI provider,
+- analysis submission (`ANALYSIS_SUBMISSION_ENABLED`),
 - sell analysis,
 - Telegram,
 - marketplace connectors,

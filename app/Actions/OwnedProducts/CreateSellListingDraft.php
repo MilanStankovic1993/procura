@@ -10,6 +10,7 @@ use App\Enums\Sell\SellListingDraftStatus;
 use App\Enums\Sell\SellPhotoReadinessStatus;
 use App\Enums\Sell\SellPriceBandStatus;
 use App\Enums\Sell\SellPriceStrategy;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Models\Currency;
 use App\Models\Organization;
 use App\Models\OwnedProduct;
@@ -23,8 +24,8 @@ use App\SellListingContent\Generators\DeterministicSellListingContentGenerator;
 use App\SellListingContent\PhotoReadiness\DeterministicPhotoReadinessEvaluator;
 use App\SellListingContent\SellListingVersionEvidence;
 use App\SellPriceIntelligence\CurrentSellPriceBandResolver;
+use App\Support\Validation\ApplicationValidation;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use JsonException;
 
 final class CreateSellListingDraft
@@ -68,11 +69,10 @@ final class CreateSellListingDraft
                 ->findOrFail($ownedProductId);
 
             if ($ownedProduct->status !== OwnedProductStatus::Ready) {
-                throw ValidationException::withMessages([
-                    'owned_product' => [
-                        'The owned product must be ready before generating listing content.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product',
+                    ApplicationValidationCode::OwnedProductNotReady,
+                );
             }
 
             $assessment = $this->currentAssessment->resolve(
@@ -85,22 +85,20 @@ final class CreateSellListingDraft
                 || $assessment->status !== OwnedProductAssessmentStatus::Ready
                 || $assessment->matcher_status !== ProductMatchStatus::Matched
             ) {
-                throw ValidationException::withMessages([
-                    'owned_product_assessment_id' => [
-                        'A current ready matched assessment is required.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product_assessment_id',
+                    ApplicationValidationCode::OwnedProductAssessmentNotReady,
+                );
             }
 
             if (
                 $assessment->getKey()
                 !== $attributes['owned_product_assessment_id']
             ) {
-                throw ValidationException::withMessages([
-                    'owned_product_assessment_id' => [
-                        'The owned-product assessment changed. Reload before generating a draft.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product_assessment_id',
+                    ApplicationValidationCode::OwnedProductAssessmentStale,
+                );
             }
 
             $priceBand = $this->currentPriceBand->resolve(
@@ -111,11 +109,10 @@ final class CreateSellListingDraft
             );
 
             if ($priceBand === null) {
-                throw ValidationException::withMessages([
-                    'sell_price_band_id' => [
-                        'A current complete Sell price band is required.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'sell_price_band_id',
+                    ApplicationValidationCode::SellPriceBandRequired,
+                );
             }
 
             if (
@@ -124,11 +121,10 @@ final class CreateSellListingDraft
                 || $priceBand->target_currency_code
                     !== $attributes['target_currency_code']
             ) {
-                throw ValidationException::withMessages([
-                    'sell_price_band_id' => [
-                        'The selected price band does not match the requested market and currency.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'sell_price_band_id',
+                    ApplicationValidationCode::SellPriceBandMarketMismatch,
+                );
             }
 
             $strategy = SellPriceStrategy::from(
@@ -145,11 +141,10 @@ final class CreateSellListingDraft
             );
 
             if ($outsideBand && $overrideReason === null) {
-                throw ValidationException::withMessages([
-                    'price_override_reason' => [
-                        'A reason is required when the target price is outside the selected guidance band.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'price_override_reason',
+                    ApplicationValidationCode::SellPriceOverrideReasonRequired,
+                );
             }
 
             $images = OwnedProductImage::query()
@@ -159,11 +154,10 @@ final class CreateSellListingDraft
             $imageHash = OwnedProductAssessmentEvidence::imageHash($images);
 
             if (! hash_equals($assessment->image_evidence_hash, $imageHash)) {
-                throw ValidationException::withMessages([
-                    'owned_product_assessment_id' => [
-                        'Image evidence changed. Create a new assessment before generating a draft.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product_assessment_id',
+                    ApplicationValidationCode::OwnedProductAssessmentStale,
+                );
             }
 
             $snapshot = $assessment->snapshot()->firstOrFail();

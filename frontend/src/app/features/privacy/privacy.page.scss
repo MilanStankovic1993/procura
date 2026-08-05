@@ -158,6 +158,23 @@ small {
   background: color-mix(in srgb, var(--danger) 7%, var(--surface));
 }
 
+.fulfillment {
+  border: 1px solid color-mix(in srgb, var(--success) 35%, var(--line));
+  border-radius: 0.8rem;
+  padding: 0.9rem;
+  background: color-mix(in srgb, var(--success) 7%, var(--surface));
+}
+
+.fulfillment p {
+  margin: 0.35rem 0 0.85rem;
+  color: var(--ink-muted);
+}
+
+.fulfillment dl > div {
+  border-top: 0;
+  padding-top: 0;
+}
+
 .primary,
 .secondary,
 .danger {

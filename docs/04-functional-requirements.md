@@ -28,16 +28,33 @@ The system shall:
 - require optimistic concurrency and exact idempotent replay for subject cancellation and operator
   transitions;
 - permit subject cancellation only while the request is in a cancellable state;
-- require a verified super administrator and external evidence reference for approved, fulfilled,
-  and rejected outcomes;
+- require a verified super administrator and external evidence reference for approved and rejected
+  outcomes;
+- reserve `fulfilled` for a request-type-specific operation that creates an immutable fulfillment
+  receipt in the same transaction as the terminal event;
 - expose a bounded personal history and localized event timeline while excluding internal hashes
   and idempotency values;
 - keep the Filament resource read-only and perform transitions only through the audited operational
   command.
 
-The current workflow does not generate an export archive or delete user data automatically.
-`fulfilled` may be recorded only after the separately approved production procedure has completed
-and its evidence reference exists.
+The data-export completion operation is disabled by default. It accepts only an approved
+`data_export` request and requires the exact event head, exact approved inventory version, identity
+evidence, private-artifact reference, SHA-256, bounded byte size, bounded future expiry, delivery
+evidence, and UUID replay key. The subject API receives only a safe receipt projection, never the
+artifact location, checksum, identity evidence, payload hash, or idempotency key. The bounded
+delivery receipt reference remains visible in the existing subject-owned event timeline.
+
+The workflow does not generate export archives or perform unreviewed automatic deletion. A
+separate, disabled-by-default account-erasure operation accepts only an approved
+`account_deletion` request. It requires the exact event head, erasure-inventory version, identity,
+erasure-run, private-storage and processor evidence, one clearance reference for every snapshotted
+blocker, and a bounded backup-purge deadline. Business ownership, active subscriptions and
+super-admin status are recalculated live and must actually be absent. Known private files must
+already be removed and verifiably absent. The terminal transaction removes the personal tenant,
+personal access state/preferences/integrations, anonymizes invitation addresses, revokes
+credentials, tombstones the user while retaining pseudonymous business/audit references, and
+creates the immutable receipt and audit event. External object-store/processor/backup work remains
+an owner-approved production procedure, not an inferred side effect.
 
 ## FR-002 Organizations
 
@@ -517,3 +534,114 @@ All Angular routes and reusable feature panels shall use typed translation keys 
 copy. A feature is incomplete if any supported locale lacks a key or if a template/component
 introduces hard-coded interface text. Country, currency, number, date, and money presentation shall
 use the active interface locale while preserving ISO codes and exact stored amounts.
+
+## FR-020 Broker and sourcing requests
+
+Verified organization members with `broker-requests.view` shall be able to read only their active
+organization's sourcing requests. Members with `broker-requests.manage` shall additionally be able
+to:
+
+- create and edit a bounded draft containing the requested product, condition, quantity, optional
+  maximum budget, target countries, needed-by date, and notes;
+- submit a draft against the exact current event and a UUID idempotency key;
+- consume the plan feature `broker_requests.monthly` exactly once on first submission;
+- cancel a request while it remains in a subject-cancellable state;
+- compare tenant-safe presented offers with an exact item/shipping/tax-duty/other-cost breakdown,
+  validity, delivery, condition, warranty, and return terms;
+- accept one unexpired offer against the exact current request and offer event heads, atomically
+  marking all other presented offers as not selected;
+- inspect the complete bounded request event timeline without internal hashes, snapshots,
+  idempotency keys, or operator-only evidence.
+
+Every mutation shall be tenant-scoped, authorized on the server, protected by an exact event-head
+check, and recorded as an immutable previous-event-linked snapshot. Reusing an idempotency key with
+changed input shall fail closed. A verified super administrator may move a submitted request to
+`reviewing`, then `searching`, or cancel it only through the audited command with an external
+evidence reference. `offers_available`, `accepted`, and `completed` are reserved for dedicated
+offer/transaction application actions and shall not be written by a generic status transition.
+
+The delivered offer boundary is manual and evidence-bound: a verified super administrator presents
+immutable supplier terms only from `searching`/`offers_available`. Tenant projections omit the
+private supplier reference, operator evidence, hashes, snapshots, and replay keys. Different
+currencies shall not be ranked without separate current normalization evidence.
+
+Every newly presented offer shall disclose the server-authoritative commission rule version, rate
+in basis points, exact commission base, exact commission amount, and exact customer-payable total
+before acceptance. The commission base is the complete supplier-offer total. Calculation uses
+integer minor units and deterministic half-up rounding; overflow beyond the JavaScript-safe integer
+boundary fails closed.
+
+When transaction writes are enabled, accepting an offer shall atomically create exactly one
+`BrokerTransaction`, its opening event, exactly one `BrokerCommission`, and its opening event.
+The initial transaction state is `awaiting_payment`; the initial commission state is `pending`.
+Verified super administrators may append evidence-bound transaction transitions only through:
+
+```text
+awaiting_payment -> payment_confirmed -> supplier_ordered -> shipped -> delivered -> completed
+       \
+        +-> cancelled
+```
+
+Every transition requires the exact current transaction event, a UUID idempotency key, reason,
+external evidence reference, and occurrence time. Completion atomically changes the broker request
+from `accepted` to `completed` and the commission from `pending` to `earned`. Pre-payment
+cancellation atomically changes the request to `cancelled` and the commission to `waived`.
+An earned commission may be changed to `settled` only by its dedicated evidence-bound operation.
+
+These records are an operational evidence ledger, not a payment processor. Procura shall not
+collect card data, hold or transfer funds, initiate a supplier purchase, infer payment from a
+browser redirect, or contact a payment/supplier provider in this boundary. Provider integrations,
+refund/dispute handling, automated supplier communication, and marketplace mutation remain
+separately approved procedures.
+
+When broker payment-case writes are enabled, a verified super administrator may open a dedicated
+`refund` or `dispute` case only after the transaction has reached `payment_confirmed`. Opening
+requires the exact current transaction event, a transaction-scoped UUID idempotency key, an amount
+greater than zero and no greater than the immutable customer-payable total, a bounded external case
+reference, reason, and evidence reference. The case currency is copied from the transaction and can
+never be supplied independently or changed.
+
+Payment cases use their own immutable previous-event-linked lifecycle and never rewrite the
+transaction, request, offer, report, or commission ledgers:
+
+```text
+open -> under_review -> resolved
+  \          \
+   +----------+-> cancelled
+```
+
+Resolution requires a type-compatible outcome and reviewed external evidence. Refund cases accept
+only `refund_confirmed` with a positive resolved amount no greater than the requested amount, or
+`refund_rejected` with zero resolved amount. Dispute cases accept only `dispute_won` with zero
+resolved amount, or `dispute_lost` with a positive resolved amount no greater than the requested
+amount. These names describe reviewed external evidence; Procura still does not move money, submit
+a chargeback, reverse commission, or call a payment provider. Commission remediation remains a
+separately approved finance operation.
+
+Every payment-case mutation shall require a verified super administrator, exact current event
+head, UUID idempotency, bounded reason and evidence, deterministic row locking, and a maximum
+bounded history. Exact replay is inert; changed replay, a stale head, duplicate logical external
+case, invalid state/type/outcome/amount, or disabled switch fails closed. Tenant projections expose
+only safe type/status/amount/outcome/timeline facts and omit external case references, operator
+evidence, snapshots, hashes, and replay keys. An open or under-review case in a personal
+organization blocks account erasure.
+
+When broker-report generation is enabled, a verified super administrator may generate a localized
+PDF only for a `completed` transaction whose commission is `earned` or `settled`. Generation shall
+require the exact current transaction and commission event heads, a UUID idempotency key, a bounded
+reason, an external case reference, and one supported locale. The immutable report snapshot shall
+contain only subject-safe request, accepted-offer, disclosed commission, transaction-status, and
+bounded timeline facts. Private supplier references, operator evidence, event payloads, hashes,
+replay keys, payment data, and credentials shall never enter the PDF.
+
+Every generated report shall record its version, locale, exact source event IDs, per-transaction
+sequence, snapshot/hash, private storage disk/path, SHA-256 checksum, byte count, page count,
+generation time, and configured artifact expiry. Exact replay is inert; changed replay or stale
+source heads fail closed. The artifact shall use a private disk, a short-lived signed tenant route,
+authorization on every download, `private, no-store` response headers, and checksum/size
+verification before streaming.
+
+Expired artifacts shall be purged by a bounded scheduled operation. Purge shall append an immutable
+event and retain the non-secret report metadata/snapshot while removing the private file. A purged
+or expired report cannot be downloaded. Personal-account erasure shall fail closed while a broker
+report artifact still exists in the personal organization.

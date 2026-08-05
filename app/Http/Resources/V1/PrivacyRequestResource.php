@@ -34,6 +34,9 @@ final class PrivacyRequestResource extends JsonResource
             'events' => PrivacyRequestEventResource::collection(
                 $this->whenLoaded('events'),
             ),
+            'fulfillment' => new PrivacyRequestFulfillmentResource(
+                $this->whenLoaded('fulfillment'),
+            ),
         ];
     }
 }

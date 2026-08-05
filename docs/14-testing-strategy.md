@@ -27,9 +27,31 @@ Required:
 - subscription enforcement,
 - saved search matching,
 - outcome recording,
-- privacy request creation, history, cancellation, and operational transitions,
+- privacy request creation, history, cancellation, operational transitions, export fulfillment,
+  and account erasure,
+- broker-request draft, submission, history, cancellation, quota, operator review/search, offer
+  presentation/comparison/acceptance, transaction fulfillment, commission earning/waiver/
+  settlement, localized report generation/download/retention purge,
 - analysis operations queue and audited manual retry,
-- dependency readiness and queue-worker heartbeat processing.
+- dependency readiness and queue-worker heartbeat processing,
+- production preflight configuration, secret-free JSON, strict warning handling, trusted origin/
+  proxy boundaries, shared data-plane drivers, secure sessions/storage, provider kill switches, and
+  feature dependency consistency.
+
+Production-preflight coverage must prove safe disabled integrations remain explicit warnings,
+blocking failures return non-zero, strict mode rejects warnings, non-production rehearsal requires
+an explicit option, fake analysis cannot be enabled, disabled analysis submission consumes no quota
+and creates no dispatch, Redis `retry_after` exceeds the longest job timeout, catch-all proxies are
+rejected, and configured secrets never appear in table or JSON output.
+
+The production-runtime CI contract must additionally apply the complete migration ledger against
+MySQL 8.4, prove cached application readiness against Redis, and run the dedicated MySQL schema/
+session compatibility test. That test verifies UTC, strict mode, `utf8mb4`, InnoDB, migration
+completeness, foreign keys, bounded index names, and the reserved `rank` query. The production build
+must fail when the nginx security/routing boundary, Supervisor worker pools, queue ownership, retry
+timing, scheduler recovery set, or fail-closed environment template drifts from its reviewed
+contract. The complete functional suite remains in the PHP 8.3/8.4/8.5 SQLite matrix; MySQL is an
+additional production-family compatibility gate, not a false claim that every test is duplicated.
 
 Operational-readiness coverage must prove database/cache failure isolation, sanitized public
 `503` responses, disabled-by-default queue monitoring, one job on every configured worker queue,
@@ -40,9 +62,57 @@ Admin catalog parity.
 Privacy workflow coverage must prove verified self-service access without organization context,
 active ISO residence validation, notice attestation, one active request per subject/type, exact
 creation/cancellation/transition replay, stale-head conflicts, cross-user `404`, deterministic
-deletion blockers/response target, immutable request/event records, terminal evidence requirements,
-verified-super-admin transition authorization, safe platform/Admin projections, five-language
-catalog parity, and successful CLI operation without any real export or erasure.
+deletion blockers/response target, immutable request/event/fulfillment records, reserved generic
+terminal state, verified-super-admin authorization, fulfillment kill switch, exact inventory
+version, private-artifact checksum/size/expiry and delivery evidence, erasure-specific kill switch
+and inventory, exact blocker-clearance set, live ownership/billing/admin recalculation, private-file
+absence, personal-tenant removal, access revocation, pseudonymous business-history retention,
+transactional rollback, exact replay/changed conflict, safe subject/Admin projections,
+five-language catalog parity, and successful CLI operation without any real archive generation,
+provider delivery, or external processor/backup mutation.
+
+Broker-request coverage must prove verified tenant access, owner/administrator/analyst/viewer
+capability boundaries, cross-tenant `404`, draft-only content mutation, exact create/update/
+submit/cancel replay, changed replay conflict, stale-head rejection, immutable bounded event
+history, atomic one-time `broker_requests.monthly` consumption, fail-closed Free-plan exhaustion,
+request/offer kill-switch behavior, safe subject/Admin projections, verified-super-admin evidence,
+allowed review/search/cancel transitions, immutable offer terms/events, server-calculated
+safe-integer totals, exact request/offer-head acceptance, expired/stale rejection, alternative
+offer closure, request-cancellation cleanup, cross-currency warning, private supplier-reference
+exclusion, rejection of reserved transaction states, active personal-request account-erasure
+blocking, complete five-language catalogs, and API/CLI operation without a supplier connector,
+payment, marketplace, or report provider.
+
+Broker transaction/commission coverage must additionally prove a positive versioned commission
+configuration, integer half-up basis-point calculation, JavaScript-safe total bounds, immutable
+offer-term recomputation at acceptance, atomic one-to-one transaction/commission creation, exact
+opening source heads, append-only previous-linked histories, verified-super-admin-only mutation,
+mandatory external evidence, exact-head concurrency, exact UUID replay/changed conflict, the strict
+payment/order/shipping/delivery/completion sequence, pre-payment-only cancellation, atomic request
+completion/cancellation and commission earning/waiver, earned-only settlement, false-by-default
+transaction activation, and exclusion of evidence/hashes/snapshots/replay keys from subject and
+Admin projections. Provider fakes are unnecessary because this boundary makes no external payment,
+supplier, carrier, settlement, or report call.
+
+Broker-report coverage must prove false-by-default activation, verified-super-admin-only
+generation, completed transaction plus earned/settled commission state, both exact source heads,
+UUID exact replay and changed/logical-source conflict, immutable subject-safe snapshots, exclusion
+of notes/private supplier/operator/replay/hash data, real `%PDF` output, bounded size/page count,
+private storage write verification, safe API/Admin projections, short-lived relative signing,
+tenant `404`, policy authorization, no-store/no-sniff delivery, checksum/size/missing/expiry
+failure, immutable generated/purged events, deletion-before-purge semantics, retry after storage
+failure, personal-erasure blocker/private-file inventory, all five locales, and Poppler-rendered
+visual inspection of every page. No provider fake is needed because rendering is first-party and
+the boundary performs no outbound call.
+
+Broker payment-case coverage must prove false-by-default activation, post-payment-only opening,
+verified-super-admin authorization, exact transaction/case-head concurrency, transaction-scoped
+UUID replay/conflict, duplicate logical external-case rejection, safe-integer and payable-total
+amount limits, strict `open -> under_review -> resolved|cancelled` sequencing, type-compatible
+refund/dispute outcomes and zero/positive resolved-amount rules, immutable snapshots/events,
+unchanged transaction/commission histories, safe tenant/Admin projections, CLI parity, active
+personal-case erasure blocking, privacy inventory v4, and complete five-language catalogs. No
+provider fake is required because the boundary performs no payment-provider call.
 
 Analysis operations coverage must prove verified-super-admin-only mutation, exact current-dispatch
 checks, UUID replay/mismatch behavior, automatic-retry and total-run ceilings, unchanged
@@ -88,7 +158,12 @@ Required:
 - ordinary tenant users cannot access billing operations and rendered admin tables expose no
   sensitive provider identifiers,
 - users cannot read/cancel another subject's privacy request and Admin privacy tables expose no
-  requester-email, payload, active-key, or idempotency hashes,
+  requester-email, payload, active-key, artifact reference/checksum, fulfillment evidence, or
+  idempotency hashes,
+- users cannot read or mutate another organization's broker request; viewers cannot mutate, and
+  tenant/Admin projections expose no event snapshot, internal hash, idempotency key, or
+  unauthorized operator evidence; tenant users cannot execute transaction or commission
+  operations,
 - ordinary and unverified users cannot access Analysis Operations or request manual retries, and
   rendered rows expose no raw analysis/dispatch failures, payload/error hashes, or idempotency keys.
 
@@ -230,7 +305,7 @@ verification and covers:
 - exact equality between the closed `ApplicationValidationCode` enum and all five
   `application_validation.php` catalogs, non-empty/non-English messages, request-scoped Serbian
   runtime rendering, locale reset after the `422`, and a source guard preventing migrated platform
-  and Analysis services from recreating ad hoc validation messages,
+  Analysis, and OwnedProducts services from recreating ad hoc validation messages,
 - desktop and 390 x 844 responsive rendering without horizontal overflow,
 - representative domain-screen translations for every non-English catalog,
 - exact key-order and non-empty-value equality across all five server-side admin catalogs,

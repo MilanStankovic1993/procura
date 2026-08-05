@@ -30,9 +30,10 @@ php artisan migrate --force
 sudo nginx -t
 ```
 
-`npm run build:frontend` emits directly to `public/spa` and runs
-`tools/verify-production-serving.mjs`. A failed output, missing hashed asset, source map, unsafe SPA
-fallback, or incomplete Laravel route boundary fails the build.
+`npm run build:frontend` emits directly to `public/spa` and runs both production serving and
+deployment-contract verifiers. A failed output, missing hashed asset, source map, unsafe SPA
+fallback, incomplete Laravel route boundary, missing security header, or drift in the associated
+Supervisor/environment/scheduler contract fails the build.
 
 Copy `procura.conf.example` into the nginx site configuration, then replace the example domain,
 certificate paths, release root, and PHP-FPM socket for the target environment. Do not enable the

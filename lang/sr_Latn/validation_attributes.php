@@ -49,6 +49,8 @@ return [
     'expected_current_attribution_id' => 'očekivana trenutna atribucija',
     'expected_current_cost_snapshot_id' => 'očekivani trenutni snimak troškova',
     'expected_current_event_id' => 'očekivani trenutni događaj',
+    'expected_offer_event_id' => 'očekivani trenutni događaj brokerske ponude',
+    'expected_request_event_id' => 'očekivani trenutni događaj brokerskog zahteva',
     'expected_current_log_id' => 'očekivano trenutno stanje obaveštenja',
     'expected_current_purchase_id' => 'očekivana trenutna kupovina',
     'expected_current_sale_id' => 'očekivana trenutna prodaja',

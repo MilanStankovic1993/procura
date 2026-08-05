@@ -138,16 +138,28 @@ and stores privacy-notice/workflow versions with every request. It exposes no re
 payload, active-key, or idempotency hashes. Cross-user request identifiers resolve as `404`, while
 Admin access requires a verified super administrator.
 
-Privacy requests and their event histories are immutable. State changes use subject/operator
+Privacy requests, event histories, and fulfillment receipts are immutable. State changes use subject/operator
 authorization, row locks, optimistic concurrency, UUID idempotency, stable payload hashes, a
-previous-event chain, and platform audit events. Approved, fulfilled, and rejected states require a
-reference to separately retained operational evidence.
+previous-event chain, and platform audit events. Approved and rejected states require separately
+retained operational evidence. Generic transitions cannot write `fulfilled`.
 
-Account deletion currently records deterministic blockers for retention review, business ownership
-transfer, active subscription resolution, and super-admin continuity. The workflow deliberately
-does not create export archives or erase data automatically. Before production activation, legal
-owners must approve identity verification, jurisdictional deadlines, retention/legal holds, secure
-export delivery, erasure sequencing, evidence storage/access, incident handling, and processor
+Data-export fulfillment is disabled by default and is request-type specific. It requires an
+approved event head, the configured inventory/execution versions, identity and secure-delivery
+evidence, plus an exact private archive SHA-256, byte size, and bounded expiry. One database
+transaction creates the terminal event, one immutable receipt, and the platform audit event.
+Changed replay fails; API/Admin projections omit the artifact location and sensitive evidence.
+
+Account deletion snapshots deterministic blockers for retention review, business ownership
+transfer, active subscription resolution, and super-admin continuity. Its dedicated executor is
+independently disabled by default. Every snapshot blocker requires evidence, while ownership,
+billing and super-admin blockers are recalculated and must be absent at execution. Known
+personal-tenant files must already be absent. Identity, isolated-run, private-storage and processor
+evidence plus a bounded backup-purge deadline are mandatory. The atomic database step removes the
+personal tenant and revocable access/personal state, pseudonymizes retained relationships, and
+creates an immutable receipt; it does not claim to delete external storage, processors, logs,
+analytics, queues or backups. Before production activation, legal owners must approve identity
+verification, jurisdictional deadlines, retention/legal holds, secure export delivery, erasure
+sequencing, evidence storage/access, restoration handling, incident handling, and the processor
 inventory. Operators must never use direct SQL deletion as a substitute for that procedure.
 
 Analysis manual retry is a platform operation, not a tenant capability. Only a verified
@@ -219,10 +231,77 @@ Required:
 - admin authorization tests,
 - signed URL tests,
 - privacy request ownership, verification, rate-limit, idempotency, optimistic-concurrency,
-  immutable-ledger, blocker, terminal-evidence, localization, and sensitive-field projection tests.
+  immutable-ledger/receipt, blocker, reserved-terminal-state, fulfillment kill-switch,
+  inventory/checksum/size/expiry/delivery evidence, erasure kill-switch/live-blocker/clearance,
+  private-file absence, tombstone/access revocation, rollback/replay, localization, and
+  sensitive-field projection tests.
 - manual analysis-retry verified-super-admin authorization, current-dispatch concurrency,
   UUID replay/conflict, automatic-retry and run-limit enforcement, quota preservation, immutable
   retry/dispatch evidence, safe Admin projection, and CLI tests.
+- broker-request/offer cross-tenant lookup, role capability, draft-only request mutation, exact
+  request/offer-head concurrency, UUID replay/conflict, immutable event chains, submission quota
+  atomicity, request/offer kill switches, verified-super-admin offer evidence, offer expiration,
+  exact-money overflow, atomic alternative closure, privacy-erasure blocker, safe tenant/Admin
+  projection, localization, and CLI tests.
+- accepted-offer transaction/commission atomicity, immutable disclosed commission recomputation,
+  transaction kill switch, verified-super-admin evidence, exact-head transitions, UUID
+  replay/conflict, pre-payment-only cancellation, terminal request/commission atomicity,
+  settlement isolation, safe subject/Admin projections, and CLI tests.
+- broker-report completed/earned source-state enforcement, dual exact-head concurrency,
+  verified-super-admin evidence, immutable source-safe snapshots, deterministic first-party PDF
+  rendering, private storage, signed relative URLs, tenant `404`, authorization on every download,
+  checksum/size/expiry verification, bounded retention purge, account-erasure blocking, and
+  five-language PDF/UI/Admin tests.
+
+Broker requests are organization-owned and must never be queried by a browser-supplied tenant ID.
+Content is editable only in `draft`; every later change appends an immutable, previous-linked
+snapshot under a row lock and exact event-head check. Submission usage is consumed atomically and
+exact replay is inert. Tenant projections exclude operator evidence, event/request hashes,
+snapshots, and idempotency keys. Operator transitions require a verified super administrator,
+reason, external evidence, and the exact head; only the dedicated presentation action can create an
+offer and only the tenant acceptance action can accept it. Tenant offer projections exclude the
+private supplier reference and all operator evidence/replay data. Acceptance recomputes the
+immutable disclosed commission terms before atomically opening a one-to-one transaction and
+commission ledger; inconsistent legacy or corrupt terms fail closed before any acceptance event is
+written. Only verified super administrators can append payment/fulfillment/settlement evidence,
+and every operation requires an exact current head, UUID, bounded reason code, and external
+evidence reference. Tenant projections exclude all operator evidence, snapshots, hashes, and replay
+keys. Procura stores no card data, payment-provider secret, funds, supplier credential, or proof
+that an external operation actually occurred beyond the reviewed reference. An active request in a
+user's personal organization blocks account erasure until it is cancelled or completed through an
+approved lifecycle.
+
+Broker reports are disabled independently by default. Generation is CLI-only and requires a
+verified super administrator, a completed transaction, an earned or settled commission, both exact
+current event heads, a UUID, bounded reason, external evidence, and a supported locale. Rendering
+accepts only the server-built subject-safe snapshot; Dompdf remote resources, PHP, and JavaScript
+are disabled and DejaVu Sans is embedded/subset for the five supported languages. Artifacts live on
+the configured private disk and are addressed only by server-generated organization/transaction/
+report ULIDs. The API never returns disk, path, source heads, evidence, snapshots, hashes, or replay
+keys. Short-lived relative signed URLs are still tenant-scoped and policy-authorized on use.
+Download fails closed for non-available/expired/missing/corrupt artifacts and sends private,
+no-store and no-sniff headers. The scheduled purge deletes the exact artifact before appending the
+immutable `purged` event; deletion failure leaves it `available` for retry. Available personal
+report artifacts are both a live privacy blocker and part of the final private-file absence check.
+
+Broker payment cases are independently disabled by default and writable only through CLI actions
+by a verified super administrator. Opening requires the exact transaction event at or after payment
+confirmation, copies transaction money/currency, and rejects duplicate normalized external cases.
+Every later write requires the exact case head, a transaction-scoped UUID, bounded reason and
+reviewed evidence, and a type-compatible resolution/outcome amount. Subject projections omit
+external case/evidence references, snapshots, hashes, and replay keys. Open personal cases block
+account erasure, and privacy data/erasure inventories are versioned at `v4`. No card data, provider
+credential, raw provider payload, fund movement, commission reversal, or outbound request enters
+this boundary.
+
+Production activation is independently fail-closed. Host validation is enabled outside local and
+test environments, forwarded headers are trusted only from explicit `TRUSTED_PROXIES` IPs/CIDRs,
+and catch-all proxy trust is prohibited. `operations:production-preflight` evaluates effective
+cached configuration without returning secret values and blocks unsafe origins, debug/key state,
+privileged/non-MySQL database access, non-UTC/non-`utf8mb4` sessions, unencrypted Redis, queue
+visibility races, insecure sessions, local/public private-evidence storage, fake enabled analysis,
+log-only mail, and inconsistent feature dependencies. `ANALYSIS_SUBMISSION_ENABLED=false` prevents quota consumption, dispatch
+creation, and provider work while a reviewed production AI/matching provider is unavailable.
 
 Sell price-intelligence commands additionally require tenant-scoped owned-product lookup, the
 `owned-products.manage` capability, an exact current assessment ID, and composite database foreign

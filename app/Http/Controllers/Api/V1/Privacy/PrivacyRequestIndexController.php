@@ -17,6 +17,7 @@ final class PrivacyRequestIndexController extends Controller
             ->where('subject_user_id', $request->user()->getKey())
             ->with([
                 'residenceCountry',
+                'fulfillment',
                 'currentEvent.actor:id,name',
                 'events' => fn ($query) => $query
                     ->with('actor:id,name')

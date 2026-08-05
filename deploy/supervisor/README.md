@@ -9,6 +9,11 @@ in every non-local environment.
 Copy `procura.conf.example` into the Supervisor configuration directory and replace the PHP binary,
 release path, operating-system user, process count, and log path for the target host.
 
+`npm run verify:production-deployment` validates the reviewed worker pool names, exact queue
+ownership, attempts, timeouts, hourly recycling, graceful shutdown allowance, heartbeat coverage,
+and Redis `retry_after` relationship. Run it in the immutable release before installing the target-
+specific Supervisor file.
+
 The example starts four analysis processes, two connector processes, and four notification
 processes. The analysis pool gives
 the latency-sensitive `analyses` queue priority over the general `default` queue. Its jobs own their

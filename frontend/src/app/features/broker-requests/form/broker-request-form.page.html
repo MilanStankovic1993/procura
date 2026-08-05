@@ -1,0 +1,198 @@
+<div class="page">
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'brokerRequest.eyebrow' | t }}</p>
+      <h1>
+        {{
+          (editing()
+            ? 'brokerRequest.form.editTitle'
+            : 'brokerRequest.form.createTitle')
+            | t
+        }}
+      </h1>
+      <p>{{ 'brokerRequest.form.description' | t }}</p>
+    </div>
+    <a class="back" routerLink="/app/broker-requests">
+      {{ 'brokerRequest.form.back' | t }}
+    </a>
+  </header>
+
+  @if (error()) {
+    <div class="alert" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="panel">{{ 'brokerRequest.form.loading' | t }}</div>
+  } @else {
+    <form class="panel" [formGroup]="form" (ngSubmit)="save()">
+      <section>
+        <div class="section-heading">
+          <span>1</span>
+          <div>
+            <h2>{{ 'brokerRequest.form.productSection' | t }}</h2>
+            <p>{{ 'brokerRequest.form.productSectionHelp' | t }}</p>
+          </div>
+        </div>
+
+        <label for="broker-title">{{ 'brokerRequest.fields.title' | t }}</label>
+        <input id="broker-title" formControlName="title" maxlength="160" />
+
+        <label for="broker-description">
+          {{ 'brokerRequest.fields.description' | t }}
+        </label>
+        <textarea
+          id="broker-description"
+          formControlName="product_description"
+          rows="6"
+          maxlength="3000"
+          [placeholder]="'brokerRequest.form.descriptionPlaceholder' | t"
+        ></textarea>
+
+        <div class="grid">
+          <div>
+            <label for="broker-category">
+              {{ 'brokerRequest.fields.category' | t }}
+            </label>
+            <select id="broker-category" formControlName="product_category_id">
+              <option value="">{{ 'common.notSet' | t }}</option>
+              @for (category of categories(); track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label for="broker-condition">
+              {{ 'brokerRequest.fields.condition' | t }}
+            </label>
+            <select
+              id="broker-condition"
+              formControlName="condition_preference"
+            >
+              @for (condition of conditions; track condition) {
+                <option [value]="condition">
+                  {{ conditionLabel(condition) }}
+                </option>
+              }
+            </select>
+          </div>
+          <div>
+            <label for="broker-brand">{{ 'brokerRequest.fields.brand' | t }}</label>
+            <input id="broker-brand" formControlName="brand_preference" />
+          </div>
+          <div>
+            <label for="broker-model">{{ 'brokerRequest.fields.model' | t }}</label>
+            <input id="broker-model" formControlName="model_preference" />
+          </div>
+          <div>
+            <label for="broker-quantity">
+              {{ 'brokerRequest.fields.quantity' | t }}
+            </label>
+            <input
+              id="broker-quantity"
+              type="number"
+              min="1"
+              max="1000"
+              formControlName="quantity"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-heading">
+          <span>2</span>
+          <div>
+            <h2>{{ 'brokerRequest.form.marketSection' | t }}</h2>
+            <p>{{ 'brokerRequest.form.marketSectionHelp' | t }}</p>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <label for="broker-budget">{{ 'brokerRequest.fields.budget' | t }}</label>
+            <input
+              id="broker-budget"
+              inputmode="decimal"
+              formControlName="budget"
+              [placeholder]="'brokerRequest.form.budgetPlaceholder' | t"
+            />
+          </div>
+          <div>
+            <label for="broker-currency">
+              {{ 'brokerRequest.fields.currency' | t }}
+            </label>
+            <select
+              id="broker-currency"
+              formControlName="budget_currency_code"
+            >
+              <option value="">{{ 'common.notSet' | t }}</option>
+              @for (currency of catalog()?.currencies ?? []; track currency.code) {
+                <option [value]="currency.code">
+                  {{ currency.code }} · {{ currency.name }}
+                </option>
+              }
+            </select>
+          </div>
+          <div class="wide">
+            <label for="broker-countries">
+              {{ 'brokerRequest.fields.targetCountries' | t }}
+            </label>
+            <select
+              id="broker-countries"
+              multiple
+              size="8"
+              formControlName="target_country_codes"
+            >
+              @for (country of countries(); track country.code) {
+                <option [value]="country.code">
+                  {{ countryName(country) }} ({{ country.code }})
+                </option>
+              }
+            </select>
+            <small>{{ 'brokerRequest.form.countryHelp' | t }}</small>
+          </div>
+          <div>
+            <label for="broker-needed-by">
+              {{ 'brokerRequest.fields.neededBy' | t }}
+            </label>
+            <input
+              id="broker-needed-by"
+              type="date"
+              [min]="minDate"
+              formControlName="needed_by"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-heading">
+          <span>3</span>
+          <div>
+            <h2>{{ 'brokerRequest.form.notesSection' | t }}</h2>
+            <p>{{ 'brokerRequest.form.notesSectionHelp' | t }}</p>
+          </div>
+        </div>
+        <label for="broker-notes">{{ 'brokerRequest.fields.notes' | t }}</label>
+        <textarea
+          id="broker-notes"
+          formControlName="notes"
+          rows="4"
+          maxlength="2000"
+        ></textarea>
+      </section>
+
+      <footer>
+        <p>{{ 'brokerRequest.form.draftDisclosure' | t }}</p>
+        <button type="submit" [disabled]="saving()">
+          {{
+            (saving()
+              ? 'brokerRequest.form.saving'
+              : 'brokerRequest.form.saveDraft')
+              | t
+          }}
+        </button>
+      </footer>
+    </form>
+  }
+</div>

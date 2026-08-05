@@ -1,6 +1,6 @@
 # 18 - Development Handoff
 
-Last updated: 2026-07-28
+Last updated: 2026-07-29
 
 This document is the persistent handoff for continuing Procura development on another computer or
 in a new Codex task. Read it after the preceding product and architecture documents and verify the
@@ -429,42 +429,62 @@ The request-scoped `OrganizationContext` is authoritative for tenant-aware appli
 Local verification completed for this task:
 
 ```text
-php artisan migrate                 passed through batch 39 on MySQL 8.4.3; 42 migrations retained
-php -d xdebug.mode=off -d memory_limit=512M vendor/bin/pest
-                                    304 passed (3533 assertions)
+php artisan migrate:status          passed through batch 46 on MySQL 8.4.3; 49 migrations retained
+php -d memory_limit=512M vendor/bin/pest --compact
+                                    350 passed (4830 assertions) in 158.59 seconds
+production preflight targeted       12 passed (348 assertions), including cached-config inspection,
+                                    secret-safe JSON, strict warning enforcement, sanitized
+                                    production-template/UTC validation, and trusted proxy rejection
+deployment/safety targeted          10 passed (32 assertions), including bounded test-database
+                                    opt-in and the MySQL/Redis GitHub Actions contract
+broker payment-case targeted        17 passed (268 assertions), including payment-head eligibility,
+                                    exact replay/conflict, reviewed refund/dispute outcomes,
+                                    immutable evidence, safe projections, erasure blocking, and CLI
+broker-report regression targeted   5 passed (65 assertions), including real PDF generation,
+                                    exact replay, signed tenant-safe download, integrity failure,
+                                    expiry purge/privacy blocking, stale-source rejection, and CLI
+commission calculator targeted      2 passed (5 assertions), including half-up boundaries and
+                                    JavaScript-safe payable overflow
 capacity/Admin/Analysis/readiness   53 passed (439 assertions), including a 2,000-row capacity
 targeted                            fixture, cache recovery, tenant query bounds, queue dispatch,
                                     exact JSON, catalog parity, and safe rendered projections
-API/Admin localization targeted     32 passed (904 assertions), including regional browser tags,
+API/Admin localization targeted     33 passed (1454 assertions), including regional browser tags,
                                     authenticated preference, fallback, request-state reset, every
-                                    current validator rule/field, 22 typed conflict codes, 60 typed
+                                    current validator rule/field, 22 typed conflict codes, 179 typed
                                     application-validation codes, safe request-scoped rendering,
-                                    migrated-source guards, and Filament rendering
+                                    migrated-source guards, payment-case Admin access/redaction, and
+                                    Filament rendering
 platform validation regression      61 passed (835 assertions) across organizations, listings,
 targeted                            privacy, monitoring/Telegram, product search, sale outcomes,
                                     and manual analysis retry
 Analysis validation regression      26 passed (535 assertions) across comparable identity/intake,
 targeted                            market normalization, cost/opportunity confirmation, buyer
                                     decision transitions, concurrency, authorization, and tenancy
+OwnedProducts validation regression 37 passed (707 assertions) across intake/assessment, images,
+targeted                            Sell comparables/normalization, listing drafts, sale portfolio,
+                                    realized outcomes, estimate accuracy, authorization, and tenancy
 conflict domain regression targeted 48 passed (741 assertions) across billing, marketplace import,
                                     privacy, buyer decision, sale portfolio, and outcome tracking
 vendor/bin/pint --test              passed
 npm run lint:frontend               passed
 npm run check:i18n                  passed; all application screens use the localization boundary
-npm run test:frontend               77 passed across 31 files
-npm run build                       passed on Node 24.18 without warnings (405.33 kB initial;
-                                    owned-product detail 189.19 kB lazy;
-                                    analysis detail 160.82 kB lazy)
-composer validate --no-check-publish passed
+npm run test:frontend               81 passed across 32 files
+npm run build                       passed on Node 24.18 without warnings (419.88 kB initial;
+                                    broker-request detail 38.54 kB lazy;
+                                    owned-product detail 189.18 kB lazy;
+                                    analysis detail 160.84 kB lazy)
+composer validate --strict          passed
 php artisan optimize                passed, then cache cleared
 php artisan schedule:list           passed; analysis, CSV import, email/Telegram recovery,
                                     challenge expiry, and singleton queue heartbeat dispatch run
-                                    every minute
+                                    every minute; expired broker-report artifacts purge daily at
+                                    02:30 with overlap/single-server protection
 npm audit --prefix frontend --omit=dev --audit-level=high passed; 0 vulnerabilities
 optimized runtime                   200 `/up`, 200 API health with database/cache `ok` and queue
                                     monitoring intentionally `not_monitored`, and guest Analysis
-                                    Operations 302 to authentication; production-gated switches
-                                    verified false
+                                    Operations 302 to authentication; privacy production gates
+                                    verified false and broker requests verified enabled
+production serving contract         passed for built Angular output and nginx routing
 localized runtime                  422 Serbian validation with `Content-Language: sr-Latn` for
                                     `sr-RS`; unsupported Italian returns English `422`; neither
                                     request creates an account or workspace
@@ -731,13 +751,14 @@ personal organization, sessions, password-reset token, and related records were 
 
 Production serving now has one reproducible output and an explicit web-server contract.
 `npm run build:frontend` writes content-hashed Angular assets to ignored `public/spa` output and
-automatically runs `tools/verify-production-serving.mjs`. The smoke check verifies every referenced
-bundle, rejects public source maps and un-hashed bundles, and verifies that the nginx example keeps
-API, Sanctum, Filament, Flux, fingerprinted Livewire, storage, and health paths out of the SPA
-fallback. The nginx example uses an internal no-store application shell, immutable hashed assets,
-TLS, direct-PHP denial, hidden-file denial, and a named PHP-FPM front controller. Target-specific
-domain, certificate, release path, socket values, and `nginx -t` remain deployment-environment
-responsibilities.
+automatically runs both `tools/verify-production-serving.mjs` and
+`tools/verify-production-deployment.mjs`. The checks verify every referenced bundle, reject public
+source maps and un-hashed bundles, and ensure that the nginx example keeps API, Sanctum, Filament,
+Flux, fingerprinted Livewire, storage, and health paths out of the SPA fallback. They also lock the
+reviewed security headers, TLS boundary, Supervisor pool/queue/timeout/attempt/recycle contract,
+Redis `retry_after`, heartbeat queue set, scheduler recovery set, and fail-closed production
+template. Target-specific domain, certificate, release path, socket values, and `nginx -t` remain
+deployment-environment responsibilities.
 
 The development proxy targets `127.0.0.1` and sets the Laragon virtual host explicitly, so it does
 not depend on local `procura.test` DNS resolution. Use the `localhost:4200` browser origin from
@@ -753,8 +774,15 @@ continues to serve the same client paths from its internal no-store Angular shel
 GitHub Actions targets PHP 8.3, 8.4, and 8.5 and runs Pest directly with a 512 MB process-only
 memory ceiling. The PHP 8.4 job explicitly runs the deterministic 2,000-row capacity/query-budget
 suite, installs the Angular lockfile, audits production Angular dependencies, lints and tests
-Angular, builds `public/spa`, and runs the production serving-contract smoke check. Confirm the
-remote workflow result after this branch is pushed or opened as a pull request.
+Angular, builds `public/spa`, and runs the complete production deployment contract. A separate
+bounded job provisions MySQL 8.4 and Redis 7.4, applies every migration, verifies cached Redis/MySQL
+readiness, and runs a dedicated strict-MySQL contract for UTC/session SQL mode, `utf8mb4`, InnoDB,
+foreign keys, migration completeness, index-name bounds, and the reserved `rank` query. The complete
+functional suite remains in the PHP-version SQLite matrix; a local experiment proved duplicating
+all tests on MySQL would exceed ten minutes after only the first bounded tranche, so CI uses the
+focused compatibility gate instead of an impractical claim. Workflow concurrency cancels
+superseded runs, and both jobs have explicit 20-minute limits. Confirm the remote workflow result
+after this branch is pushed or opened as a pull request.
 
 ## 4. Not implemented yet
 
@@ -777,13 +805,15 @@ The following remain intentionally unimplemented:
 - approved automated market-factor/customs/tax profiles; the explicit evidence-bound Buy and Sell
   normalization commands are implemented, but no reusable profile or automated source is active,
 - approved production identity verification, retention/legal-hold matrix, secure data-export
-  assembly/delivery, account-erasure execution, evidence repository, and processor inventory; the
-  audited request workflow is implemented but deliberately performs none of those external steps,
+  assembly/delivery, external storage/processor/log/analytics/queue cleanup, backup purge,
+  evidence repository, and processor inventory; the audited workflow can execute the database
+  erasure/tombstone boundary and record verified receipts but deliberately performs none of those
+  external assembly, delivery, provider, storage, or backup steps,
 - automatic marketplace publication or remote listing mutation,
-- remaining application-service failures built through ad hoc `ValidationException::withMessages`
-  still originate as English sentences and should move to typed language-neutral presentation
-  codes; standard FormRequest/Fortify messages and all six explicit API conflict exception
-  families are complete,
+- payment/refund/dispute execution and supplier communication/integration;
+  tenant requests, immutable offers, exact subject acceptance, fulfillment-evidence transactions,
+  commission earning/waiver, settlement ledgers, and private evidence-derived PDF reports are
+  implemented,
 - Stripe test/live products and Prices, tax/payment-method/portal policy, production credentials,
   public webhook registration, lifecycle acceptance evidence, and separately approved live
   activation,
@@ -978,6 +1008,18 @@ Operational readiness is safe to inspect locally without queue monitoring:
 php artisan operations:readiness
 ```
 
+Effective production configuration can be rehearsed locally without pretending it is launch-ready:
+
+```powershell
+php artisan operations:production-preflight --allow-non-production --json
+```
+
+The command is intentionally blocked by the local HTTP, MySQL identity, Redis TLS, session, private
+storage, fake-provider, and mail configuration. In an inactive production release, run it after
+`php artisan optimize` without `--allow-non-production`; use `--strict` for the complete advertised
+feature scope. Stable output contains no configured secret values. The sanitized starting template
+is `deploy/env/procura.production.env.example`; never commit its completed form.
+
 Production and staging release verification must instead use
 `php artisan operations:readiness --require-queue-heartbeats --json` after the shared cache,
 singleton scheduler, and all worker pools are active. Do not enable the flag locally merely to make
@@ -1077,13 +1119,98 @@ The subject-scoped privacy-request foundation is now complete:
 3. Request events are immutable, monotonically sequenced, previous-event linked, actor-attributed,
    payload hashed, and optimistic-concurrency protected. Exact replay is inert and stale writes
    fail with `409`.
-4. Verified super administrators append operational transitions only through
-   `privacy-requests:transition`; approved, fulfilled, and rejected states require an external
-   evidence reference. Filament provides a localized read-only ledger and open-request dashboard.
-5. Angular provides the complete request form, notice boundary, blocker/status/history timeline,
-   and two-step cancellation in EN/DE/ES/FR/sr-Latn.
-6. The implementation never builds an export or deletes account data automatically. Production
-   legal/retention/identity/delivery/erasure procedures remain mandatory go-live work.
+4. Verified super administrators append review/approval/rejection transitions only through
+   `privacy-requests:transition`; the generic action now refuses `fulfilled`. Filament provides a
+   localized read-only ledger and open-request dashboard.
+5. `privacy-requests:complete-export` is the only data-export terminal operation. It is disabled by
+   default and requires an approved exact event head, UUID replay key, configured inventory
+   version, identity evidence, private artifact reference/SHA-256/byte size/bounded expiry, secure
+   delivery evidence, and reviewed note.
+6. Export completion atomically appends the terminal event, immutable `privacy_request_fulfillments`
+   receipt, and `privacy_request.export_fulfilled` audit event. Exact replay is inert; changed
+   replay conflicts. The subject API and localized Admin projection omit the artifact location,
+   checksum, identity reference, payload hash, and idempotency key; the existing event timeline
+   retains its bounded delivery receipt reference.
+7. `privacy-requests:complete-erasure` is the only account-deletion terminal operation and has an
+   independent false-by-default switch/inventory. It requires an approved exact head, identity,
+   isolated-run, storage and processor evidence, exact snapshot-clearance set, bounded backup-purge
+   deadline, empty live ownership/billing/admin blockers, and verified absence of known personal
+   tenant files. It atomically removes the personal tenant and revocable access/preferences,
+   anonymizes invitations, detaches business memberships, writes an unverified non-admin user
+   tombstone, and records `privacy_request.account_erased`.
+8. Exact erasure replay is inert after the tombstone, deadline or configuration changes; changed
+   replay conflicts. Retained business/audit rows use the pseudonymous user key. Receipt projections
+   expose the backup deadline but never identity/run/storage/processor evidence or clearances.
+9. Angular provides the complete request form, notice boundary, blocker/status/history timeline,
+   safe fulfillment receipt projection, and two-step cancellation in EN/DE/ES/FR/sr-Latn.
+10. The implementation never builds or delivers an export and never infers external object-store,
+    processor, log, analytics, queue, or backup erasure. Production legal, retention, identity,
+    inventory, delivery, artifact disposal, external erasure evidence, backup restoration handling,
+    and processor procedures remain mandatory go-live work.
+
+The Phase 8 broker-request, offer, transaction, commission, report, and payment-case ledgers are now
+complete at the provider-independent application boundary:
+
+1. Verified members read only the active organization's requests. Owner, administrator and analyst
+   roles can create/update/submit/cancel; viewers remain read-only. Cross-tenant identifiers resolve
+   as `404`.
+2. Drafts capture bounded product criteria, condition, quantity, optional exact budget/currency,
+   target ISO countries, needed-by date and notes. Content updates are allowed only in `draft`.
+3. Every create/update/submit/cancel operation appends an immutable full request snapshot with a
+   monotonically sequenced previous-event link, exact current-head check, UUID idempotency and
+   stable hashes. Exact replay is inert; changed replay and stale heads fail closed.
+4. First submission consumes `broker_requests.monthly` inside the same transaction. Free-plan
+   exhaustion and the module switch fail closed without appending an event or usage.
+5. Verified super administrators use `broker-requests:transition` with an exact head, reason and
+   evidence to enter `reviewing`, then `searching`, or cancel. The generic command refuses
+   `offers_available`, `accepted`, and `completed`.
+6. A verified super administrator presents immutable, evidence-bound supplier terms only through
+   `broker-offers:present`, against the exact request head. The server calculates every subtotal,
+   total, versioned commission, and customer-payable amount in integer minor units and enforces
+   half-up basis-point rounding, safe-integer, currency, validity, country, quantity, and
+   bounded-history constraints.
+7. Tenant acceptance requires both exact request and selected-offer heads and revalidates the
+   immutable commission arithmetic. One database transaction accepts the selected offer, marks
+   every alternative `not_selected`, moves the request to `accepted`, and opens one
+   `awaiting_payment` transaction plus one `pending` commission with immutable opening events.
+   Exact replay is inert; stale, expired, inconsistent-commission, changed-key, viewer, and
+   cross-tenant attempts fail closed.
+8. Verified super administrators use `broker-transactions:transition` with exact heads, UUID
+   replay, bounded reason, and mandatory external evidence for
+   `payment_confirmed -> supplier_ordered -> shipped -> delivered -> completed`. Only
+   `awaiting_payment` may be cancelled; post-payment exceptions use a separate payment-case ledger
+   and never overload the fulfillment state.
+9. Completion atomically completes the request and earns the commission; pre-payment cancellation
+   atomically cancels the request and waives it. `broker-commissions:settle` separately settles only
+   an earned commission with its own exact-head evidence and replay contract.
+10. Angular supplies list/create/edit/detail/history, submit/cancel, safe offer comparison, exact
+    supplier/commission/payable disclosure, explicit cross-currency warning, two-step acceptance,
+    and fulfillment/commission/payment-case timelines in EN/DE/ES/FR/sr-Latn. Filament supplies
+    separate localized read-only request, offer, transaction, commission, payment-case, and report
+    resources. Subject projections omit private supplier/external-case references, snapshots,
+    hashes, idempotency keys, and operator evidence.
+11. `broker-reports:generate` accepts only a completed transaction plus earned/settled commission,
+    both exact event heads, verified-super-admin reason/evidence, UUID and supported locale. It
+    commits one immutable subject-safe snapshot and Dompdf A4 artifact with private
+    organization/transaction/ULID path, SHA-256, size, page count and retention deadline. Subject
+    API/Angular expose only safe metadata and a short-lived relative signed URL; every download
+    repeats tenant policy, status, expiry, size and checksum checks. The daily bounded singleton
+    purge deletes the artifact before appending its immutable `purged` event. The localized
+    read-only Broker Reports resource omits storage/source/evidence/hash/replay internals. Poppler
+    visual QA confirmed both Serbian-Latin A4 pages, diacritics, localized country/status labels,
+    clean page breaks and numbering.
+12. `broker-payment-cases:open` opens one immutable refund or dispute investigation against an exact
+    payment-confirmed-or-later transaction head. `broker-payment-cases:transition` enforces
+    `open -> under_review -> resolved` or cancellation, type-compatible reviewed outcomes, exact
+    minor-unit amounts, UUID replay, bounded evidence, logical-case uniqueness, and a 100-case
+    transaction history cap. It records evidence about an external procedure; it never calls a
+    payment provider, refunds funds, files a chargeback, or reverses commission.
+13. An active request, available report artifact, or open/under-review payment case in a user's
+    personal organization blocks account erasure until lifecycle resolution/purge. The private-file
+    absence inventory and both privacy inventory versions are now `v4`. Payment/refund/chargeback
+    execution and supplier communication/integration remain explicit later Phase 8 boundaries.
+    Transaction/commission/report/payment-case rows are evidence ledgers and never claim that
+    Procura handled funds or executed an external operation.
 
 The Analysis Operations boundary is now complete and production-gated:
 
@@ -1120,6 +1247,21 @@ The base operational-readiness boundary is now complete and production-gated:
 6. `OPERATIONS_QUEUE_HEARTBEATS_ENABLED` is false by default. Production activation, alerting,
    controlled failure/recovery, temporary incident fallback, and load-balancer routing are
    mandatory in `docs/19-production-go-live.md`.
+
+The production-configuration preflight boundary is now complete:
+
+1. `operations:production-preflight` inspects effective configuration after caching and emits a
+   stable table or exactly one secret-free JSON document.
+2. Blocking checks cover production/debug/key, same-origin HTTPS/CORS/Sanctum, bounded trusted
+   proxies and trusted hosts, strict non-root MySQL, TLS Redis cache/queue, queue timeout/failure
+   storage, encrypted secure sessions, private fail-loud S3 disks, mail, analysis providers, and
+   broker/privacy dependency consistency.
+3. Safe disabled external integrations remain explicit warnings; `--strict` promotes every warning
+   to a failed launch decision. Non-production rehearsal requires `--allow-non-production`.
+4. `ANALYSIS_SUBMISSION_ENABLED` defaults false in code. With it false, draft submission fails
+   before quota consumption, dispatch creation, or provider work; local/test configuration opts in.
+5. Laravel host validation is active outside local/testing, proxy trust comes only from explicit
+   `TRUSTED_PROXIES`, and catch-all proxy ranges fail preflight.
 
 The first performance/capacity regression boundary is now complete:
 
@@ -1158,6 +1300,8 @@ personal organizations and memberships (complete)
 -> production Angular serving and deployment boundary (complete)
 -> database/cache readiness, per-pool worker heartbeats, deploy CLI, and localized Admin status
    (complete; production heartbeat switch off)
+-> effective production-config preflight, trusted host/proxy boundary, and analysis submission kill
+   switch (complete; external provider and production values pending)
 -> deterministic capacity fixture, dashboard snapshot, `11/1/2` query budgets, and guarded staging
    CLI (complete first baseline; concurrent load/soak evidence pending)
 -> central five-language API/Fortify validation and request-locale isolation (complete)
@@ -1189,6 +1333,14 @@ personal organizations and memberships (complete)
 -> Stripe test/live control-plane activation and full lifecycle evidence (production register)
 -> Phase 6 connector registry and authorized CSV ingest boundary (complete)
 -> Phase 6 email, contracted partner-feed, and approved API connectors (source-dependent)
+-> Phase 7 explicit Buy/Sell market normalization boundary (complete)
+-> Phase 7 approved live FX/profiles/customs sources (provider/policy-dependent)
+-> Phase 8 broker/sourcing request foundation (complete)
+-> Phase 8 immutable offers and subject acceptance (complete)
+-> Phase 8 transaction, fulfillment-evidence, and commission ledgers (complete)
+-> Phase 8 evidence-derived PDF reports and secure retention-bound delivery (complete)
+-> Phase 8 provider-independent refund/dispute investigation ledger (complete)
+-> Phase 8 payment/refund/chargeback execution and supplier integrations (provider/policy-dependent)
 ```
 
 ## 9. Known non-blocking notes
@@ -1197,7 +1349,7 @@ personal organizations and memberships (complete)
 - The organization deployment backfill processes users in chunks of 500 and is idempotent. Its
   `down()` intentionally preserves ownership data on a single-step rollback; rolling back the
   preceding schema migration removes the new tables and pointer.
-- The Angular 22.0.8 CLI development dependency currently reports a moderate Windows path traversal advisory through its MCP SDK and `@hono/node-server` 1.x. npm's suggested fix downgrades Angular CLI to 21, so keep Angular 22 and upgrade when the Angular CLI publishes a compatible patch. The production-only audit completed again on 2026-07-28 with zero vulnerabilities, confirming that this advisory is absent from the production dependency tree.
+- The Angular 22.0.8 CLI development dependency currently reports a moderate Windows path traversal advisory through its MCP SDK and `@hono/node-server` 1.x. npm's suggested fix downgrades Angular CLI to 21, so keep Angular 22 and upgrade when the Angular CLI publishes a compatible patch. The production-only audit completed again on 2026-07-29 with zero vulnerabilities, confirming that this advisory is absent from the production dependency tree.
 - The 8 kB warning and 12 kB error component-style budgets remain active. The listing detail page is
   currently 7.13 kB. Price-estimate and risk-assessment rendering are isolated in their own
   components rather than increasing the analysis-detail budget, and the production build completes
@@ -1207,7 +1359,7 @@ personal organizations and memberships (complete)
   owned-product assessment, Sell price intelligence, and Sell listing-draft/photo-readiness, plus
   complete buy-analysis domain screens, saved-search management, match evidence, and the in-app
   notification inbox.
-  Every catalog currently implements the same 1981-key
+  Every catalog currently implements the same 2189-key
   `TranslationDictionary`;
   missing keys fail TypeScript compilation. `npm run check:i18n` also rejects common hard-coded
   application copy.
@@ -1218,15 +1370,18 @@ personal organizations and memberships (complete)
   `Content-Language`, and request-state reset are regression tested. All 22 codes across the six
   explicit API conflict exception families are enum-backed, have exact five-catalog parity, retain
   the same language-neutral response code, and render no raw diagnostic. The first application
-  validation platform and Analysis tranches are also complete: 60 `ApplicationValidationCode`
-  cases and exact
+  validation platform, Analysis, OwnedProducts, privacy, broker-request, broker-offer,
+  broker-transaction, broker-commission, broker-report, and broker-payment-case tranches are
+  complete: 179
+  `ApplicationValidationCode` cases and exact
   EN/DE/ES/FR/sr-Latn `application_validation.php` catalogs now cover organizations,
   monitoring/notifications, Telegram, privacy, listing uploads, product search, outcome-money
   normalization, manual analysis retry, comparable identity/intake, cross-market normalization,
-  cost and opportunity confirmation, and buyer decisions while preserving field-keyed `422`
-  responses. A source contract prevents those 21 migrated services/controllers from returning to
-  embedded English validation strings. The remaining 61 ad hoc calls are isolated to 13
-  owned-product domain actions and form the final localization tranche; stored evidence
+  cost and opportunity confirmation, buyer decisions, owned-product intake/assessment and images,
+  Sell evidence/listing/portfolio lifecycles, realized outcomes, and estimate accuracy while
+  preserving field-keyed `422` responses. A source contract prevents all 34 migrated
+  services/controllers from returning to embedded English validation strings. No direct
+  `ValidationException::withMessages` call remains in `app/Actions/OwnedProducts`; stored evidence
   identifiers remain language-neutral.
 - The separate Filament surface now follows the same five authenticated personal locales. Its
   server catalogs have an exact shared key contract, and application-owned translation overrides
@@ -1234,7 +1389,7 @@ personal organizations and memberships (complete)
   during Filament upgrades until the upstream catalogs provide equivalent keys.
 - German, Spanish, French, and Serbian Latin catalogs remain lazy chunks and do not increase the
   initial JavaScript bundle with every translation. Complete domain catalogs are currently
-  136.52–144.93 kB raw per lazy chunk. No localization dependency was added.
+  143.91–152.70 kB raw per lazy chunk. No localization dependency was added.
 - npm install scripts are explicitly approved and version-pinned in `frontend/package.json` for esbuild, Parcel watcher, lmdb, and msgpackr extraction.
 - The first auth package install encountered an incomplete copied `vendor` directory. The generated directory was safely rebuilt with a clean Composer dist install; no repository file or user change was removed.
 - Local email delivery is not a production mail service. Registration, reset, verification, and
@@ -1270,22 +1425,30 @@ personal organizations and memberships (complete)
 - SQLite accepted `rank` unquoted in the comparable-item relationship ordering, while MySQL 8.4.3
   treats it as a window-function keyword. Real MySQL QA exposed the difference; the relationship now
   qualifies and quotes the column explicitly.
+- A disposable local `procura_ci_codex` database was created only after proving the name did not
+  exist, and was removed after each attempt. No SQL assertion failed, but the Windows MySQL host
+  spent 20â€“55 seconds on several large DDL migrations and a clean ledger reached only its midpoint
+  before the five-minute diagnostic limit. The CI contract therefore performs one explicit
+  `migrate:fresh` followed by a read-only integration check without `RefreshDatabase`; the required
+  Linux MySQL/Redis workflow result remains the authoritative release evidence after push.
 - Replacing one-element comparable reason arrays initially produced Angular `NG0956` development
   warnings because text values were tracked by identity. The short ordered text lists now track by
   index; the full component suite, production build, and post-fix browser reload are clean.
 - A slow parallel validation run crossed a one-second boundary between initial and duplicate
   comparable fixture timestamps, correctly producing a new evidence record and exposing a flaky
   test. The test now derives both payloads from one fixed base timestamp. That checkpoint passed
-  163 tests and 1139 assertions; the current suite passes 304 tests and 3533 assertions after the
+  163 tests and 1139 assertions; the current suite passes 350 tests and 4830 assertions after the
   later Sell, outcome, monitoring, billing, connector, normalization, privacy, Analysis
-  Operations, operational-readiness, first deterministic capacity, server/API localization, and
-  typed platform-validation boundaries.
+  Operations, operational-readiness, deterministic capacity, server/API localization, typed
+  platform-validation, privacy fulfillment/erasure, broker workflow/report/payment-case, and
+  production-preflight boundaries.
 - The local Wamp PHP CLI loads Xdebug in `develop` mode and defaults to a 128 MB memory limit.
   Repeated bare `php artisan test` attempts exhausted that local profile while Pest retained a
   large historical result cache; no assertion failed. The documented CI-equivalent command
-  (`php -d xdebug.mode=off -d memory_limit=512M vendor/bin/pest`) passed all 304 tests and 3533
-  assertions in 108.19 seconds. Keep using that documented runner instead of treating the
-  machine-specific 128 MB/Xdebug profile as the project test contract.
+  (`php -d xdebug.mode=off -d memory_limit=512M vendor/bin/pest`) passed the then-current 304-test
+  checkpoint. The current 350-test suite also passes with the documented 512 MB boundary. Keep
+  using that runner instead of treating the machine-specific 128 MB/Xdebug profile as the project
+  test contract.
 - The DealScore migration uses explicit bounded index names and completed directly as MySQL batch
   21. Its evaluator is framework-independent, uses integer basis-point arithmetic and preserves
   every exact source snapshot; the recording action locks the entire immutable analysis, product,
@@ -1331,7 +1494,48 @@ personal organizations and memberships (complete)
   parent/dispatch cascade rules, unique analysis/run, analysis/idempotency and new-dispatch
   constraints, bounded helper-index names, and requested/hash indexes. The new table started with
   zero rows while the existing 6 users, 2 organizations, 6 memberships, 2 analyses, 1 dispatch, and
-  1 subscription-usage row remained unchanged; the migration ledger now contains 42 rows.
+  1 subscription-usage row remained unchanged; the migration ledger then contained 42 rows.
+- The privacy-fulfillment migration completed directly as MySQL batch 40. Schema inspection
+  confirmed 18 InnoDB columns, request/event/actor foreign keys, request/event/idempotency unique
+  constraints, type/completion and payload-hash indexes, actor `SET NULL`, completion-event
+  `RESTRICT`, and request `CASCADE`. The migration is additive and the fulfillment kill switch
+  remains false by default; the migration ledger now contains 43 rows.
+- The account-erasure extension completed directly as MySQL batch 41. Schema inspection confirmed
+  the indexed nullable user tombstone time, request-linked `RESTRICT` erasure reference, and four
+  nullable evidence/deadline receipt fields (22 receipt columns total). Both erasure versions are
+  explicit, `PRIVACY_ERASURE_ENABLED` remains false, and the configured backup maximum is 90 days.
+- The broker-request migration completed directly as MySQL batch 42. Schema inspection confirmed
+  the 22-column InnoDB request projection, 17-column immutable event ledger, current/previous-event
+  foreign keys, requester restriction, actor `SET NULL`, tenant/idempotency and request/sequence
+  unique constraints, bounded tenant/status/needed-by/type/hash indexes, and currency/category
+  references. Both tables started empty and the migration ledger contains 45 rows.
+- The broker-offer migration completed directly as MySQL batch 43. Schema inspection confirmed the
+  30-column immutable offer projection, 18-column offer-event ledger, composite tenant/request/source
+  constraints, current/previous-event chains, exact currency and country references, and bounded
+  event, idempotency, sequence, status, and expiry indexes. Offer writes remain disabled by default
+  in production through `BROKER_OFFERS_ENABLED=false`; the local migration ledger contains 46 rows.
+- The broker-transaction migration completed directly as MySQL batch 44. It adds five immutable
+  commission-disclosure fields to offers and creates the 23-column transaction projection,
+  19-column immutable transaction-event ledger, 20-column commission projection, and 20-column
+  immutable commission-event ledger. Composite tenant/request/offer/transaction/source-event
+  foreign keys, one-to-one request/offer/transaction constraints, exact sequence/idempotency
+  uniqueness, current/previous-event chains, actor `SET NULL`, and status/type/hash indexes are in
+  place. Transaction writes remain false by default through
+  `BROKER_TRANSACTIONS_ENABLED=false`; the local migration ledger contains 47 rows.
+- The broker-report migration completed directly as MySQL batch 45. It creates the immutable report
+  projection/event ledger, exact transaction/commission/source-event composite foreign keys,
+  current/previous event chain, transaction-sequence/idempotency/logical-source uniqueness,
+  private artifact integrity/retention metadata, and bounded status/expiry/hash indexes. Report
+  generation remains false by default through `BROKER_REPORTS_ENABLED=false`; purge scheduling is
+  deliberately independent of that switch. Local development enables the switch for verification,
+  and the local migration ledger contains 48 rows.
+- The broker payment-case migration completed as MySQL batch 46 after its interrupted first attempt
+  left only two verified-empty partial tables. Those tables were removed in reverse dependency
+  order and the unchanged migration then completed normally, without touching user data. It creates
+  the immutable refund/dispute projection and event ledger with exact transaction/request/offer/
+  tenant/source-event chains, logical-case and transaction-scoped idempotency uniqueness, bounded
+  sequence/status/type indexes, and immutable model guards. Writes remain false by default through
+  `BROKER_PAYMENT_CASES_ENABLED=false`; the local migration ledger contains 49 rows.
 
 ## 10. Required completion behavior
 

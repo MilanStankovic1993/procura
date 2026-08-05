@@ -49,6 +49,8 @@ return [
     'expected_current_attribution_id' => 'atribución actual esperada',
     'expected_current_cost_snapshot_id' => 'instantánea de costes actual esperada',
     'expected_current_event_id' => 'evento actual esperado',
+    'expected_offer_event_id' => 'evento actual esperado de la oferta del bróker',
+    'expected_request_event_id' => 'evento actual esperado de la solicitud al bróker',
     'expected_current_log_id' => 'estado de notificación actual esperado',
     'expected_current_purchase_id' => 'compra actual esperada',
     'expected_current_sale_id' => 'venta actual esperada',

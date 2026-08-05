@@ -32,3 +32,8 @@ Schedule::command('operations:dispatch-queue-heartbeats')
     ->everyMinute()
     ->withoutOverlapping()
     ->onOneServer();
+
+Schedule::command('broker-reports:purge-expired')
+    ->dailyAt('02:30')
+    ->withoutOverlapping()
+    ->onOneServer();

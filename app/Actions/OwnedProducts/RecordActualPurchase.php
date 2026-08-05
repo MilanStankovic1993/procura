@@ -4,16 +4,17 @@ namespace App\Actions\OwnedProducts;
 
 use App\Enums\Api\ApiErrorCode;
 use App\Enums\Organizations\OrganizationPermission;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Exceptions\OutcomeTrackingConflictException;
 use App\Models\ActualPurchase;
 use App\Models\Organization;
 use App\Models\OwnedProduct;
 use App\Models\User;
 use App\OutcomeTracking\OutcomeMoneyNormalizer;
+use App\Support\Validation\ApplicationValidation;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use JsonException;
 
 final class RecordActualPurchase
@@ -92,11 +93,10 @@ final class RecordActualPurchase
             if ($sequence > (int) config(
                 'outcome_tracking.maximum_purchase_records_per_product',
             )) {
-                throw ValidationException::withMessages([
-                    'owned_product' => [
-                        'The actual purchase history limit has been reached.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product',
+                    ApplicationValidationCode::ActualPurchaseHistoryLimit,
+                );
             }
 
             $evidenceSnapshot = [
@@ -187,11 +187,10 @@ final class RecordActualPurchase
         }
 
         if ($current !== null && $correctionReason === null) {
-            throw ValidationException::withMessages([
-                'correction_reason' => [
-                    'A correction reason is required for a new purchase evidence version.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'correction_reason',
+                ApplicationValidationCode::CorrectionReasonRequired,
+            );
         }
     }
 

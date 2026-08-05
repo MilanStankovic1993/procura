@@ -2,6 +2,10 @@
 
 return [
     'provider' => env('ANALYSIS_PROVIDER', 'fake'),
+    'submission_enabled' => (bool) env(
+        'ANALYSIS_SUBMISSION_ENABLED',
+        false,
+    ),
     'queue' => env('ANALYSIS_QUEUE', 'analyses'),
     'manual_retry_enabled' => (bool) env(
         'ANALYSIS_MANUAL_RETRY_ENABLED',

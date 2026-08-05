@@ -159,10 +159,30 @@ API routes. Creation locks the subject, snapshots server-derived blockers, appen
 and writes a safe platform audit event in one transaction.
 
 All later state transitions pass through `TransitionPrivacyRequest` and
-`PrivacyRequestEventRecorder`. The operator command requires the exact current event, UUID
-idempotency key, reason code, note, and evidence for terminal operational outcomes. The Filament
-resource and dashboard are read-only projections. No queue worker, scheduled deletion, export
-generator, or external compliance provider is implied by this foundation.
+`PrivacyRequestEventRecorder`. The generic operator command requires the exact current event, UUID
+idempotency key, reason code, note, and evidence, but is prohibited from writing `fulfilled`.
+Data-export completion instead passes through `CompletePrivacyDataExport`, which locks the
+operator/request, verifies the production kill switch, approved state, exact inventory version,
+identity evidence, private-artifact SHA-256/size/expiry and delivery evidence, then appends the
+terminal event, immutable `privacy_request_fulfillments` receipt, and platform audit record in one
+transaction. Exact replay returns the one existing receipt; changed replay conflicts.
+
+`CompletePrivacyAccountErasure` is a separate production-gated command boundary. It locks the
+operator, request and subject; verifies the approved exact head, dedicated switch/inventory,
+snapshot-clearance set and bounded backup deadline; recalculates live ownership, subscription and
+super-admin blockers; and refuses to run while any known personal listing image, owned-product
+image or import artifact still exists. Its transaction creates the terminal event/receipt/audit
+record, removes the personal tenant and revocable personal state, detaches remaining business
+memberships, anonymizes invitation addresses, revokes credentials, and writes an unverified,
+non-admin user tombstone. Exact replay returns the existing receipt even after configuration or
+deadline changes; changed replay conflicts.
+
+The API exposes only receipt ID, type, versions, artifact size/expiry, backup-purge deadline and
+completion time. Artifact location/checksum, identity/run/storage/processor evidence, clearance
+data, payload hash, and idempotency key remain private; the subject event timeline retains only its
+bounded completion reference. Filament is a localized read-only projection. No queue worker,
+archive generator, scheduled deletion, external object/processor cleanup or external compliance
+provider is implied by these boundaries.
 
 ## 3.6 Analysis operations boundary
 
@@ -181,6 +201,80 @@ projection, and records a platform audit event. Dispatch occurs after commit thr
 idempotent dispatcher. The original request and subscription usage are retained.
 `ANALYSIS_MANUAL_RETRY_ENABLED` is false by default and disables both Admin eligibility and the
 application action until the production procedure is approved.
+
+## 3.7 Broker-request boundary
+
+The broker module begins with a tenant-owned request aggregate rather than a generic CRUD table.
+Versioned `/api/v1/broker-requests` endpoints resolve every record through the active organization
+and policy capability. Create/update/submit/cancel controllers delegate to transactional actions;
+the Angular client never supplies an organization, requester, status, sequence, usage count, or
+operator evidence as trusted state.
+
+Each request points to an append-only `BrokerRequestEvent` head. Create, draft update, subject
+submit/cancel, and operator review/search/cancel use row locks, an exact expected event ULID, UUID
+idempotency, stable payload hashes, monotonically increasing sequence, a previous-event link, and
+an immutable full request snapshot. Submission consumes the provider-independent
+`broker_requests.monthly` entitlement in the same transaction and exact replay cannot consume it
+again.
+
+Tenant responses are safe projections of current request data and the bounded event timeline; they
+exclude event snapshots, payload/request hashes, replay keys, and operator evidence. Filament is a
+localized read-only operations projection. Verified super administrators use
+`broker-requests:transition` with an exact head, UUID, reason, and external evidence to enter
+`reviewing`, then `searching`, or cancel.
+
+`PresentBrokerRequestOffer` is the dedicated manual operations boundary for immutable supplier
+terms. It locks the request, validates server-calculated exact money, appends offer/request events,
+and moves the request to `offers_available`. `AcceptBrokerRequestOffer` resolves the request and all
+presented offers under deterministic row locks, exact request/offer heads, and one UUID replay
+anchor. The tenant API exposes only safe offer terms; private supplier references, evidence,
+snapshots, hashes, and replay keys remain server-side. The Angular comparison explicitly refuses
+to imply cross-currency ranking.
+
+Offer presentation also snapshots the configured commission rule/version and calculates the exact
+customer-payable total in integer minor units. When transaction writes are enabled, acceptance
+creates the transaction, opening transaction event, commission, and opening commission event in the
+same database transaction as request/offer acceptance. An accepted offer can therefore never exist
+without its exact commercial fulfillment boundary after activation.
+
+The transaction application action uses deterministic row locking, exact current-event checks,
+UUID replay protection, an explicit transition matrix, and mandatory external evidence. Completion
+also appends the request-completed and commission-earned events; pre-payment cancellation appends
+request-cancelled and commission-waived events. Commission settlement is a separate exact-head
+action. Tenant resources expose safe status, amounts, timestamps, and event history only. Admin
+resources expose bounded evidence to verified super administrators, never snapshots, hashes,
+idempotency keys, supplier credentials, card data, or raw provider payloads.
+
+This is a provider-independent evidence ledger. Payment execution, refunds/disputes, escrow,
+supplier connectors, and automated communication remain reserved for later application boundaries.
+
+`OpenBrokerPaymentCase` and `TransitionBrokerPaymentCase` provide the provider-independent
+refund/dispute investigation boundary. Opening locks the transaction, requires its exact current
+event at or after payment confirmation, copies exact money/currency ownership, rejects a duplicate
+logical external case, and appends the opening projection/event atomically. Transitioning locks the
+case, enforces exact-head and UUID replay semantics plus a strict state/type/outcome/amount matrix,
+and appends one new snapshot event. Neither action calls a provider or changes transaction,
+request, offer, commission, or report history.
+
+Tenant API delivery is read-only through the existing broker-request detail projection and omits
+external case/evidence references and all replay/integrity internals. A separate localized
+verified-super-admin-only Filament resource exposes bounded operational references for reviewed
+support work. The independent `BROKER_PAYMENT_CASES_ENABLED` switch gates writes without hiding
+history.
+
+`GenerateBrokerReport` is a separate false-by-default document boundary. It locks the completed
+transaction and earned/settled commission, verifies both exact event heads, builds a deterministic
+subject-safe snapshot, renders one A4 PDF with remote resources and script execution disabled,
+checks a configured size ceiling, stores the artifact on a private disk, and appends the report plus
+opening event under one retry-safe transaction. Storage compensation removes an orphan if the
+database write fails.
+
+The report API never accepts a disk/path and never renders arbitrary HTML. It returns safe metadata
+and a short-lived relative signed URL only for available, unexpired artifacts. The download
+controller repeats tenant policy authorization and verifies file existence, byte size, and SHA-256
+before returning `private, no-store`. A bounded scheduled command deletes expired artifacts and
+then appends the immutable purge event; a missing artifact is treated as already removed, while a
+storage error leaves the report available for retry.
 
 ## 4. Queue pipeline
 
@@ -220,6 +314,10 @@ action records only explicit user workflow changes after an assessed current Dea
 run in the queue and does not create purchase, payment, inventory, or outcome records.
 
 Submission writes one `analysis_dispatches` outbox record after an atomic entitlement check.
+`ANALYSIS_SUBMISSION_ENABLED` is checked before that transaction; when disabled it consumes no
+quota, creates no dispatch, and invokes no provider. The code default is false, while local/test
+environments opt in explicitly. Production may enable it only after both configured analysis and
+product-matching adapters resolve to reviewed non-fake implementations.
 Controllers never execute provider work. `analyses:dispatch-pending` runs every minute and recovers
 pending dispatches, interrupted dispatch claims, and stale processing leases. Each provider attempt
 is append-only in `ai_analyses`; queue-level terminal failures also reconcile domain state. The
@@ -610,7 +708,10 @@ field-keyed `422` response shape. The first migrated platform tranche covers org
 saved-search/notification/Telegram operations, privacy requests, listing uploads, product search,
 realized-money normalization, and manual analysis retry. The complete Analysis tranche additionally
 covers comparable identity/intake, cross-market normalization, cost and opportunity confirmation,
-and buyer decisions. Owned-product domain actions remain the explicitly tracked final tranche.
+and buyer decisions. The final OwnedProducts tranche covers intake/assessment lifecycle,
+private-image limits, Sell comparables and normalization, listing drafts, sale-portfolio lifecycle,
+realized purchase/sale/cost evidence, profit attribution, and estimate accuracy. No owned-product
+action constructs ad hoc public validation copy.
 
 The translated surface covers the public and authentication flows, workspace shell, organization,
 market and subscription administration, listing intake/detail, owned-product intake/list/detail,

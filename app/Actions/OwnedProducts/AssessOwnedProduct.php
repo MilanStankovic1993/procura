@@ -4,6 +4,7 @@ namespace App\Actions\OwnedProducts;
 
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\OwnedProducts\OwnedProductStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Models\Organization;
 use App\Models\OwnedProduct;
 use App\Models\OwnedProductAssessment;
@@ -13,8 +14,8 @@ use App\Models\User;
 use App\OwnedProductAssessment\Contracts\OwnedProductAssessor;
 use App\OwnedProductAssessment\Data\OwnedProductAssessmentInputData;
 use App\OwnedProductAssessment\OwnedProductAssessmentEvidence;
+use App\Support\Validation\ApplicationValidation;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use JsonException;
 
 class AssessOwnedProduct
@@ -51,11 +52,10 @@ class AssessOwnedProduct
                 ->findOrFail($ownedProductId);
 
             if ($ownedProduct->status !== OwnedProductStatus::Ready) {
-                throw ValidationException::withMessages([
-                    'owned_product' => [
-                        'The owned-product intake must be ready before assessment.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product',
+                    ApplicationValidationCode::OwnedProductNotReady,
+                );
             }
 
             $snapshot = OwnedProductSnapshot::query()
@@ -66,11 +66,10 @@ class AssessOwnedProduct
                 ->firstOrFail();
 
             if ($snapshot->getKey() !== $expectedSnapshotId) {
-                throw ValidationException::withMessages([
-                    'owned_product_snapshot_id' => [
-                        'The owned-product intake changed. Reload the latest snapshot before assessment.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product_snapshot_id',
+                    ApplicationValidationCode::OwnedProductAssessmentStale,
+                );
             }
 
             $images = OwnedProductImage::query()

@@ -6,6 +6,7 @@ use App\Enums\Catalog\ProductMatchStatus;
 use App\Enums\Listings\MarketplaceConnectorType;
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\OwnedProducts\OwnedProductAssessmentStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Models\Country;
 use App\Models\MarketplaceSource;
 use App\Models\Organization;
@@ -17,9 +18,9 @@ use App\Models\SellComparableSelection;
 use App\Models\SellPriceBand;
 use App\Models\User;
 use App\OwnedProductAssessment\CurrentOwnedProductAssessmentResolver;
+use App\Support\Validation\ApplicationValidation;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 final class CreateSellComparable
 {
@@ -72,11 +73,10 @@ final class CreateSellComparable
                 || $assessment->getKey()
                     !== $attributes['owned_product_assessment_id']
             ) {
-                throw ValidationException::withMessages([
-                    'owned_product_assessment_id' => [
-                        'The assessment is stale. Reload and assess the current intake and image evidence.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product_assessment_id',
+                    ApplicationValidationCode::OwnedProductAssessmentStale,
+                );
             }
 
             if (
@@ -84,22 +84,20 @@ final class CreateSellComparable
                 || $assessment->matcher_status !== ProductMatchStatus::Matched
                 || $assessment->product_model_id === null
             ) {
-                throw ValidationException::withMessages([
-                    'owned_product_assessment_id' => [
-                        'A ready assessment with a confirmed canonical product is required.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product_assessment_id',
+                    ApplicationValidationCode::OwnedProductAssessmentNotReady,
+                );
             }
 
             if (
                 ! $source->active
                 || $source->connector_type !== MarketplaceConnectorType::Manual
             ) {
-                throw ValidationException::withMessages([
-                    'marketplace_source_key' => [
-                        'Only the approved manual connector can create Sell comparable evidence in this phase.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'marketplace_source_key',
+                    ApplicationValidationCode::SellComparableManualConnectorRequired,
+                );
             }
 
             $snapshot = $assessment->snapshot()->firstOrFail();
@@ -113,11 +111,10 @@ final class CreateSellComparable
                     true,
                 )
             ) {
-                throw ValidationException::withMessages([
-                    'country_code' => [
-                        'The comparable market must be one of the assessed target countries.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'country_code',
+                    ApplicationValidationCode::SellComparableTargetCountryInvalid,
+                );
             }
 
             $variantId = $attributes['product_variant_id'] ?? null;
@@ -133,11 +130,10 @@ final class CreateSellComparable
                     ->exists();
 
                 if (! $variantExists) {
-                    throw ValidationException::withMessages([
-                        'product_variant_id' => [
-                            'The comparable variant must belong to the assessed canonical model.',
-                        ],
-                    ]);
+                    ApplicationValidation::fail(
+                        'product_variant_id',
+                        ApplicationValidationCode::SellComparableVariantMismatch,
+                    );
                 }
             }
 
@@ -255,11 +251,10 @@ final class CreateSellComparable
                     'sell_price_intelligence.max_currency_scopes_per_market',
                 )
             ) {
-                throw ValidationException::withMessages([
-                    'currency_code' => [
-                        'The configured currency-scope limit for this market has been reached.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'currency_code',
+                    ApplicationValidationCode::SellComparableCurrencyScopeLimit,
+                );
             }
 
             $selection = null;

@@ -149,10 +149,118 @@ resolver deterministically falls back to Free.
 
 ```text
 BrokerRequest
-BrokerOffer
+BrokerRequestEvent
+BrokerRequestOffer
+BrokerRequestOfferEvent
 BrokerTransaction
-Commission
+BrokerTransactionEvent
+BrokerCommission
+BrokerCommissionEvent
 ```
+
+`BrokerRequest` is the implemented tenant-owned sourcing aggregate. It stores the requester,
+current status, bounded structured product criteria, target ISO country codes, optional exact
+integer-minor-unit budget/currency, current event head, event sequence, and submit/resolution
+timestamps. Draft content is mutable only through its application action and only while status is
+`draft`.
+
+`BrokerRequestEvent` is append-only and stores the organization/request, actor, monotonically
+increasing sequence, previous event, transition, reason, optional private operator evidence,
+UUID idempotency key, payload/request hashes, exact request snapshot, and occurrence time. The
+aggregate is updated under a row lock and exact-current-event check. Exact replay is inert; stale
+state or changed key reuse fails closed. Submission consumes `broker_requests.monthly` inside the
+same transaction. Tenant APIs never expose internal hashes, snapshots, idempotency keys, or
+operator evidence.
+
+The implemented lifecycle is:
+
+```text
+draft -> submitted -> reviewing -> searching
+   \          \            \            \
+    +----------+------------+-------------> cancelled
+```
+
+`BrokerRequestOffer` is the implemented immutable commercial-terms projection. It stores a
+tenant-safe supplier name, private operator supplier reference, exact quantity and integer-minor
+unit item/shipping/tax-duty/other/total amounts, ISO currency/origin, delivery/validity, warranty,
+return terms, source request-event head, current offer-event head, and resolution timestamps.
+Amounts are checked against the JavaScript safe-integer boundary and totals are calculated by the
+server; different currencies are not normalized or ranked implicitly.
+
+`BrokerRequestOfferEvent` is append-only and preserves each exact offer snapshot and status change.
+A verified super administrator presents an offer only from `searching` or `offers_available`, with
+external evidence and the exact request head. The first and every additional presentation appends
+both offer and request events. Subject acceptance locks the request and every presented offer,
+requires the exact selected-offer and request heads, accepts one offer, marks alternatives
+`not_selected`, and changes the request to `accepted` in one transaction. Exact replay is inert.
+Subject cancellation from `offers_available` similarly resolves all presented offers atomically.
+The generic operator transition still rejects `offers_available`, `accepted`, and `completed`.
+
+```text
+searching -> offers_available -> accepted
+                    \
+                     +-> cancelled
+
+offer: presented -> accepted | not_selected
+```
+
+`BrokerTransaction` is the implemented tenant-owned fulfillment projection created exactly once
+when an accepted offer is recorded. It retains the immutable request/offer/source-event identities,
+supplier total, disclosed commission, customer-payable total, currency, current event head,
+sequence, and bounded lifecycle timestamps. Money is copied from the accepted immutable offer and
+cannot be supplied by the browser or changed later.
+
+`BrokerTransactionEvent` is append-only and preserves each exact transaction snapshot, transition,
+actor, reason, external evidence reference, UUID idempotency key, payload/aggregate hashes,
+previous-event link, sequence, and occurrence time. Only verified super administrators append
+manual operational transitions against the exact current head.
+
+```text
+awaiting_payment -> payment_confirmed -> supplier_ordered -> shipped -> delivered -> completed
+       \
+        +-> cancelled
+```
+
+`BrokerCommission` is a one-to-one projection of the immutable commission terms disclosed on the
+accepted offer. Its base is the supplier-offer total; the amount is deterministically rounded
+half-up from the configured basis-point rate. `BrokerCommissionEvent` is the append-only evidence
+ledger for `pending -> earned -> settled` or `pending -> waived`. Completing/cancelling the
+transaction updates the request and commission in the same database transaction. Settlement is a
+separate verified-super-admin operation with exact-head and external evidence requirements.
+
+No transaction or commission row proves that Procura processed money. Payment, purchase,
+fulfillment, and settlement fields record bounded external evidence only; no card data, payment
+token, credential, raw provider payload, or escrow balance is stored.
+
+`BrokerPaymentCase` is the tenant-owned, provider-independent projection for one post-payment
+refund or dispute investigation. It copies transaction/request/offer ownership, the exact opening
+transaction-event head, currency, requested amount, and a SHA-256 logical-case key derived from the
+normalized external case reference. Those source facts are immutable. Only status, compatible
+resolution outcome/amount, current head, sequence, and lifecycle timestamps may advance.
+
+`BrokerPaymentCaseEvent` is the append-only evidence chain for
+`open -> under_review -> resolved|cancelled` and `open -> cancelled`. Every event preserves the
+previous event, actor, exact snapshot/hash, reason, external evidence, UUID idempotency key,
+sequence, and occurrence time. Refund and dispute outcomes have disjoint allowed values and exact
+resolved-amount rules. A case does not mutate the historical transaction or commission and is not
+proof that Procura initiated, received, or transferred funds.
+
+`BrokerReport` is the tenant-owned projection of one immutable, localized transaction-report
+artifact. It belongs to exactly one request, accepted offer, transaction, and commission and stores
+the exact completed transaction-event and earned/settled commission-event heads used to render it.
+Multiple immutable sequences are allowed when the commission head or requested locale changes.
+One logical source-head/version/locale combination and one transaction-scoped idempotency key are
+unique.
+
+`BrokerReportEvent` is the append-only chain for `available -> purged`. The opening event preserves
+the exact subject-safe report snapshot/hash plus artifact checksum/size/page/expiry metadata. The
+purge event records automated retention completion without retaining the deleted file. Projection
+updates may change only status, current event, sequence, and purge time. Storage disk/path,
+checksum, source heads, snapshot, locale, report version, and artifact metadata are immutable.
+
+The PDF is not an accounting invoice, payment receipt, supplier order, or proof of settlement. It
+contains no private supplier identifier, operator evidence, card/payment data, credential, raw
+provider payload, replay key, or internal event hash.
 
 ## 2. Important aggregates
 
@@ -693,6 +801,7 @@ Owns:
 
 - one subject-scoped `PrivacyRequest` projection;
 - an append-only `PrivacyRequestEvent` chain;
+- at most one immutable `PrivacyRequestFulfillment` receipt;
 - a nullable subject link plus normalized requester-email hash;
 - workflow and privacy-notice versions, response target, residence country, preferred locale,
   server-derived blocker snapshot, and resolution time.
@@ -707,14 +816,29 @@ Implementation rules:
   optional external evidence reference, occurrence time, idempotency key, and stable payload hash;
 - the aggregate head is updated under a transaction and expected-current-event check. Exact replay
   is inert; stale state or changed key reuse returns a conflict;
-- request/event updates and individual deletes are blocked. Event rows cascade only if the complete
-  parent aggregate is removed by an approved future retention procedure;
+- request/event/fulfillment updates and individual deletes are blocked. Event and receipt rows
+  cascade only if the complete parent aggregate is removed by an approved future retention
+  procedure;
 - the subject foreign key is nullable with `nullOnDelete`, so the operational ledger can survive
   approved account erasure without preserving a duplicate clear-text email;
 - deletion blockers are server-derived from retention review, business ownership, active
   subscriptions, and super-admin continuity;
-- `approved`, `fulfilled`, and `rejected` transitions require an external evidence reference.
-  Workflow fulfillment never performs export generation or account deletion itself.
+- `approved` and `rejected` transitions require an external evidence reference. Generic transitions
+  cannot write `fulfilled`;
+- data-export fulfillment requires an approved exact head, current inventory/execution versions,
+  identity evidence, private artifact reference/SHA-256/byte size/bounded expiry, delivery evidence,
+  and UUID replay key. The terminal event, receipt, and platform audit event are atomic;
+- account erasure requires its independent false-by-default switch, approved exact head, current
+  erasure inventory, blocker clearances, empty live ownership/billing/admin blockers, verified
+  absence of known personal-tenant files, identity/storage/processor/run evidence, and bounded
+  backup-purge deadline;
+- erasure deletes the personal organization and revocable personal access/preferences/integrations,
+  removes non-owner business memberships, anonymizes invitation addresses, and changes the user to
+  an unverified non-admin tombstone linked to the completing request. Business and immutable audit
+  rows retain only that pseudonymous user key;
+- the application never infers export generation/delivery or external object-store, processor,
+  log, analytics, queue, or backup erasure. Those steps are completed and evidenced through the
+  approved production procedure before or after the database boundary as its inventory requires.
 
 ## 3. Core identifiers
 
@@ -865,6 +989,7 @@ Global data:
 Tenant data:
 
 - analyses,
+- broker requests and immutable broker-request events,
 - comparable records and selection sets,
 - price estimates and estimate items,
 - risk assessments and risk signals,

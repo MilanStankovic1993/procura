@@ -108,6 +108,11 @@ class Organization extends Model
         return $this->hasMany(OwnedProduct::class);
     }
 
+    public function brokerRequests(): HasMany
+    {
+        return $this->hasMany(BrokerRequest::class);
+    }
+
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class)

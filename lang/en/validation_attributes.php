@@ -49,6 +49,8 @@ return [
     'expected_current_attribution_id' => 'expected current attribution',
     'expected_current_cost_snapshot_id' => 'expected current cost snapshot',
     'expected_current_event_id' => 'expected current event',
+    'expected_offer_event_id' => 'expected current broker-offer event',
+    'expected_request_event_id' => 'expected current broker-request event',
     'expected_current_log_id' => 'expected current notification state',
     'expected_current_purchase_id' => 'expected current purchase',
     'expected_current_sale_id' => 'expected current sale',

@@ -5,8 +5,10 @@ namespace App\Actions\Privacy;
 use App\Actions\Administration\RecordPlatformAuditEvent;
 use App\Enums\Privacy\PrivacyRequestActorType;
 use App\Enums\Privacy\PrivacyRequestStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Models\PrivacyRequest;
 use App\Models\User;
+use App\Support\Validation\ApplicationValidation;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -114,6 +116,13 @@ final class TransitionPrivacyRequest
         string $note,
         ?string $evidenceReference,
     ): void {
+        if ($nextStatus === PrivacyRequestStatus::Fulfilled) {
+            ApplicationValidation::fail(
+                'next_status',
+                ApplicationValidationCode::PrivacyFulfillmentReserved,
+            );
+        }
+
         if (! preg_match('/^[a-z0-9][a-z0-9_-]{2,79}$/', $reasonCode)) {
             throw new InvalidArgumentException(
                 'The reason code must contain 3 to 80 lowercase identifier characters.',

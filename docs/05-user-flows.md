@@ -197,3 +197,40 @@ Organization owner opens Plan & usage
 Only the organization owner may create Checkout or portal sessions. Administrators and other
 members may view plan and usage information but cannot manage billing. A manual super-admin plan
 assignment blocks self-service replacement until an explicit future operational reconciliation.
+
+## Flow I — Broker transaction report
+
+```text
+Broker transaction reaches completed
+→ commission reaches earned or settled
+→ verified super administrator supplies both exact ledger heads and external case evidence
+→ Procura builds one subject-safe immutable snapshot
+→ first-party renderer creates a localized A4 PDF on private storage
+→ checksum, size, page count, retention deadline, source heads and opening event are committed
+→ authorized tenant member receives a short-lived relative signed download URL
+→ every download rechecks tenant authorization, availability, expiry, size and SHA-256
+→ scheduled retention purge removes the artifact before appending the immutable purged event
+```
+
+The PDF is available in English, German, Spanish, French, and Serbian Latin. It includes public
+request facts, accepted commercial terms, the safe transaction timeline and commission disclosure.
+It deliberately excludes request notes, private supplier references, operator evidence, event
+snapshots/hashes, replay keys, credentials, payment data, and private storage coordinates. An
+available personal-organization report blocks account erasure until its artifact is purged.
+
+## Flow J — Broker refund or dispute evidence
+
+```text
+External payment is confirmed and recorded on the broker transaction
+→ customer/support opens an approved external refund or dispute case
+→ verified super administrator records the case against the exact transaction event
+→ Procura copies the immutable transaction currency and bounded requested amount
+→ a second exact-head operation starts review
+→ reviewed external outcome evidence resolves or cancels the dedicated case
+→ tenant members see only safe type/status/amount/outcome/timeline facts
+```
+
+The transaction and commission histories remain unchanged. A resolved outcome records reviewed
+external evidence only; it does not mean Procura initiated a refund, submitted a chargeback, moved
+funds, or adjusted commission. External case/evidence references, snapshots, hashes, and replay
+keys remain operator-only. An open or under-review personal case blocks account erasure.

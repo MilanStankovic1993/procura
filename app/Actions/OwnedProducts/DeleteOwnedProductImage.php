@@ -4,11 +4,12 @@ namespace App\Actions\OwnedProducts;
 
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\OwnedProducts\OwnedProductStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Models\OwnedProductImage;
 use App\Models\User;
+use App\Support\Validation\ApplicationValidation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
 
 class DeleteOwnedProductImage
 {
@@ -30,9 +31,10 @@ class DeleteOwnedProductImage
             );
 
             if ($lockedImage->ownedProduct->status === OwnedProductStatus::Archived) {
-                throw ValidationException::withMessages([
-                    'status' => 'Archived owned products cannot lose images.',
-                ]);
+                ApplicationValidation::fail(
+                    'status',
+                    ApplicationValidationCode::ArchivedOwnedProductImmutable,
+                );
             }
 
             $disk = $lockedImage->disk;

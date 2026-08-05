@@ -197,6 +197,39 @@ test('submitting a draft consumes quota and dispatches exactly once across dupli
     Queue::assertPushed(ProcessBuyAnalysis::class, 1);
 });
 
+test('the production kill switch leaves a draft and its quota untouched', function () {
+    Queue::fake();
+    config()->set('analyses.submission_enabled', false);
+    [$analyst, $organization] = analysisRequestWorkspace(
+        OrganizationRole::Analyst,
+    );
+    $listing = analysisRequestListing(
+        $analyst,
+        $organization,
+        withEvidence: true,
+    );
+    $analysis = app(CreateBuyAnalysisDraft::class)->create(
+        $organization,
+        $analyst,
+        $listing->getKey(),
+        'DE',
+    );
+
+    $this->actingAs($analyst)
+        ->postJson(route('api.v1.analyses.submit', $analysis))
+        ->assertUnprocessable()
+        ->assertJsonPath(
+            'errors.analysis.0',
+            __('application_validation.analysis_submission_disabled'),
+        );
+
+    expect($analysis->fresh()->status)->toBe(AnalysisStatus::Draft)
+        ->and(SubscriptionUsage::query()->count())->toBe(0)
+        ->and(AnalysisDispatch::query()->count())->toBe(0);
+    Queue::assertPushed(MatchListingSnapshot::class, 1);
+    Queue::assertNotPushed(ProcessBuyAnalysis::class);
+});
+
 test('quota exhaustion leaves the analysis as a draft with no dispatch record', function () {
     Queue::fake();
     [$owner, $organization] = analysisRequestWorkspace();

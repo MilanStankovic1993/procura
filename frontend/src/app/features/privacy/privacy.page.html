@@ -170,6 +170,41 @@
               </div>
             }
 
+            @if (request.fulfillment; as fulfillment) {
+              <div class="fulfillment">
+                <strong>{{ 'privacy.fulfillmentTitle' | t }}</strong>
+                <p>{{ 'privacy.fulfillmentDescription' | t }}</p>
+                <dl>
+                  <div>
+                    <dt>{{ 'privacy.fulfillmentCompletedAt' | t }}</dt>
+                    <dd>{{ date(fulfillment.completed_at) }}</dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'privacy.fulfillmentInventory' | t }}</dt>
+                    <dd>{{ fulfillment.data_inventory_version }}</dd>
+                  </div>
+                  @if (fulfillment.artifact_size_bytes !== null) {
+                    <div>
+                      <dt>{{ 'privacy.fulfillmentArtifactSize' | t }}</dt>
+                      <dd>{{ fileSize(fulfillment.artifact_size_bytes) }}</dd>
+                    </div>
+                  }
+                  @if (fulfillment.artifact_expires_at) {
+                    <div>
+                      <dt>{{ 'privacy.fulfillmentArtifactExpiry' | t }}</dt>
+                      <dd>{{ date(fulfillment.artifact_expires_at) }}</dd>
+                    </div>
+                  }
+                  @if (fulfillment.backup_purge_due_at) {
+                    <div>
+                      <dt>{{ 'privacy.fulfillmentBackupPurgeDue' | t }}</dt>
+                      <dd>{{ date(fulfillment.backup_purge_due_at) }}</dd>
+                    </div>
+                  }
+                </dl>
+              </div>
+            }
+
             <div class="timeline">
               <h4>{{ 'privacy.timeline' | t }}</h4>
               @for (event of request.events; track event.id) {

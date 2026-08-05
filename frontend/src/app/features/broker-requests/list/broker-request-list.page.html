@@ -1,0 +1,109 @@
+<div class="page">
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'brokerRequest.eyebrow' | t }}</p>
+      <h1>{{ 'brokerRequest.list.title' | t }}</h1>
+      <p>{{ 'brokerRequest.list.description' | t }}</p>
+    </div>
+    @if (canManage()) {
+      <a class="primary" routerLink="/app/broker-requests/new">
+        {{ 'brokerRequest.list.create' | t }}
+      </a>
+    }
+  </header>
+
+  <section class="boundary">
+    <strong>{{ 'brokerRequest.boundaryTitle' | t }}</strong>
+    <p>{{ 'brokerRequest.boundaryDescription' | t }}</p>
+  </section>
+
+  <form class="filters" [formGroup]="filters" (ngSubmit)="applyFilters()">
+    <div>
+      <label for="broker-query">{{ 'brokerRequest.list.search' | t }}</label>
+      <input
+        id="broker-query"
+        type="search"
+        formControlName="q"
+        [placeholder]="'brokerRequest.list.searchPlaceholder' | t"
+      />
+    </div>
+    <div>
+      <label for="broker-status">{{ 'brokerRequest.list.status' | t }}</label>
+      <select id="broker-status" formControlName="status">
+        <option value="">{{ 'brokerRequest.list.allStatuses' | t }}</option>
+        @for (status of statuses; track status) {
+          <option [value]="status">{{ statusLabel(status) }}</option>
+        }
+      </select>
+    </div>
+    <button class="secondary" type="submit">
+      {{ 'brokerRequest.list.apply' | t }}
+    </button>
+    <button class="ghost" type="button" (click)="clearFilters()">
+      {{ 'brokerRequest.list.clear' | t }}
+    </button>
+  </form>
+
+  @if (error()) {
+    <div class="alert" role="alert">{{ error() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="empty">{{ 'brokerRequest.list.loading' | t }}</div>
+  } @else if (records().length === 0) {
+    <div class="empty">
+      <strong>{{ 'brokerRequest.list.emptyTitle' | t }}</strong>
+      <p>{{ 'brokerRequest.list.emptyDescription' | t }}</p>
+    </div>
+  } @else {
+    <section class="grid" [attr.aria-label]="'brokerRequest.list.aria' | t">
+      @for (request of records(); track request.id) {
+        <a class="card" [routerLink]="['/app/broker-requests', request.id]">
+          <div class="card-head">
+            <span class="status" [attr.data-status]="request.status">
+              {{ statusLabel(request.status) }}
+            </span>
+            <span>{{ date(request.created_at) }}</span>
+          </div>
+          <h2>{{ request.title }}</h2>
+          <p>{{ request.product_description }}</p>
+          <dl>
+            <div>
+              <dt>{{ 'brokerRequest.fields.condition' | t }}</dt>
+              <dd>{{ conditionLabel(request.condition_preference) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'brokerRequest.fields.quantity' | t }}</dt>
+              <dd>{{ request.quantity }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'brokerRequest.fields.budget' | t }}</dt>
+              <dd>{{ money(request) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'brokerRequest.fields.neededBy' | t }}</dt>
+              <dd>{{ date(request.needed_by) }}</dd>
+            </div>
+          </dl>
+          <small>{{ countries(request.target_country_codes) }}</small>
+        </a>
+      }
+    </section>
+
+    @if (nextCursor()) {
+      <button
+        class="load-more"
+        type="button"
+        [disabled]="loadingMore()"
+        (click)="loadMore()"
+      >
+        {{
+          (loadingMore()
+            ? 'brokerRequest.list.loadingMore'
+            : 'brokerRequest.list.loadMore')
+            | t
+        }}
+      </button>
+    }
+  }
+</div>

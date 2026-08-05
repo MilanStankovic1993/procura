@@ -37,12 +37,22 @@ Deliverables:
 - typed five-language application-validation boundary for organizations, monitoring/notifications,
   Telegram, privacy, uploads, catalog search, outcome-money normalization, and manual retry
   (platform tranche complete), plus comparable identity/intake, market normalization, cost and
-  opportunity confirmation, and buyer decisions (Analysis tranche complete; owned-product domain
-  actions remain),
+  opportunity confirmation, buyer decisions, and the complete owned-product assessment, Sell,
+  portfolio, outcome, and estimate-accuracy lifecycle (complete),
 - audited self-service data-export/account-deletion request workflow with immutable events,
-  read-only Admin visibility, and explicit production compliance handoff,
+  read-only Admin visibility, reserved fulfillment state, disabled-by-default evidence-bound
+  data-export receipt and account-erasure/tombstone operations, live blockers, file-absence
+  verification, and explicit production compliance handoff (complete; archive generation,
+  external processor/object cleanup and backup purge remain go-live execution work),
 - dependency-readiness endpoint, per-pool queue heartbeats, strict deploy CLI, and localized Admin
   readiness projection (complete; production activation remains in the go-live register),
+- secret-free effective production-configuration preflight, trusted-host/proxy enforcement,
+  sanitized production environment template, and fail-closed analysis-submission switch (complete;
+  real production values/provider evidence remain in the go-live register),
+- production deployment-contract verifier plus a bounded MySQL 8.4/Redis 7.4 CI lane that applies
+  the real migration ledger, checks cached dependency readiness, and enforces a strict MySQL
+  schema/session/index/query compatibility contract outside SQLite (complete; remote workflow
+  evidence remains part of each release record),
 - deterministic scale fixture, versioned dashboard/operations/tenant-list query budgets,
   stampede-protected dashboard snapshot, and guarded staging capacity CLI (complete first
   baseline; concurrent load/soak scenarios remain launch work),
@@ -64,7 +74,9 @@ Deliverables:
 - risk score,
 - deal score,
 - bounded queue recovery plus localized Analysis Operations, immutable manual-retry ledger,
-  verified-super-admin retry action/CLI, and production runbook (complete).
+  verified-super-admin retry action/CLI, and production runbook (complete),
+- independent submission kill switch (complete; false by default in code) and approved non-fake AI/
+  product-matching provider activation (pending provider, privacy, evaluation, and cost policy).
 
 ## Phase 3 — Sell Analysis MVP
 
@@ -152,6 +164,40 @@ Deliverables:
   assessment/target-scoped immutable evidence, dated FX provenance, bounded explicit factor and
   landed costs, atomic selector/price-band v2 replay, five-language UI, and read-only operations
   visibility).
+
+## Phase 8 — Broker requests
+
+Duration: 3–5 weeks for the complete commercial brokerage flow.
+
+Delivered foundation:
+
+- tenant-safe sourcing-request list/create/edit/detail API and Angular workflow;
+- immutable previous-event-linked history, exact optimistic concurrency, and UUID idempotency;
+- draft-only content mutation and subject submit/cancel lifecycle;
+- atomic provider-independent `broker_requests.monthly` plan enforcement;
+- verified-super-admin review/search/cancel command with required evidence;
+- immutable supplier/broker offer aggregate with exact integer-minor-unit cost breakdown;
+- atomic offer presentation and subject acceptance against exact request/offer event heads;
+- safe multi-currency comparison UI, two-step acceptance, offer cancellation cleanup, and offer
+  read-only Admin/CLI operations;
+- atomic accepted-offer transaction/commission creation with disclosed exact commission terms;
+- evidence-bound payment/order/shipping/delivery/completion lifecycle and independent commission
+  settlement ledger, without payment or supplier-provider execution;
+- immutable evidence-derived A4 PDF reports in all five locales, private checksum-verified signed
+  delivery, bounded retention purge, read-only Admin visibility, and privacy-erasure integration;
+- provider-independent refund/dispute case ledger with exact transaction/case heads, strict
+  type/outcome/amount rules, safe tenant timelines, read-only Admin/CLI operations, and personal
+  erasure blocking, without provider execution or commission mutation;
+- localized read-only Admin operations resource;
+- EN/DE/ES/FR/sr-Latn interface and validation catalogs;
+- production activation/rollback procedure and privacy-erasure blocker.
+
+Remaining Phase 8 work:
+
+- approved supplier communication/integration procedures;
+- payment-provider execution, actual refund/chargeback submission, commission-remediation rules,
+  and externally approved billing policy;
+- operational monitoring and acceptance evidence for the complete brokerage lifecycle.
 
 ## Commercial target
 

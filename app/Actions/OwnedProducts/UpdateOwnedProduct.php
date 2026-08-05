@@ -4,10 +4,11 @@ namespace App\Actions\OwnedProducts;
 
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\OwnedProducts\OwnedProductStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Models\OwnedProduct;
 use App\Models\User;
+use App\Support\Validation\ApplicationValidation;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class UpdateOwnedProduct
 {
@@ -43,9 +44,10 @@ class UpdateOwnedProduct
             );
 
             if ($locked->status === OwnedProductStatus::Archived) {
-                throw ValidationException::withMessages([
-                    'status' => 'Archived owned products cannot be changed.',
-                ]);
+                ApplicationValidation::fail(
+                    'status',
+                    ApplicationValidationCode::ArchivedOwnedProductImmutable,
+                );
             }
 
             $targetStatus = isset($attributes['status'])
@@ -53,13 +55,10 @@ class UpdateOwnedProduct
                 : $locked->status;
 
             if (! $locked->status->canTransitionTo($targetStatus)) {
-                throw ValidationException::withMessages([
-                    'status' => sprintf(
-                        'The owned-product lifecycle cannot transition from %s to %s.',
-                        $locked->status->value,
-                        $targetStatus->value,
-                    ),
-                ]);
+                ApplicationValidation::fail(
+                    'status',
+                    ApplicationValidationCode::OwnedProductLifecycleTransitionNotAllowed,
+                );
             }
 
             $targetCountryCodes = $attributes['target_country_codes'] ?? null;

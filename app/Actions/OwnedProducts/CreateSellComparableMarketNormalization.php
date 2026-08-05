@@ -7,6 +7,7 @@ use App\Enums\Comparables\MarketCompatibilityStatus;
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\OwnedProducts\OwnedProductAssessmentStatus;
 use App\Enums\Pricing\ExchangeRateResolutionStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Models\Currency;
 use App\Models\Organization;
 use App\Models\OwnedProduct;
@@ -16,11 +17,11 @@ use App\Models\User;
 use App\OwnedProductAssessment\CurrentOwnedProductAssessmentResolver;
 use App\Pricing\Contracts\ExchangeRateResolver;
 use App\Pricing\MinorMoneyConverter;
+use App\Support\Validation\ApplicationValidation;
 use Brick\Math\BigInteger;
 use Brick\Math\RoundingMode;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 final class CreateSellComparableMarketNormalization
 {
@@ -48,11 +49,10 @@ final class CreateSellComparableMarketNormalization
             $attributes,
         ): array {
             if (($attributes['evidence_confirmed'] ?? false) !== true) {
-                throw ValidationException::withMessages([
-                    'evidence_confirmed' => [
-                        'The Sell market-normalization evidence must be explicitly confirmed.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'evidence_confirmed',
+                    ApplicationValidationCode::MarketNormalizationEvidenceConfirmationRequired,
+                );
             }
 
             $this->authorizer->authorize(
@@ -87,11 +87,10 @@ final class CreateSellComparableMarketNormalization
                 || $comparable->product_model_id
                     !== $assessment->product_model_id
             ) {
-                throw ValidationException::withMessages([
-                    'comparable' => [
-                        'The comparable must belong to the current ready canonical Sell assessment.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'comparable',
+                    ApplicationValidationCode::SellComparableNormalizationAssessmentMismatch,
+                );
             }
 
             $targetCountryCode = strtoupper(
@@ -109,22 +108,20 @@ final class CreateSellComparableMarketNormalization
                     true,
                 )
             ) {
-                throw ValidationException::withMessages([
-                    'target_country_code' => [
-                        'The normalization target must be an assessed Sell country.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'target_country_code',
+                    ApplicationValidationCode::SellComparableNormalizationTargetCountryInvalid,
+                );
             }
 
             if (
                 $comparable->country_code === $targetCountryCode
                 && $comparable->currency_code === $targetCurrencyCode
             ) {
-                throw ValidationException::withMessages([
-                    'comparable' => [
-                        'Same-market, same-currency Sell evidence does not require normalization.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'comparable',
+                    ApplicationValidationCode::SellComparableNormalizationUnnecessary,
+                );
             }
 
             $status = MarketCompatibilityStatus::from(
@@ -281,11 +278,10 @@ final class CreateSellComparableMarketNormalization
         $targetCurrency = $currencies->get($targetCurrencyCode);
 
         if ($sourceCurrency === null || $targetCurrency === null) {
-            throw ValidationException::withMessages([
-                'currency' => [
-                    'Source and target currency metadata are required.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'currency',
+                ApplicationValidationCode::MarketNormalizationCurrencyMetadataRequired,
+            );
         }
 
         $resolution = $this->exchangeRates->resolve(
@@ -295,13 +291,12 @@ final class CreateSellComparableMarketNormalization
         );
 
         if ($resolution->status !== ExchangeRateResolutionStatus::Resolved) {
-            throw ValidationException::withMessages([
-                'exchange_rate' => [
-                    $resolution->status === ExchangeRateResolutionStatus::Stale
-                        ? 'The dated exchange-rate evidence is stale.'
-                        : 'Dated exchange-rate evidence is missing.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'exchange_rate',
+                $resolution->status === ExchangeRateResolutionStatus::Stale
+                    ? ApplicationValidationCode::MarketNormalizationExchangeRateStale
+                    : ApplicationValidationCode::MarketNormalizationExchangeRateMissing,
+            );
         }
 
         $convertedAmount = $this->money->convert(
@@ -324,11 +319,10 @@ final class CreateSellComparableMarketNormalization
         );
 
         if ($normalizedAmount->isGreaterThan($maximum)) {
-            throw ValidationException::withMessages([
-                'costs' => [
-                    'The normalized amount exceeds the supported monetary bound.',
-                ],
-            ]);
+            ApplicationValidation::fail(
+                'costs',
+                ApplicationValidationCode::MarketNormalizationAmountLimit,
+            );
         }
 
         $reasonCodes = [

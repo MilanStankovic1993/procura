@@ -29,6 +29,17 @@ export interface PrivacyRequestEvent {
   readonly occurred_at: string;
 }
 
+export interface PrivacyRequestFulfillment {
+  readonly id: string;
+  readonly request_type: PrivacyRequestType;
+  readonly execution_version: string;
+  readonly data_inventory_version: string;
+  readonly artifact_size_bytes: number | null;
+  readonly artifact_expires_at: string | null;
+  readonly backup_purge_due_at: string | null;
+  readonly completed_at: string;
+}
+
 export interface PrivacyRequest {
   readonly id: string;
   readonly type: PrivacyRequestType;
@@ -46,6 +57,7 @@ export interface PrivacyRequest {
   readonly resolved_at: string | null;
   readonly current_event: PrivacyRequestEvent;
   readonly events: readonly PrivacyRequestEvent[];
+  readonly fulfillment: PrivacyRequestFulfillment | null;
 }
 
 export interface PrivacyRequestInput {

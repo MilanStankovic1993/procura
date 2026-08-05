@@ -6,12 +6,14 @@ use App\Enums\Analyses\AnalysisDispatchStatus;
 use App\Enums\Analyses\AnalysisStatus;
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\Subscriptions\FeatureCode;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Exceptions\InvalidAnalysisTransition;
 use App\Models\Analysis;
 use App\Models\AnalysisDispatch;
 use App\Models\Organization;
 use App\Models\User;
 use App\Subscriptions\SubscriptionUsageService;
+use App\Support\Validation\ApplicationValidation;
 use Illuminate\Support\Facades\DB;
 
 class SubmitAnalysis
@@ -27,6 +29,13 @@ class SubmitAnalysis
         User $actor,
         string $analysisId,
     ): Analysis {
+        if (! (bool) config('analyses.submission_enabled')) {
+            ApplicationValidation::fail(
+                'analysis',
+                ApplicationValidationCode::AnalysisSubmissionDisabled,
+            );
+        }
+
         [$analysis, $dispatch] = DB::transaction(function () use (
             $organization,
             $actor,

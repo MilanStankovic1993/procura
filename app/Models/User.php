@@ -56,6 +56,7 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference,
             'is_super_admin' => 'boolean',
             'password' => 'hashed',
             'preferred_locale' => SupportedLocale::class,
+            'privacy_erased_at' => 'immutable_datetime',
         ];
     }
 
@@ -68,6 +69,7 @@ class User extends Authenticatable implements FilamentUser, HasLocalePreference,
     {
         return $panel->getId() === 'admin'
             && $this->is_super_admin
+            && $this->privacy_erased_at === null
             && $this->hasVerifiedEmail();
     }
 

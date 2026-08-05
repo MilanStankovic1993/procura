@@ -816,7 +816,9 @@ Tables:
 broker_requests
 broker_request_offers
 broker_transactions
-commissions
+broker_commissions
+broker_reports
+broker_report_events
 ```
 
 Statuses:
@@ -1165,8 +1167,28 @@ register
 /broker-requests
 /organization
 /billing
+/app/privacy
 /settings
 ```
+
+### Privacy fulfillment boundary
+
+Generic privacy workflow transitions must never write `fulfilled`. Each privacy request type needs
+its own application action that validates the approved exact event head, verified super-admin
+operator, UUID replay key, current execution/inventory versions, and type-specific evidence before
+atomically appending the terminal event, immutable fulfillment receipt, and platform audit event.
+
+Data-export fulfillment is disabled by default and records only evidence for an archive that was
+assembled and securely delivered by an approved external procedure. It requires a private artifact
+reference, SHA-256, exact byte size, bounded expiry, identity evidence, and delivery evidence. Never
+expose artifact location/checksum, identity evidence, payload hashes, or idempotency keys through
+subject/Admin projections; only the bounded delivery receipt reference belongs in the existing
+subject event timeline. Account-deletion fulfillment uses its own disabled-by-default executor. It
+requires exact snapshot clearances, recalculates live ownership/billing/admin blockers, verifies
+known personal-tenant files are absent, revokes access, removes the personal tenant, and writes an
+immutable receipt plus pseudonymous user tombstone. Never treat this database operation as proof of
+external object-store, processor, log, analytics, queue or backup erasure; those remain
+inventory-driven production evidence and the receipt carries the bounded backup-purge deadline.
 
 ### Interface localization
 
@@ -1208,7 +1230,9 @@ Expected application-service `422` failures use the closed `ApplicationValidatio
 `ApplicationValidation` boundary. They preserve Laravel's field-keyed error shape while selecting
 safe presentation from the five `application_validation.php` catalogs. Services must not embed
 English validation copy or interpolate database/provider diagnostics into public errors. Adding a
-code requires all five catalog entries and the enum/catalog contract test in the same change.
+code requires all five catalog entries and the enum/catalog contract test in the same change. The
+current 138-code contract covers the platform, Analysis, OwnedProducts, privacy fulfillment,
+broker-request, and broker-offer service validation tranches.
 
 ### Listing detail screen
 
@@ -1540,6 +1564,16 @@ webhook projection, append-only operations evidence, and five-language UI. Strip
 products, Price IDs, tax/portal policy, production secrets, and complete lifecycle acceptance
 remain external release work governed by `docs/19-production-go-live.md`.
 
+Production release safety includes a secret-free effective-configuration preflight, explicit
+trusted-host/proxy boundaries, strict UTC/`utf8mb4` MySQL and TLS Redis/session/private-storage requirements, and
+an independent analysis-submission kill switch. The fake analysis/product-matching providers may
+be used only when submission is disabled outside development/testing; enabling production analysis
+requires reviewed non-fake adapters and the activation evidence in `docs/19-production-go-live.md`.
+The release build also enforces the nginx/Supervisor/scheduler/environment deployment contract, and
+CI must apply the complete migration ledger and dedicated strict schema/session/query compatibility
+contract against MySQL 8.4 with cached readiness proven through Redis, in addition to the complete
+functional SQLite PHP-version matrix.
+
 ### Phase 8 — broker requests
 
 Build:
@@ -1548,7 +1582,21 @@ Build:
 - admin workflow,
 - offers,
 - commission records,
-- PDF report generation later.
+- evidence-derived localized PDF reports with private signed delivery.
+
+Delivered request and offer foundation: tenant-safe request list/create/edit/detail, immutable event
+snapshots, exact optimistic concurrency, UUID replay safety, atomic plan quota at submission,
+subject cancellation, verified-super-admin review/search/cancel command, read-only Admin
+operations, privacy-erasure blocking, immutable evidence-bound supplier offers, server-calculated
+exact-money terms, exact request/offer-head subject acceptance, atomic alternative closure, safe
+multi-currency comparison, atomic accepted-offer transaction/commission creation, evidence-bound
+payment/order/shipping/delivery/completion tracking, independent commission settlement evidence,
+evidence-derived immutable PDF reports with checksum-verified private signed delivery and retention
+purge, a provider-independent immutable refund/dispute investigation ledger with strict reviewed
+outcome rules and safe subject/Admin projections, and complete EN/DE/ES/FR/sr-Latn UI/validation.
+These records do not execute payment, refunds, chargebacks, commission reversals, or supplier
+operations. Provider communication and actual payment/refund/dispute execution remain separate
+Phase 8 procedures.
 
 ---
 

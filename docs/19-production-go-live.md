@@ -1,6 +1,6 @@
 # 19 - Production Go-Live Register
 
-Last updated: 2026-07-28
+Last updated: 2026-08-05
 
 This file is the single operational source of truth for everything that must be configured outside
 the Procura codebase before a production release can be activated. It contains variable names,
@@ -50,10 +50,16 @@ Complete this section in the deployment ticket or release system, not by committ
 - `APP_DEBUG=false`
 - `APP_URL=https://<production-host>`
 - `FRONTEND_URL=https://<production-host>`
+- `FRONTEND_URLS` and `SANCTUM_STATEFUL_DOMAINS` limited to the same approved production origin
+- `TRUSTED_PROXIES` containing only the exact load-balancer/reverse-proxy IPs or CIDRs; catch-all
+  values such as `*`, `0.0.0.0/0`, and `::/0` are prohibited
 - `APP_KEY` from the encrypted secret manager; it must remain stable across releases
 - `LOG_CHANNEL`, `LOG_LEVEL`, and the production log aggregation destination
-- production MySQL connection variables
-- shared production cache and queue connection variables
+- production MySQL connection variables with `DB_TIMEZONE=+00:00`, strict SQL mode, `utf8mb4`,
+  a dedicated non-root identity, and no placeholder database name
+- shared production cache and queue connection variables, with `REDIS_URL=rediss://...`,
+  `CACHE_STORE=redis`, `QUEUE_CONNECTION=redis`, `QUEUE_FAILED_DRIVER=database-uuids`, and
+  `REDIS_QUEUE_RETRY_AFTER` greater than the 900-second connector-job timeout
 - `OPERATIONS_READINESS_CACHE_STORE=redis` or the exact approved shared cache store
 - `OPERATIONS_DASHBOARD_CACHE_STORE=redis` or the same approved shared cache store
 - reviewed `OPERATIONS_DASHBOARD_CACHE_TTL_SECONDS` value; repository default is 30 seconds
@@ -63,9 +69,13 @@ Complete this section in the deployment ticket or release system, not by committ
   `OPERATIONS_QUEUE_HEARTBEAT_MAX_AGE_SECONDS`,
   `OPERATIONS_QUEUE_HEARTBEAT_MAX_LATENCY_SECONDS`, and
   `OPERATIONS_QUEUE_HEARTBEAT_TTL_SECONDS` values
-- production session, trusted-proxy, cookie-domain, and secure-cookie settings
+- production sessions using database/Redis plus `SESSION_ENCRYPT=true`,
+  `SESSION_SECURE_COOKIE=true`, `SESSION_HTTP_ONLY=true`, and reviewed `lax` or `strict` SameSite
 - production mail transport variables
-- production filesystem/S3-compatible storage variables
+- production filesystem/S3-compatible storage variables; default, listing, owned-product, import,
+  and broker-report disks must resolve to private storage with `AWS_THROW=true`
+- `ANALYSIS_SUBMISSION_ENABLED=false` while the fake provider is configured or a real provider has
+  not completed the activation procedure in section 7
 - `ANALYSIS_MANUAL_RETRY_ENABLED=false` until the Analysis Operations activation record below is
   approved
 - approved bounded values for `ANALYSIS_MANUAL_RETRY_ATTEMPTS` and
@@ -73,8 +83,11 @@ Complete this section in the deployment ticket or release system, not by committ
 - release and CI build hosts use the exact Node.js version pinned in `.nvmrc`; Angular must never
   be built with an unsupported system-default runtime
 
-Production hosts must not use the fake AI provider, local filesystem for durable private evidence,
-database cache across a multi-host cluster, or an unmonitored single-process queue.
+Production hosts must not accept analysis submissions through the fake AI/product-matching
+providers, use local filesystem for durable private evidence, use database cache across a
+multi-host cluster, or use an unmonitored single-process queue. Start from
+`deploy/env/procura.production.env.example`; it is deliberately incomplete and must never be used
+unchanged or filled with secrets inside Git.
 
 ### 3.2 Infrastructure and control-plane work
 
@@ -105,7 +118,20 @@ php -d memory_limit=512M vendor/bin/pest
 php artisan migrate --force
 php artisan db:seed --class=PlanSeeder --force
 php artisan optimize
+php artisan operations:production-preflight --json
 ```
+
+`npm run build:frontend` also verifies the reviewed nginx security/routing headers, Supervisor
+worker pool ownership and timeouts, Redis retry timing, scheduler recovery coverage, and sanitized
+production-template defaults. CI separately applies the complete ledger and strict schema/session
+compatibility contract on MySQL 8.4 and checks cached readiness through Redis 7.4; that required job
+must be green before release approval. The PHP-version matrix retains the complete functional suite.
+
+The preflight reads effective cached configuration and emits one secret-free JSON document.
+`blocked` or a non-zero exit code prohibits activation. `review_required` is deployable only when
+every warning is explicitly matched to an intentionally excluded/disabled integration in the
+release record. `--strict` additionally fails on every warning and is the target for the complete
+advertised feature set. `--allow-non-production` exists only for staging/configuration rehearsal.
 
 After successful checks, atomically switch the current-release symlink, reload PHP-FPM, restart
 queue workers, and verify the scheduler. Never run `optimize:clear` against the active production
@@ -461,6 +487,23 @@ Before activation, record:
 
 Production must never silently fall back to fabricated AI results.
 
+`ANALYSIS_SUBMISSION_ENABLED` is the independent fail-closed traffic boundary. Keep it `false` in
+the initial production deployment: users may prepare immutable drafts, but submission consumes no
+quota, creates no dispatch, and performs no provider call. Before setting it `true`:
+
+1. implement and review both configured `ListingAiAnalyzer` and `ProductMatcher` adapters;
+2. prove the container resolves non-fake adapters after configuration is cached;
+3. complete privacy/retention, regional processing, cost-limit, timeout, retry, circuit-breaker,
+   provider-outage, evaluation, and incident-disable evidence;
+4. run controlled staging submissions through every queue/recovery path and record accuracy,
+   latency, cost, malformed-response, timeout, rate-limit, and outage evidence;
+5. set the switch true, rebuild configuration, reload web/workers, rerun
+   `operations:production-preflight --strict --json`, and perform one approved low-risk smoke case.
+
+Rollback starts by setting `ANALYSIS_SUBMISSION_ENABLED=false`, rebuilding configuration, and
+reloading web/workers. Preserve existing analyses and dispatch history; drain or quarantine queued
+work according to the provider incident procedure rather than deleting ledger rows.
+
 ### 7.1 Analysis processing operations
 
 Status: **review queue complete; manual retry disabled by default pending production approval**
@@ -761,11 +804,290 @@ authorize any marketplace or dataset by itself.
 Scraping, browser extensions, automatic marketplace publication, and unapproved remote mutations
 remain prohibited.
 
+### 8.5 Broker-request activation and operations
+
+The delivered broker boundary accepts/reviews sourcing requests, records manually reviewed supplier
+offers, discloses a versioned commission, opens a transaction/commission ledger on acceptance, and
+records evidence for external payment, supplier-order, shipping, delivery, completion, and
+commission-settlement outcomes. It also records reviewed refund/dispute investigations after
+payment confirmation without changing fulfillment or commission history. It does not contact a
+supplier, publish to a marketplace, hold funds, charge a payment method, execute a refund or
+chargeback, place an order, call a carrier, or transfer/reverse commission. It can generate a
+first-party evidence-derived private PDF after completion; none of these records prove that an
+external operation occurred. Name the product owner, commercial-policy owner, finance owner,
+operations owner, privacy owner, and incident substitute before activation.
+
+Release procedure:
+
+1. Run `2026_07_29_120000_create_broker_request_tables.php` and
+   `2026_07_29_130000_create_broker_request_offer_tables.php`, then
+   `2026_07_29_140000_create_broker_transaction_tables.php` and
+   `2026_07_29_150000_create_broker_report_tables.php`, followed by
+   `2026_08_05_100000_create_broker_payment_case_tables.php`, through the normal release migration.
+   Verify the 22-column request projection, 17-column request-event ledger, 35-column immutable
+   offer projection, 18-column offer-event ledger, 23-column transaction projection, 19-column
+   transaction-event ledger, 20-column commission projection, 20-column commission-event ledger,
+   the report projection/immutable report-event ledger, and the payment-case projection/immutable
+   payment-case-event ledger. Verify current/previous/source event
+   foreign keys, composite tenant/request/offer/
+   transaction constraints, one-to-one request/offer/transaction ownership, idempotency and
+   sequence uniqueness, actor `SET NULL`, currency/country/category references, and
+   status/validity/type/hash/expiry indexes, report logical-source uniqueness, payment-case logical
+   identity uniqueness, and transaction-scoped payment-case idempotency.
+2. Confirm every production plan version has an intentional `broker_requests.monthly` value.
+   Missing or exhausted entitlement must fail closed; do not rely on a hidden browser control or
+   client-supplied plan value.
+3. Obtain written commercial/finance approval for one versioned commission rule. Set
+   `BROKER_COMMISSION_RULE_VERSION` to its immutable identifier and
+   `BROKER_COMMISSION_RATE_BASIS_POINTS` to the approved positive integer from `1` through `10000`.
+   `250` means 2.50%. New offer presentation fails closed for a blank version, zero/invalid rate,
+   or unsafe exact total. A later policy change requires a new rule version; it never rewrites an
+   already presented offer, transaction, or commission.
+4. Before enabling any switch, prove there are no pre-existing presented offers with a zero,
+   invalid, or mathematically inconsistent commission/base/payable snapshot. The migration adds
+   zero defaults only for additive schema safety; it does not infer a historical commercial
+   agreement. If any legacy row exists, keep all broker write switches false and resolve it through
+   a reviewed additive migration/procedure. Never silently backfill or accept it.
+5. Set `BROKER_REQUESTS_ENABLED=true` while keeping `BROKER_OFFERS_ENABLED=false`,
+   `BROKER_TRANSACTIONS_ENABLED=false`, `BROKER_PAYMENT_CASES_ENABLED=false`, and
+   `BROKER_REPORTS_ENABLED=false`. Rebuild the
+   configuration cache and reload web, queue, and
+   CLI workers. Verify effective config on every runtime pool. The switches gate writes, not
+   existing read/audit access. Enable `BROKER_OFFERS_ENABLED=true` only after offer-specific
+   staging evidence is approved; keep transaction acceptance/operations disabled until the full
+   lifecycle evidence below passes.
+6. With a dedicated staging organization, exercise owner/administrator/analyst/viewer access,
+   cross-tenant `404`, draft-only edit, exact create/update/submit/cancel replay, changed replay,
+   stale expected head, quota exhaustion/rollback, safe timeline projection, five locales, and
+   account-erasure blocking for an active personal request. Then enable offers in staging and prove
+   operator-only presentation, exact supplier/commission/customer-payable calculation and
+   disclosure, integer half-up rounding, exact request/offer replay, changed replay, stale/expired/
+   inconsistent-term rejection, multi-offer alternative closure, cancellation cleanup, viewer
+   refusal, cross-tenant `404`, private supplier-reference exclusion, and cross-currency warning.
+7. Set `BROKER_TRANSACTIONS_ENABLED=true` in staging only. Prove acceptance atomically creates
+   exactly one `awaiting_payment` transaction and one `pending` commission, then prove exact replay,
+   changed replay, stale-head rejection, evidence-required operator authorization, every allowed
+   fulfillment step, skipped-step refusal, pre-payment cancellation/waiver, post-payment
+   cancellation refusal, atomic request completion/commission earning, earned-only settlement, and
+   safe subject/Admin projections in all five locales. Rehearse disabling and re-enabling the switch
+   without modifying existing history.
+8. Verify only a verified super administrator can open the six read-only Broker Admin resources
+   and run operator commands. Start review from `submitted`, then search from `reviewing`, retaining
+   the new current event after each command:
+
+```text
+php artisan broker-requests:transition <request-ulid> reviewing \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<submitted-current-event-ulid> \
+  --idempotency=<uuid> \
+  --reason-code=operator_review_started \
+  --evidence=<external-case-reference>
+
+php artisan broker-requests:transition <request-ulid> searching \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<reviewing-current-event-ulid> \
+  --idempotency=<new-uuid> \
+  --reason-code=operator_search_started \
+  --evidence=<external-case-reference>
+
+php artisan broker-offers:present <request-ulid> \
+  --actor-email=<verified-super-admin> \
+  --expected-request-event=<searching-current-event-ulid> \
+  --idempotency=<new-uuid> \
+  --supplier-name="<tenant-safe-display-name>" \
+  --supplier-reference=<private-vault-or-case-reference> \
+  --description="<exact-included-terms>" \
+  --condition=<new|used|refurbished> \
+  --quantity=<whole-number> \
+  --unit-price-minor=<integer-minor-units> \
+  --shipping-minor=<integer-minor-units> \
+  --tax-duty-minor=<integer-minor-units> \
+  --other-cost-minor=<integer-minor-units> \
+  --currency=<ISO-4217> \
+  --valid-until=<future-ISO-8601-time> \
+  --evidence=<external-quote-evidence-reference>
+```
+
+Retain an exact UUID only for an exact retry. A changed operation requires a new reviewed command.
+The generic command must reject `offers_available`, `accepted`, and `completed`; no operator note
+or database update may substitute for the dedicated offer/acceptance/transaction actions. Never
+place supplier credentials, personal contacts, quote contents, payment data, or evidence contents
+in shell history.
+
+After the corresponding external operation has actually completed and its evidence is stored in
+the approved external case/ledger, append exactly one transaction step:
+
+```text
+php artisan broker-transactions:transition <transaction-ulid> <target-status> \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<current-transaction-event-ulid> \
+  --idempotency=<uuid> \
+  --reason-code=<approved-code> \
+  --evidence=<external-ledger-or-case-reference>
+```
+
+Allowed sequence:
+
+```text
+awaiting_payment -> payment_confirmed -> supplier_ordered -> shipped
+-> delivered -> completed
+awaiting_payment -> cancelled
+```
+
+There is deliberately no transaction cancellation after payment confirmation. Do not edit a row or
+overload a fulfillment state for a refund/dispute. Completion atomically completes the request and
+earns the commission; pre-payment cancellation atomically cancels the request and waives it.
+
+Keep `BROKER_PAYMENT_CASES_ENABLED=false` until finance, privacy, support, and incident owners have
+approved the external refund/dispute procedure, evidence-vault reference format, reason-code list,
+and outcome semantics. Then enable it in staging only and open the investigation after the external
+provider/support case exists:
+
+```text
+php artisan broker-payment-cases:open <transaction-ulid> <refund|dispute> \
+  --actor-email=<verified-super-admin> \
+  --expected-transaction-event=<current-payment-confirmed-or-later-event-ulid> \
+  --idempotency=<uuid> \
+  --amount-minor=<positive-integer-no-greater-than-customer-payable> \
+  --external-case=<approved-external-case-reference> \
+  --reason-code=<approved-code> \
+  --evidence=<approved-reviewed-evidence-reference>
+```
+
+Move it to review, and only then resolve it with a type-compatible outcome:
+
+```text
+php artisan broker-payment-cases:transition <payment-case-ulid> under_review \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<current-payment-case-event-ulid> \
+  --idempotency=<uuid> \
+  --reason-code=<approved-code> \
+  --evidence=<approved-reviewed-evidence-reference>
+
+php artisan broker-payment-cases:transition <payment-case-ulid> resolved \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<current-payment-case-event-ulid> \
+  --idempotency=<new-uuid> \
+  --outcome=<refund_confirmed|refund_rejected|dispute_won|dispute_lost> \
+  --resolved-amount-minor=<integer-minor-units> \
+  --reason-code=<approved-code> \
+  --evidence=<approved-reviewed-evidence-reference>
+```
+
+`refund_confirmed` and `dispute_lost` require a positive resolved amount no greater than the
+requested amount; `refund_rejected` and `dispute_won` require zero. Cancellation is allowed from
+`open` or `under_review` without outcome/amount. Prove exact replay, changed replay, stale heads,
+duplicate logical reference, pre-payment refusal, skipped review, incompatible outcome/amount,
+history cap, authorization, five-locale safe subject projection, Admin redaction, and erasure
+blocking. These commands only record reviewed evidence; perform the real refund/chargeback through
+the separately approved provider procedure and never place payment data or evidence contents in
+shell history.
+
+After external settlement of an earned commission:
+
+```text
+php artisan broker-commissions:settle <commission-ulid> \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<current-commission-event-ulid> \
+  --idempotency=<uuid> \
+  --reason-code=external_commission_settled \
+  --evidence=<external-settlement-ledger-reference>
+```
+
+9. Provision an approved private object-storage prefix and service identity with read/write/delete
+   access limited to broker-report objects. Set and independently review:
+
+```text
+BROKER_REPORTS_ENABLED=false
+BROKER_REPORT_VERSION=broker-transaction-report:v1
+BROKER_REPORT_DISK=<approved-private-disk>
+BROKER_REPORT_RETENTION_DAYS=<approved-1..3650>
+BROKER_REPORT_DOWNLOAD_TTL_MINUTES=<approved-1..60>
+BROKER_REPORT_MAX_BYTES=<1024..10485760>
+BROKER_REPORT_PURGE_BATCH=<1..500>
+```
+
+   Verify the configured disk is private, encryption/backup/replication/legal-hold behavior matches
+   the retention policy, web and CLI identities can write/read/delete only the intended prefix, and
+   logs do not contain object bytes, signed URLs, private paths, source snapshots, or evidence.
+   Confirm the daily `broker-reports:purge-expired` singleton appears in `schedule:list`, runs from
+   a scheduler with the shared cache lock, and alerts on non-zero exit/failure count. Purge must run
+   even while generation is disabled.
+
+   Enable `BROKER_REPORTS_ENABLED=true` in staging only, rebuild config, and generate against one
+   completed transaction with an earned or settled commission:
+
+```text
+php artisan broker-reports:generate <transaction-ulid> \
+  --actor-email=<verified-super-admin> \
+  --expected-transaction-event=<current-transaction-event-ulid> \
+  --expected-commission-event=<current-commission-event-ulid> \
+  --idempotency=<uuid> \
+  --locale=<en|de|es|fr|sr-Latn> \
+  --reason-code=completed_transaction_report \
+  --evidence=<external-case-reference>
+```
+
+   Prove exact replay is inert; changed replay/logical duplicate, stale source heads, incomplete/
+   cancelled transactions, pending/waived commissions, unverified/non-admin actors, and unsupported
+   locale fail closed. Render every locale with Poppler and inspect every page for A4 layout,
+   diacritics, translated labels, clean breaks and page numbering. Verify the subject API/Admin omit
+   paths, disks, source heads, snapshots, hashes, evidence and replay keys. Verify the short-lived
+   relative URL still enforces active tenant membership and policy, cross-tenant access is `404`,
+   and expired/missing/size-mismatched/checksum-mismatched/purged artifacts are not delivered.
+   Expire a staging artifact, run `php artisan broker-reports:purge-expired --limit=100`, and prove
+   deletion occurs before the immutable purge event; simulate deletion failure and prove the report
+   stays available for retry. Confirm an available personal report blocks erasure and the approved
+   privacy export/erasure inventory contracts use `privacy-data-inventory:v4` and
+   `privacy-erasure-inventory:v4`.
+
+10. Attach the staging evidence, commercial rule approval, data-protection review, incident
+   rehearsal, external operating procedure, and independent release approval. Only then enable
+   `BROKER_TRANSACTIONS_ENABLED=true` and `BROKER_REPORTS_ENABLED=true` in production. Enable
+   `BROKER_PAYMENT_CASES_ENABLED=true` only if its separate evidence and owner approvals have also
+   passed. Reload every web/queue/CLI runtime. Run one
+   approved low-value end-to-end acceptance case before expanding access. A transaction/commission
+   row is an application ledger, not proof that Procura processed money.
+
+Monitor request creation/submission/cancellation rate, quota rejection, stale/conflicting commands,
+requests aging in `submitted`/`reviewing`/`searching`/`offers_available`, target dates, offer
+presentation/acceptance/cancellation rate, expired offers, stale/conflicting acceptance,
+transactions aging in every non-terminal state, commissions aging in `earned`, report generation
+rate/failure/size/page/locale, artifacts nearing/over retention, purge processed/failed counts,
+signed-download `403`/`404`, integrity failures, invalid disclosed term rejection, forbidden/skipped
+transitions, payment cases aging in `open`/`under_review`, outcome and amount anomalies, payment-case
+quota/conflict/stale rejection, settlement rate, unauthorized attempts, command evidence
+completeness, database latency, and all six event-history growth rates. Never log product
+notes, supplier references, offer terms, payment data, snapshots, replay keys, hashes, or evidence
+contents.
+
+Rollback/incident boundary:
+
+- set `BROKER_REPORTS_ENABLED=false` first to stop generation while keeping the purge schedule
+  running. Set `BROKER_PAYMENT_CASES_ENABLED=false` to stop new payment-case writes while retaining
+  read/audit access. Then set `BROKER_TRANSACTIONS_ENABLED=false` to stop acceptance, fulfillment
+  transitions, and commission settlement. Pause the corresponding external payment/refund/
+  supplier/settlement procedures;
+- set `BROKER_OFFERS_ENABLED=false` to stop new offer presentation; set
+  `BROKER_REQUESTS_ENABLED=false` when all remaining broker request mutations must stop. Rebuild
+  configuration and reload every runtime process while preserving read/audit access;
+- do not edit/delete request, offer, transaction, commission, report, payment-case, or event rows to
+  correct history and do not decrement usage directly;
+- retain affected requests/events/evidence under the incident hold;
+- do not roll back any of the five migrations while any broker projection/event table contains
+  rows or while a downstream record references the added offer columns;
+- preserve read/download access for valid existing reports unless security/privacy incident policy
+  requires containment; continue retention purge and never bulk-delete object prefixes. Payment/
+  refund/chargeback execution, supplier/carrier integration, and marketplace mutation remain
+  inactive until their later approved provider procedures exist.
+
 ## 9. Privacy request operations
 
-The application contains an audited intake and state-transition ledger, not an automatic export or
-erasure engine. Production must keep privacy processing inactive until the following owner-approved
-record is complete:
+The application contains an audited intake/state ledger, a disabled-by-default data-export
+completion boundary, and a separately disabled account-erasure/tombstone boundary. It does not
+assemble/deliver archives or infer external object-store, processor, log, analytics, queue, or
+backup deletion. Production must keep both `PRIVACY_FULFILLMENT_ENABLED=false` and
+`PRIVACY_ERASURE_ENABLED=false` until the following owner-approved record is complete:
 
 - named legal/privacy owner, security owner, primary operator, and escalation substitute;
 - applicable jurisdictions, response deadlines, extensions, and identity-verification standard;
@@ -785,27 +1107,58 @@ record is complete:
 
 Release procedure:
 
-1. Run `2026_07_28_100000_create_privacy_request_tables.php` through the normal release migration
-   and verify both tables, the current/previous-event foreign keys, subject-null-on-delete behavior,
-   unique active and idempotency constraints, and status/response-target indexes.
-2. Set and approve `PRIVACY_WORKFLOW_VERSION`, `PRIVACY_NOTICE_VERSION`, and
-   `PRIVACY_RESPONSE_TARGET_DAYS`, rebuild the configuration cache, and verify the captured values.
-   The repository defaults are `privacy-request-workflow:v1`, `privacy-notice:v1`, and 30 days.
+1. Run `2026_07_28_100000_create_privacy_request_tables.php`,
+   `2026_07_29_100000_create_privacy_request_fulfillments.php`, and
+   `2026_07_29_110000_add_account_erasure_execution_fields.php` through the normal release migration.
+   Verify the request/current-event and event/previous-event chains, subject/actor null-on-delete
+   behavior, one-receipt-per-request/event constraints, UUID/payload indexes, and immutable model
+   guards.
+2. Set and approve `PRIVACY_WORKFLOW_VERSION`, `PRIVACY_NOTICE_VERSION`,
+   `PRIVACY_RESPONSE_TARGET_DAYS`, `PRIVACY_FULFILLMENT_VERSION`,
+   `PRIVACY_DATA_INVENTORY_VERSION`, `PRIVACY_EXPORT_MAX_BYTES`, and
+   `PRIVACY_EXPORT_MAX_RETENTION_DAYS`, plus `PRIVACY_ERASURE_VERSION`,
+   `PRIVACY_ERASURE_INVENTORY_VERSION`, and `PRIVACY_BACKUP_MAX_RETENTION_DAYS`. Keep both activation
+   switches false, rebuild the configuration cache, and verify the effective values. Repository defaults are
+   `privacy-request-workflow:v1`, `privacy-notice:v1`, 30 response days,
+   `privacy-fulfillment:v1`, `privacy-data-inventory:v4`, 104857600 bytes, 30 export-retention days,
+   `privacy-erasure:v1`, `privacy-erasure-inventory:v4`, and 90 backup-retention days.
 3. Verify `/api/v1/me/privacy-requests` requires a verified session, works without active
    organization context, is rate limited, returns cross-subject `404`, and exposes no internal
-   hashes or idempotency values.
+   hashes, artifact location/checksum, identity evidence, or idempotency values. A completed receipt
+   may expose only its ID, type, execution/inventory versions, byte size, artifact expiry,
+   backup-purge deadline, and completion time;
+   the subject event timeline also exposes its bounded delivery receipt reference.
 4. Verify only verified super administrators can open the read-only Admin resource and run the
-   transition command. No browser control may mutate the ledger.
+   commands. No browser control may mutate the ledger.
 5. Exercise export and deletion cases in a non-production release environment, including every
    blocker, stale expected-event conflict, exact idempotent retry, cancellation, rejection,
-   evidence-bound approval/fulfillment, deadline monitoring, and restored-backup follow-up.
-6. Record the external case/evidence reference on every approved, fulfilled, or rejected
-   transition. Mark `fulfilled` only after secure delivery or approved erasure has completed and
-   been independently checked.
-7. Monitor open requests by response target and alert the named owner before the approved internal
+   evidence-bound approval, disabled fulfillment, inventory mismatch, malformed checksum, zero or
+   oversized artifact, expired/over-retained artifact, unauthorized operator, changed replay, safe
+   projections, erasure-switch/inventory mismatch, incomplete/extra clearance, live ownership,
+   active subscription, super-admin continuity, present/unreadable private files, transactional
+   rollback, access revocation/tombstone, deadline monitoring, and restored-backup follow-up.
+6. Complete the owner-approved archive inventory/format/encryption/malware-scan procedure outside
+   this application. Store the archive in the approved private vault, calculate SHA-256 and exact
+   byte size, deliver through the approved channel, independently verify the recipient and delivery,
+   and set an expiry no later than the configured maximum. Never place contents, credentials,
+   identity documents, or a public/download URL in a command option.
+7. After export staging evidence is signed off, set `PRIVACY_FULFILLMENT_ENABLED=true`. Enable
+   `PRIVACY_ERASURE_ENABLED=true` only after the independent erasure staging/owner sign-off. Rebuild
+   and reload configuration on every web/CLI worker and rerun both disabled/enabled smoke cases. A
+   configuration change is not active until all long-lived processes have reloaded it.
+8. Record the external case/evidence reference on every approval or rejection. Record data-export
+   `fulfilled` only through `privacy-requests:complete-export` after secure delivery and independent
+   verification. The generic transition command must reject `fulfilled`.
+9. Before account erasure, freeze the approved subject from new activity through the reviewed
+   operational isolation procedure; clear every snapshotted blocker; remove every inventoried
+   private object; finish required processor requests; and retain references only, never evidence
+   contents, in command options. Record `fulfilled` only through
+   `privacy-requests:complete-erasure`. Evidence cannot override live ownership, billing or
+   super-admin blockers, and a known file that exists or cannot be checked blocks the transaction.
+10. Monitor open requests by response target and alert the named owner before the approved internal
    escalation threshold. There is intentionally no automatic scheduled transition.
 
-Operator command:
+Review/approval/rejection command:
 
 ```text
 php artisan privacy-requests:transition <request-ulid> <status> \
@@ -817,19 +1170,71 @@ php artisan privacy-requests:transition <request-ulid> <status> \
   --evidence=<external-case-or-artifact-reference>
 ```
 
-Retain the exact UUID only for an exact retry. A changed operation requires a new UUID. Never put
-customer export contents, credentials, secrets, or raw identity documents in the note/evidence
-reference.
+Data-export completion command:
+
+```text
+php artisan privacy-requests:complete-export <request-ulid> \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<approved-current-event-ulid> \
+  --idempotency=<uuid> \
+  --inventory-version=<exact-approved-inventory-version> \
+  --identity-evidence=<external-identity-reference> \
+  --artifact-reference=<private-vault-reference> \
+  --artifact-sha256=<64-lowercase-or-uppercase-hex> \
+  --artifact-size-bytes=<exact-integer> \
+  --artifact-expires-at=<ISO-8601> \
+  --delivery-evidence=<external-delivery-reference> \
+  --note="<reviewed completion note>"
+```
+
+Account-erasure completion command:
+
+```text
+php artisan privacy-requests:complete-erasure <request-ulid> \
+  --actor-email=<verified-super-admin> \
+  --expected-event=<approved-current-event-ulid> \
+  --idempotency=<uuid> \
+  --inventory-version=<exact-approved-erasure-inventory> \
+  --identity-evidence=<external-identity-reference> \
+  --erasure-evidence=<isolated-erasure-run-reference> \
+  --storage-evidence=<private-storage-clearance-reference> \
+  --processor-evidence=<processor-clearance-reference> \
+  --completion-evidence=<subject-safe-completion-reference> \
+  --clearance=<snapshot-blocker-code>=<external-clearance-reference> \
+  --backup-purge-due-at=<ISO-8601> \
+  --note="<reviewed completion note>"
+```
+
+Repeat `--clearance` exactly once for every code stored in `blocking_reason_codes`. Confirm
+business ownership, active subscriptions and super-admin status are actually absent. Confirm every
+known personal listing image, owned-product image and import artifact has been removed from its
+configured private disk; a database row may remain until this command, but its referenced object
+must not. The transaction then deletes the personal organization and personal database boundary,
+revokes sessions/tokens/integrations, removes personal searches/alerts and memberships, anonymizes
+invitation addresses, writes an unverified non-admin tombstone, and retains immutable/business rows
+under the pseudonymous user key. Track the backup purge to the recorded deadline and prevent a
+restored backup from reactivating the tombstone or its credentials.
+
+Retain the exact UUID and every option only for an exact retry. A changed operation requires review
+before a new command; after one receipt exists, changed input conflicts and does not change the
+terminal request. Never put customer export contents, credentials, secrets, raw identity documents,
+or a public artifact URL in the note/reference fields.
 
 Rollback/incident boundary:
 
+- immediately set the affected `PRIVACY_FULFILLMENT_ENABLED` and/or
+  `PRIVACY_ERASURE_ENABLED` switch false, rebuild configuration, and reload all processes if
+  evidence, delivery, inventory, artifact disposal, erasure isolation, processor clearance or
+  backup handling is uncertain; this blocks new receipts but preserves existing requests/deadlines;
 - disable self-service ingress at the edge only under the approved incident process; preserve
   access to existing ledger records and deadline monitoring;
-- never edit or delete request/event rows to “correct” history; append the reviewed next event;
+- never edit or delete request/event/fulfillment rows to “correct” history; append only an allowed
+  reviewed next event before terminal completion;
 - never use direct SQL deletion or `fulfilled` status as a substitute for the approved erasure
   procedure;
 - place affected evidence and external processor requests under incident hold;
-- do not roll back the migration while any privacy request or event exists.
+- do not roll back any privacy migration while any request, event, fulfillment or user tombstone
+  exists.
 
 ## 10. Final launch gate
 
@@ -840,6 +1245,8 @@ system, with evidence. At minimum:
 - migrations and rollback implications have been reviewed,
 - secrets exist only in the encrypted production secret manager,
 - TLS, mail, storage, queue, scheduler, monitoring, and alerts are operational,
+- `operations:production-preflight --strict --json` exits zero for the complete advertised launch
+  scope, or every warning in a non-strict successful report is signed off as intentionally excluded,
 - `operations:readiness --require-queue-heartbeats --json` exits zero and the external readiness
   monitor confirms controlled failure and recovery,
 - production-shaped staging capacity evidence passes the versioned query/duration budgets and the

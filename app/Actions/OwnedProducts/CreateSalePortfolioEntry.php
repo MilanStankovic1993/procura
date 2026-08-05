@@ -5,6 +5,7 @@ namespace App\Actions\OwnedProducts;
 use App\Enums\Api\ApiErrorCode;
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\OwnedProducts\OwnedProductStatus;
+use App\Enums\Validation\ApplicationValidationCode;
 use App\Exceptions\SalePortfolioConflictException;
 use App\Models\Organization;
 use App\Models\OwnedProduct;
@@ -12,9 +13,9 @@ use App\Models\SalePortfolioEntry;
 use App\Models\SellListingDraft;
 use App\Models\User;
 use App\SalePortfolio\SalePortfolioSourceEvidence;
+use App\Support\Validation\ApplicationValidation;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 use JsonException;
 
 final class CreateSalePortfolioEntry
@@ -54,11 +55,10 @@ final class CreateSalePortfolioEntry
                 ->findOrFail($ownedProductId);
 
             if ($product->status !== OwnedProductStatus::Ready) {
-                throw ValidationException::withMessages([
-                    'owned_product' => [
-                        'The owned product must be ready before it enters the sale portfolio.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product',
+                    ApplicationValidationCode::OwnedProductNotReady,
+                );
             }
 
             $payloadHash = $this->payloadHash(
@@ -101,11 +101,10 @@ final class CreateSalePortfolioEntry
                 $product,
                 $draft,
             ), lockForUpdate: true)) {
-                throw ValidationException::withMessages([
-                    'sell_listing_draft_id' => [
-                        'A current ready listing draft with completed photo review is required.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'sell_listing_draft_id',
+                    ApplicationValidationCode::SalePortfolioDraftNotReady,
+                );
             }
 
             $sequence = ((int) SalePortfolioEntry::query()
@@ -115,11 +114,10 @@ final class CreateSalePortfolioEntry
             if ($sequence > (int) config(
                 'sale_portfolio.maximum_entries_per_product',
             )) {
-                throw ValidationException::withMessages([
-                    'owned_product' => [
-                        'The sale portfolio history limit has been reached for this product.',
-                    ],
-                ]);
+                ApplicationValidation::fail(
+                    'owned_product',
+                    ApplicationValidationCode::SalePortfolioHistoryLimit,
+                );
             }
 
             $inputSnapshot = [

@@ -49,6 +49,8 @@ return [
     'expected_current_attribution_id' => 'attribution actuelle attendue',
     'expected_current_cost_snapshot_id' => 'instantané de coûts actuel attendu',
     'expected_current_event_id' => 'événement actuel attendu',
+    'expected_offer_event_id' => 'événement actuel attendu de l’offre du courtier',
+    'expected_request_event_id' => 'événement actuel attendu de la demande de courtage',
     'expected_current_log_id' => 'état de notification actuel attendu',
     'expected_current_purchase_id' => 'achat actuel attendu',
     'expected_current_sale_id' => 'vente actuelle attendue',

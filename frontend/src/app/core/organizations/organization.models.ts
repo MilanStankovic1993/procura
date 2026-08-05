@@ -15,7 +15,9 @@ export type OrganizationCapability =
   | 'analyses.manage'
   | 'saved-searches.view'
   | 'saved-searches.manage'
-  | 'notifications.view';
+  | 'notifications.view'
+  | 'broker-requests.view'
+  | 'broker-requests.manage';
 
 export interface OrganizationSummary {
   readonly id: string;

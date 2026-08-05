@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use LogicException;
 
 final class PrivacyRequest extends Model
@@ -87,5 +88,10 @@ final class PrivacyRequest extends Model
     {
         return $this->hasMany(PrivacyRequestEvent::class)
             ->orderByDesc('sequence');
+    }
+
+    public function fulfillment(): HasOne
+    {
+        return $this->hasOne(PrivacyRequestFulfillment::class);
     }
 }

@@ -31,6 +31,8 @@ enum OrganizationRole: string
                 OrganizationPermission::ViewSavedSearches,
                 OrganizationPermission::ManageSavedSearches,
                 OrganizationPermission::ViewNotifications,
+                OrganizationPermission::ViewBrokerRequests,
+                OrganizationPermission::ManageBrokerRequests,
             ],
             self::Analyst => [
                 OrganizationPermission::ViewMembers,
@@ -43,6 +45,8 @@ enum OrganizationRole: string
                 OrganizationPermission::ViewSavedSearches,
                 OrganizationPermission::ManageSavedSearches,
                 OrganizationPermission::ViewNotifications,
+                OrganizationPermission::ViewBrokerRequests,
+                OrganizationPermission::ManageBrokerRequests,
             ],
             self::Viewer => [
                 OrganizationPermission::ViewMembers,
@@ -51,6 +55,7 @@ enum OrganizationRole: string
                 OrganizationPermission::ViewAnalyses,
                 OrganizationPermission::ViewSavedSearches,
                 OrganizationPermission::ViewNotifications,
+                OrganizationPermission::ViewBrokerRequests,
             ],
         };
     }

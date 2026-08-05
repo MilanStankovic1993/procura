@@ -11,6 +11,14 @@ use App\Http\Controllers\Api\V1\ArchiveSavedSearchController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\AuthenticatedUserController;
 use App\Http\Controllers\Api\V1\BeginTelegramConnectionController;
+use App\Http\Controllers\Api\V1\BrokerRequests\AcceptBrokerRequestOfferController;
+use App\Http\Controllers\Api\V1\BrokerRequests\BrokerRequestIndexController;
+use App\Http\Controllers\Api\V1\BrokerRequests\CancelBrokerRequestController;
+use App\Http\Controllers\Api\V1\BrokerRequests\DownloadBrokerReportController;
+use App\Http\Controllers\Api\V1\BrokerRequests\ShowBrokerRequestController;
+use App\Http\Controllers\Api\V1\BrokerRequests\StoreBrokerRequestController;
+use App\Http\Controllers\Api\V1\BrokerRequests\SubmitBrokerRequestController;
+use App\Http\Controllers\Api\V1\BrokerRequests\UpdateBrokerRequestController;
 use App\Http\Controllers\Api\V1\Comparables\IndexAnalysisComparableController;
 use App\Http\Controllers\Api\V1\Comparables\StoreAnalysisComparableController;
 use App\Http\Controllers\Api\V1\Comparables\StoreComparableMarketNormalizationController;
@@ -283,6 +291,44 @@ Route::prefix('v1')->group(function (): void {
             Route::get('/listing-images/{image}/content', ShowListingImageController::class)
                 ->middleware('signed:relative')
                 ->name('api.v1.listing-images.content');
+
+            Route::get('/broker-requests', BrokerRequestIndexController::class)
+                ->name('api.v1.broker-requests.index');
+
+            Route::post('/broker-requests', StoreBrokerRequestController::class)
+                ->name('api.v1.broker-requests.store');
+
+            Route::get(
+                '/broker-requests/{brokerRequest}',
+                ShowBrokerRequestController::class,
+            )->name('api.v1.broker-requests.show');
+
+            Route::put(
+                '/broker-requests/{brokerRequest}',
+                UpdateBrokerRequestController::class,
+            )->name('api.v1.broker-requests.update');
+
+            Route::post(
+                '/broker-requests/{brokerRequest}/submit',
+                SubmitBrokerRequestController::class,
+            )->name('api.v1.broker-requests.submit');
+
+            Route::post(
+                '/broker-requests/{brokerRequest}/cancel',
+                CancelBrokerRequestController::class,
+            )->name('api.v1.broker-requests.cancel');
+
+            Route::post(
+                '/broker-requests/{brokerRequest}/offers/{offer}/accept',
+                AcceptBrokerRequestOfferController::class,
+            )->name('api.v1.broker-requests.offers.accept');
+
+            Route::get(
+                '/broker-reports/{brokerReport}/content',
+                DownloadBrokerReportController::class,
+            )
+                ->middleware('signed:relative')
+                ->name('api.v1.broker-reports.content');
 
             Route::get('/saved-searches', SavedSearchIndexController::class)
                 ->name('api.v1.saved-searches.index');

@@ -164,6 +164,18 @@ export class PrivacyPage implements OnInit {
     });
   }
 
+  protected fileSize(sizeBytes: number): string {
+    if (sizeBytes < 1024 * 1024) {
+      return `${this.i18n.formatNumber(
+        Math.max(1, Math.round(sizeBytes / 1024)),
+      )} KB`;
+    }
+
+    return `${this.i18n.formatNumber(sizeBytes / (1024 * 1024), {
+      maximumFractionDigits: 1,
+    })} MB`;
+  }
+
   protected countryName(code: string, fallback: string): string {
     return this.i18n.regionName(code, fallback);
   }

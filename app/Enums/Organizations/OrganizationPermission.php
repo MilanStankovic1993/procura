@@ -20,4 +20,6 @@ enum OrganizationPermission: string
     case ViewSavedSearches = 'saved-searches.view';
     case ManageSavedSearches = 'saved-searches.manage';
     case ViewNotifications = 'notifications.view';
+    case ViewBrokerRequests = 'broker-requests.view';
+    case ManageBrokerRequests = 'broker-requests.manage';
 }

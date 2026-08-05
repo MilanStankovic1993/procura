@@ -210,6 +210,38 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'broker-requests',
+        data: { titleKey: 'route.brokerRequests' },
+        loadComponent: () =>
+          import(
+            './features/broker-requests/list/broker-request-list.page'
+          ).then((component) => component.BrokerRequestListPage),
+      },
+      {
+        path: 'broker-requests/new',
+        data: { titleKey: 'route.createBrokerRequest' },
+        loadComponent: () =>
+          import(
+            './features/broker-requests/form/broker-request-form.page'
+          ).then((component) => component.BrokerRequestFormPage),
+      },
+      {
+        path: 'broker-requests/:id/edit',
+        data: { titleKey: 'route.editBrokerRequest' },
+        loadComponent: () =>
+          import(
+            './features/broker-requests/form/broker-request-form.page'
+          ).then((component) => component.BrokerRequestFormPage),
+      },
+      {
+        path: 'broker-requests/:id',
+        data: { titleKey: 'route.brokerRequestDetail' },
+        loadComponent: () =>
+          import(
+            './features/broker-requests/detail/broker-request-detail.page'
+          ).then((component) => component.BrokerRequestDetailPage),
+      },
+      {
         path: 'markets',
         data: { titleKey: 'route.markets' },
         loadComponent: () =>
