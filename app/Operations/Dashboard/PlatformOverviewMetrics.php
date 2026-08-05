@@ -3,6 +3,7 @@
 namespace App\Operations\Dashboard;
 
 use App\Analysis\Operations\AnalysisOperationsQuery;
+use App\BrokerRequests\Operations\BrokerOperationsMonitor;
 use App\Enums\Monitoring\NotificationChannel;
 use App\Enums\Monitoring\NotificationEventType;
 use App\Enums\Subscriptions\FeatureCode;
@@ -35,12 +36,14 @@ final class PlatformOverviewMetrics
         'billing_attention',
         'privacy_requests',
         'analysis_operations',
+        'broker_operations',
     ];
 
     public function __construct(
         private readonly CacheFactory $cache,
         private readonly OperationsConfiguration $configuration,
         private readonly AnalysisOperationsQuery $analysisOperations,
+        private readonly BrokerOperationsMonitor $brokerOperations,
     ) {}
 
     /**
@@ -175,6 +178,7 @@ final class PlatformOverviewMetrics
                 )
                 ->count(),
             'analysis_operations' => $this->analysisOperations->count(),
+            'broker_operations' => $this->brokerOperations->attentionCount(),
         ];
     }
 

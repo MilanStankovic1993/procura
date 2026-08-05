@@ -241,6 +241,7 @@ return [
             'billing_attention' => ['label' => 'Billing events needing attention', 'description' => 'Rejected projections or active subscription conflicts'],
             'privacy_requests' => ['label' => 'Open privacy requests', 'description' => 'Export or deletion workflows awaiting resolution'],
             'analysis_operations' => ['label' => 'Analyses needing attention', 'description' => 'Terminal failures or processing heads requiring operator review'],
+            'broker_operations' => ['label' => 'Broker lifecycle attention', 'description' => 'Aged requests, expired offers, or delayed transaction, commission, report, and payment-case heads'],
         ],
     ],
     'values' => [

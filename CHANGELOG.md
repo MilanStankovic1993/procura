@@ -40,6 +40,12 @@
   and logical-case uniqueness, safe tenant timelines, localized read-only Admin and CLI operations,
   personal-account erasure blocking, and privacy inventory v4. It does not move funds, submit a
   refund or chargeback, call a provider, or rewrite transaction/commission history.
+- Added bounded Phase 8 broker lifecycle monitoring: one constant-query classifier covers aged and
+  past-due requests, expired offers, delayed non-terminal transactions, earned commissions,
+  overdue report purges, and open payment cases. A secret-free JSON CLI supports alerting, the
+  cached Admin dashboard exposes a localized attention tile in all five locales, production
+  preflight validates every threshold, and lifecycle acceptance tests prove safe output and exact
+  classifications without exposing tenant, supplier, payment, replay, or evidence data.
 - Added the typed `ApplicationValidationCode`/`ApplicationValidation` boundary and exact
   EN/DE/ES/FR/sr-Latn catalogs for 179 expected platform, Analysis, OwnedProducts, privacy,
   broker-request, and broker-offer validation failures across
@@ -57,7 +63,7 @@
   attribute catalogs, privacy-preserving reset copy, CI contracts, and production smoke/reload
   instructions.
 - Added the first production-capacity regression boundary: a 2,000-row deterministic tenant
-  fixture, versioned `11/1/2` query budgets for cold Admin metrics/Analysis Operations/tenant
+  fixture, versioned `12/1/2` query budgets for cold Admin metrics/Analysis Operations/tenant
   Analysis listing, a guarded JSON staging command with optional duration enforcement, one shared
   stampede-protected dashboard snapshot, explicit CI execution, and production-shaped load/rollback
   instructions.

@@ -115,6 +115,18 @@ class PlatformOverview extends StatsOverviewWidget
                         ? 'danger'
                         : 'success',
                 ),
+            Stat::make(
+                __('admin.dashboard.stats.broker_operations.label'),
+                $metrics['broker_operations'],
+            )
+                ->description(
+                    __('admin.dashboard.stats.broker_operations.description'),
+                )
+                ->color(
+                    $metrics['broker_operations'] > 0
+                        ? 'danger'
+                        : 'success',
+                ),
         ];
     }
 }

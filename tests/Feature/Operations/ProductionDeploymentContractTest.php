@@ -57,6 +57,9 @@ test('the production build verifies every deploy contract', function () {
     $nginx = file_get_contents(
         base_path('deploy/nginx/procura.conf.example'),
     );
+    $environment = file_get_contents(
+        base_path('deploy/env/procura.production.env.example'),
+    );
 
     expect($package['scripts']['build:frontend'])
         ->toContain('npm run verify:production-deployment')
@@ -66,5 +69,12 @@ test('the production build verifies every deploy contract', function () {
         ->and($nginx)
         ->toContain('add_header Permissions-Policy')
         ->toContain('fastcgi_param HTTP_PROXY "";')
-        ->toContain('ssl_protocols TLSv1.2 TLSv1.3;');
+        ->toContain('ssl_protocols TLSv1.2 TLSv1.3;')
+        ->and($environment)
+        ->toContain('BROKER_MONITOR_REQUEST_AGE_HOURS=48')
+        ->toContain('BROKER_MONITOR_OFFER_EXPIRY_GRACE_HOURS=1')
+        ->toContain('BROKER_MONITOR_TRANSACTION_AGE_HOURS=24')
+        ->toContain('BROKER_MONITOR_COMMISSION_AGE_HOURS=72')
+        ->toContain('BROKER_MONITOR_REPORT_PURGE_GRACE_HOURS=26')
+        ->toContain('BROKER_MONITOR_PAYMENT_CASE_AGE_HOURS=48');
 });

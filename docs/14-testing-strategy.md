@@ -114,6 +114,13 @@ unchanged transaction/commission histories, safe tenant/Admin projections, CLI p
 personal-case erasure blocking, privacy inventory v4, and complete five-language catalogs. No
 provider fake is required because the boundary performs no payment-provider call.
 
+Broker operations-monitoring coverage must prove each of the seven current-head classifications,
+disjoint request age versus past-needed-by counting, terminal/resolved exclusion, reviewed bounded
+configuration, one SQL query independent of table size, safe zero/attention JSON states,
+report-only versus alerting exit codes, production-preflight rejection of invalid thresholds,
+five-language Admin catalog parity, the cached dashboard query budget, and exclusion of tenant,
+supplier, offer, money, storage, payment, evidence, snapshot, hash, and replay data.
+
 Analysis operations coverage must prove verified-super-admin-only mutation, exact current-dispatch
 checks, UUID replay/mismatch behavior, automatic-retry and total-run ceilings, unchanged
 subscription usage, cumulative attempt bounds, append-only retry/dispatch evidence, safe error
@@ -412,7 +419,7 @@ The first deterministic capacity regression suite is implemented at
 `tests/Feature/Performance/CapacityBaselineTest.php`. It loads 2,000 tenant Analysis rows and proves
 that:
 
-- the cold global Admin metrics projection remains exactly eleven queries;
+- the cold global Admin metrics projection remains exactly twelve queries;
 - a repeated Admin metrics projection uses the shared snapshot and performs zero database queries;
 - a corrupt cached payload is rejected, replaced once, and then reused without database queries;
 - Analysis Operations count remains one query;

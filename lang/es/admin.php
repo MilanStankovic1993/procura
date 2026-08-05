@@ -241,6 +241,7 @@ return [
             'billing_attention' => ['label' => 'Eventos de facturación que requieren atención', 'description' => 'Proyecciones rechazadas o conflictos de suscripción activa'],
             'privacy_requests' => ['label' => 'Solicitudes de privacidad abiertas', 'description' => 'Procesos de exportación o eliminación pendientes de resolución'],
             'analysis_operations' => ['label' => 'Análisis que requieren atención', 'description' => 'Fallos terminales o cabeceras de procesamiento que requieren revisión'],
+            'broker_operations' => ['label' => 'Flujo de intermediación que requiere atención', 'description' => 'Solicitudes antiguas, ofertas vencidas o estados retrasados de transacciones, comisiones, informes y casos de pago'],
         ],
     ],
     'values' => [

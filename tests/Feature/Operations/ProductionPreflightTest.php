@@ -242,6 +242,12 @@ test('inconsistent broker switches and enabled incomplete billing fail closed', 
         ->and(productionPreflightStatus('optional.billing'))->toBe('fail');
 });
 
+test('invalid broker monitoring thresholds block production preflight', function () {
+    config(['broker.monitoring.request_age_hours' => 0]);
+
+    expect(productionPreflightStatus('features.dependencies'))->toBe('fail');
+});
+
 test('operator output contains stable check keys but no configured credentials', function () {
     config([
         'monitoring.telegram.bot_token' => 'telegram-token-secret-marker',

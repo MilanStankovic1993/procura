@@ -1,5 +1,6 @@
 <?php
 
+use App\BrokerRequests\Operations\BrokerOperationsMonitor;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
@@ -29,6 +30,7 @@ test('the production database family satisfies the schema and session contract',
     $foreignKeys = DB::table('information_schema.referential_constraints')
         ->where('constraint_schema', $database)
         ->count();
+    $brokerOperations = app(BrokerOperationsMonitor::class)->inspect();
     $migrationFiles = count(glob(database_path('migrations/*.php')) ?: []);
 
     expect(config('testing.mysql_enabled'))
@@ -53,6 +55,18 @@ test('the production database family satisfies the schema and session contract',
         ->toBe(0)
         ->and($foreignKeys)
         ->toBeGreaterThan(0)
+        ->and($brokerOperations->attentionCount())
+        ->toBe(0)
+        ->and(array_keys($brokerOperations->counts))
+        ->toBe([
+            'requests_aging',
+            'requests_past_needed_by',
+            'offers_expired',
+            'transactions_aging',
+            'commissions_aging',
+            'reports_overdue_purge',
+            'payment_cases_aging',
+        ])
         ->and(DB::table('migrations')->count())
         ->toBe($migrationFiles);
 

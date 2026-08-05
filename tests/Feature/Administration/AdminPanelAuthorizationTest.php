@@ -98,7 +98,8 @@ test('verified super administrators can access operational resources while resou
     $this->actingAs($admin)
         ->get(route('filament.admin.pages.dashboard'))
         ->assertOk()
-        ->assertSee('Procura Operations');
+        ->assertSee('Procura Operations')
+        ->assertSeeText('Broker lifecycle attention');
 
     foreach ([
         UserResource::class,

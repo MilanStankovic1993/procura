@@ -10,6 +10,7 @@ use App\Actions\BrokerRequests\TransitionBrokerPaymentCase;
 use App\Actions\BrokerRequests\TransitionBrokerRequest;
 use App\Actions\BrokerRequests\TransitionBrokerTransaction;
 use App\Actions\Markets\SyncMarketReferenceData;
+use App\BrokerRequests\Operations\BrokerOperationsMonitor;
 use App\Enums\BrokerRequests\BrokerCommissionStatus;
 use App\Enums\BrokerRequests\BrokerPaymentCaseOutcome;
 use App\Enums\BrokerRequests\BrokerPaymentCaseStatus;
@@ -40,6 +41,7 @@ use App\Models\User;
 use App\Privacy\AccountDeletionBlockerResolver;
 use Database\Seeders\PlanSeeder;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -62,6 +64,12 @@ beforeEach(function () {
         'broker.report_download_ttl_minutes' => 10,
         'broker.report_max_bytes' => 5 * 1024 * 1024,
         'broker.report_purge_batch' => 100,
+        'broker.monitoring.request_age_hours' => 48,
+        'broker.monitoring.offer_expiry_grace_hours' => 1,
+        'broker.monitoring.transaction_age_hours' => 24,
+        'broker.monitoring.commission_age_hours' => 72,
+        'broker.monitoring.report_purge_grace_hours' => 26,
+        'broker.monitoring.payment_case_age_hours' => 48,
     ]);
 });
 
@@ -1669,4 +1677,191 @@ test('stale expired disabled and cancellation offer boundaries fail closed', fun
         BrokerRequestOfferStatus::NotSelected,
     )->and($offer->offer->fresh()->resolved_at)->not->toBeNull()
         ->and($cancelled->json('data.current_event_id'))->not->toBeNull();
+});
+
+test('broker operations monitoring classifies every bounded lifecycle attention signal in one query', function () {
+    Storage::fake('local');
+    config([
+        'broker.monitoring.request_age_hours' => 1,
+        'broker.monitoring.offer_expiry_grace_hours' => 1,
+        'broker.monitoring.transaction_age_hours' => 1,
+        'broker.monitoring.commission_age_hours' => 1,
+        'broker.monitoring.report_purge_grace_hours' => 1,
+        'broker.monitoring.payment_case_age_hours' => 1,
+    ]);
+
+    [$requestOwner] = brokerWorkspace();
+    [$agedRequest] = searchingBrokerRequest($requestOwner);
+    DB::table('broker_request_events')
+        ->where('id', $agedRequest->current_event_id)
+        ->update(['occurred_at' => now()->subHours(2)]);
+
+    [$dueOwner] = brokerWorkspace();
+    $dueCreated = $this->actingAs($dueOwner)
+        ->postJson(
+            route('api.v1.broker-requests.store'),
+            brokerRequestPayload(),
+        )
+        ->assertCreated();
+    $this->actingAs($dueOwner)
+        ->postJson(
+            route(
+                'api.v1.broker-requests.submit',
+                $dueCreated->json('data.id'),
+            ),
+            [
+                'expected_current_event_id' => (
+                    $dueCreated->json('data.current_event_id')
+                ),
+                'idempotency_key' => (string) Str::uuid(),
+            ],
+        )
+        ->assertAccepted();
+    DB::table('broker_requests')
+        ->where('id', $dueCreated->json('data.id'))
+        ->update(['needed_by' => now()->subDay()->toDateString()]);
+
+    [$offerOwner] = brokerWorkspace();
+    [$offerRequest, $offerOperator, $searchEventId] = (
+        searchingBrokerRequest($offerOwner)
+    );
+    $presented = app(PresentBrokerRequestOffer::class)->execute(
+        $offerRequest,
+        $offerOperator,
+        $searchEventId,
+        (string) Str::uuid(),
+        'quote:operations-monitor-expiry',
+        brokerOfferPayload(),
+    );
+    DB::table('broker_request_offers')
+        ->where('id', $presented->offer->getKey())
+        ->update(['valid_until' => now()->subHours(2)]);
+
+    [$transactionOwner] = brokerWorkspace();
+    [, , $agingTransaction] = acceptedBrokerTransaction($transactionOwner);
+    DB::table('broker_transaction_events')
+        ->where('id', $agingTransaction->current_event_id)
+        ->update(['occurred_at' => now()->subHours(2)]);
+
+    [$completedOwner] = brokerWorkspace();
+    [, $completedOperator, $completedTransaction, $earnedCommission] = (
+        completedBrokerReportTransaction($completedOwner)
+    );
+    DB::table('broker_commissions')
+        ->where('id', $earnedCommission->getKey())
+        ->update(['earned_at' => now()->subHours(2)]);
+    $generated = app(GenerateBrokerReport::class)->execute(
+        transaction: $completedTransaction,
+        actor: $completedOperator,
+        expectedTransactionEventId: $completedTransaction->current_event_id,
+        expectedCommissionEventId: $earnedCommission->current_event_id,
+        idempotencyKey: (string) Str::uuid(),
+        locale: SupportedLocale::English,
+        reasonCode: 'operations_monitor_report',
+        evidenceReference: 'case:operations-monitor-report',
+    );
+    DB::table('broker_reports')
+        ->where('id', $generated->report->getKey())
+        ->update(['artifact_expires_at' => now()->subHours(2)]);
+    $paymentCase = app(OpenBrokerPaymentCase::class)->execute(
+        transaction: $completedTransaction,
+        actor: $completedOperator,
+        type: BrokerPaymentCaseType::Refund,
+        requestedAmountMinor: 1000,
+        expectedTransactionEventId: $completedTransaction->current_event_id,
+        idempotencyKey: (string) Str::uuid(),
+        externalCaseReference: 'provider:operations-monitor-refund',
+        reasonCode: 'customer_refund_requested',
+        evidenceReference: 'case:operations-monitor-refund',
+    );
+    DB::table('broker_payment_case_events')
+        ->where('id', $paymentCase->event->getKey())
+        ->update(['occurred_at' => now()->subHours(2)]);
+
+    DB::flushQueryLog();
+    DB::enableQueryLog();
+    $report = app(BrokerOperationsMonitor::class)->inspect();
+    $queries = DB::getQueryLog();
+    DB::disableQueryLog();
+    $encoded = json_encode(
+        $report->operatorPayload(),
+        JSON_THROW_ON_ERROR,
+    );
+
+    expect($report->status())->toBe('attention_required')
+        ->and($report->attentionCount())->toBe(7)
+        ->and($report->counts)->toBe([
+            'requests_aging' => 1,
+            'requests_past_needed_by' => 1,
+            'offers_expired' => 1,
+            'transactions_aging' => 1,
+            'commissions_aging' => 1,
+            'reports_overdue_purge' => 1,
+            'payment_cases_aging' => 1,
+        ])
+        ->and($queries)->toHaveCount(1)
+        ->and($encoded)->not->toContain($agedRequest->organization_id)
+        ->and($encoded)->not->toContain('vault:supplier-quote-001')
+        ->and($encoded)->not->toContain('case:operations-monitor-report');
+});
+
+test('broker operations command has safe report and alerting exit modes', function () {
+    config([
+        'broker.monitoring.request_age_hours' => 1,
+        'broker.monitoring.offer_expiry_grace_hours' => 1,
+        'broker.monitoring.transaction_age_hours' => 1,
+        'broker.monitoring.commission_age_hours' => 1,
+        'broker.monitoring.report_purge_grace_hours' => 1,
+        'broker.monitoring.payment_case_age_hours' => 1,
+    ]);
+
+    $clearExit = Artisan::call('broker-operations:status', [
+        '--json' => true,
+        '--fail-on-attention' => true,
+    ]);
+    $clearPayload = json_decode(
+        trim(Artisan::output()),
+        true,
+        flags: JSON_THROW_ON_ERROR,
+    );
+
+    [$owner] = brokerWorkspace();
+    [$request] = searchingBrokerRequest($owner);
+    DB::table('broker_request_events')
+        ->where('id', $request->current_event_id)
+        ->update(['occurred_at' => now()->subHours(2)]);
+
+    $strictExit = Artisan::call('broker-operations:status', [
+        '--json' => true,
+        '--fail-on-attention' => true,
+    ]);
+    $attentionPayload = json_decode(
+        trim(Artisan::output()),
+        true,
+        flags: JSON_THROW_ON_ERROR,
+    );
+    $reportOnlyExit = Artisan::call('broker-operations:status', [
+        '--json' => true,
+    ]);
+
+    expect($clearExit)->toBe(0)
+        ->and($clearPayload['status'])->toBe('clear')
+        ->and($clearPayload['attention_count'])->toBe(0)
+        ->and($strictExit)->toBe(1)
+        ->and($attentionPayload['status'])->toBe('attention_required')
+        ->and($attentionPayload['counts']['requests_aging'])->toBe(1)
+        ->and($reportOnlyExit)->toBe(0)
+        ->and(json_encode($attentionPayload, JSON_THROW_ON_ERROR))
+        ->not->toContain($request->getKey())
+        ->not->toContain($request->organization_id);
+});
+
+test('broker operations monitoring rejects unsafe threshold configuration', function () {
+    config(['broker.monitoring.request_age_hours' => 0]);
+
+    expect(fn () => app(BrokerOperationsMonitor::class)->inspect())
+        ->toThrow(
+            RuntimeException::class,
+            'The broker.monitoring.request_age_hours broker monitoring setting is invalid.',
+        );
 });

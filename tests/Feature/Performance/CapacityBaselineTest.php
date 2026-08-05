@@ -145,7 +145,7 @@ test('critical query counts stay constant with two thousand tenant analyses', fu
         ->and($report->passed())->toBeTrue()
         ->and(
             $report->probes['platform_dashboard_cold']->queryCount,
-        )->toBe(11)
+        )->toBe(12)
         ->and(
             $report->probes['analysis_operations_count']->queryCount,
         )->toBe(1)
@@ -176,7 +176,8 @@ test('the shared dashboard snapshot removes repeated aggregate queries', functio
     expect($cold)->toBe($warm)
         ->and($cold['users'])->toBeGreaterThanOrEqual(1)
         ->and($cold['analysis_operations'])->toBe(20)
-        ->and($coldQueries)->toHaveCount(11)
+        ->and($cold['broker_operations'])->toBe(0)
+        ->and($coldQueries)->toHaveCount(12)
         ->and($warmQueries)->toHaveCount(0);
 })->group('capacity');
 
@@ -204,7 +205,8 @@ test('a corrupt dashboard cache payload is replaced by a valid snapshot', functi
 
     expect($recovered)->toBe($cached)
         ->and($recovered['analysis_operations'])->toBe(10)
-        ->and($recoveryQueries)->toHaveCount(11)
+        ->and($recovered['broker_operations'])->toBe(0)
+        ->and($recoveryQueries)->toHaveCount(12)
         ->and($cachedQueries)->toHaveCount(0)
         ->and(Cache::store('array')->get($cacheKey))->toBe($recovered);
 })->group('capacity');
@@ -225,7 +227,7 @@ test('the capacity command emits one strict machine-readable report', function (
     expect($exitCode)->toBe(0)
         ->and($payload['status'])->toBe('passed')
         ->and($payload['probes']['platform_dashboard_cold']['query_count'])
-        ->toBe(11)
+        ->toBe(12)
         ->and($payload['probes']['analysis_operations_count']['query_count'])
         ->toBe(1)
         ->and($payload['probes']['tenant_analysis_index']['query_count'])

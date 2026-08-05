@@ -241,6 +241,7 @@ return [
             'billing_attention' => ['label' => 'Zu prüfende Zahlungsereignisse', 'description' => 'Abgelehnte Übernahmen oder Konflikte aktiver Abonnements'],
             'privacy_requests' => ['label' => 'Offene Datenschutzanfragen', 'description' => 'Export- oder Löschabläufe, die auf Klärung warten'],
             'analysis_operations' => ['label' => 'Zu prüfende Analysen', 'description' => 'Endgültige Fehler oder Verarbeitungsköpfe, die eine Bedienerprüfung erfordern'],
+            'broker_operations' => ['label' => 'Broker-Abläufe mit Handlungsbedarf', 'description' => 'Gealterte Anfragen, abgelaufene Angebote oder verzögerte Transaktions-, Provisions-, Berichts- und Zahlungsfallköpfe'],
         ],
     ],
     'values' => [

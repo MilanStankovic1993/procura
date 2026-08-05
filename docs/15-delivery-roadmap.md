@@ -188,6 +188,9 @@ Delivered foundation:
 - provider-independent refund/dispute case ledger with exact transaction/case heads, strict
   type/outcome/amount rules, safe tenant timelines, read-only Admin/CLI operations, and personal
   erasure blocking, without provider execution or commission mutation;
+- bounded single-query lifecycle monitoring with reviewed age/grace thresholds, secret-free
+  machine JSON, alerting exit semantics, a five-language Admin attention tile, and full
+  application acceptance coverage;
 - localized read-only Admin operations resource;
 - EN/DE/ES/FR/sr-Latn interface and validation catalogs;
 - production activation/rollback procedure and privacy-erasure blocker.
@@ -197,7 +200,8 @@ Remaining Phase 8 work:
 - approved supplier communication/integration procedures;
 - payment-provider execution, actual refund/chargeback submission, commission-remediation rules,
   and externally approved billing policy;
-- operational monitoring and acceptance evidence for the complete brokerage lifecycle.
+- production-shaped monitoring integration and external staging acceptance evidence for the
+  complete brokerage lifecycle.
 
 ## Commercial target
 
