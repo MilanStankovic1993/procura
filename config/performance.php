@@ -21,4 +21,18 @@ return [
             ],
         ],
     ],
+    'queue_throughput' => [
+        'default_jobs' => 100,
+        'maximum_jobs' => 5000,
+        'default_timeout_seconds' => 60,
+        'maximum_timeout_seconds' => 300,
+        'receipt_ttl_seconds' => 900,
+        'poll_interval_milliseconds' => 100,
+        'cache_key_prefix' => 'performance:queue-throughput:v1',
+        'budgets' => [
+            'minimum_throughput_per_second' => 5.0,
+            'maximum_p95_latency_milliseconds' => 15000,
+            'maximum_p99_latency_milliseconds' => 30000,
+        ],
+    ],
 ];

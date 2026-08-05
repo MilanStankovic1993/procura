@@ -67,6 +67,10 @@
   Analysis listing, a guarded JSON staging command with optional duration enforcement, one shared
   stampede-protected dashboard snapshot, explicit CI execution, and production-shaped load/rollback
   instructions.
+- Added a bounded staging queue-throughput harness that sends synthetic no-op probes through each
+  configured worker pool, records short-lived shared-cache receipts, measures dispatch duration,
+  completion, jobs/second, and p50/p95/p99 latency, enforces versioned or stricter budgets, emits
+  secret-free JSON, cleans completed evidence, and permanently refuses production execution.
 - Added production-grade operational readiness with bounded database/shared-cache probes,
   per-pool queue-processing heartbeats, stale/high-latency and out-of-order protection, sanitized
   `503` health responses, strict JSON/CLI deployment checks, a five-language Admin readiness tile,

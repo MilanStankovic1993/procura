@@ -107,3 +107,8 @@ appears in `failed_jobs`. Do not disable heartbeat monitoring merely to clear an
 `operations:capacity-baseline` is not a scheduled command and must never be added to cron or
 Supervisor. It is a bounded release/diagnostic probe whose production execution requires the
 explicit acknowledgement and the approval procedure in `docs/19-production-go-live.md`.
+
+`operations:queue-throughput` is also never scheduled. It creates real synthetic queue traffic,
+is permanently blocked in production, and may run in staging only under the recorded load window
+and worker-capacity procedure in `docs/19-production-go-live.md`. The `--allow-non-staging` option
+exists only for local contract rehearsal and can never turn local output into launch evidence.

@@ -429,7 +429,18 @@ that:
 
 These deterministic query-count tests run in CI and intentionally do not enforce wall time.
 Staging must run `operations:capacity-baseline --enforce-duration` against MySQL and a
-production-shaped, non-customer dataset. The current harness covers the first operational query
-budgets only. Full concurrent analysis creation, queue throughput, comparable selection,
-price/rate resolution, Sell multi-scope recalculation, browser/API latency percentiles, saturation,
-and soak testing remain required before launch; none may be claimed from an in-memory SQLite test.
+production-shaped, non-customer dataset.
+
+`tests/Feature/Performance/QueueThroughputTest.php` now protects the separate queue workload
+contract: unique cache receipts, late/duplicate rejection, cleanup, exact JSON, environment and
+load acknowledgement gates, Redis-only staging evidence, versioned-budget tightening, permanent
+production refusal, and bounded incomplete-batch timeout. CI uses sync/fake queue drivers only to
+prove those deterministic contracts; it is not throughput evidence.
+
+Actual staging evidence must run `operations:queue-throughput` through shared Redis and the real
+Supervisor worker pools. It measures queue transport/worker scheduling completion, jobs/second,
+and p50/p95/p99 dispatch-to-process latency without creating business records. Full concurrent
+Analysis HTTP creation and processing, comparable selection, price/rate resolution, Sell
+multi-scope recalculation, browser/API percentiles, database/cache/worker saturation, and soak
+testing remain required before launch; none may be claimed from an in-memory SQLite or sync-queue
+test.

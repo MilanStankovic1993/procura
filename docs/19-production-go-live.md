@@ -257,10 +257,10 @@ Incident and rollback boundary:
 - no schema rollback is required. Heartbeat cache keys contain no business data and expire after
   the configured TTL.
 
-### 3.6 Capacity baseline and dashboard aggregate cache
+### 3.6 Capacity baseline, queue throughput, and dashboard aggregate cache
 
-Status: **deterministic application/query baseline complete; production-shaped load evidence
-pending**
+Status: **deterministic query and bounded queue-workload harnesses complete; production-shaped
+staging execution and broader load evidence pending**
 
 Application controls now present:
 
@@ -273,7 +273,13 @@ Application controls now present:
   bounded 50-row tenant Analysis page;
 - automated fixtures prove constant query counts with 2,000 Analysis rows;
 - `operations:capacity-baseline` performs bounded reads only, emits no SQL or business payloads,
-  and refuses production unless `--allow-production-read-only` is explicit.
+  and refuses production unless `--allow-production-read-only` is explicit;
+- `operations:queue-throughput` dispatches bounded synthetic no-op jobs through one configured
+  worker pool, stores only expiring timing receipts in shared cache, reports completion,
+  jobs/second, and p50/p95/p99 dispatch-to-process latency, and permanently refuses production;
+- the repository baselines are 100 jobs, a 60-second timeout, at least 5 jobs/second, p95 no more
+  than 15 seconds, and p99 no more than 30 seconds. A release may supply stricter targets but the
+  command rejects weaker overrides.
 
 Required staging configuration:
 
@@ -285,7 +291,9 @@ OPERATIONS_DASHBOARD_CACHE_TTL_SECONDS=30
 Staging procedure:
 
 1. Use MySQL and shared Redis versions/configuration equivalent to production. Never use SQLite,
-   array/file cache, or the local database cache as launch evidence.
+   array/file cache, or the local database cache as launch evidence. Synchronize the command host
+   and every worker host to the same monitored UTC time source before interpreting dispatch-to-
+   process percentiles.
 2. Load a synthetic or irreversibly anonymized dataset at or above the approved launch profile.
    It must include multiple tenants, at least one tenant with thousands of Analyses, terminal/stale
    operations heads, notification heads, privacy requests, subscriptions, and active markets.
@@ -304,19 +312,45 @@ php artisan operations:capacity-baseline \
 5. Require exit code zero, query counts no greater than `12/1/2`, every duration within the
    versioned budgets, a 50-row tenant result when sufficient fixtures exist, and no SQL/error text
    in the retained JSON.
-6. Exercise concurrent cold Admin requests at snapshot expiry and prove only one recomputation
+6. Record an approved per-pool target that is at least as strict as the repository baseline. With
+   real Supervisor workers and normal staging monitoring active, run the bounded queue workload
+   separately for `analyses`, `connectors`, `notifications`, and `default`:
+
+```bash
+php artisan operations:queue-throughput \
+  --queue=<configured-queue> \
+  --jobs=<approved-bounded-count> \
+  --timeout=<approved-seconds> \
+  --minimum-throughput=<approved-jobs-per-second> \
+  --maximum-p95-ms=<approved-milliseconds> \
+  --maximum-p99-ms=<approved-milliseconds> \
+  --acknowledge-load \
+  --json
+```
+
+7. Require exit code zero, `completed_jobs=expected_jobs`, `missed_jobs=0`, no `error_code`, and
+   throughput/p95/p99 within the recorded targets. Preserve the secret-free JSON alongside queue
+   depth, failed-job count, worker count/restarts, Redis CPU/memory/latency, database load, and the
+   exact release. A local `--allow-non-staging` sync/fake rehearsal is contract verification only
+   and is never launch evidence.
+8. Exercise concurrent cold Admin requests at snapshot expiry and prove only one recomputation
    reaches MySQL. Confirm warm requests use the snapshot and that cache failure falls back to the
    cold budget while readiness becomes unavailable.
-7. Continue with the remaining performance plan: concurrent creation, queue throughput,
-   comparable selection, price/rate resolution, Sell multi-scope recalculation, endpoint/browser
-   percentiles, database/cache/worker saturation, and an approved soak window.
+9. Continue with the remaining performance plan: concurrent Analysis creation and real pipeline
+   processing, comparable selection, price/rate resolution, Sell multi-scope recalculation,
+   endpoint/browser percentiles, database/cache/worker saturation beyond the bounded probe, and an
+   approved soak window. The no-op queue workload is evidence for transport and worker scheduling,
+   not for provider or business-pipeline capacity.
 
 Production diagnostic boundary:
 
-- staging evidence is mandatory; passing this command alone is not launch approval;
+- staging evidence is mandatory; passing either capacity command alone is not launch approval;
+- `operations:queue-throughput` is always rejected in production and has no bypass. Do not copy,
+  rename, or invoke its probe jobs from application code to evade that boundary;
 - normal production monitoring uses real latency, slow-query, queue, saturation, and error-rate
   telemetry, not repeated capacity commands;
-- one production run requires an approved maintenance/incident ticket, an off-peak window,
+- one production read-baseline run requires an approved maintenance/incident ticket, an off-peak
+  window,
   `--allow-production-read-only`, and preferably no tenant probe unless its load is specifically
   approved;
 - `--enforce-duration` should be interpreted against the actual host and current load, never used
@@ -332,6 +366,9 @@ Rollback/incident boundary:
   contain counters only and expire automatically; no database rollback exists;
 - a shared-cache outage already falls back to the cold query path, so restrict Admin access during
   a prolonged outage if repeated cold aggregates add database pressure;
+- stop a staging throughput run by stopping the invoking command and, if necessary, pausing the
+  affected staging pool. The marker and receipt keys contain no business data and expire after 15
+  minutes; do not flush the complete shared cache to remove them;
 - never edit performance budgets during an incident merely to change command status.
 
 ## 4. Mail delivery
@@ -1290,8 +1327,9 @@ system, with evidence. At minimum:
   scope, or every warning in a non-strict successful report is signed off as intentionally excluded,
 - `operations:readiness --require-queue-heartbeats --json` exits zero and the external readiness
   monitor confirms controlled failure and recovery,
-- production-shaped staging capacity evidence passes the versioned query/duration budgets and the
-  remaining concurrent load/soak scenarios meet the approved launch target,
+- production-shaped staging capacity evidence passes the versioned query/duration budgets, every
+  configured worker pool passes the bounded queue-throughput completion/p95/p99 target, and the
+  remaining full-pipeline concurrent load/saturation/soak scenarios meet the approved launch target,
 - privacy, terms, billing, tax, refund, retention, and incident-response procedures are approved,
 - load, security, tenancy, authorization, localization, accessibility, and disaster-recovery checks
   meet the launch target,
