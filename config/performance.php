@@ -35,4 +35,29 @@ return [
             'maximum_p99_latency_milliseconds' => 30000,
         ],
     ],
+    'analysis_pipeline_workload' => [
+        'enabled' => (bool) env(
+            'PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED',
+            false,
+        ),
+        'cache_store' => env(
+            'PERFORMANCE_ANALYSIS_WORKLOAD_CACHE_STORE',
+        ),
+        'default_scenarios' => 20,
+        'maximum_scenarios' => 250,
+        'default_permit_ttl_seconds' => 900,
+        'maximum_permit_ttl_seconds' => 3600,
+        'lock_seconds' => 10,
+        'lock_wait_seconds' => 3,
+        'cache_key_prefix' => 'performance:analysis-pipeline-workload:v1',
+        'header' => 'X-Procura-Analysis-Workload-Permit',
+        'budgets' => [
+            'version' => 'analysis-pipeline-workload-budget:v1',
+            'minimum_throughput_per_second' => 0.25,
+            'maximum_draft_p95_milliseconds' => 2000,
+            'maximum_submit_p95_milliseconds' => 2000,
+            'maximum_pipeline_p95_milliseconds' => 60000,
+            'maximum_failure_rate_basis_points' => 0,
+        ],
+    ],
 ];

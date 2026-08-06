@@ -489,12 +489,14 @@ Route::prefix('v1')->group(function (): void {
                 ->name('api.v1.analyses.index');
 
             Route::post('/buy-analyses', StoreBuyAnalysisController::class)
+                ->middleware('analysis-workload-permit')
                 ->name('api.v1.buy-analyses.store');
 
             Route::get('/analyses/{analysis}', ShowAnalysisController::class)
                 ->name('api.v1.analyses.show');
 
             Route::post('/analyses/{analysis}/submit', SubmitAnalysisController::class)
+                ->middleware('analysis-workload-permit')
                 ->name('api.v1.analyses.submit');
 
             Route::post(

@@ -1,0 +1,9 @@
+{
+    "actors": [
+        {
+            "key": "actor-1",
+            "email": "approved-load-actor@example.test",
+            "password": "replace-from-the-staging-secret-manager"
+        }
+    ]
+}

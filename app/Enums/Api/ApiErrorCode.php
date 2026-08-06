@@ -4,6 +4,7 @@ namespace App\Enums\Api;
 
 enum ApiErrorCode: string
 {
+    case AnalysisWorkloadPermitRejected = 'analysis_workload_permit_rejected';
     case BillingCheckoutExpired = 'billing_checkout_expired';
     case BillingManualAssignment = 'billing_manual_assignment';
     case BillingNotConfigured = 'billing_not_configured';

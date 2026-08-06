@@ -39,6 +39,7 @@ function configureProductionPreflightBaseline(): void
             'notifications',
             'default',
         ],
+        'performance.analysis_pipeline_workload.enabled' => false,
         'queue.default' => 'redis',
         'queue.connections.redis' => [
             'driver' => 'redis',
@@ -124,7 +125,15 @@ test('a safe base configuration is deployable while external activation remains 
         ->and($payload['summary']['failed'])->toBe(0)
         ->and($payload['summary']['warnings'])->toBeGreaterThan(0)
         ->and($payload['checks']['data.private_storage']['status'])->toBe('pass')
+        ->and($payload['checks']['operations.performance_workloads']['status'])->toBe('pass')
         ->and($payload['checks']['operations.queue_heartbeats']['status'])->toBe('pass');
+});
+
+test('production preflight fails when analysis workload permits are enabled', function () {
+    config()->set('performance.analysis_pipeline_workload.enabled', true);
+
+    expect(productionPreflightStatus('operations.performance_workloads'))
+        ->toBe('fail');
 });
 
 test('the command emits one secret-free JSON document and strict mode blocks warnings', function () {
