@@ -2,6 +2,7 @@
 
 namespace App\Actions\OwnedProducts;
 
+use App\Enums\Sell\SellPriceIntelligenceMetricStage;
 use App\Models\OwnedProduct;
 use App\Models\OwnedProductAssessment;
 use App\Models\SellComparableSelection;
@@ -9,6 +10,7 @@ use App\Models\SellPriceBand;
 use App\SellPriceIntelligence\Data\SellComparableSelectionData;
 use App\SellPriceIntelligence\Data\SellPriceBandData;
 use App\SellPriceIntelligence\Estimators\DeterministicSellPriceBandEstimator;
+use App\SellPriceIntelligence\Metrics\SellPriceIntelligenceMetricTimer;
 use App\SellPriceIntelligence\Selectors\DeterministicSellComparableSelector;
 use Illuminate\Support\Facades\DB;
 use LogicException;
@@ -26,6 +28,7 @@ final class RefreshSellPriceIntelligence
         OwnedProductAssessment $assessment,
         string $targetCountryCode,
         string $targetCurrencyCode,
+        SellPriceIntelligenceMetricTimer $metric,
     ): array {
         if (DB::transactionLevel() < 1) {
             throw new LogicException(
@@ -33,27 +36,52 @@ final class RefreshSellPriceIntelligence
             );
         }
 
-        $selectionData = $this->selector->select(
-            $ownedProduct,
-            $assessment,
-            strtoupper($targetCountryCode),
-            strtoupper($targetCurrencyCode),
+        $selectionData = $metric->measure(
+            SellPriceIntelligenceMetricStage::ComparableSelection,
+            fn (): SellComparableSelectionData => $this->selector->select(
+                $ownedProduct,
+                $assessment,
+                strtoupper($targetCountryCode),
+                strtoupper($targetCurrencyCode),
+            ),
         );
-        $selection = $this->recordSelection(
-            $ownedProduct,
-            $assessment->getKey(),
-            $selectionData,
+        $selection = $metric->measure(
+            SellPriceIntelligenceMetricStage::SelectionPersistence,
+            fn (): SellComparableSelection => $this->recordSelection(
+                $ownedProduct,
+                $assessment->getKey(),
+                $selectionData,
+            ),
         );
-        $bandData = $this->estimator->estimate($assessment, $selection);
-
-        return [
-            'selection' => $selection,
-            'price_band' => $this->recordPriceBand(
+        $bandData = $metric->measure(
+            SellPriceIntelligenceMetricStage::PriceBandEstimation,
+            fn (): SellPriceBandData => $this->estimator->estimate(
+                $assessment,
+                $selection,
+            ),
+        );
+        $priceBand = $metric->measure(
+            SellPriceIntelligenceMetricStage::PriceBandPersistence,
+            fn (): SellPriceBand => $this->recordPriceBand(
                 $ownedProduct,
                 $assessment->getKey(),
                 $selection,
                 $bandData,
             ),
+        );
+        $metric->observeScope(
+            candidateCount: $selectionData->candidateCount,
+            includedCount: count($selectionData->included),
+            excludedCount: count($selectionData->excluded),
+            bandInputCount: $bandData->inputCount,
+            outlierCount: $bandData->outlierCount,
+            selectionReplayed: ! $selection->wasRecentlyCreated,
+            priceBandReplayed: ! $priceBand->wasRecentlyCreated,
+        );
+
+        return [
+            'selection' => $selection,
+            'price_band' => $priceBand,
         ];
     }
 

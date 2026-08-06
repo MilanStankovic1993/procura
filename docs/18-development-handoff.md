@@ -435,10 +435,10 @@ The request-scoped `OrganizationContext` is authoritative for tenant-aware appli
 Local verification completed for this task:
 
 ```text
-php artisan migrate:status          passed through batch 47 on MySQL 8.4.3; 50 migrations retained
+php artisan migrate:status          passed through batch 48 on MySQL 8.4.3; 51 migrations retained
 $env:XDEBUG_MODE='off'; php -d memory_limit=512M vendor/bin/pest --compact
-                                    378 passed (5041 assertions) in 129.51 seconds
-production preflight targeted       15 passed (383 assertions), including cached-config inspection,
+                                    387 passed (5108 assertions) in 117.09 seconds
+production preflight targeted       16 passed (388 assertions), including cached-config inspection,
                                     secret-safe JSON, strict warning enforcement, sanitized
                                     production-template/UTC validation, and trusted proxy rejection
 deployment/safety targeted          10 passed (32 assertions), including bounded test-database
@@ -454,9 +454,10 @@ commission calculator targeted      2 passed (5 assertions), including half-up b
 capacity/Admin/Analysis/readiness   53 passed (439 assertions), including a 2,000-row capacity
 targeted                            fixture, cache recovery, tenant query bounds, queue dispatch,
                                     exact JSON, catalog parity, and safe rendered projections
-performance contracts targeted      27 passed (145 assertions), including 2,000-row `12/1/2` query
+performance contracts targeted      30 passed (166 assertions), including 2,000-row `12/1/2` query
                                     budgets, queue receipt integrity, actor-bound Analysis workload
-                                    permits, and stage-ledger/percentile/retention/redaction gates
+                                    permits, and Analysis/Sell stage-ledger, multi-scope, percentile,
+                                    retention, fail-open, version and redaction gates
 API/Admin localization targeted     33 passed (1454 assertions), including regional browser tags,
                                     authenticated preference, fallback, request-state reset, every
                                     current validator rule/field, 23 typed conflict codes, 179 typed
@@ -806,9 +807,9 @@ The following remain intentionally unimplemented:
 - production shared-cache selection, singleton scheduler activation, worker-pool heartbeat
   activation, external readiness monitoring, and controlled staging failure/recovery evidence,
 - production-shaped execution of the implemented bounded Redis queue-throughput/percentile,
-  staging-only Analysis API/pipeline workload, and six-stage internal attribution harnesses, plus
-  Sell, browser, saturation, and soak evidence beyond the deterministic dashboard/operations/
-  tenant-list query baseline,
+  staging-only Analysis API/pipeline workload, six-stage internal attribution, and Sell multi-scope
+  attribution harnesses, plus the real staging Sell, browser, saturation, and soak evidence beyond
+  the deterministic dashboard/operations/tenant-list query baseline,
 - a real external AI provider and production provider credentials/budgets,
 - verified production catalog import/administration and operator match review,
 - approved external exchange-rate ingestion, provider monitoring, and retention operations beyond
@@ -1088,7 +1089,7 @@ Analysis result or retry path. A local fake-provider report is available only as
 
 ```powershell
 php artisan operations:analysis-pipeline-stage-metrics --window=60 --limit=1000 `
-  --minimum-samples=1 --expected-samples=1 --allow-local-rehearsal --json
+  --minimum-samples=20 --allow-local-rehearsal --json
 ```
 
 Only the same command run in staging without the rehearsal flag can emit release evidence. It
@@ -1097,6 +1098,25 @@ or above the configured minimum, the exact expected attempt count, and the versi
 budgets. Production aggregation is
 permanently refused. `operations:purge-analysis-pipeline-metrics` removes only expired metric rows
 in a bounded batch; the singleton scheduler runs it daily and the default retention is 30 days.
+
+Sell comparable and normalization mutations now also time their shared deterministic refresh path.
+One best-effort row is scheduled only after the business transaction commits; a recorder/storage
+failure is reported internally and cannot roll back or alter the Sell result. Rows contain only the
+closed operation type, metric/selector/algorithm versions, aggregate scope/work counters, five
+fixed stage durations and total duration. They contain no tenant, user, product, assessment,
+comparable, country, currency, URL, evidence hash or payload. A local contract rehearsal is:
+
+```powershell
+php artisan operations:sell-price-intelligence-stage-metrics --window=60 --limit=1000 `
+  --minimum-samples=20 --allow-local-rehearsal --json
+```
+
+Only staging can emit release evidence. It requires an exact reviewed comparable-operation count,
+an exact total scope count, at least two scopes in every operation, no truncation, one metrics/
+selector/algorithm version, fresh selection and price-band writes, minimum samples and passing
+`sell-price-intelligence-stage-budget:v1` p95 limits. Production aggregation is permanently refused.
+`operations:purge-sell-price-intelligence-metrics` removes only expired rows in a bounded batch;
+the singleton scheduler runs it daily at 02:50 and retention defaults to 30 days (maximum 90).
 
 Do not copy another computer's `.env` or `APP_KEY` through Git. Open the cloned Procura directory itself as the Codex workspace.
 
@@ -1364,8 +1384,12 @@ The current performance/capacity application boundary is now complete:
 11. Metric writes fail open, aggregation is staging-only, retention purge is daily/bounded, and
     production preflight requires valid retention/versioned budgets plus enabled metrics whenever
     Analysis submission is enabled.
-12. Production-shaped staging execution with approved non-fake providers plus Sell/browser,
-    saturation, and soak scenarios remain mandatory in `docs/19-production-go-live.md`.
+12. Each successfully committed Sell refresh records one anonymous aggregate stage metric. The
+    staging-only report requires exact reviewed comparable operations/scopes, real multi-scope and
+    fresh projection work, one version set and passing p95 budgets; writes fail open, production
+    aggregation is forbidden, retention is daily/bounded, and production preflight requires it.
+13. Production-shaped staging execution with approved non-fake providers plus real Sell evidence,
+    browser, saturation, and soak scenarios remain mandatory in `docs/19-production-go-live.md`.
 
 Do not expand payment processing beyond the reviewed Stripe hosted-subscription boundary, or add
 escrow, marketplace mutations, scraping, external AI credentials, browser extensions, or
@@ -1632,6 +1656,12 @@ personal organizations and memberships (complete)
   indexes, and no tenant/user/listing/request/result/error payload columns. The table started empty,
   the daily bounded purge is active independently of Analysis submission, and the local migration
   ledger contains 50 rows.
+- The Sell price-intelligence metric migration completed directly as MySQL batch 48. Schema
+  inspection confirmed one anonymous 20-column InnoDB row per committed recalculation, closed
+  operation/version fields, aggregate scope/work/replay counters, five fixed microsecond stages,
+  total duration, and bounded retention/report indexes. It has no foreign key, tenant/user/product/
+  market identifier, evidence hash or payload column. The table started empty, the daily bounded
+  purge runs independently at 02:50, and the local migration ledger contains 51 rows.
 
 ## 10. Required completion behavior
 

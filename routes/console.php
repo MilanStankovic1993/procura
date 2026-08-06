@@ -42,3 +42,8 @@ Schedule::command('operations:purge-analysis-pipeline-metrics --limit=1000')
     ->dailyAt('02:45')
     ->withoutOverlapping()
     ->onOneServer();
+
+Schedule::command('operations:purge-sell-price-intelligence-metrics --limit=1000')
+    ->dailyAt('02:50')
+    ->withoutOverlapping()
+    ->onOneServer();

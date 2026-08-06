@@ -71,6 +71,8 @@ test('the production build verifies every deploy contract', function () {
         ->toContain('fastcgi_param HTTP_PROXY "";')
         ->toContain('ssl_protocols TLSv1.2 TLSv1.3;')
         ->and($environment)
+        ->toContain('PERFORMANCE_SELL_METRICS_ENABLED=true')
+        ->toContain('PERFORMANCE_SELL_METRICS_RETENTION_DAYS=30')
         ->toContain('BROKER_MONITOR_REQUEST_AGE_HOURS=48')
         ->toContain('BROKER_MONITOR_OFFER_EXPIRY_GRACE_HOURS=1')
         ->toContain('BROKER_MONITOR_TRANSACTION_AGE_HOURS=24')

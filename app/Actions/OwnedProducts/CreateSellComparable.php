@@ -6,11 +6,14 @@ use App\Enums\Catalog\ProductMatchStatus;
 use App\Enums\Listings\MarketplaceConnectorType;
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\OwnedProducts\OwnedProductAssessmentStatus;
+use App\Enums\Sell\SellPriceIntelligenceMetricOperation;
+use App\Enums\Sell\SellPriceIntelligenceMetricStage;
 use App\Enums\Validation\ApplicationValidationCode;
 use App\Models\Country;
 use App\Models\MarketplaceSource;
 use App\Models\Organization;
 use App\Models\OwnedProduct;
+use App\Models\OwnedProductAssessment;
 use App\Models\ProductVariant;
 use App\Models\SellComparableMarketNormalization;
 use App\Models\SellComparableRecord;
@@ -18,8 +21,11 @@ use App\Models\SellComparableSelection;
 use App\Models\SellPriceBand;
 use App\Models\User;
 use App\OwnedProductAssessment\CurrentOwnedProductAssessmentResolver;
+use App\SellPriceIntelligence\Metrics\SellPriceIntelligenceMetrics;
+use App\SellPriceIntelligence\Metrics\SellPriceIntelligenceMetricTimer;
 use App\Support\Validation\ApplicationValidation;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 final class CreateSellComparable
@@ -28,6 +34,7 @@ final class CreateSellComparable
         private readonly OwnedProductAuthorizer $authorizer,
         private readonly CurrentOwnedProductAssessmentResolver $currentAssessment,
         private readonly RefreshSellPriceIntelligence $priceIntelligence,
+        private readonly SellPriceIntelligenceMetrics $priceIntelligenceMetrics,
     ) {}
 
     /**
@@ -199,63 +206,17 @@ final class CreateSellComparable
                 ],
             );
             $created = $record->wasRecentlyCreated;
-            $recordScopes = SellComparableRecord::query()
-                ->where(
-                    'owned_product_assessment_id',
-                    $assessment->getKey(),
-                )
-                ->select(['country_code', 'currency_code'])
-                ->distinct()
-                ->orderBy('country_code')
-                ->orderBy('currency_code')
-                ->get();
-            $defaultScopes = Country::query()
-                ->whereIn('code', $snapshot->target_country_codes)
-                ->where('active', true)
-                ->whereNotNull('currency_code')
-                ->orderBy('code')
-                ->get(['code as country_code', 'currency_code']);
-            $normalizationScopes = SellComparableMarketNormalization::query()
-                ->where(
-                    'owned_product_assessment_id',
-                    $assessment->getKey(),
-                )
-                ->select([
-                    'target_country_code as country_code',
-                    'target_currency_code as currency_code',
-                ])
-                ->distinct()
-                ->orderBy('target_country_code')
-                ->orderBy('target_currency_code')
-                ->get();
-            $marketScopes = $defaultScopes
-                ->concat($recordScopes)
-                ->concat($normalizationScopes)
-                ->unique(
-                    static fn ($scope): string => (
-                        $scope->country_code.'|'.$scope->currency_code
-                    ),
-                )
-                ->sortBy(
-                    static fn ($scope): string => (
-                        $scope->country_code.'|'.$scope->currency_code
-                    ),
-                )
-                ->values();
-
-            if (
-                $marketScopes
-                    ->where('country_code', $countryCode)
-                    ->count()
-                > (int) config(
-                    'sell_price_intelligence.max_currency_scopes_per_market',
-                )
-            ) {
-                ApplicationValidation::fail(
-                    'currency_code',
-                    ApplicationValidationCode::SellComparableCurrencyScopeLimit,
-                );
-            }
+            $metric = SellPriceIntelligenceMetricTimer::start(
+                SellPriceIntelligenceMetricOperation::ComparableRecalculation,
+            );
+            $marketScopes = $metric->measure(
+                SellPriceIntelligenceMetricStage::ScopeDiscovery,
+                fn (): Collection => $this->marketScopes(
+                    $assessment,
+                    $snapshot->target_country_codes,
+                    $countryCode,
+                ),
+            );
 
             $selection = null;
             $priceBand = null;
@@ -266,6 +227,7 @@ final class CreateSellComparable
                     $assessment,
                     $scope->country_code,
                     $scope->currency_code,
+                    $metric,
                 );
 
                 if (
@@ -283,6 +245,9 @@ final class CreateSellComparable
                 );
             }
 
+            $metric->finish();
+            $this->priceIntelligenceMetrics->recordAfterCommit($metric);
+
             return [
                 'record' => $record->load([
                     'marketplaceSource',
@@ -295,6 +260,70 @@ final class CreateSellComparable
                 'created' => $created,
             ];
         }, attempts: 3);
+    }
+
+    /**
+     * @param  list<string>  $targetCountryCodes
+     * @return Collection<int, object>
+     */
+    private function marketScopes(
+        OwnedProductAssessment $assessment,
+        array $targetCountryCodes,
+        string $submittedCountryCode,
+    ): Collection {
+        $recordScopes = SellComparableRecord::query()
+            ->where('owned_product_assessment_id', $assessment->getKey())
+            ->select(['country_code', 'currency_code'])
+            ->distinct()
+            ->orderBy('country_code')
+            ->orderBy('currency_code')
+            ->get();
+        $defaultScopes = Country::query()
+            ->whereIn('code', $targetCountryCodes)
+            ->where('active', true)
+            ->whereNotNull('currency_code')
+            ->orderBy('code')
+            ->get(['code as country_code', 'currency_code']);
+        $normalizationScopes = SellComparableMarketNormalization::query()
+            ->where('owned_product_assessment_id', $assessment->getKey())
+            ->select([
+                'target_country_code as country_code',
+                'target_currency_code as currency_code',
+            ])
+            ->distinct()
+            ->orderBy('target_country_code')
+            ->orderBy('target_currency_code')
+            ->get();
+        $marketScopes = $defaultScopes
+            ->concat($recordScopes)
+            ->concat($normalizationScopes)
+            ->unique(
+                static fn ($scope): string => (
+                    $scope->country_code.'|'.$scope->currency_code
+                ),
+            )
+            ->sortBy(
+                static fn ($scope): string => (
+                    $scope->country_code.'|'.$scope->currency_code
+                ),
+            )
+            ->values();
+
+        if (
+            $marketScopes
+                ->where('country_code', $submittedCountryCode)
+                ->count()
+            > (int) config(
+                'sell_price_intelligence.max_currency_scopes_per_market',
+            )
+        ) {
+            ApplicationValidation::fail(
+                'currency_code',
+                ApplicationValidationCode::SellComparableCurrencyScopeLimit,
+            );
+        }
+
+        return $marketScopes;
     }
 
     /**

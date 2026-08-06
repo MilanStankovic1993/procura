@@ -455,6 +455,16 @@ batch-bounded retention purge. It also proves that aggregate JSON contains no An
 tenant, user, listing, credential, request, result, error, or external-provider identifiers. CI
 proves the contract with deterministic durations; it is not latency evidence.
 
+`tests/Feature/Performance/SellPriceIntelligenceStageMetricsTest.php` protects the separate Sell
+multi-scope attribution boundary: one immutable, payload-free metric per successfully committed
+comparable or normalization recalculation; aggregate scope discovery, deterministic selection,
+selection persistence, price-band estimation, price-band persistence and total timings; exact
+reviewed operation/scope counts; at least two scopes per comparable recalculation; single metric,
+selector and algorithm versions; fresh projection writes; nearest-rank p50/p95/p99; permanent
+production aggregation refusal; fail-open storage; and a daily batch-bounded purge. Normalization
+metrics remain available to ordinary monitoring but are excluded from multi-scope release evidence.
+CI uses deterministic durations and proves the contract only; it is not staging latency evidence.
+
 Actual staging evidence must run `operations:queue-throughput` through shared Redis and the real
 Supervisor worker pools. It measures queue transport/worker scheduling completion, jobs/second,
 and p50/p95/p99 dispatch-to-process latency without creating business records. The separate
@@ -464,7 +474,8 @@ throttle, create, submit, polling and queue-worker boundaries. It measures draft
 submit-to-terminal p50/p95/p99 plus completion, throughput, terminal states and HTTP status counts.
 Only a run with approved non-fake analysis and matching providers is release evidence. Comparable/
 price/rate/risk sub-scope attribution must then pass the separate staging-only
-`operations:analysis-pipeline-stage-metrics` report over the isolated workload window. Sell multi-
-scope recalculation, browser percentiles, database/cache/worker saturation, and soak testing remain
+`operations:analysis-pipeline-stage-metrics` report over the isolated workload window. The separate
+Sell workload must then pass `operations:sell-price-intelligence-stage-metrics` over its own isolated
+multi-scope window. Browser percentiles, database/cache/worker saturation, and soak testing remain
 required before launch; none may be claimed from an in-memory SQLite, sync queue, fake-provider
 rehearsal or CI contract test.
