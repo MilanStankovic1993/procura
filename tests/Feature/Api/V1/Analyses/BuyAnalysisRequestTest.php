@@ -8,9 +8,13 @@ use App\Actions\Markets\SyncMarketReferenceData;
 use App\Analysis\Contracts\ListingAiAnalyzer;
 use App\Analysis\Data\AiAnalysisData;
 use App\Analysis\Data\AnalysisInputData;
+use App\Analysis\Metrics\AnalysisPipelineStageTimer;
+use App\Analysis\Metrics\Contracts\AnalysisPipelineMetricRecorder;
 use App\Enums\Analyses\AiAnalysisStatus;
 use App\Enums\Analyses\AiValidationStatus;
 use App\Enums\Analyses\AnalysisDispatchStatus;
+use App\Enums\Analyses\AnalysisPipelineProviderScope;
+use App\Enums\Analyses\AnalysisPipelineStage;
 use App\Enums\Analyses\AnalysisStatus;
 use App\Enums\Listings\ListingImageKind;
 use App\Enums\Organizations\OrganizationRole;
@@ -20,6 +24,7 @@ use App\Jobs\ProcessBuyAnalysis;
 use App\Models\AiAnalysis;
 use App\Models\Analysis;
 use App\Models\AnalysisDispatch;
+use App\Models\AnalysisPipelineMetric;
 use App\Models\Brand;
 use App\Models\Listing;
 use App\Models\ListingImage;
@@ -39,6 +44,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
+    config()->set('performance.analysis_pipeline_metrics.enabled', true);
     app(SyncMarketReferenceData::class)->sync();
     $this->seed(PlanSeeder::class);
     analysisRequestCatalog();
@@ -345,6 +351,7 @@ test('the deterministic provider preserves a missing-comparables boundary and du
 
     $analysis->refresh();
     $attempt = AiAnalysis::query()->firstOrFail();
+    $metric = AnalysisPipelineMetric::query()->firstOrFail();
 
     expect($analysis->status)->toBe(AnalysisStatus::NeedsInput)
         ->and($analysis->processing_attempts)->toBe(1)
@@ -363,7 +370,24 @@ test('the deterministic provider preserves a missing-comparables boundary and du
         ->and($attempt->confidence_basis_points)->toBe(9000)
         ->and(AiAnalysis::query()->count())->toBe(1)
         ->and(ProductMatch::query()->count())->toBe(1)
-        ->and(ProductMatch::query()->firstOrFail()->status->value)->toBe('matched');
+        ->and(ProductMatch::query()->firstOrFail()->status->value)->toBe('matched')
+        ->and(AnalysisPipelineMetric::query()->count())->toBe(1)
+        ->and($metric->ai_analysis_id)->toBe($attempt->getKey())
+        ->and($metric->provider_scope)->toBe(AnalysisPipelineProviderScope::Rehearsal)
+        ->and($metric->attempt_status)->toBe(AiAnalysisStatus::Completed)
+        ->and($metric->failed_stage)->toBeNull()
+        ->and($metric->provider_analysis_microseconds)->toBeGreaterThan(0)
+        ->and($metric->product_matching_microseconds)->toBeGreaterThan(0)
+        ->and($metric->comparable_selection_microseconds)->toBeGreaterThan(0)
+        ->and($metric->price_estimation_microseconds)->toBeNull()
+        ->and($metric->risk_assessment_microseconds)->toBeNull()
+        ->and($metric->finalization_microseconds)->toBeGreaterThan(0)
+        ->and($metric->total_microseconds)->toBeGreaterThanOrEqual(
+            $metric->provider_analysis_microseconds
+            + $metric->product_matching_microseconds
+            + $metric->comparable_selection_microseconds
+            + $metric->finalization_microseconds,
+        );
 });
 
 test('missing price currency and evidence produce a structured needs input state', function () {
@@ -432,7 +456,105 @@ test('provider failures record bounded retry metadata and one observable attempt
         ->and($analysis->last_error_code)->toBe('RuntimeException')
         ->and($dispatch->fresh()->status)->toBe(AnalysisDispatchStatus::Failed)
         ->and(AiAnalysis::query()->count())->toBe(3)
-        ->and(AiAnalysis::query()->where('status', AiAnalysisStatus::Failed)->count())->toBe(3);
+        ->and(AiAnalysis::query()->where('status', AiAnalysisStatus::Failed)->count())->toBe(3)
+        ->and(AnalysisPipelineMetric::query()->count())->toBe(3)
+        ->and(AnalysisPipelineMetric::query()
+            ->where('failed_stage', AnalysisPipelineStage::ProviderAnalysis)
+            ->count())->toBe(3)
+        ->and(AnalysisPipelineMetric::query()
+            ->whereNotNull('finalization_microseconds')
+            ->count())->toBe(3);
+});
+
+test('a metric recorder outage cannot corrupt a completed analysis', function () {
+    Queue::fake();
+    [$owner, $organization] = analysisRequestWorkspace();
+    $listing = analysisRequestListing($owner, $organization, withEvidence: true);
+    $analysis = app(CreateBuyAnalysisDraft::class)->create(
+        $organization,
+        $owner,
+        $listing->getKey(),
+        'DE',
+    );
+    $analysis = app(SubmitAnalysis::class)->submit(
+        $organization,
+        $owner,
+        $analysis->getKey(),
+    );
+    app()->instance(
+        AnalysisPipelineMetricRecorder::class,
+        new class implements AnalysisPipelineMetricRecorder
+        {
+            public function record(
+                string $aiAnalysisId,
+                int $attemptNumber,
+                string $pipelineVersion,
+                AnalysisPipelineProviderScope $providerScope,
+                AnalysisPipelineStageTimer $timer,
+            ): void {
+                throw new RuntimeException('Simulated metric storage outage.');
+            }
+        },
+    );
+
+    app(RunBuyAnalysis::class)->run(
+        $analysis->getKey(),
+        $analysis->currentDispatch()->valueOrFail('id'),
+    );
+
+    expect($analysis->fresh()->status)->toBe(AnalysisStatus::NeedsInput)
+        ->and(AiAnalysis::query()->firstOrFail()->status)
+        ->toBe(AiAnalysisStatus::Completed)
+        ->and(AnalysisPipelineMetric::query()->count())->toBe(0);
+});
+
+test('a metric recorder outage preserves the original provider failure', function () {
+    Queue::fake();
+    [$owner, $organization] = analysisRequestWorkspace();
+    $listing = analysisRequestListing($owner, $organization, withEvidence: true);
+    $analysis = app(CreateBuyAnalysisDraft::class)->create(
+        $organization,
+        $owner,
+        $listing->getKey(),
+        'DE',
+    );
+    $analysis = app(SubmitAnalysis::class)->submit(
+        $organization,
+        $owner,
+        $analysis->getKey(),
+    );
+    app()->instance(ListingAiAnalyzer::class, new class implements ListingAiAnalyzer
+    {
+        public function analyze(AnalysisInputData $input): AiAnalysisData
+        {
+            throw new RuntimeException('Original provider failure.');
+        }
+    });
+    app()->instance(
+        AnalysisPipelineMetricRecorder::class,
+        new class implements AnalysisPipelineMetricRecorder
+        {
+            public function record(
+                string $aiAnalysisId,
+                int $attemptNumber,
+                string $pipelineVersion,
+                AnalysisPipelineProviderScope $providerScope,
+                AnalysisPipelineStageTimer $timer,
+            ): void {
+                throw new RuntimeException('Simulated metric storage outage.');
+            }
+        },
+    );
+
+    expect(fn () => app(RunBuyAnalysis::class)->run(
+        $analysis->getKey(),
+        $analysis->currentDispatch()->valueOrFail('id'),
+    ))->toThrow(RuntimeException::class, 'Original provider failure.');
+
+    expect($analysis->fresh()->status)->toBe(AnalysisStatus::Failed)
+        ->and(AiAnalysis::query()->firstOrFail()->status)
+        ->toBe(AiAnalysisStatus::Failed)
+        ->and(AnalysisPipelineMetric::query()->count())->toBe(0);
 });
 
 test('an exhausted queue job records an unexpected terminal failure without corrupting completed work', function () {

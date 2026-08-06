@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Analysis\Contracts\ListingAiAnalyzer;
+use App\Analysis\Metrics\Contracts\AnalysisPipelineMetricRecorder;
+use App\Analysis\Metrics\DatabaseAnalysisPipelineMetricRecorder;
 use App\Analysis\Providers\FakeListingAiAnalyzer;
 use App\Billing\Contracts\BillingProvider;
 use App\Billing\Providers\StripeBillingProvider;
@@ -84,6 +86,11 @@ class AppServiceProvider extends ServiceProvider
                 default => throw new \LogicException('The configured analysis provider is not supported.'),
             };
         });
+
+        $this->app->bind(
+            AnalysisPipelineMetricRecorder::class,
+            DatabaseAnalysisPipelineMetricRecorder::class,
+        );
 
         $this->app->bind(ProductMatcher::class, function (): ProductMatcher {
             return match (config('product_matching.provider')) {
