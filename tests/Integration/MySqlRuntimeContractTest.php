@@ -31,12 +31,14 @@ test('the production database family satisfies the schema and session contract',
         ->where('constraint_schema', $database)
         ->count();
     $sellMetricColumns = DB::table('information_schema.columns')
+        ->selectRaw('COLUMN_NAME AS column_name')
         ->where('table_schema', $database)
         ->where('table_name', 'sell_price_intelligence_metrics')
         ->orderBy('ordinal_position')
         ->pluck('column_name')
         ->all();
     $sellMetricIndexes = DB::table('information_schema.statistics')
+        ->selectRaw('INDEX_NAME AS index_name')
         ->where('table_schema', $database)
         ->where('table_name', 'sell_price_intelligence_metrics')
         ->pluck('index_name')
