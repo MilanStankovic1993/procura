@@ -1,4 +1,8 @@
-<div class="dashboard">
+<div
+  class="dashboard"
+  data-performance-page="overview"
+  [attr.data-performance-state]="health() || healthError() ? 'ready' : 'loading'"
+>
   <header>
     <div>
       <p class="eyebrow">{{ 'dashboard.eyebrow' | t }}</p>

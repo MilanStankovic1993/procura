@@ -2,6 +2,7 @@
 
 return [
     'analysis_workload_permit_rejected' => 'Le permis de charge contrôlée des analyses est invalide ou indisponible.',
+    'browser_workload_permit_rejected' => 'Le permis de charge contrôlée du navigateur est invalide ou indisponible.',
     'billing_checkout_expired' => 'Cette demande de paiement a expiré. Recommencez avec une nouvelle clé d’idempotence.',
     'billing_manual_assignment' => 'Un forfait a été attribué à cet espace de travail par un administrateur.',
     'billing_not_configured' => 'Le paiement n’est pas configuré pour ce forfait et cet intervalle.',

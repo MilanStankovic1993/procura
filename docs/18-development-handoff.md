@@ -437,8 +437,8 @@ Local verification completed for this task:
 ```text
 php artisan migrate:status          passed through batch 48 on MySQL 8.4.3; 51 migrations retained
 $env:XDEBUG_MODE='off'; php -d memory_limit=512M vendor/bin/pest --compact
-                                    387 passed (5108 assertions) in 117.09 seconds
-production preflight targeted       16 passed (388 assertions), including cached-config inspection,
+                                    392 passed (5149 assertions) in 220.84 seconds
+production preflight targeted       17 passed (398 assertions), including cached-config inspection,
                                     secret-safe JSON, strict warning enforcement, sanitized
                                     production-template/UTC validation, and trusted proxy rejection
 deployment/safety targeted          10 passed (32 assertions), including bounded test-database
@@ -454,10 +454,11 @@ commission calculator targeted      2 passed (5 assertions), including half-up b
 capacity/Admin/Analysis/readiness   53 passed (439 assertions), including a 2,000-row capacity
 targeted                            fixture, cache recovery, tenant query bounds, queue dispatch,
                                     exact JSON, catalog parity, and safe rendered projections
-performance contracts targeted      30 passed (166 assertions), including 2,000-row `12/1/2` query
+performance contracts targeted      34 passed (195 assertions), including 2,000-row `12/1/2` query
                                     budgets, queue receipt integrity, actor-bound Analysis workload
-                                    permits, and Analysis/Sell stage-ledger, multi-scope, percentile,
-                                    retention, fail-open, version and redaction gates
+                                    permits, sealed browser scenario permits, and Analysis/Sell
+                                    stage-ledger, multi-scope, percentile, retention, fail-open,
+                                    version and redaction gates
 API/Admin localization targeted     33 passed (1454 assertions), including regional browser tags,
                                     authenticated preference, fallback, request-state reset, every
                                     current validator rule/field, 23 typed conflict codes, 179 typed
@@ -1080,6 +1081,20 @@ authenticated requests/minute under the application limit of 60, and outputs agg
 only. A permit created with `--allow-fake-provider-rehearsal` produces an
 `evidence_eligible=false` report that fails the release gate by design.
 
+The critical-browser workload harness is now implemented under the same production-safety model.
+In staging, enable `PERFORMANCE_BROWSER_WORKLOAD_ENABLED=true` with a shared Redis cache store and
+run `operations:issue-browser-workload-permit` for dedicated verified actors. The permit is sealed
+to the exact HTTPS staging origin, the three approved routes (`overview`, `buy_index`,
+`sell_index`), exact per-route sample count, `browser-desktop-profile:v1`, and
+`browser-workload-budget:v1`; every cold sample consumes one actor-bound scenario allowance.
+`tools/performance/browser-workload.mjs` uses the normal Angular login and Sanctum/CSRF session,
+fresh Chromium cache per sample, fixed CPU/network/viewport emulation and language-independent page
+ready markers. Its JSON contains only aggregate TTFB/route-ready/LCP/CLS p50/p95/p99, generic
+failure/HTTP counts and version metadata. Production issuance/use is permanently refused and
+production preflight requires the switch off. Install the locked Chromium only on a dedicated
+CI/staging runner as documented in section 3.6 of `docs/19-production-go-live.md`; an undersampled
+rehearsal cannot become release evidence.
+
 Every terminal AI attempt now also writes one best-effort, append-only pipeline metric with fixed
 microsecond columns for provider analysis, product matching, comparable selection, price
 estimation (including rate resolution), risk assessment, finalization, and total duration. It
@@ -1388,8 +1403,9 @@ The current performance/capacity application boundary is now complete:
     staging-only report requires exact reviewed comparable operations/scopes, real multi-scope and
     fresh projection work, one version set and passing p95 budgets; writes fail open, production
     aggregation is forbidden, retention is daily/bounded, and production preflight requires it.
-13. Production-shaped staging execution with approved non-fake providers plus real Sell evidence,
-    browser, saturation, and soak scenarios remain mandatory in `docs/19-production-go-live.md`.
+13. Production-shaped staging execution with approved non-fake providers plus real Sell and sealed
+    browser evidence, saturation, and soak scenarios remain mandatory in
+    `docs/19-production-go-live.md`.
 
 Do not expand payment processing beyond the reviewed Stripe hosted-subscription boundary, or add
 escrow, marketplace mutations, scraping, external AI credentials, browser extensions, or

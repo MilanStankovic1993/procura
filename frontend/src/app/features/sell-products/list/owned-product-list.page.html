@@ -1,4 +1,8 @@
-<div class="page">
+<div
+  class="page"
+  data-performance-page="sell_index"
+  [attr.data-performance-state]="loading() ? 'loading' : error() ? 'error' : 'ready'"
+>
   <header>
     <div>
       <p class="eyebrow">{{ 'ownedProduct.list.eyebrow' | t }}</p>

@@ -2,6 +2,7 @@
 
 return [
     'analysis_workload_permit_rejected' => 'The controlled analysis workload permit is invalid or unavailable.',
+    'browser_workload_permit_rejected' => 'The controlled browser workload permit is invalid or unavailable.',
     'billing_checkout_expired' => 'This Checkout request has expired. Start again with a new idempotency key.',
     'billing_manual_assignment' => 'This workspace has an administrator-managed plan assignment.',
     'billing_not_configured' => 'Billing Checkout is not configured for this plan and interval.',

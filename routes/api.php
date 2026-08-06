@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\Analyses\SubmitAnalysisController;
 use App\Http\Controllers\Api\V1\ArchiveSavedSearchController;
 use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\AuthenticatedUserController;
+use App\Http\Controllers\Api\V1\AuthorizeBrowserWorkloadController;
 use App\Http\Controllers\Api\V1\BeginTelegramConnectionController;
 use App\Http\Controllers\Api\V1\BrokerRequests\AcceptBrokerRequestOfferController;
 use App\Http\Controllers\Api\V1\BrokerRequests\BrokerRequestIndexController;
@@ -210,6 +211,13 @@ Route::prefix('v1')->group(function (): void {
 
     Route::middleware(['auth:sanctum', 'verified', 'throttle:api', 'organization.context'])
         ->group(function (): void {
+            Route::post(
+                '/operations/browser-workload/authorize',
+                AuthorizeBrowserWorkloadController::class,
+            )
+                ->middleware('browser-workload-permit')
+                ->name('api.v1.operations.browser-workload.authorize');
+
             Route::get('/organizations', OrganizationIndexController::class)
                 ->name('api.v1.organizations.index');
 
