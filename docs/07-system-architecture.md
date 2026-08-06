@@ -793,6 +793,16 @@ because CI hardware timing is not a trustworthy production SLO. The command perf
 write, external call, provider request, queue dispatch, or unbounded row load. Production execution
 is refused unless an operator supplies the explicit read-only acknowledgement.
 
+`operations:queue-throughput` is the separate bounded staging workload for queue transport and
+worker-pool concurrency. It dispatches unique synthetic no-op jobs to one configured queue, records
+only run identity, sequence, dispatch/process timestamps, and latency in the shared cache, polls the
+receipts in bounded batches, calculates completion, jobs/second, and nearest-rank p50/p95/p99, then
+removes the run evidence. A run marker prevents late jobs from recreating accepted evidence; any
+residual race expires through the fixed TTL. Staging requires Redis for both queue and cache, every
+timing budget may only be tightened from the repository baseline, and production execution has no
+override. This isolates infrastructure throughput measurement from customer data and from the real
+Analysis pipeline; it does not claim endpoint or provider-processing capacity.
+
 ## 9. Deployment
 
 Initial deployment can use:

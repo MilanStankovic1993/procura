@@ -54,8 +54,9 @@ Deliverables:
   schema/session/index/query compatibility contract outside SQLite (complete; remote workflow
   evidence remains part of each release record),
 - deterministic scale fixture, versioned dashboard/operations/tenant-list query budgets,
-  stampede-protected dashboard snapshot, and guarded staging capacity CLI (complete first
-  baseline; concurrent load/soak scenarios remain launch work),
+  stampede-protected dashboard snapshot, guarded read-capacity CLI, and bounded Redis
+  queue-throughput/percentile workload (application harness complete; production-shaped staging
+  execution, full Analysis/API concurrency, saturation, and soak evidence remain launch work),
 - test foundation.
 
 ## Phase 2 — Buy Analysis MVP

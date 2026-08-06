@@ -436,8 +436,8 @@ Local verification completed for this task:
 
 ```text
 php artisan migrate:status          passed through batch 46 on MySQL 8.4.3; 49 migrations retained
-php -d memory_limit=512M vendor/bin/pest --compact
-                                    350 passed (4830 assertions) in 158.59 seconds
+$env:XDEBUG_MODE='off'; php -d memory_limit=512M vendor/bin/pest --compact
+                                    362 passed (4928 assertions) in 180.25 seconds
 production preflight targeted       12 passed (348 assertions), including cached-config inspection,
                                     secret-safe JSON, strict warning enforcement, sanitized
                                     production-template/UTC validation, and trusted proxy rejection
@@ -454,6 +454,9 @@ commission calculator targeted      2 passed (5 assertions), including half-up b
 capacity/Admin/Analysis/readiness   53 passed (439 assertions), including a 2,000-row capacity
 targeted                            fixture, cache recovery, tenant query bounds, queue dispatch,
                                     exact JSON, catalog parity, and safe rendered projections
+performance contracts targeted      15 passed (76 assertions), including 2,000-row `12/1/2` query
+                                    budgets plus queue receipt integrity, cleanup, JSON, staging/
+                                    production gates, stricter percentile budgets, and timeout
 API/Admin localization targeted     33 passed (1454 assertions), including regional browser tags,
                                     authenticated preference, fallback, request-state reset, every
                                     current validator rule/field, 22 typed conflict codes, 179 typed
@@ -778,8 +781,9 @@ could swallow unknown API routes, backend prefixes, or mutating requests. Produc
 continues to serve the same client paths from its internal no-store Angular shell.
 
 GitHub Actions targets PHP 8.3, 8.4, and 8.5 and runs Pest directly with a 512 MB process-only
-memory ceiling. The PHP 8.4 job explicitly runs the deterministic 2,000-row capacity/query-budget
-suite, installs the Angular lockfile, audits production Angular dependencies, lints and tests
+memory ceiling. The PHP 8.4 job explicitly runs the complete deterministic performance-contract
+directory (the 2,000-row capacity/query budget and queue-throughput safety suite), installs the
+Angular lockfile, audits production Angular dependencies, lints and tests
 Angular, builds `public/spa`, and runs the complete production deployment contract. A separate
 bounded job provisions MySQL 8.4 and Redis 7.4, applies every migration, verifies cached Redis/MySQL
 readiness, and runs a dedicated strict-MySQL contract for UTC/session SQL mode, `utf8mb4`, InnoDB,
@@ -800,8 +804,9 @@ The following remain intentionally unimplemented:
 - actual production host provisioning, TLS certificates, and release activation,
 - production shared-cache selection, singleton scheduler activation, worker-pool heartbeat
   activation, external readiness monitoring, and controlled staging failure/recovery evidence,
-- production-shaped concurrent load, queue-throughput, saturation, percentile, and soak evidence
-  beyond the implemented deterministic dashboard/operations/tenant-list query baseline,
+- production-shaped execution of the implemented bounded Redis queue-throughput/percentile
+  harness, plus concurrent Analysis/API load, real pipeline capacity, saturation, and soak evidence
+  beyond the deterministic dashboard/operations/tenant-list query baseline,
 - a real external AI provider and production provider credentials/budgets,
 - verified production catalog import/administration and operator match review,
 - approved external exchange-rate ingestion, provider monitoring, and retention operations beyond
@@ -1047,6 +1052,21 @@ The tenant Analysis probe is included only when a reviewed local/staging organiz
 passed through `--organization`. Production execution is refused without
 `--allow-production-read-only`; follow the stricter go-live procedure rather than bypassing it.
 
+The queue-throughput contract can be rehearsed locally with the matching local queue worker
+running, but the output is deliberately not launch evidence because local workers do not reproduce
+the staging Redis/Supervisor topology:
+
+```powershell
+php artisan operations:queue-throughput --queue=analyses --jobs=100 `
+  --timeout=60 --acknowledge-load --allow-non-staging --json
+```
+
+For release evidence, omit `--allow-non-staging`, run once per configured worker queue in staging,
+and follow `docs/19-production-go-live.md`. The command sends only bounded no-op jobs and emits
+completion, jobs/second, and p50/p95/p99 latency. It stores no business rows, automatically removes
+accepted shared-cache receipts, allows only stricter budget overrides, and has no production
+bypass. It proves queue transport and worker scheduling, not Analysis/provider processing.
+
 Do not copy another computer's `.env` or `APP_KEY` through Git. Open the cloned Procura directory itself as the Codex workspace.
 
 ## 7. Current implementation boundary
@@ -1276,7 +1296,7 @@ The production-configuration preflight boundary is now complete:
 5. Laravel host validation is active outside local/testing, proxy trust comes only from explicit
    `TRUSTED_PROXIES`, and catch-all proxy ranges fail preflight.
 
-The first performance/capacity regression boundary is now complete:
+The current performance/capacity application boundary is now complete:
 
 1. `PlatformOverviewMetrics` owns twelve global non-readiness counts. A cold snapshot is exactly
    twelve queries; a warm validated shared-cache snapshot performs zero database queries.
@@ -1291,8 +1311,15 @@ The first performance/capacity regression boundary is now complete:
 5. The CI fixture inserts 2,000 synthetic Analysis rows and proves constant query counts, cache
    reuse, strict JSON, invalid-input rejection, production acknowledgement, and fail-closed budget
    regression.
-6. This is not launch load evidence. Production-shaped staging concurrency, throughput,
-   percentile, saturation, and soak scenarios remain mandatory in
+6. `operations:queue-throughput` sends a bounded set of unique no-op jobs through one configured
+   queue and measures completion, jobs/second, and nearest-rank p50/p95/p99 from expiring shared
+   cache receipts. Staging requires real Redis queue/cache drivers; production is permanently
+   forbidden and optional thresholds may only tighten the versioned baseline.
+7. CI proves receipt validation, duplicate/late rejection, cleanup, strict JSON, environment/load
+   gates, Redis staging enforcement, timeout failure, and budget tightening with sync/fake drivers.
+   CI output is not throughput evidence.
+8. Production-shaped staging execution plus full Analysis/API concurrency, real pipeline
+   percentiles, saturation, and soak scenarios remain mandatory in
    `docs/19-production-go-live.md`.
 
 Do not expand payment processing beyond the reviewed Stripe hosted-subscription boundary, or add
@@ -1315,8 +1342,9 @@ personal organizations and memberships (complete)
    (complete; production heartbeat switch off)
 -> effective production-config preflight, trusted host/proxy boundary, and analysis submission kill
    switch (complete; external provider and production values pending)
--> deterministic capacity fixture, dashboard snapshot, `12/1/2` query budgets, and guarded staging
-   CLI (complete first baseline; concurrent load/soak evidence pending)
+-> deterministic capacity fixture, dashboard snapshot, `12/1/2` query budgets, guarded read CLI,
+   and bounded Redis queue throughput/p50/p95/p99 harness (application complete; staging execution,
+   full Analysis/API load, saturation, and soak evidence pending)
 -> central five-language API/Fortify validation and request-locale isolation (complete)
 -> typed five-language API domain-conflict presentation and raw-message exclusion (complete)
 -> Phase 2 manual listing intake foundation (complete)
@@ -1451,9 +1479,10 @@ personal organizations and memberships (complete)
 - A slow parallel validation run crossed a one-second boundary between initial and duplicate
   comparable fixture timestamps, correctly producing a new evidence record and exposing a flaky
   test. The test now derives both payloads from one fixed base timestamp. That checkpoint passed
-  163 tests and 1139 assertions; the current suite passes 350 tests and 4830 assertions after the
+  163 tests and 1139 assertions; the current suite passes 362 tests and 4928 assertions after the
   later Sell, outcome, monitoring, billing, connector, normalization, privacy, Analysis
-  Operations, operational-readiness, deterministic capacity, server/API localization, typed
+  Operations, operational-readiness, deterministic capacity/queue throughput, server/API
+  localization, typed
   platform-validation, privacy fulfillment/erasure, broker workflow/report/payment-case, and
   production-preflight boundaries.
 - The local Wamp PHP CLI loads Xdebug in `develop` mode and defaults to a 128 MB memory limit.

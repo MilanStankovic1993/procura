@@ -81,9 +81,9 @@ jobs:
         if: matrix.php == '8.4'
         run: npm run build:frontend
 
-      - name: Execute deterministic capacity query budgets
+      - name: Execute deterministic capacity contracts
         if: matrix.php == '8.4'
-        run: php -d memory_limit=512M vendor/bin/pest tests/Feature/Performance/CapacityBaselineTest.php
+        run: php -d memory_limit=512M vendor/bin/pest tests/Feature/Performance
 
       - name: Execute tests
         run: php -d memory_limit=512M vendor/bin/pest
