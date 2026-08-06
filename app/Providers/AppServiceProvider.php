@@ -50,6 +50,8 @@ use App\ProfitCalculation\Calculators\DeterministicProfitCalculator;
 use App\ProfitCalculation\Contracts\ProfitCalculator;
 use App\RiskAssessment\Contracts\RiskEvaluator;
 use App\RiskAssessment\Evaluators\DeterministicRiskEvaluator;
+use App\SellPriceIntelligence\Metrics\Contracts\SellPriceIntelligenceMetricRecorder;
+use App\SellPriceIntelligence\Metrics\DatabaseSellPriceIntelligenceMetricRecorder;
 use App\Tenancy\OrganizationContext;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -90,6 +92,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             AnalysisPipelineMetricRecorder::class,
             DatabaseAnalysisPipelineMetricRecorder::class,
+        );
+        $this->app->bind(
+            SellPriceIntelligenceMetricRecorder::class,
+            DatabaseSellPriceIntelligenceMetricRecorder::class,
         );
 
         $this->app->bind(ProductMatcher::class, function (): ProductMatcher {

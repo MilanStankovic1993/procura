@@ -168,6 +168,14 @@ requireCondition(
   'The production template must fail closed for analysis submission.',
 );
 requireCondition(
+  environment.get('PERFORMANCE_SELL_METRICS_ENABLED') === 'true',
+  'The production template must keep required Sell telemetry enabled.',
+);
+requireCondition(
+  environment.get('PERFORMANCE_SELL_METRICS_RETENTION_DAYS') === '30',
+  'The production template must use the reviewed Sell telemetry retention.',
+);
+requireCondition(
   environment.get('APP_DEBUG') === 'false' && environment.get('APP_ENV') === 'production',
   'The production template must disable debug rendering in production.',
 );
@@ -188,16 +196,23 @@ for (const command of [
   'notifications:expire-telegram-connections',
   'operations:dispatch-queue-heartbeats',
   'broker-reports:purge-expired',
+  'operations:purge-analysis-pipeline-metrics',
+  'operations:purge-sell-price-intelligence-metrics',
 ]) {
   requireCondition(schedule.includes(`Schedule::command('${command}`), `Scheduled recovery is missing: ${command}.`);
 }
 
 requireCondition(
-  (schedule.match(/->withoutOverlapping\(\)/g) ?? []).length >= 7,
+  /Schedule::command\('operations:purge-sell-price-intelligence-metrics --limit=1000'\)\r?\n\s*->dailyAt\('02:50'\)/.test(schedule),
+  'The bounded Sell metric purge must run daily at 02:50.',
+);
+
+requireCondition(
+  (schedule.match(/->withoutOverlapping\(\)/g) ?? []).length >= 9,
   'Every production recovery schedule must prevent overlapping execution.',
 );
 requireCondition(
-  (schedule.match(/->onOneServer\(\)/g) ?? []).length >= 2,
+  (schedule.match(/->onOneServer\(\)/g) ?? []).length >= 4,
   'Cluster-wide heartbeat and retention schedules must run on one server.',
 );
 

@@ -42,6 +42,8 @@ function configureProductionPreflightBaseline(): void
         'performance.analysis_pipeline_workload.enabled' => false,
         'performance.analysis_pipeline_metrics.enabled' => false,
         'performance.analysis_pipeline_metrics.retention_days' => 30,
+        'performance.sell_price_intelligence_metrics.enabled' => true,
+        'performance.sell_price_intelligence_metrics.retention_days' => 30,
         'queue.default' => 'redis',
         'queue.connections.redis' => [
             'driver' => 'redis',
@@ -129,6 +131,7 @@ test('a safe base configuration is deployable while external activation remains 
         ->and($payload['checks']['data.private_storage']['status'])->toBe('pass')
         ->and($payload['checks']['operations.performance_workloads']['status'])->toBe('pass')
         ->and($payload['checks']['operations.analysis_pipeline_metrics']['status'])->toBe('pass')
+        ->and($payload['checks']['operations.sell_price_intelligence_metrics']['status'])->toBe('pass')
         ->and($payload['checks']['operations.queue_heartbeats']['status'])->toBe('pass');
 });
 
@@ -154,6 +157,21 @@ test('enabled analysis submission requires valid pipeline metrics', function () 
     ]);
 
     expect(productionPreflightStatus('operations.analysis_pipeline_metrics'))
+        ->toBe('fail');
+});
+
+test('Sell price intelligence requires enabled valid production metrics', function () {
+    config()->set('performance.sell_price_intelligence_metrics.enabled', false);
+
+    expect(productionPreflightStatus('operations.sell_price_intelligence_metrics'))
+        ->toBe('fail');
+
+    config([
+        'performance.sell_price_intelligence_metrics.enabled' => true,
+        'performance.sell_price_intelligence_metrics.retention_days' => 91,
+    ]);
+
+    expect(productionPreflightStatus('operations.sell_price_intelligence_metrics'))
         ->toBe('fail');
 });
 

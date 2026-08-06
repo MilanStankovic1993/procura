@@ -15,6 +15,7 @@ use App\Operations\Data\ProductionPreflightReport;
 use App\Privacy\PrivacyWorkflowConfiguration;
 use App\ProductMatching\Contracts\ProductMatcher;
 use App\ProductMatching\Providers\FakeCatalogProductMatcher;
+use App\SellPriceIntelligence\Metrics\SellPriceIntelligenceMetricsConfiguration;
 use Carbon\CarbonImmutable;
 use Illuminate\Encryption\Encrypter;
 use Throwable;
@@ -30,6 +31,7 @@ final class ProductionPreflight
         private readonly PrivacyWorkflowConfiguration $privacy,
         private readonly BrokerOperationsConfiguration $brokerOperations,
         private readonly AnalysisPipelineMetricsConfiguration $pipelineMetrics,
+        private readonly SellPriceIntelligenceMetricsConfiguration $sellMetrics,
     ) {}
 
     public function inspect(bool $allowNonProduction = false): ProductionPreflightReport
@@ -325,6 +327,22 @@ final class ProductionPreflight
             $metricsValid,
             'Analysis pipeline metric retention and versioned budgets are valid for the current activation state.',
             'Pipeline metric configuration must be valid, and enabled Analysis submission requires PERFORMANCE_ANALYSIS_METRICS_ENABLED=true.',
+        );
+
+        $sellMetricsValid = false;
+
+        try {
+            $this->sellMetrics->assertValid();
+            $sellMetricsValid = $this->sellMetrics->enabled();
+        } catch (Throwable) {
+            $sellMetricsValid = false;
+        }
+
+        $this->result(
+            'operations.sell_price_intelligence_metrics',
+            $sellMetricsValid,
+            'Sell price-intelligence metric retention and versioned budgets are valid and enabled.',
+            'PERFORMANCE_SELL_METRICS_ENABLED must be true and the Sell metric retention/versioned budgets must be valid.',
         );
 
         $queues = config('operations.readiness.queue_heartbeats.queues', []);

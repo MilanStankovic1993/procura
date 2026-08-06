@@ -30,6 +30,27 @@ test('the production database family satisfies the schema and session contract',
     $foreignKeys = DB::table('information_schema.referential_constraints')
         ->where('constraint_schema', $database)
         ->count();
+    $sellMetricColumns = DB::table('information_schema.columns')
+        ->selectRaw('COLUMN_NAME AS column_name')
+        ->where('table_schema', $database)
+        ->where('table_name', 'sell_price_intelligence_metrics')
+        ->orderBy('ordinal_position')
+        ->pluck('column_name')
+        ->all();
+    $sellMetricIndexes = DB::table('information_schema.statistics')
+        ->selectRaw('INDEX_NAME AS index_name')
+        ->where('table_schema', $database)
+        ->where('table_name', 'sell_price_intelligence_metrics')
+        ->pluck('index_name')
+        ->unique()
+        ->values()
+        ->all();
+    $sellMetricForeignKeys = DB::table(
+        'information_schema.referential_constraints',
+    )
+        ->where('constraint_schema', $database)
+        ->where('table_name', 'sell_price_intelligence_metrics')
+        ->count();
     $brokerOperations = app(BrokerOperationsMonitor::class)->inspect();
     $migrationFiles = count(glob(database_path('migrations/*.php')) ?: []);
 
@@ -55,6 +76,37 @@ test('the production database family satisfies the schema and session contract',
         ->toBe(0)
         ->and($foreignKeys)
         ->toBeGreaterThan(0)
+        ->and($sellMetricColumns)
+        ->toBe([
+            'id',
+            'operation',
+            'metrics_version',
+            'selector_version',
+            'algorithm_version',
+            'scope_count',
+            'candidate_count',
+            'included_count',
+            'excluded_count',
+            'band_input_count',
+            'outlier_count',
+            'selection_replay_count',
+            'price_band_replay_count',
+            'scope_discovery_microseconds',
+            'comparable_selection_microseconds',
+            'selection_persistence_microseconds',
+            'price_band_estimation_microseconds',
+            'price_band_persistence_microseconds',
+            'total_microseconds',
+            'recorded_at',
+        ])
+        ->and($sellMetricIndexes)
+        ->toContain(
+            'PRIMARY',
+            'sell_price_metrics_retention_index',
+            'sell_price_metrics_report_index',
+        )
+        ->and($sellMetricForeignKeys)
+        ->toBe(0)
         ->and($brokerOperations->attentionCount())
         ->toBe(0)
         ->and(array_keys($brokerOperations->counts))

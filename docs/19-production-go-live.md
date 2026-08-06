@@ -307,6 +307,24 @@ Application controls now present:
 - `operations:purge-analysis-pipeline-metrics` deletes only rows older than the configured
   retention in a bounded batch. The singleton scheduler runs it daily at 02:45; the default and
   sanitized-template retention is 30 days and configuration cannot exceed 90 days.
+- migration `2026_08_06_100000_create_sell_price_intelligence_metrics_table.php` adds the anonymous
+  append-only Sell performance ledger. Run it through the normal release migration step and verify
+  the InnoDB table, primary key, retention index and operation/version/report index before enabling
+  traffic; it has no foreign key to business data because it stores no business identifier;
+- every successfully committed Sell comparable or normalization recalculation schedules one
+  best-effort metric after commit. It contains only a closed operation type, metric/selector/
+  algorithm versions, aggregate scope/work counts, scope-discovery/selection/selection-persistence/
+  price-band-estimation/price-band-persistence timings and total duration. It stores no tenant,
+  user, product, assessment, comparable, country, currency, URL, evidence hash or payload, and a
+  telemetry outage cannot roll back or alter the Sell mutation;
+- `operations:sell-price-intelligence-stage-metrics` aggregates only comparable recalculations in a
+  bounded staging window. Release evidence requires the exact reviewed operation and total-scope
+  counts, at least two scopes in every operation, fresh selection/price-band writes, one metric/
+  selector/algorithm version, no truncation, at least 20 operations and every
+  `sell-price-intelligence-stage-budget:v1` p95 limit. Normalization rows are ordinary monitoring,
+  not multi-scope release evidence, and production aggregation has no override;
+- `operations:purge-sell-price-intelligence-metrics` deletes one bounded expired batch. The
+  singleton scheduler runs it daily at 02:50; retention defaults to 30 days and cannot exceed 90.
 
 Required staging configuration:
 
@@ -317,6 +335,8 @@ PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED=true
 PERFORMANCE_ANALYSIS_WORKLOAD_CACHE_STORE=redis
 PERFORMANCE_ANALYSIS_METRICS_ENABLED=true
 PERFORMANCE_ANALYSIS_METRICS_RETENTION_DAYS=30
+PERFORMANCE_SELL_METRICS_ENABLED=true
+PERFORMANCE_SELL_METRICS_RETENTION_DAYS=30
 ```
 
 Production must set `PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED=false`. The sanitized production
@@ -324,6 +344,10 @@ template already carries that value, and `operations:production-preflight` fails
 While `ANALYSIS_SUBMISSION_ENABLED=false`, production may keep
 `PERFORMANCE_ANALYSIS_METRICS_ENABLED=false`. Enabling Analysis submission requires setting it true;
 preflight blocks the release if metric retention/budgets are invalid or the required switch is off.
+Sell APIs have no production activation switch, so production must always keep
+`PERFORMANCE_SELL_METRICS_ENABLED=true`; preflight fails if that switch is off or its retention,
+metric version or versioned budgets are invalid. Both metric recorders are best effort, but disabling
+required observability is not an approved steady production state.
 
 Staging procedure:
 
@@ -453,10 +477,30 @@ php artisan operations:analysis-pipeline-stage-metrics \
     the approved staging dataset lifecycle, never ad hoc SQL deletion. Disable
     `PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED`, rebuild configuration and reload web/CLI processes when
     the evidence window closes.
-15. Continue with the remaining performance plan: Sell multi-scope recalculation, browser
-    percentiles, database/cache/worker saturation beyond the bounded run, and an approved soak
-    window. Queue throughput proves transport/scheduling; the Analysis run and stage report prove
-    only their covered API/pipeline release boundary.
+15. In a separate isolated Sell window, seed production-shaped synthetic comparable evidence so
+    every reviewed comparable mutation recalculates at least two country/currency scopes and creates
+    fresh selection and price-band projections. Record the exact operation count and the exact sum
+    of scopes before running the bounded aggregator:
+
+```bash
+php artisan operations:sell-price-intelligence-stage-metrics \
+  --window=<approved-bounded-minutes> \
+  --limit=<approved-limit-at-least-operation-count> \
+  --minimum-samples=<approved-value-at-least-20> \
+  --expected-operations=<exact-reviewed-comparable-operation-count> \
+  --expected-scopes=<exact-reviewed-total-scope-count> \
+  --json > sell-price-intelligence-stage-report.json
+```
+
+    Require exit code zero, `status=passed`, `release_evidence=true`, no truncation, exact operation
+    and scope matches, passing multi-scope/fresh-projection statuses, one metrics/selector/algorithm
+    version and passing p95 for all five stages and total. Retain only the aggregate JSON with the
+    reviewed synthetic dataset cardinalities and MySQL/host evidence; independently verify that it
+    contains no business identifier or payload. A contaminated, replayed, single-scope, mixed-
+    version, undersampled or over-budget run must be discarded and rerun, never edited.
+16. Continue with the remaining performance plan: browser percentiles, database/cache/worker
+    saturation beyond the bounded runs, and an approved soak window. Queue throughput, Analysis and
+    Sell reports prove only their covered boundaries.
 
 Production diagnostic boundary:
 
@@ -467,6 +511,9 @@ Production diagnostic boundary:
 - `operations:analysis-pipeline-stage-metrics` is also always rejected in production. Production
   records ordinary low-cardinality stage rows only when Analysis is active and uses the normal
   external monitoring path; the scheduled retention purge remains active independently;
+- `operations:sell-price-intelligence-stage-metrics` is always rejected in production. Ordinary
+  production Sell metrics and the scheduled 02:50 retention purge remain active; never use the
+  staging aggregator as a production load or diagnostic command;
 - normal production monitoring uses real latency, slow-query, queue, saturation, and error-rate
   telemetry, not repeated capacity commands;
 - one production read-baseline run requires an approved maintenance/incident ticket, an off-peak
@@ -501,6 +548,10 @@ Rollback/incident boundary:
   requires Analysis submission to remain disabled until telemetry is restored. Preserve existing
   metric rows until normal retention; do not delete them ad hoc or roll back the metric migration
   while Analysis workers still run;
+- if Sell metric writes cause a confirmed incident, setting `PERFORMANCE_SELL_METRICS_ENABLED=false`
+  is a temporary incident action only. Rebuild cached configuration and reload web/CLI/worker
+  runtimes, preserve existing rows for normal retention, and do not roll back the metric migration
+  while Sell traffic continues. Production preflight must remain failed until telemetry is restored;
 - never edit performance budgets during an incident merely to change command status.
 
 ## 4. Mail delivery

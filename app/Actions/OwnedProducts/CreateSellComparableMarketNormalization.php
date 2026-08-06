@@ -7,6 +7,7 @@ use App\Enums\Comparables\MarketCompatibilityStatus;
 use App\Enums\Organizations\OrganizationPermission;
 use App\Enums\OwnedProducts\OwnedProductAssessmentStatus;
 use App\Enums\Pricing\ExchangeRateResolutionStatus;
+use App\Enums\Sell\SellPriceIntelligenceMetricOperation;
 use App\Enums\Validation\ApplicationValidationCode;
 use App\Models\Currency;
 use App\Models\Organization;
@@ -17,6 +18,8 @@ use App\Models\User;
 use App\OwnedProductAssessment\CurrentOwnedProductAssessmentResolver;
 use App\Pricing\Contracts\ExchangeRateResolver;
 use App\Pricing\MinorMoneyConverter;
+use App\SellPriceIntelligence\Metrics\SellPriceIntelligenceMetrics;
+use App\SellPriceIntelligence\Metrics\SellPriceIntelligenceMetricTimer;
 use App\Support\Validation\ApplicationValidation;
 use Brick\Math\BigInteger;
 use Brick\Math\RoundingMode;
@@ -31,6 +34,7 @@ final class CreateSellComparableMarketNormalization
         private readonly ExchangeRateResolver $exchangeRates,
         private readonly MinorMoneyConverter $money,
         private readonly RefreshSellPriceIntelligence $priceIntelligence,
+        private readonly SellPriceIntelligenceMetrics $priceIntelligenceMetrics,
     ) {}
 
     /** @param array<string, mixed> $attributes */
@@ -241,12 +245,18 @@ final class CreateSellComparableMarketNormalization
                     ],
                 );
             $created = $normalization->wasRecentlyCreated;
+            $metric = SellPriceIntelligenceMetricTimer::start(
+                SellPriceIntelligenceMetricOperation::NormalizationRecalculation,
+            );
             $refreshed = $this->priceIntelligence->refresh(
                 $ownedProduct,
                 $assessment,
                 $targetCountryCode,
                 $targetCurrencyCode,
+                $metric,
             );
+            $metric->finish();
+            $this->priceIntelligenceMetrics->recordAfterCommit($metric);
 
             return [
                 'normalization' => $normalization->load([
