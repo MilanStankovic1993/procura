@@ -40,6 +40,8 @@ function configureProductionPreflightBaseline(): void
             'default',
         ],
         'performance.analysis_pipeline_workload.enabled' => false,
+        'performance.analysis_pipeline_metrics.enabled' => false,
+        'performance.analysis_pipeline_metrics.retention_days' => 30,
         'queue.default' => 'redis',
         'queue.connections.redis' => [
             'driver' => 'redis',
@@ -126,6 +128,7 @@ test('a safe base configuration is deployable while external activation remains 
         ->and($payload['summary']['warnings'])->toBeGreaterThan(0)
         ->and($payload['checks']['data.private_storage']['status'])->toBe('pass')
         ->and($payload['checks']['operations.performance_workloads']['status'])->toBe('pass')
+        ->and($payload['checks']['operations.analysis_pipeline_metrics']['status'])->toBe('pass')
         ->and($payload['checks']['operations.queue_heartbeats']['status'])->toBe('pass');
 });
 
@@ -133,6 +136,24 @@ test('production preflight fails when analysis workload permits are enabled', fu
     config()->set('performance.analysis_pipeline_workload.enabled', true);
 
     expect(productionPreflightStatus('operations.performance_workloads'))
+        ->toBe('fail');
+});
+
+test('enabled analysis submission requires valid pipeline metrics', function () {
+    config([
+        'analyses.submission_enabled' => true,
+        'performance.analysis_pipeline_metrics.enabled' => false,
+    ]);
+
+    expect(productionPreflightStatus('operations.analysis_pipeline_metrics'))
+        ->toBe('fail');
+
+    config([
+        'performance.analysis_pipeline_metrics.enabled' => true,
+        'performance.analysis_pipeline_metrics.retention_days' => 91,
+    ]);
+
+    expect(productionPreflightStatus('operations.analysis_pipeline_metrics'))
         ->toBe('fail');
 });
 

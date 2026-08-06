@@ -3,6 +3,7 @@
 namespace App\Operations;
 
 use App\Analysis\Contracts\ListingAiAnalyzer;
+use App\Analysis\Metrics\AnalysisPipelineMetricsConfiguration;
 use App\Analysis\Providers\FakeListingAiAnalyzer;
 use App\Billing\BillingConfiguration;
 use App\BrokerRequests\Operations\BrokerOperationsConfiguration;
@@ -28,6 +29,7 @@ final class ProductionPreflight
         private readonly TelegramConfiguration $telegram,
         private readonly PrivacyWorkflowConfiguration $privacy,
         private readonly BrokerOperationsConfiguration $brokerOperations,
+        private readonly AnalysisPipelineMetricsConfiguration $pipelineMetrics,
     ) {}
 
     public function inspect(bool $allowNonProduction = false): ProductionPreflightReport
@@ -306,6 +308,23 @@ final class ProductionPreflight
             config('performance.analysis_pipeline_workload.enabled') === false,
             'Analysis pipeline workload permits are disabled in production.',
             'PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED must remain false in production.',
+        );
+
+        $metricsValid = false;
+
+        try {
+            $this->pipelineMetrics->assertValid();
+            $metricsValid = ! (bool) config('analyses.submission_enabled')
+                || $this->pipelineMetrics->enabled();
+        } catch (Throwable) {
+            $metricsValid = false;
+        }
+
+        $this->result(
+            'operations.analysis_pipeline_metrics',
+            $metricsValid,
+            'Analysis pipeline metric retention and versioned budgets are valid for the current activation state.',
+            'Pipeline metric configuration must be valid, and enabled Analysis submission requires PERFORMANCE_ANALYSIS_METRICS_ENABLED=true.',
         );
 
         $queues = config('operations.readiness.queue_heartbeats.queues', []);

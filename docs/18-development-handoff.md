@@ -1,6 +1,6 @@
 # 18 - Development Handoff
 
-Last updated: 2026-08-05
+Last updated: 2026-08-06
 
 This document is the persistent handoff for continuing Procura development on another computer or
 in a new Codex task. Read it after the preceding product and architecture documents and verify the
@@ -435,10 +435,10 @@ The request-scoped `OrganizationContext` is authoritative for tenant-aware appli
 Local verification completed for this task:
 
 ```text
-php artisan migrate:status          passed through batch 46 on MySQL 8.4.3; 49 migrations retained
+php artisan migrate:status          passed through batch 47 on MySQL 8.4.3; 50 migrations retained
 $env:XDEBUG_MODE='off'; php -d memory_limit=512M vendor/bin/pest --compact
-                                    362 passed (4928 assertions) in 180.25 seconds
-production preflight targeted       12 passed (348 assertions), including cached-config inspection,
+                                    378 passed (5041 assertions) in 129.51 seconds
+production preflight targeted       15 passed (383 assertions), including cached-config inspection,
                                     secret-safe JSON, strict warning enforcement, sanitized
                                     production-template/UTC validation, and trusted proxy rejection
 deployment/safety targeted          10 passed (32 assertions), including bounded test-database
@@ -454,9 +454,9 @@ commission calculator targeted      2 passed (5 assertions), including half-up b
 capacity/Admin/Analysis/readiness   53 passed (439 assertions), including a 2,000-row capacity
 targeted                            fixture, cache recovery, tenant query bounds, queue dispatch,
                                     exact JSON, catalog parity, and safe rendered projections
-performance contracts targeted      20 passed (107 assertions), including 2,000-row `12/1/2` query
-                                    budgets, queue receipt integrity, and actor-bound Analysis
-                                    workload permit, production, percentile, and redaction gates
+performance contracts targeted      27 passed (145 assertions), including 2,000-row `12/1/2` query
+                                    budgets, queue receipt integrity, actor-bound Analysis workload
+                                    permits, and stage-ledger/percentile/retention/redaction gates
 API/Admin localization targeted     33 passed (1454 assertions), including regional browser tags,
                                     authenticated preference, fallback, request-state reset, every
                                     current validator rule/field, 23 typed conflict codes, 179 typed
@@ -805,8 +805,8 @@ The following remain intentionally unimplemented:
 - actual production host provisioning, TLS certificates, and release activation,
 - production shared-cache selection, singleton scheduler activation, worker-pool heartbeat
   activation, external readiness monitoring, and controlled staging failure/recovery evidence,
-- production-shaped execution of the implemented bounded Redis queue-throughput/percentile and
-  staging-only Analysis API/pipeline workload harnesses, plus comparable/price/rate sub-scope,
+- production-shaped execution of the implemented bounded Redis queue-throughput/percentile,
+  staging-only Analysis API/pipeline workload, and six-stage internal attribution harnesses, plus
   Sell, browser, saturation, and soak evidence beyond the deterministic dashboard/operations/
   tenant-list query baseline,
 - a real external AI provider and production provider credentials/budgets,
@@ -1079,6 +1079,25 @@ authenticated requests/minute under the application limit of 60, and outputs agg
 only. A permit created with `--allow-fake-provider-rehearsal` produces an
 `evidence_eligible=false` report that fails the release gate by design.
 
+Every terminal AI attempt now also writes one best-effort, append-only pipeline metric with fixed
+microsecond columns for provider analysis, product matching, comparable selection, price
+estimation (including rate resolution), risk assessment, finalization, and total duration. It
+stores no request/result/error payload, tenant/listing/user identifier, provider credential, or
+external identifier. Metric persistence failure is reported internally but cannot alter the
+Analysis result or retry path. A local fake-provider report is available only as contract rehearsal:
+
+```powershell
+php artisan operations:analysis-pipeline-stage-metrics --window=60 --limit=1000 `
+  --minimum-samples=1 --expected-samples=1 --allow-local-rehearsal --json
+```
+
+Only the same command run in staging without the rehearsal flag can emit release evidence. It
+requires an untruncated sample, one pipeline version, production-shaped providers, every stage at
+or above the configured minimum, the exact expected attempt count, and the versioned failure/p95
+budgets. Production aggregation is
+permanently refused. `operations:purge-analysis-pipeline-metrics` removes only expired metric rows
+in a bounded batch; the singleton scheduler runs it daily and the default retention is 30 days.
+
 Do not copy another computer's `.env` or `APP_KEY` through Git. Open the cloned Procura directory itself as the Codex workspace.
 
 ## 7. Current implementation boundary
@@ -1338,9 +1357,15 @@ The current performance/capacity application boundary is now complete:
    throttle, draft, submission, polling and worker pipeline. It measures aggregate draft/submit/
    terminal percentiles, throughput, failures, status codes and terminal states without emitting
    actors, credentials, cookies, permits, Analysis IDs or listing IDs.
-10. Production-shaped staging execution with approved non-fake providers plus comparable/price/
-    rate attribution, Sell/browser, saturation, and soak scenarios remain mandatory in
-    `docs/19-production-go-live.md`.
+10. Each terminal AI attempt records one immutable, payload-free stage metric. The bounded
+    `operations:analysis-pipeline-stage-metrics` report attributes p50/p95/p99 across provider,
+    product matching, comparable selection, price/rate estimation, risk, finalization and total;
+    fake, mixed-version, truncated, undersampled or over-budget reports cannot be release evidence.
+11. Metric writes fail open, aggregation is staging-only, retention purge is daily/bounded, and
+    production preflight requires valid retention/versioned budgets plus enabled metrics whenever
+    Analysis submission is enabled.
+12. Production-shaped staging execution with approved non-fake providers plus Sell/browser,
+    saturation, and soak scenarios remain mandatory in `docs/19-production-go-live.md`.
 
 Do not expand payment processing beyond the reviewed Stripe hosted-subscription boundary, or add
 escrow, marketplace mutations, scraping, external AI credentials, browser extensions, or
@@ -1364,8 +1389,8 @@ personal organizations and memberships (complete)
    switch (complete; external provider and production values pending)
 -> deterministic capacity fixture, dashboard snapshot, `12/1/2` query budgets, guarded read CLI,
    bounded Redis queue throughput/p50/p95/p99, and staging-only full Analysis API/pipeline workload
-   harnesses (application complete; staging execution, sub-scope/Sell/browser attribution,
-   saturation, and soak evidence pending)
+   plus six-stage attribution harnesses (application complete; staging execution, Sell/browser
+   attribution, saturation, and soak evidence pending)
 -> central five-language API/Fortify validation and request-locale isolation (complete)
 -> typed five-language API domain-conflict presentation and raw-message exclusion (complete)
 -> Phase 2 manual listing intake foundation (complete)
@@ -1601,6 +1626,12 @@ personal organizations and memberships (complete)
   tenant/source-event chains, logical-case and transaction-scoped idempotency uniqueness, bounded
   sequence/status/type indexes, and immutable model guards. Writes remain false by default through
   `BROKER_PAYMENT_CASES_ENABLED=false`; the local migration ledger contains 49 rows.
+- The Analysis pipeline metric migration completed directly as MySQL batch 47. Schema inspection
+  confirmed one 15-column InnoDB row per AI attempt, a unique cascading attempt reference, fixed
+  nullable microsecond columns for six closed stages, total duration, bounded retention/report
+  indexes, and no tenant/user/listing/request/result/error payload columns. The table started empty,
+  the daily bounded purge is active independently of Analysis submission, and the local migration
+  ledger contains 50 rows.
 
 ## 10. Required completion behavior
 

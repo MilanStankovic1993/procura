@@ -37,3 +37,8 @@ Schedule::command('broker-reports:purge-expired')
     ->dailyAt('02:30')
     ->withoutOverlapping()
     ->onOneServer();
+
+Schedule::command('operations:purge-analysis-pipeline-metrics --limit=1000')
+    ->dailyAt('02:45')
+    ->withoutOverlapping()
+    ->onOneServer();

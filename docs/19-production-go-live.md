@@ -257,10 +257,11 @@ Incident and rollback boundary:
 - no schema rollback is required. Heartbeat cache keys contain no business data and expire after
   the configured TTL.
 
-### 3.6 Capacity baseline, queue throughput, Analysis pipeline load, and dashboard aggregate cache
+### 3.6 Capacity baseline, queue throughput, Analysis pipeline load/stage attribution, and dashboard aggregate cache
 
-Status: **deterministic query, bounded queue-workload, and full Analysis API/pipeline workload
-harnesses complete; production-shaped staging execution and broader load evidence pending**
+Status: **deterministic query, bounded queue-workload, full Analysis API/pipeline workload, and
+six-stage attribution harnesses complete; production-shaped staging execution and broader load
+evidence pending**
 
 Application controls now present:
 
@@ -294,6 +295,18 @@ Application controls now present:
   no more than 2 seconds, submit p95 no more than 2 seconds, pipeline p95 no more than 60 seconds,
   zero failed scenarios, zero `429`, and zero server errors. A fake-provider rehearsal is always
   marked `evidence_eligible=false` and fails the release gate.
+- every terminal AI attempt writes one immutable best-effort metric row with fixed microsecond
+  timings for provider analysis, product matching, comparable selection, price/rate estimation,
+  risk assessment, finalization and total. It stores no request/result/error payload, tenant/user/
+  listing identifier, credential, provider response, hash, or external identifier;
+- `operations:analysis-pipeline-stage-metrics` reads a bounded recent staging sample and emits
+  identifier-free p50/p95/p99 plus attempt/provider-scope counts. Release evidence requires one
+  pipeline version, production-shaped providers, no truncation, at least 20 samples for every
+  stage, zero failures, and all `analysis-pipeline-stage-budget:v1` p95 limits. Production has no
+  override;
+- `operations:purge-analysis-pipeline-metrics` deletes only rows older than the configured
+  retention in a bounded batch. The singleton scheduler runs it daily at 02:45; the default and
+  sanitized-template retention is 30 days and configuration cannot exceed 90 days.
 
 Required staging configuration:
 
@@ -302,10 +315,15 @@ OPERATIONS_DASHBOARD_CACHE_STORE=redis
 OPERATIONS_DASHBOARD_CACHE_TTL_SECONDS=30
 PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED=true
 PERFORMANCE_ANALYSIS_WORKLOAD_CACHE_STORE=redis
+PERFORMANCE_ANALYSIS_METRICS_ENABLED=true
+PERFORMANCE_ANALYSIS_METRICS_RETENTION_DAYS=30
 ```
 
 Production must set `PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED=false`. The sanitized production
 template already carries that value, and `operations:production-preflight` fails if it is enabled.
+While `ANALYSIS_SUBMISSION_ENABLED=false`, production may keep
+`PERFORMANCE_ANALYSIS_METRICS_ENABLED=false`. Enabling Analysis submission requires setting it true;
+preflight blocks the release if metric retention/budgets are invalid or the required switch is off.
 
 Staging procedure:
 
@@ -411,16 +429,34 @@ node tools/performance/analysis-pipeline-workload.mjs > analysis-pipeline-worklo
     MySQL/Redis CPU, memory, connections, locks and latency, host saturation, background traffic and
     dataset cardinalities. Independently verify the report contains no actor, credential, cookie,
     permit, Analysis or listing identifiers.
-13. Delete the local permit file immediately after the run and let the shared-cache permit expire;
+13. In the same isolated staging window, with no unrelated Analysis traffic, immediately aggregate
+    the internal stage rows. Choose a bounded window beginning before the workload and require the
+    sample count to equal the reviewed scenarios; a contaminated, mixed-version, truncated or
+    undersampled window must be discarded and rerun, never edited:
+
+```bash
+php artisan operations:analysis-pipeline-stage-metrics \
+  --window=<approved-bounded-minutes> \
+  --limit=<approved-limit-at-least-scenario-count> \
+  --minimum-samples=<approved-value-at-least-20> \
+  --expected-samples=<exact-reviewed-scenario-count> \
+  --json > analysis-pipeline-stage-report.json
+```
+
+    Require exit code zero, `status=passed`, `release_evidence=true`, no truncation, one pipeline
+    version, zero rehearsal-provider rows, zero failed attempts, and passing p95 for all six stages
+    and total. Retain only this aggregate JSON beside the Node report and infrastructure evidence;
+    verify again that it contains no Analysis/attempt/tenant/user/listing identifiers or payloads.
+14. Delete the local permit file immediately after the run and let the shared-cache permit expire;
     rotate a dedicated actor credential if the file may have escaped private storage. Retain real
     staging Analysis rows as synthetic evidence until release review, then reset them only through
     the approved staging dataset lifecycle, never ad hoc SQL deletion. Disable
     `PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED`, rebuild configuration and reload web/CLI processes when
     the evidence window closes.
-14. Continue with the remaining performance plan: comparable selection and price/rate resolution
-    sub-scope attribution, Sell multi-scope recalculation, browser percentiles, database/cache/
-    worker saturation beyond the bounded run, and an approved soak window. Queue throughput proves
-    transport/scheduling; the Analysis run proves its covered API/pipeline release only.
+15. Continue with the remaining performance plan: Sell multi-scope recalculation, browser
+    percentiles, database/cache/worker saturation beyond the bounded run, and an approved soak
+    window. Queue throughput proves transport/scheduling; the Analysis run and stage report prove
+    only their covered API/pipeline release boundary.
 
 Production diagnostic boundary:
 
@@ -428,6 +464,9 @@ Production diagnostic boundary:
 - `operations:queue-throughput` and Analysis workload permit issuance/use are always rejected in
   production and have no bypass. Do not copy, rename, invoke, or remove their guards to evade that
   boundary;
+- `operations:analysis-pipeline-stage-metrics` is also always rejected in production. Production
+  records ordinary low-cardinality stage rows only when Analysis is active and uses the normal
+  external monitoring path; the scheduled retention purge remains active independently;
 - normal production monitoring uses real latency, slow-query, queue, saturation, and error-rate
   telemetry, not repeated capacity commands;
 - one production read-baseline run requires an approved maintenance/incident ticket, an off-peak
@@ -456,6 +495,12 @@ Rollback/incident boundary:
   otherwise; use `ANALYSIS_SUBMISSION_ENABLED=false` to stop all new submissions. Delete the permit
   file, let its cache state expire, preserve aggregate evidence, and never repair staging rows with
   direct SQL;
+- if metric writes cause a confirmed operational incident, set
+  `PERFORMANCE_ANALYSIS_METRICS_ENABLED=false`, rebuild cached configuration and reload all web/CLI/
+  worker processes. This does not change existing Analysis results, but production preflight then
+  requires Analysis submission to remain disabled until telemetry is restored. Preserve existing
+  metric rows until normal retention; do not delete them ad hoc or roll back the metric migration
+  while Analysis workers still run;
 - never edit performance budgets during an incident merely to change command status.
 
 ## 4. Mail delivery

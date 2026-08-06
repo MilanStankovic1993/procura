@@ -4,10 +4,15 @@ namespace App\Actions\Analyses;
 
 use App\Analysis\Contracts\ListingAiAnalyzer;
 use App\Analysis\Data\AnalysisInputData;
+use App\Analysis\Metrics\AnalysisPipelineStageTimer;
+use App\Analysis\Metrics\Contracts\AnalysisPipelineMetricRecorder;
+use App\Analysis\Providers\FakeListingAiAnalyzer;
 use App\ComparableSelection\Contracts\ComparableSelector;
 use App\Enums\Analyses\AiAnalysisStatus;
 use App\Enums\Analyses\AiValidationStatus;
 use App\Enums\Analyses\AnalysisDispatchStatus;
+use App\Enums\Analyses\AnalysisPipelineProviderScope;
+use App\Enums\Analyses\AnalysisPipelineStage;
 use App\Enums\Analyses\AnalysisStatus;
 use App\Enums\Catalog\ProductMatchStatus;
 use App\Enums\Comparables\ComparableSetStatus;
@@ -23,6 +28,7 @@ use App\Models\RiskAssessment;
 use App\Pricing\Contracts\PriceEstimator;
 use App\ProductMatching\Contracts\ProductMatcher;
 use App\ProductMatching\Data\ProductMatchingInputData;
+use App\ProductMatching\Providers\FakeCatalogProductMatcher;
 use App\RiskAssessment\Contracts\RiskEvaluator;
 use Illuminate\Support\Facades\DB;
 use LogicException;
@@ -43,6 +49,7 @@ class RunBuyAnalysis
         private readonly RiskEvaluator $riskEvaluator,
         private readonly RecordRiskAssessment $riskAssessments,
         private readonly RiskAssessmentResultProjection $riskProjection,
+        private readonly AnalysisPipelineMetricRecorder $pipelineMetrics,
     ) {}
 
     public function run(string $analysisId, string $dispatchId): void
@@ -54,113 +61,177 @@ class RunBuyAnalysis
         }
 
         [$analysis, $aiAnalysis] = $attempt;
+        $timer = new AnalysisPipelineStageTimer;
+        $providerScope = $this->providerScope();
 
         try {
-            $result = $this->provider->analyze(new AnalysisInputData(
-                analysisId: $analysis->getKey(),
-                inputHash: $analysis->request_hash,
-                requestPayload: $analysis->request_payload,
-            ));
+            $result = $timer->measure(
+                AnalysisPipelineStage::ProviderAnalysis,
+                fn () => $this->provider->analyze(new AnalysisInputData(
+                    analysisId: $analysis->getKey(),
+                    inputHash: $analysis->request_hash,
+                    requestPayload: $analysis->request_payload,
+                )),
+            );
             $listing = $analysis->request_payload['listing'] ?? [];
             $marketScope = $analysis->request_payload['market_scope'] ?? [];
-            $matchResult = $this->productMatcher->match(new ProductMatchingInputData(
-                inputHash: $analysis->request_hash,
-                title: (string) (
-                    $result->normalizedListing['title']
-                    ?? $listing['title']
-                    ?? ''
-                ),
-                description: isset($result->normalizedListing['description'])
-                    ? (string) $result->normalizedListing['description']
-                    : null,
-                marketCountryCodes: array_values(array_unique([
-                    (string) (
-                        $marketScope['source_country_code']
-                        ?? $analysis->source_country_code
-                    ),
-                    (string) (
-                        $marketScope['target_country_code']
-                        ?? $analysis->target_country_code
-                    ),
-                ])),
-                targetCountryCode: (string) (
-                    $marketScope['target_country_code']
-                    ?? $analysis->target_country_code
-                ),
-            ));
-            $productMatch = $this->productMatches->record(
-                $analysis->getKey(),
-                $aiAnalysis->getKey(),
-                $matchResult,
+            $productMatch = $timer->measure(
+                AnalysisPipelineStage::ProductMatching,
+                function () use (
+                    $analysis,
+                    $aiAnalysis,
+                    $listing,
+                    $marketScope,
+                    $result,
+                ) {
+                    $matchResult = $this->productMatcher->match(
+                        new ProductMatchingInputData(
+                            inputHash: $analysis->request_hash,
+                            title: (string) (
+                                $result->normalizedListing['title']
+                                ?? $listing['title']
+                                ?? ''
+                            ),
+                            description: isset($result->normalizedListing['description'])
+                                ? (string) $result->normalizedListing['description']
+                                : null,
+                            marketCountryCodes: array_values(array_unique([
+                                (string) (
+                                    $marketScope['source_country_code']
+                                    ?? $analysis->source_country_code
+                                ),
+                                (string) (
+                                    $marketScope['target_country_code']
+                                    ?? $analysis->target_country_code
+                                ),
+                            ])),
+                            targetCountryCode: (string) (
+                                $marketScope['target_country_code']
+                                ?? $analysis->target_country_code
+                            ),
+                        ),
+                    );
+
+                    return $this->productMatches->record(
+                        $analysis->getKey(),
+                        $aiAnalysis->getKey(),
+                        $matchResult,
+                    );
+                },
             );
             $comparableSet = null;
             $priceEstimate = null;
             $riskAssessment = null;
 
             if ($productMatch->status === ProductMatchStatus::Matched) {
-                $selection = $this->comparableSelector->select(
-                    $analysis,
-                    $productMatch,
-                    $result->normalizedListing,
-                );
-                $comparableSet = $this->comparableSets->record(
-                    $analysis->getKey(),
-                    $productMatch->getKey(),
-                    $selection,
+                $comparableSet = $timer->measure(
+                    AnalysisPipelineStage::ComparableSelection,
+                    function () use ($analysis, $productMatch, $result) {
+                        $selection = $this->comparableSelector->select(
+                            $analysis,
+                            $productMatch,
+                            $result->normalizedListing,
+                        );
+
+                        return $this->comparableSets->record(
+                            $analysis->getKey(),
+                            $productMatch->getKey(),
+                            $selection,
+                        );
+                    },
                 );
 
                 if ($comparableSet->status === ComparableSetStatus::Ready) {
-                    $priceResult = $this->priceEstimator->estimate(
-                        $analysis,
-                        $comparableSet,
-                        $result->normalizedListing,
-                    );
-                    $priceEstimate = $this->priceEstimates->record(
-                        $analysis->getKey(),
-                        $comparableSet->getKey(),
-                        $priceResult,
+                    $priceEstimate = $timer->measure(
+                        AnalysisPipelineStage::PriceEstimation,
+                        function () use ($analysis, $comparableSet, $result) {
+                            $priceResult = $this->priceEstimator->estimate(
+                                $analysis,
+                                $comparableSet,
+                                $result->normalizedListing,
+                            );
+
+                            return $this->priceEstimates->record(
+                                $analysis->getKey(),
+                                $comparableSet->getKey(),
+                                $priceResult,
+                            );
+                        },
                     );
 
                     if (
                         $priceEstimate->status
                         !== PriceEstimateStatus::NeedsInput
                     ) {
-                        $riskResult = $this->riskEvaluator->evaluate(
-                            $analysis,
-                            $productMatch,
-                            $comparableSet,
-                            $priceEstimate,
-                            $result->normalizedListing,
-                        );
-                        $riskAssessment = $this->riskAssessments->record(
-                            $analysis->getKey(),
-                            $productMatch->getKey(),
-                            $comparableSet->getKey(),
-                            $priceEstimate->getKey(),
-                            $riskResult,
+                        $riskAssessment = $timer->measure(
+                            AnalysisPipelineStage::RiskAssessment,
+                            function () use (
+                                $analysis,
+                                $productMatch,
+                                $comparableSet,
+                                $priceEstimate,
+                                $result,
+                            ) {
+                                $riskResult = $this->riskEvaluator->evaluate(
+                                    $analysis,
+                                    $productMatch,
+                                    $comparableSet,
+                                    $priceEstimate,
+                                    $result->normalizedListing,
+                                );
+
+                                return $this->riskAssessments->record(
+                                    $analysis->getKey(),
+                                    $productMatch->getKey(),
+                                    $comparableSet->getKey(),
+                                    $priceEstimate->getKey(),
+                                    $riskResult,
+                                );
+                            },
                         );
                     }
                 }
             }
 
-            $this->complete(
-                $analysis->getKey(),
-                $dispatchId,
-                $aiAnalysis->getKey(),
-                $productMatch->getKey(),
-                $comparableSet?->getKey(),
-                $priceEstimate?->getKey(),
-                $riskAssessment?->getKey(),
-                $result->toArray(),
+            $timer->measure(
+                AnalysisPipelineStage::Finalization,
+                fn () => $this->complete(
+                    $analysis->getKey(),
+                    $dispatchId,
+                    $aiAnalysis->getKey(),
+                    $productMatch->getKey(),
+                    $comparableSet?->getKey(),
+                    $priceEstimate?->getKey(),
+                    $riskAssessment?->getKey(),
+                    $result->toArray(),
+                ),
+            );
+            $this->recordPipelineMetric(
+                $aiAnalysis,
+                $analysis->pipeline_version,
+                $providerScope,
+                $timer,
             );
         } catch (Throwable $exception) {
-            $this->fail(
-                $analysis->getKey(),
-                $dispatchId,
-                $aiAnalysis->getKey(),
-                $aiAnalysis->attempt_number,
-                $exception,
-            );
+            try {
+                $timer->measure(
+                    AnalysisPipelineStage::Finalization,
+                    fn () => $this->fail(
+                        $analysis->getKey(),
+                        $dispatchId,
+                        $aiAnalysis->getKey(),
+                        $aiAnalysis->attempt_number,
+                        $exception,
+                    ),
+                );
+            } finally {
+                $this->recordPipelineMetric(
+                    $aiAnalysis,
+                    $analysis->pipeline_version,
+                    $providerScope,
+                    $timer,
+                );
+            }
 
             throw $exception;
         }
@@ -522,5 +593,32 @@ class RunBuyAnalysis
                 'last_error' => $message,
             ]);
         }, attempts: 3);
+    }
+
+    private function providerScope(): AnalysisPipelineProviderScope
+    {
+        return $this->provider instanceof FakeListingAiAnalyzer
+            || $this->productMatcher instanceof FakeCatalogProductMatcher
+                ? AnalysisPipelineProviderScope::Rehearsal
+                : AnalysisPipelineProviderScope::ProductionShaped;
+    }
+
+    private function recordPipelineMetric(
+        AiAnalysis $aiAnalysis,
+        string $pipelineVersion,
+        AnalysisPipelineProviderScope $providerScope,
+        AnalysisPipelineStageTimer $timer,
+    ): void {
+        try {
+            $this->pipelineMetrics->record(
+                $aiAnalysis->getKey(),
+                $aiAnalysis->attempt_number,
+                $pipelineVersion,
+                $providerScope,
+                $timer,
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 }

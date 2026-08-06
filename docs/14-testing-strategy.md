@@ -446,6 +446,15 @@ scenario pairs are unique, percentile calculation is stable, rate limiting fails
 aggregate report cannot contain credentials or listing identifiers. CI proves these contracts only;
 it does not make network calls or claim staging capacity.
 
+`tests/Feature/Performance/AnalysisPipelineStageMetricsTest.php` protects the internal attribution
+ledger and report boundary: one immutable payload-free row per terminal AI attempt, a closed six-
+stage vocabulary, nullable timings for stages that were not reached, fail-open metric storage,
+nearest-rank p50/p95/p99, a hard sample/window bound, minimum samples per stage, single-pipeline-
+version and production-shaped-provider evidence gates, permanent production report refusal, and a
+batch-bounded retention purge. It also proves that aggregate JSON contains no Analysis, attempt,
+tenant, user, listing, credential, request, result, error, or external-provider identifiers. CI
+proves the contract with deterministic durations; it is not latency evidence.
+
 Actual staging evidence must run `operations:queue-throughput` through shared Redis and the real
 Supervisor worker pools. It measures queue transport/worker scheduling completion, jobs/second,
 and p50/p95/p99 dispatch-to-process latency without creating business records. The separate
@@ -454,6 +463,8 @@ staging-only Analysis workload must then use `operations:issue-analysis-workload
 throttle, create, submit, polling and queue-worker boundaries. It measures draft, submit and
 submit-to-terminal p50/p95/p99 plus completion, throughput, terminal states and HTTP status counts.
 Only a run with approved non-fake analysis and matching providers is release evidence. Comparable/
-price/rate sub-scope attribution, Sell multi-scope recalculation, browser percentiles, database/
-cache/worker saturation, and soak testing remain required before launch; none may be claimed from
-an in-memory SQLite, sync queue, fake-provider rehearsal or CI contract test.
+price/rate/risk sub-scope attribution must then pass the separate staging-only
+`operations:analysis-pipeline-stage-metrics` report over the isolated workload window. Sell multi-
+scope recalculation, browser percentiles, database/cache/worker saturation, and soak testing remain
+required before launch; none may be claimed from an in-memory SQLite, sync queue, fake-provider
+rehearsal or CI contract test.
