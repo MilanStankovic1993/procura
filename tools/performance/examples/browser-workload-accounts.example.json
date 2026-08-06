@@ -1,0 +1,10 @@
+{
+    "version": 1,
+    "actors": [
+        {
+            "key": "owner_1",
+            "email": "browser-owner-1@staging.example.invalid",
+            "password": "replace-from-staging-secret-manager"
+        }
+    ]
+}

@@ -307,9 +307,10 @@ final class ProductionPreflight
     {
         $this->result(
             'operations.performance_workloads',
-            config('performance.analysis_pipeline_workload.enabled') === false,
-            'Analysis pipeline workload permits are disabled in production.',
-            'PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED must remain false in production.',
+            config('performance.analysis_pipeline_workload.enabled') === false
+                && config('performance.browser_workload.enabled') === false,
+            'Analysis and browser workload permits are disabled in production.',
+            'PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED and PERFORMANCE_BROWSER_WORKLOAD_ENABLED must remain false in production.',
         );
 
         $metricsValid = false;

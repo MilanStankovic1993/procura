@@ -11,7 +11,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
-    "check:i18n": "node tools/check-localization.mjs"
+    "check:i18n": "node tools/check-localization.mjs",
+    "install:browser-runtime": "playwright install chromium"
   },
   "private": true,
   "packageManager": "npm@11.16.0",
@@ -33,6 +34,7 @@
     "angular-eslint": "22.1.0",
     "eslint": "^10.6.0",
     "jsdom": "^28.0.0",
+    "playwright": "^1.62.1",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
     "typescript-eslint": "8.62.1",

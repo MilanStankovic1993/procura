@@ -40,6 +40,7 @@ function configureProductionPreflightBaseline(): void
             'default',
         ],
         'performance.analysis_pipeline_workload.enabled' => false,
+        'performance.browser_workload.enabled' => false,
         'performance.analysis_pipeline_metrics.enabled' => false,
         'performance.analysis_pipeline_metrics.retention_days' => 30,
         'performance.sell_price_intelligence_metrics.enabled' => true,
@@ -137,6 +138,13 @@ test('a safe base configuration is deployable while external activation remains 
 
 test('production preflight fails when analysis workload permits are enabled', function () {
     config()->set('performance.analysis_pipeline_workload.enabled', true);
+
+    expect(productionPreflightStatus('operations.performance_workloads'))
+        ->toBe('fail');
+});
+
+test('production preflight fails when browser workload permits are enabled', function () {
+    config()->set('performance.browser_workload.enabled', true);
 
     expect(productionPreflightStatus('operations.performance_workloads'))
         ->toBe('fail');

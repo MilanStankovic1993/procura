@@ -455,6 +455,15 @@ batch-bounded retention purge. It also proves that aggregate JSON contains no An
 tenant, user, listing, credential, request, result, error, or external-provider identifiers. CI
 proves the contract with deterministic durations; it is not latency evidence.
 
+`tests/Feature/Performance/BrowserWorkloadPermitTest.php` and
+`tools/performance/browser-workload.test.mjs` protect the critical-browser boundary: Redis-backed
+staging-only issuance, verified actor binding, exact per-scenario consumption, an immutable
+origin/scenario/budget/profile contract hash, permanent production refusal, private secret files,
+nearest-rank percentiles, strict completion/error/p95 gates, and an identifier-free aggregate
+report. The three Angular pages expose stable language-independent ready/error states so the runner
+does not mistake a painted loading shell for completed work. CI does not launch a remote browser or
+claim staging latency evidence.
+
 `tests/Feature/Performance/SellPriceIntelligenceStageMetricsTest.php` protects the separate Sell
 multi-scope attribution boundary: one immutable, payload-free metric per successfully committed
 comparable or normalization recalculation; aggregate scope discovery, deterministic selection,
@@ -476,6 +485,7 @@ Only a run with approved non-fake analysis and matching providers is release evi
 price/rate/risk sub-scope attribution must then pass the separate staging-only
 `operations:analysis-pipeline-stage-metrics` report over the isolated workload window. The separate
 Sell workload must then pass `operations:sell-price-intelligence-stage-metrics` over its own isolated
-multi-scope window. Browser percentiles, database/cache/worker saturation, and soak testing remain
-required before launch; none may be claimed from an in-memory SQLite, sync queue, fake-provider
-rehearsal or CI contract test.
+multi-scope window. The separate browser permit/Chromium runner must then pass all three critical
+routes with the sealed staging origin, profile and budgets. Database/cache/worker saturation and
+soak testing remain required before launch; none may be claimed from an in-memory SQLite, sync
+queue, fake-provider or undersampled rehearsal, or CI contract test.

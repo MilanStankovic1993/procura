@@ -2,6 +2,7 @@
 
 return [
     'analysis_workload_permit_rejected' => 'Dozvola za kontrolisano opterećenje analiza nije ispravna ili nije dostupna.',
+    'browser_workload_permit_rejected' => 'Dozvola za kontrolisano opterećenje pregledača nije ispravna ili nije dostupna.',
     'billing_checkout_expired' => 'Ovaj zahtev za plaćanje je istekao. Pokrenite ga ponovo sa novim ključem idempotentnosti.',
     'billing_manual_assignment' => 'Ovom radnom prostoru je administrator dodelio paket.',
     'billing_not_configured' => 'Naplata nije podešena za ovaj paket i interval.',

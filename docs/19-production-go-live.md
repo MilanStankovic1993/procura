@@ -259,9 +259,9 @@ Incident and rollback boundary:
 
 ### 3.6 Capacity baseline, queue throughput, Analysis pipeline load/stage attribution, and dashboard aggregate cache
 
-Status: **deterministic query, bounded queue-workload, full Analysis API/pipeline workload, and
-six-stage attribution harnesses complete; production-shaped staging execution and broader load
-evidence pending**
+Status: **deterministic query, bounded queue-workload, full Analysis API/pipeline workload,
+six-stage attribution, and critical-browser percentile harnesses complete; production-shaped
+staging execution and broader saturation/soak evidence pending**
 
 Application controls now present:
 
@@ -295,6 +295,20 @@ Application controls now present:
   no more than 2 seconds, submit p95 no more than 2 seconds, pipeline p95 no more than 60 seconds,
   zero failed scenarios, zero `429`, and zero server errors. A fake-provider rehearsal is always
   marked `evidence_eligible=false` and fails the release gate.
+- `operations:issue-browser-workload-permit` issues a staging-only, expiring permit bound to at
+  most 20 verified actors, the exact HTTPS staging origin, all three approved critical scenarios,
+  a versioned desktop/network/CPU profile, versioned budgets, and a separately consumed allowance
+  for every cold sample. The contract hash prevents a private permit file from being edited into a
+  weaker evidence claim; production issuance and use have no override;
+- `tools/performance/browser-workload.mjs` authenticates every dedicated actor through the normal
+  Angular/Sanctum cookie and CSRF flow, opens a fresh cache-cold Chromium context for every
+  `/app/overview`, `/app/buy`, and `/app/sell` sample, and waits for application-owned ready state
+  after tenant API data resolves. It fails on page/console/network/API errors and emits only
+  aggregate document-TTFB, route-ready, LCP and CLS p50/p95/p99 plus generic status/failure counts;
+- browser release evidence requires at least 20 samples per scenario, zero failures, TTFB p95 no
+  more than 1 second, route-ready p95 no more than 4 seconds, LCP p95 no more than 2.5 seconds, CLS
+  p95 no more than 0.1, the exact `browser-desktop-profile:v1`, and the exact
+  `browser-workload-budget:v1`. An undersampled rehearsal is always ineligible;
 - every terminal AI attempt writes one immutable best-effort metric row with fixed microsecond
   timings for provider analysis, product matching, comparable selection, price/rate estimation,
   risk assessment, finalization and total. It stores no request/result/error payload, tenant/user/
@@ -333,14 +347,17 @@ OPERATIONS_DASHBOARD_CACHE_STORE=redis
 OPERATIONS_DASHBOARD_CACHE_TTL_SECONDS=30
 PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED=true
 PERFORMANCE_ANALYSIS_WORKLOAD_CACHE_STORE=redis
+PERFORMANCE_BROWSER_WORKLOAD_ENABLED=true
+PERFORMANCE_BROWSER_WORKLOAD_CACHE_STORE=redis
 PERFORMANCE_ANALYSIS_METRICS_ENABLED=true
 PERFORMANCE_ANALYSIS_METRICS_RETENTION_DAYS=30
 PERFORMANCE_SELL_METRICS_ENABLED=true
 PERFORMANCE_SELL_METRICS_RETENTION_DAYS=30
 ```
 
-Production must set `PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED=false`. The sanitized production
-template already carries that value, and `operations:production-preflight` fails if it is enabled.
+Production must set both `PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED=false` and
+`PERFORMANCE_BROWSER_WORKLOAD_ENABLED=false`. The sanitized production template already carries
+those values, and `operations:production-preflight` fails if either is enabled.
 While `ANALYSIS_SUBMISSION_ENABLED=false`, production may keep
 `PERFORMANCE_ANALYSIS_METRICS_ENABLED=false`. Enabling Analysis submission requires setting it true;
 preflight blocks the release if metric retention/budgets are invalid or the required switch is off.
@@ -498,16 +515,47 @@ php artisan operations:sell-price-intelligence-stage-metrics \
     reviewed synthetic dataset cardinalities and MySQL/host evidence; independently verify that it
     contains no business identifier or payload. A contaminated, replayed, single-scope, mixed-
     version, undersampled or over-budget run must be discarded and rerun, never edited.
-16. Continue with the remaining performance plan: browser percentiles, database/cache/worker
-    saturation beyond the bounded runs, and an approved soak window. Queue throughput, Analysis and
-    Sell reports prove only their covered boundaries.
+16. On a dedicated staging runner using a repository-supported Node release, install the exact
+    locked dependencies and Chromium build. Copy the accounts template into ignored private
+    storage, replace credentials from the staging secret manager, and include reviewed actors for
+    every role that is part of launch acceptance. Never put credentials in command arguments,
+    logs, screenshots, or retained evidence:
+
+```bash
+npm --prefix frontend ci
+npm --prefix frontend run install:browser-runtime
+cp tools/performance/examples/browser-workload-accounts.example.json \
+  storage/app/private/browser-workload-accounts.json
+php artisan operations:issue-browser-workload-permit \
+  --actor-email=<staging-browser-actor-1> \
+  --actor-email=<staging-browser-actor-2> \
+  --samples-per-scenario=<approved-value-at-least-20> \
+  --ttl=<60-to-3600-seconds> \
+  --acknowledge-load \
+  --json
+export PROCURA_BROWSER_LOAD_BASE_URL=https://staging.example.invalid
+export PROCURA_BROWSER_LOAD_PERMIT_FILE=/release/storage/app/private/<generated-permit-file>.json
+export PROCURA_BROWSER_LOAD_ACCOUNTS_FILE=/release/storage/app/private/browser-workload-accounts.json
+node tools/performance/browser-workload.mjs > browser-workload-report.json
+```
+
+    The base URL must exactly match the HTTPS origin sealed into the permit. The runner paces each
+    actor, uses a fresh browser cache per sample, consumes one server authorization per scenario,
+    and records no screenshot, trace, response body, URL, email, cookie, credential or permit in
+    its report. Require exit code zero, `status=passed`, `evidence_eligible=true`, exact samples and
+    scenario keys, zero failure and HTTP-error counts, the reviewed Chromium major version and all
+    versioned p95 budgets. Delete both private files after review and disable the staging switch.
+    `--allow-undersampled-rehearsal` is contract testing only and cannot pass the release gate.
+17. Continue with the remaining performance plan: database/cache/worker saturation beyond the
+    bounded runs and an approved soak window. Queue throughput, Analysis, Sell, and browser reports
+    prove only their covered boundaries.
 
 Production diagnostic boundary:
 
 - staging evidence is mandatory; passing either capacity command alone is not launch approval;
-- `operations:queue-throughput` and Analysis workload permit issuance/use are always rejected in
-  production and have no bypass. Do not copy, rename, invoke, or remove their guards to evade that
-  boundary;
+- `operations:queue-throughput` plus Analysis and browser workload permit issuance/use are always
+  rejected in production and have no bypass. Do not copy, rename, invoke, or remove their guards to
+  evade that boundary;
 - `operations:analysis-pipeline-stage-metrics` is also always rejected in production. Production
   records ordinary low-cardinality stage rows only when Analysis is active and uses the normal
   external monitoring path; the scheduled retention purge remains active independently;
