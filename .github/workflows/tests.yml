@@ -77,6 +77,10 @@ jobs:
         if: matrix.php == '8.4'
         run: npm run test:frontend
 
+      - name: Test performance tools
+        if: matrix.php == '8.4'
+        run: npm run test:performance-tools
+
       - name: Build Angular frontend
         if: matrix.php == '8.4'
         run: npm run build:frontend

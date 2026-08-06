@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'analysis_workload_permit_rejected' => 'Die Genehmigung für die kontrollierte Analyselast ist ungültig oder nicht verfügbar.',
     'billing_checkout_expired' => 'Diese Checkout-Anfrage ist abgelaufen. Starten Sie erneut mit einem neuen Idempotenzschlüssel.',
     'billing_manual_assignment' => 'Diesem Arbeitsbereich wurde der Tarif durch einen Administrator zugewiesen.',
     'billing_not_configured' => 'Der Billing-Checkout ist für diesen Tarif und dieses Intervall nicht konfiguriert.',

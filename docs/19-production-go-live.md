@@ -257,10 +257,10 @@ Incident and rollback boundary:
 - no schema rollback is required. Heartbeat cache keys contain no business data and expire after
   the configured TTL.
 
-### 3.6 Capacity baseline, queue throughput, and dashboard aggregate cache
+### 3.6 Capacity baseline, queue throughput, Analysis pipeline load, and dashboard aggregate cache
 
-Status: **deterministic query and bounded queue-workload harnesses complete; production-shaped
-staging execution and broader load evidence pending**
+Status: **deterministic query, bounded queue-workload, and full Analysis API/pipeline workload
+harnesses complete; production-shaped staging execution and broader load evidence pending**
 
 Application controls now present:
 
@@ -279,14 +279,33 @@ Application controls now present:
   jobs/second, and p50/p95/p99 dispatch-to-process latency, and permanently refuses production;
 - the repository baselines are 100 jobs, a 60-second timeout, at least 5 jobs/second, p95 no more
   than 15 seconds, and p99 no more than 30 seconds. A release may supply stricter targets but the
-  command rejects weaker overrides.
+  command rejects weaker overrides;
+- `operations:issue-analysis-workload-permit` issues an expiring, actor-bound permit for at most 250
+  reviewed scenarios and exactly two Analysis mutations per scenario. It works only in staging,
+  requires Redis queue/cache and enabled Analysis submission, writes the token only to ignored
+  private storage, and has no production override;
+- `tools/performance/analysis-pipeline-workload.mjs` authenticates through the normal Sanctum
+  cookie/CSRF flow, respects tenant authorization, subscription quota and the API throttle, creates
+  unique drafts, submits them to the real `analyses` worker pool, polls normal detail resources,
+  and reports aggregate draft/submit/pipeline p50/p95/p99, throughput, failure rate, terminal states
+  and HTTP status counts. It never outputs actors, emails, passwords, cookies, permits, Analysis IDs
+  or listing IDs;
+- the versioned Analysis workload baseline is at least 0.25 completed scenarios/second, draft p95
+  no more than 2 seconds, submit p95 no more than 2 seconds, pipeline p95 no more than 60 seconds,
+  zero failed scenarios, zero `429`, and zero server errors. A fake-provider rehearsal is always
+  marked `evidence_eligible=false` and fails the release gate.
 
 Required staging configuration:
 
 ```dotenv
 OPERATIONS_DASHBOARD_CACHE_STORE=redis
 OPERATIONS_DASHBOARD_CACHE_TTL_SECONDS=30
+PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED=true
+PERFORMANCE_ANALYSIS_WORKLOAD_CACHE_STORE=redis
 ```
+
+Production must set `PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED=false`. The sanitized production
+template already carries that value, and `operations:production-preflight` fails if it is enabled.
 
 Staging procedure:
 
@@ -336,17 +355,79 @@ php artisan operations:queue-throughput \
 8. Exercise concurrent cold Admin requests at snapshot expiry and prove only one recomputation
    reaches MySQL. Confirm warm requests use the snapshot and that cache failure falls back to the
    cold budget while readiness becomes unavailable.
-9. Continue with the remaining performance plan: concurrent Analysis creation and real pipeline
-   processing, comparable selection, price/rate resolution, Sell multi-scope recalculation,
-   endpoint/browser percentiles, database/cache/worker saturation beyond the bounded probe, and an
-   approved soak window. The no-op queue workload is evidence for transport and worker scheduling,
-   not for provider or business-pipeline capacity.
+9. Prepare dedicated, verified staging actors with an active synthetic workspace, Analyst or higher
+   role, a reviewed plan/quota covering the run, and no customer data. Use multiple actors for
+   concurrency; the runner deliberately shapes each actor to 45 authenticated requests/minute below
+   the application limit of 60 and treats every `429` as failure. Copy the sanitized examples to
+   ignored private storage and replace placeholders from the staging secret manager and synthetic
+   fixture inventory:
+
+```bash
+cp tools/performance/examples/analysis-workload-accounts.example.json \
+  storage/app/private/analysis-workload-accounts.json
+cp tools/performance/examples/analysis-workload-scenarios.example.json \
+  storage/app/private/analysis-workload-scenarios.json
+```
+
+   Keep actor keys unique. Every scenario must reference one actor and a unique
+   `(listing_id, target_country_code)` pair belonging to that actor's active workspace; otherwise
+   draft idempotency would reuse work and invalidate the capacity claim. Scenario count must equal
+   the requested permit count. Never place credentials in command options, shell history, logs or
+   the retained report.
+10. With approved non-fake analysis and product-matching providers, normal staging monitoring, and
+    real workers active, issue the short-lived permit. Repeat `--actor-email` once per dedicated
+    actor; use generic staging-only addresses and do not capture this command line as evidence:
+
+```bash
+php artisan operations:issue-analysis-workload-permit \
+  --actor-email=<staging-load-actor-1> \
+  --actor-email=<staging-load-actor-2> \
+  --scenarios=<approved-count> \
+  --ttl=<60-to-3600-seconds> \
+  --acknowledge-load \
+  --json
+```
+
+   The secret-free response identifies the generated file under `storage/app/private`. Do not copy
+   that file into release evidence. If real providers are not yet installed, an operator may add
+   `--allow-fake-provider-rehearsal` only to verify the harness; that permit cannot pass the release
+   gate.
+11. Set paths through environment variables so credentials and the permit never enter process
+    arguments, then run the bounded client. The base URL must be the root of the HTTPS staging
+    origin; HTTP, credentials in URLs, paths, query strings, and fragments are rejected:
+
+```bash
+export PROCURA_ANALYSIS_LOAD_BASE_URL=https://staging.example.invalid
+export PROCURA_ANALYSIS_LOAD_PERMIT_FILE=/release/storage/app/private/<generated-permit-file>.json
+export PROCURA_ANALYSIS_LOAD_ACCOUNTS_FILE=/release/storage/app/private/analysis-workload-accounts.json
+export PROCURA_ANALYSIS_LOAD_SCENARIOS_FILE=/release/storage/app/private/analysis-workload-scenarios.json
+export PROCURA_ANALYSIS_LOAD_CONCURRENCY=<1-to-20>
+node tools/performance/analysis-pipeline-workload.mjs > analysis-pipeline-workload-report.json
+```
+
+12. Require exit code zero, `status=passed`, `evidence_eligible=true`, exact expected completion,
+    zero failure/rate-limit/server-error counts and all versioned budgets met. Preserve only the
+    aggregate report alongside exact release/provider versions, worker/queue depth and restarts,
+    MySQL/Redis CPU, memory, connections, locks and latency, host saturation, background traffic and
+    dataset cardinalities. Independently verify the report contains no actor, credential, cookie,
+    permit, Analysis or listing identifiers.
+13. Delete the local permit file immediately after the run and let the shared-cache permit expire;
+    rotate a dedicated actor credential if the file may have escaped private storage. Retain real
+    staging Analysis rows as synthetic evidence until release review, then reset them only through
+    the approved staging dataset lifecycle, never ad hoc SQL deletion. Disable
+    `PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED`, rebuild configuration and reload web/CLI processes when
+    the evidence window closes.
+14. Continue with the remaining performance plan: comparable selection and price/rate resolution
+    sub-scope attribution, Sell multi-scope recalculation, browser percentiles, database/cache/
+    worker saturation beyond the bounded run, and an approved soak window. Queue throughput proves
+    transport/scheduling; the Analysis run proves its covered API/pipeline release only.
 
 Production diagnostic boundary:
 
 - staging evidence is mandatory; passing either capacity command alone is not launch approval;
-- `operations:queue-throughput` is always rejected in production and has no bypass. Do not copy,
-  rename, or invoke its probe jobs from application code to evade that boundary;
+- `operations:queue-throughput` and Analysis workload permit issuance/use are always rejected in
+  production and have no bypass. Do not copy, rename, invoke, or remove their guards to evade that
+  boundary;
 - normal production monitoring uses real latency, slow-query, queue, saturation, and error-rate
   telemetry, not repeated capacity commands;
 - one production read-baseline run requires an approved maintenance/incident ticket, an off-peak
@@ -369,6 +450,12 @@ Rollback/incident boundary:
 - stop a staging throughput run by stopping the invoking command and, if necessary, pausing the
   affected staging pool. The marker and receipt keys contain no business data and expire after 15
   minutes; do not flush the complete shared cache to remove them;
+- stop an Analysis workload by terminating the Node runner, disabling
+  `PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED`, rebuilding configuration, and reloading web/CLI runtimes.
+  Allow already accepted Analysis jobs to finish unless the provider/queue incident procedure says
+  otherwise; use `ANALYSIS_SUBMISSION_ENABLED=false` to stop all new submissions. Delete the permit
+  file, let its cache state expire, preserve aggregate evidence, and never repair staging rows with
+  direct SQL;
 - never edit performance budgets during an incident merely to change command status.
 
 ## 4. Mail delivery

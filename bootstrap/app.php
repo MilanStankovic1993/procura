@@ -6,6 +6,7 @@ use App\Exceptions\MarketplaceImportConflictException;
 use App\Exceptions\OutcomeTrackingConflictException;
 use App\Exceptions\PrivacyRequestConflictException;
 use App\Exceptions\SalePortfolioConflictException;
+use App\Http\Middleware\RequireAnalysisPipelineWorkloadPermit;
 use App\Http\Middleware\RequireStripeWebhookConfiguration;
 use App\Http\Middleware\ResolveOrganizationContext;
 use App\Http\Middleware\SetAuthenticatedUserLocale;
@@ -37,6 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SetAuthenticatedUserLocale::class,
         );
         $middleware->alias([
+            'analysis-workload-permit' => RequireAnalysisPipelineWorkloadPermit::class,
             'organization.context' => ResolveOrganizationContext::class,
             'stripe-webhook-configured' => RequireStripeWebhookConfiguration::class,
         ]);

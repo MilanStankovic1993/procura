@@ -301,6 +301,13 @@ final class ProductionPreflight
 
     private function inspectOperations(): void
     {
+        $this->result(
+            'operations.performance_workloads',
+            config('performance.analysis_pipeline_workload.enabled') === false,
+            'Analysis pipeline workload permits are disabled in production.',
+            'PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED must remain false in production.',
+        );
+
         $queues = config('operations.readiness.queue_heartbeats.queues', []);
         $required = ['analyses', 'connectors', 'notifications', 'default'];
         $enabled = config('operations.readiness.queue_heartbeats.enabled') === true;

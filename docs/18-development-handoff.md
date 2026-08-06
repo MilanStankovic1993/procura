@@ -454,15 +454,15 @@ commission calculator targeted      2 passed (5 assertions), including half-up b
 capacity/Admin/Analysis/readiness   53 passed (439 assertions), including a 2,000-row capacity
 targeted                            fixture, cache recovery, tenant query bounds, queue dispatch,
                                     exact JSON, catalog parity, and safe rendered projections
-performance contracts targeted      15 passed (76 assertions), including 2,000-row `12/1/2` query
-                                    budgets plus queue receipt integrity, cleanup, JSON, staging/
-                                    production gates, stricter percentile budgets, and timeout
+performance contracts targeted      20 passed (107 assertions), including 2,000-row `12/1/2` query
+                                    budgets, queue receipt integrity, and actor-bound Analysis
+                                    workload permit, production, percentile, and redaction gates
 API/Admin localization targeted     33 passed (1454 assertions), including regional browser tags,
                                     authenticated preference, fallback, request-state reset, every
-                                    current validator rule/field, 22 typed conflict codes, 179 typed
+                                    current validator rule/field, 23 typed conflict codes, 179 typed
                                     application-validation codes, safe request-scoped rendering,
-                                    migrated-source guards, payment-case Admin access/redaction, and
-                                    Filament rendering
+                                    migrated-source guards, payment-case Admin access/redaction,
+                                    and Filament rendering
 platform validation regression      61 passed (835 assertions) across organizations, listings,
 targeted                            privacy, monitoring/Telegram, product search, sale outcomes,
                                     and manual analysis retry
@@ -784,7 +784,8 @@ GitHub Actions targets PHP 8.3, 8.4, and 8.5 and runs Pest directly with a 512 M
 memory ceiling. The PHP 8.4 job explicitly runs the complete deterministic performance-contract
 directory (the 2,000-row capacity/query budget and queue-throughput safety suite), installs the
 Angular lockfile, audits production Angular dependencies, lints and tests
-Angular, builds `public/spa`, and runs the complete production deployment contract. A separate
+Angular, runs the Node performance-tool contracts, builds `public/spa`, and runs the complete
+production deployment contract. A separate
 bounded job provisions MySQL 8.4 and Redis 7.4, applies every migration, verifies cached Redis/MySQL
 readiness, and runs a dedicated strict-MySQL contract for UTC/session SQL mode, `utf8mb4`, InnoDB,
 foreign keys, migration completeness, index-name bounds, and the reserved `rank` query. The complete
@@ -804,9 +805,10 @@ The following remain intentionally unimplemented:
 - actual production host provisioning, TLS certificates, and release activation,
 - production shared-cache selection, singleton scheduler activation, worker-pool heartbeat
   activation, external readiness monitoring, and controlled staging failure/recovery evidence,
-- production-shaped execution of the implemented bounded Redis queue-throughput/percentile
-  harness, plus concurrent Analysis/API load, real pipeline capacity, saturation, and soak evidence
-  beyond the deterministic dashboard/operations/tenant-list query baseline,
+- production-shaped execution of the implemented bounded Redis queue-throughput/percentile and
+  staging-only Analysis API/pipeline workload harnesses, plus comparable/price/rate sub-scope,
+  Sell, browser, saturation, and soak evidence beyond the deterministic dashboard/operations/
+  tenant-list query baseline,
 - a real external AI provider and production provider credentials/budgets,
 - verified production catalog import/administration and operator match review,
 - approved external exchange-rate ingestion, provider monitoring, and retention operations beyond
@@ -1067,6 +1069,16 @@ completion, jobs/second, and p50/p95/p99 latency. It stores no business rows, au
 accepted shared-cache receipts, allows only stricter budget overrides, and has no production
 bypass. It proves queue transport and worker scheduling, not Analysis/provider processing.
 
+The full Analysis workload harness is also implemented but intentionally cannot run locally or in
+production. In staging, enable `PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED=true`, use Redis for
+`PERFORMANCE_ANALYSIS_WORKLOAD_CACHE_STORE`, prepare dedicated verified load actors and unique
+synthetic listing/target pairs under `storage/app/private`, and follow section 3.6 of
+`docs/19-production-go-live.md`. The permit command stores its token only in a mode-0600 ignored
+private file; the Node runner uses normal cookie/CSRF login and API routes, shapes each actor to 45
+authenticated requests/minute under the application limit of 60, and outputs aggregate evidence
+only. A permit created with `--allow-fake-provider-rehearsal` produces an
+`evidence_eligible=false` report that fails the release gate by design.
+
 Do not copy another computer's `.env` or `APP_KEY` through Git. Open the cloned Procura directory itself as the Codex workspace.
 
 ## 7. Current implementation boundary
@@ -1318,9 +1330,17 @@ The current performance/capacity application boundary is now complete:
 7. CI proves receipt validation, duplicate/late rejection, cleanup, strict JSON, environment/load
    gates, Redis staging enforcement, timeout failure, and budget tightening with sync/fake drivers.
    CI output is not throughput evidence.
-8. Production-shaped staging execution plus full Analysis/API concurrency, real pipeline
-   percentiles, saturation, and soak scenarios remain mandatory in
-   `docs/19-production-go-live.md`.
+8. `operations:issue-analysis-workload-permit` issues an actor-bound, expiring and mutation-bounded
+   token only in staging and writes it only under ignored private storage. Production refuses both
+   issuance and every Analysis mutation carrying the workload header; production preflight also
+   fails if the feature switch is enabled.
+9. `tools/performance/analysis-pipeline-workload.mjs` uses the normal Sanctum, tenant, quota,
+   throttle, draft, submission, polling and worker pipeline. It measures aggregate draft/submit/
+   terminal percentiles, throughput, failures, status codes and terminal states without emitting
+   actors, credentials, cookies, permits, Analysis IDs or listing IDs.
+10. Production-shaped staging execution with approved non-fake providers plus comparable/price/
+    rate attribution, Sell/browser, saturation, and soak scenarios remain mandatory in
+    `docs/19-production-go-live.md`.
 
 Do not expand payment processing beyond the reviewed Stripe hosted-subscription boundary, or add
 escrow, marketplace mutations, scraping, external AI credentials, browser extensions, or
@@ -1343,8 +1363,9 @@ personal organizations and memberships (complete)
 -> effective production-config preflight, trusted host/proxy boundary, and analysis submission kill
    switch (complete; external provider and production values pending)
 -> deterministic capacity fixture, dashboard snapshot, `12/1/2` query budgets, guarded read CLI,
-   and bounded Redis queue throughput/p50/p95/p99 harness (application complete; staging execution,
-   full Analysis/API load, saturation, and soak evidence pending)
+   bounded Redis queue throughput/p50/p95/p99, and staging-only full Analysis API/pipeline workload
+   harnesses (application complete; staging execution, sub-scope/Sell/browser attribution,
+   saturation, and soak evidence pending)
 -> central five-language API/Fortify validation and request-locale isolation (complete)
 -> typed five-language API domain-conflict presentation and raw-message exclusion (complete)
 -> Phase 2 manual listing intake foundation (complete)
@@ -1481,15 +1502,16 @@ personal organizations and memberships (complete)
   test. The test now derives both payloads from one fixed base timestamp. That checkpoint passed
   163 tests and 1139 assertions; the current suite passes 362 tests and 4928 assertions after the
   later Sell, outcome, monitoring, billing, connector, normalization, privacy, Analysis
-  Operations, operational-readiness, deterministic capacity/queue throughput, server/API
+  Operations, operational-readiness, deterministic capacity/queue throughput/Analysis workload,
+  server/API
   localization, typed
   platform-validation, privacy fulfillment/erasure, broker workflow/report/payment-case, and
-  production-preflight boundaries.
+  production-preflight boundaries: 368 tests and 4970 assertions.
 - The local Wamp PHP CLI loads Xdebug in `develop` mode and defaults to a 128 MB memory limit.
   Repeated bare `php artisan test` attempts exhausted that local profile while Pest retained a
   large historical result cache; no assertion failed. The documented CI-equivalent command
   (`php -d xdebug.mode=off -d memory_limit=512M vendor/bin/pest`) passed the then-current 304-test
-  checkpoint. The current 350-test suite also passes with the documented 512 MB boundary. Keep
+  checkpoint. The current 368-test suite also passes with the documented 512 MB boundary. Keep
   using that runner instead of treating the machine-specific 128 MB/Xdebug profile as the project
   test contract.
 - The DealScore migration uses explicit bounded index names and completed directly as MySQL batch

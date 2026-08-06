@@ -437,10 +437,23 @@ load acknowledgement gates, Redis-only staging evidence, versioned-budget tighte
 production refusal, and bounded incomplete-batch timeout. CI uses sync/fake queue drivers only to
 prove those deterministic contracts; it is not throughput evidence.
 
+`tests/Feature/Performance/AnalysisPipelineWorkloadPermitTest.php` and the Node contract at
+`tools/performance/analysis-pipeline-workload.test.mjs` protect the full-pipeline workload boundary:
+ordinary API traffic is unchanged, permits are staging-only, actor-bound, expiring and mutation-
+bounded, production rejection has no override, permit secrets remain in ignored private files,
+fake providers are marked ineligible for release evidence, cookie/CSRF handling is deterministic,
+scenario pairs are unique, percentile calculation is stable, rate limiting fails the run, and the
+aggregate report cannot contain credentials or listing identifiers. CI proves these contracts only;
+it does not make network calls or claim staging capacity.
+
 Actual staging evidence must run `operations:queue-throughput` through shared Redis and the real
 Supervisor worker pools. It measures queue transport/worker scheduling completion, jobs/second,
-and p50/p95/p99 dispatch-to-process latency without creating business records. Full concurrent
-Analysis HTTP creation and processing, comparable selection, price/rate resolution, Sell
-multi-scope recalculation, browser/API percentiles, database/cache/worker saturation, and soak
-testing remain required before launch; none may be claimed from an in-memory SQLite or sync-queue
-test.
+and p50/p95/p99 dispatch-to-process latency without creating business records. The separate
+staging-only Analysis workload must then use `operations:issue-analysis-workload-permit` and
+`tools/performance/analysis-pipeline-workload.mjs` against normal Sanctum session, tenant, quota,
+throttle, create, submit, polling and queue-worker boundaries. It measures draft, submit and
+submit-to-terminal p50/p95/p99 plus completion, throughput, terminal states and HTTP status counts.
+Only a run with approved non-fake analysis and matching providers is release evidence. Comparable/
+price/rate sub-scope attribution, Sell multi-scope recalculation, browser percentiles, database/
+cache/worker saturation, and soak testing remain required before launch; none may be claimed from
+an in-memory SQLite, sync queue, fake-provider rehearsal or CI contract test.

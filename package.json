@@ -11,6 +11,7 @@
         "lint:frontend": "npm --prefix frontend run check:i18n && npm --prefix frontend run lint",
         "check:i18n": "npm --prefix frontend run check:i18n",
         "test:frontend": "npm --prefix frontend run test -- --watch=false",
+        "test:performance-tools": "node --test tools/performance/*.test.mjs",
         "verify:production-serving": "node tools/verify-production-serving.mjs",
         "verify:production-deployment": "npm run verify:production-serving && node tools/verify-production-deployment.mjs"
     }

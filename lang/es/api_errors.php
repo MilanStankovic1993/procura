@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'analysis_workload_permit_rejected' => 'El permiso para la carga controlada de análisis no es válido o no está disponible.',
     'billing_checkout_expired' => 'Esta solicitud de pago ha caducado. Iníciala de nuevo con una clave de idempotencia nueva.',
     'billing_manual_assignment' => 'Este espacio de trabajo tiene un plan asignado por un administrador.',
     'billing_not_configured' => 'El proceso de pago no está configurado para este plan e intervalo.',
