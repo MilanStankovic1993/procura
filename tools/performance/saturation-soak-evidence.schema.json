@@ -1,0 +1,242 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Procura saturation and soak evidence input",
+    "description": "Identifier-free external monitoring export. Phase order, duration, timestamp gaps, monotonic counters and release budgets are additionally enforced by the application verifier.",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "contract_version",
+        "release_sha",
+        "environment",
+        "sample_interval_seconds",
+        "samples"
+    ],
+    "properties": {
+        "contract_version": {
+            "const": "capacity-saturation-soak-input:v1"
+        },
+        "release_sha": {
+            "type": "string",
+            "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+        },
+        "environment": {
+            "const": "staging"
+        },
+        "sample_interval_seconds": {
+            "type": "integer",
+            "minimum": 15,
+            "maximum": 60
+        },
+        "samples": {
+            "type": "array",
+            "minItems": 8,
+            "maxItems": 20000,
+            "items": {
+                "$ref": "#/$defs/sample"
+            }
+        }
+    },
+    "$defs": {
+        "basisPoints": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 10000
+        },
+        "counter": {
+            "type": "integer",
+            "minimum": 0
+        },
+        "queue": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "depth",
+                "oldest_job_age_milliseconds"
+            ],
+            "properties": {
+                "depth": {
+                    "$ref": "#/$defs/counter"
+                },
+                "oldest_job_age_milliseconds": {
+                    "$ref": "#/$defs/counter"
+                }
+            }
+        },
+        "worker": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "busy_utilization_basis_points",
+                "restarts_total"
+            ],
+            "properties": {
+                "busy_utilization_basis_points": {
+                    "$ref": "#/$defs/basisPoints"
+                },
+                "restarts_total": {
+                    "$ref": "#/$defs/counter"
+                }
+            }
+        },
+        "sample": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "observed_at",
+                "phase",
+                "database",
+                "redis",
+                "host",
+                "application",
+                "queues",
+                "workers"
+            ],
+            "properties": {
+                "observed_at": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"
+                },
+                "phase": {
+                    "enum": [
+                        "baseline",
+                        "saturation",
+                        "soak",
+                        "recovery"
+                    ]
+                },
+                "database": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "connection_utilization_basis_points",
+                        "cpu_utilization_basis_points",
+                        "deadlocks_total"
+                    ],
+                    "properties": {
+                        "connection_utilization_basis_points": {
+                            "$ref": "#/$defs/basisPoints"
+                        },
+                        "cpu_utilization_basis_points": {
+                            "$ref": "#/$defs/basisPoints"
+                        },
+                        "deadlocks_total": {
+                            "$ref": "#/$defs/counter"
+                        }
+                    }
+                },
+                "redis": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "memory_utilization_basis_points",
+                        "cpu_utilization_basis_points",
+                        "evicted_keys_total",
+                        "rejected_connections_total"
+                    ],
+                    "properties": {
+                        "memory_utilization_basis_points": {
+                            "$ref": "#/$defs/basisPoints"
+                        },
+                        "cpu_utilization_basis_points": {
+                            "$ref": "#/$defs/basisPoints"
+                        },
+                        "evicted_keys_total": {
+                            "$ref": "#/$defs/counter"
+                        },
+                        "rejected_connections_total": {
+                            "$ref": "#/$defs/counter"
+                        }
+                    }
+                },
+                "host": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "cpu_utilization_basis_points",
+                        "memory_utilization_basis_points"
+                    ],
+                    "properties": {
+                        "cpu_utilization_basis_points": {
+                            "$ref": "#/$defs/basisPoints"
+                        },
+                        "memory_utilization_basis_points": {
+                            "$ref": "#/$defs/basisPoints"
+                        }
+                    }
+                },
+                "application": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "http_requests_total",
+                        "http_server_errors_total",
+                        "jobs_processed_total",
+                        "jobs_failed_total"
+                    ],
+                    "properties": {
+                        "http_requests_total": {
+                            "$ref": "#/$defs/counter"
+                        },
+                        "http_server_errors_total": {
+                            "$ref": "#/$defs/counter"
+                        },
+                        "jobs_processed_total": {
+                            "$ref": "#/$defs/counter"
+                        },
+                        "jobs_failed_total": {
+                            "$ref": "#/$defs/counter"
+                        }
+                    }
+                },
+                "queues": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "analyses",
+                        "connectors",
+                        "notifications",
+                        "default"
+                    ],
+                    "properties": {
+                        "analyses": {
+                            "$ref": "#/$defs/queue"
+                        },
+                        "connectors": {
+                            "$ref": "#/$defs/queue"
+                        },
+                        "notifications": {
+                            "$ref": "#/$defs/queue"
+                        },
+                        "default": {
+                            "$ref": "#/$defs/queue"
+                        }
+                    }
+                },
+                "workers": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "analyses",
+                        "connectors",
+                        "notifications",
+                        "default"
+                    ],
+                    "properties": {
+                        "analyses": {
+                            "$ref": "#/$defs/worker"
+                        },
+                        "connectors": {
+                            "$ref": "#/$defs/worker"
+                        },
+                        "notifications": {
+                            "$ref": "#/$defs/worker"
+                        },
+                        "default": {
+                            "$ref": "#/$defs/worker"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

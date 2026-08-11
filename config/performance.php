@@ -35,6 +35,66 @@ return [
             'maximum_p99_latency_milliseconds' => 30000,
         ],
     ],
+    'saturation_soak_evidence' => [
+        'input_contract_version' => 'capacity-saturation-soak-input:v1',
+        'report_contract_version' => 'capacity-saturation-soak-report:v1',
+        'budget_version' => 'capacity-saturation-soak-budget:v1',
+        'private_directory' => 'performance-evidence',
+        'maximum_file_bytes' => 10_485_760,
+        'maximum_samples' => 20_000,
+        'sample_interval_seconds' => [
+            'minimum' => 15,
+            'maximum' => 60,
+            'maximum_gap_multiplier' => 2,
+        ],
+        'phases' => [
+            'baseline' => [
+                'minimum_duration_seconds' => 300,
+            ],
+            'saturation' => [
+                'minimum_duration_seconds' => 900,
+            ],
+            'soak' => [
+                'minimum_duration_seconds' => 3600,
+            ],
+            'recovery' => [
+                'minimum_duration_seconds' => 600,
+            ],
+        ],
+        'budgets' => [
+            'minimum_http_requests' => 1000,
+            'minimum_jobs_processed' => 100,
+            'minimum_soak_pressure_p50_basis_points' => 5000,
+            'maximum_database_connection_p95_basis_points' => 8000,
+            'maximum_database_cpu_p95_basis_points' => 8000,
+            'maximum_redis_memory_p95_basis_points' => 8000,
+            'maximum_redis_cpu_p95_basis_points' => 8000,
+            'maximum_host_cpu_p95_basis_points' => 8500,
+            'maximum_host_memory_p95_basis_points' => 8500,
+            'maximum_worker_busy_p95_basis_points' => 9000,
+            'maximum_recovery_utilization_basis_points' => 7500,
+            'maximum_http_server_error_rate_basis_points' => 0,
+            'maximum_job_failure_rate_basis_points' => 0,
+            'maximum_database_deadlocks' => 0,
+            'maximum_redis_evicted_keys' => 0,
+            'maximum_redis_rejected_connections' => 0,
+            'maximum_worker_restarts' => 0,
+            'maximum_queue_depth' => [
+                'analyses' => 500,
+                'connectors' => 100,
+                'notifications' => 500,
+                'default' => 100,
+            ],
+            'maximum_queue_oldest_job_age_milliseconds' => [
+                'analyses' => 120_000,
+                'connectors' => 900_000,
+                'notifications' => 120_000,
+                'default' => 120_000,
+            ],
+            'maximum_recovery_queue_depth' => 0,
+            'maximum_recovery_oldest_job_age_milliseconds' => 0,
+        ],
+    ],
     'analysis_pipeline_workload' => [
         'enabled' => (bool) env(
             'PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED',

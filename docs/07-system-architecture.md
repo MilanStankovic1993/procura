@@ -803,6 +803,20 @@ timing budget may only be tightened from the repository baseline, and production
 override. This isolates infrastructure throughput measurement from customer data and from the real
 Analysis pipeline; it does not claim endpoint or provider-processing capacity.
 
+`operations:verify-saturation-soak-evidence` closes the application-side infrastructure evidence
+boundary without coupling Procura to one monitoring vendor. An approved staging collector exports
+only the exact aggregate fields declared in
+`tools/performance/saturation-soak-evidence.schema.json`: resource utilization in basis points,
+cumulative error/event counters, fixed queue depth/age, and fixed worker busy/restart metrics. The
+parser rejects additional fields, malformed or gapped UTC samples, phase reordering, decreasing
+counters, an unexpected release commit, and files outside ignored private storage. The verifier
+requires ordered baseline, saturation, soak, and recovery phases, calculates nearest-rank
+percentiles and deltas, requires median pressure throughout soak rather than accepting one short
+peak, and applies the versioned capacity budget. It permanently refuses
+production. A local rehearsal can prove only the contract; only a passing run executed by the
+staging application reports `release_evidence=true`. The raw monitoring export remains private and
+only the identifier-free aggregate report belongs in release evidence.
+
 ## 9. Deployment
 
 Initial deployment can use:

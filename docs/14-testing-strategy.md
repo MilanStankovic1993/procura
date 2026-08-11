@@ -437,6 +437,15 @@ load acknowledgement gates, Redis-only staging evidence, versioned-budget tighte
 production refusal, and bounded incomplete-batch timeout. CI uses sync/fake queue drivers only to
 prove those deterministic contracts; it is not throughput evidence.
 
+`tests/Feature/Performance/SaturationSoakEvidenceTest.php` protects the vendor-neutral external
+telemetry boundary: a closed JSON schema, ignored-private-file containment, exact release binding,
+strict UTC timeline and phase order, monotonic cumulative counters, exact configured queue/worker
+maps, nearest-rank percentiles, sustained median-soak pressure, versioned capacity/recovery budgets,
+identifier-free output,
+local rehearsal ineligibility, and permanent production refusal. CI uses short synthetic phases and
+does not create traffic or claim infrastructure capacity; the application verifier validates an
+approved collector export but is not itself a load generator or monitoring system.
+
 `tests/Feature/Performance/AnalysisPipelineWorkloadPermitTest.php` and the Node contract at
 `tools/performance/analysis-pipeline-workload.test.mjs` protect the full-pipeline workload boundary:
 ordinary API traffic is unchanged, permits are staging-only, actor-bound, expiring and mutation-
@@ -487,5 +496,7 @@ price/rate/risk sub-scope attribution must then pass the separate staging-only
 Sell workload must then pass `operations:sell-price-intelligence-stage-metrics` over its own isolated
 multi-scope window. The separate browser permit/Chromium runner must then pass all three critical
 routes with the sealed staging origin, profile and budgets. Database/cache/worker saturation and
-soak testing remain required before launch; none may be claimed from an in-memory SQLite, sync
-queue, fake-provider or undersampled rehearsal, or CI contract test.
+soak testing must then be captured by approved external monitoring and pass
+`operations:verify-saturation-soak-evidence` for the exact release. None may be claimed from an
+in-memory SQLite, sync queue, fake-provider, local verifier rehearsal, undersampled run, or CI
+contract test.
