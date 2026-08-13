@@ -962,7 +962,7 @@ The Laragon development environment uses MySQL 8.4 LTS with a local `procura` da
 - Production and primary local development use MySQL 8.4 LTS or a compatible supported successor.
 - Local processing uses Laravel's database queue. Independent analysis, connector, and notification
   Supervisor pools plus a once-per-minute cron scheduler contract exist in `deploy/supervisor/`.
-  The scheduler can emit short-lived shared-cache heartbeats to all four documented queues, but the
+  The scheduler can emit short-lived shared-cache heartbeats to all documented queues, but the
   feature remains off locally and until production activation. Redis, Horizon, external production
   monitoring, and target-host provisioning are not configured yet.
 

@@ -6,7 +6,7 @@ $heartbeatQueues = array_values(array_filter(array_map(
         ',',
         (string) env(
             'OPERATIONS_QUEUE_HEARTBEAT_QUEUES',
-            'analyses,connectors,notifications,default',
+            'analyses,connectors,imports,notifications,default',
         ),
     ),
 )));

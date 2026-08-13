@@ -16,6 +16,10 @@ Schedule::command('marketplace-imports:dispatch-pending --limit=100')
     ->everyMinute()
     ->withoutOverlapping();
 
+Schedule::command('catalog-imports:dispatch-pending --limit=100')
+    ->everyMinute()
+    ->withoutOverlapping();
+
 Schedule::command('notifications:recover-email-deliveries --limit=100')
     ->everyMinute()
     ->withoutOverlapping();

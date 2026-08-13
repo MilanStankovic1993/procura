@@ -485,3 +485,37 @@ and terminal failure metadata. Queue-level exhausted failures and stale processi
 the same domain state. The localized Analysis Operations queue and audited manual retry action now
 cover terminal failed heads. Automatic recovery remains owned by the scheduled dispatcher; manual
 retry remains unavailable while an automatic retry exists.
+
+## 7. Controlled product catalog imports
+
+The global product catalog accepts only reviewed UTF-8 CSV datasets uploaded by a verified super
+administrator. Every upload requires a source name, immutable dataset version, license or
+authorization statement, and explicit source-rights confirmation. The original file remains on the
+private configured disk, and its SHA-256 checksum plus the operator identity are retained in the
+audit trail.
+
+Required columns:
+
+```text
+category_name,category_slug,brand_name,model_name,model_number,
+model_canonical_key,variant_name,variant_canonical_key
+```
+
+Optional columns:
+
+```text
+sku,country_code,market_model_number,voltage_millivolts,plug_type,
+measurement_system,warranty_applicable,model_specifications,variant_attributes,
+included_accessories,aliases,alias_locale,active
+```
+
+`model_specifications` and `variant_attributes` are JSON objects. `included_accessories` is a JSON
+list, and multiple aliases use `|` as the separator. Country codes must already exist in the ISO
+reference table. Import processing is queued on `CATALOG_IMPORT_QUEUE`; operators inspect aggregate
+jobs in **Catalog imports** and every imported, unchanged, or rejected row in **Catalog import
+rows**. Existing canonical identities are never silently overwritten: identical records are marked
+unchanged and conflicting records are rejected with row-level evidence.
+
+The scheduler runs `catalog-imports:dispatch-pending --limit=100` every minute to recover pending
+or stale processing heads. Production workers and queue-heartbeat monitoring must include the
+configured `CATALOG_IMPORT_QUEUE`.
