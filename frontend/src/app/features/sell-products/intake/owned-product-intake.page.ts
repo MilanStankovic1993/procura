@@ -22,6 +22,8 @@ import {
 import { MarketReferenceService } from '../../../core/market-reference.service';
 import { OrganizationContextService } from '../../../core/organizations/organization-context.service';
 
+type IntakeStep = 1 | 2 | 3;
+
 @Component({
   selector: 'app-owned-product-intake-page',
   imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
@@ -44,6 +46,11 @@ export class OwnedProductIntakePage {
   protected readonly error = signal<string | null>(null);
   protected readonly selectedFiles = signal<readonly File[]>([]);
   protected readonly createdOwnedProductId = signal<string | null>(null);
+  protected readonly currentStep = signal<IntakeStep>(1);
+  protected readonly furthestStep = signal<IntakeStep>(1);
+  protected readonly countrySearch = signal('');
+  protected readonly showAllCountries = signal(false);
+  protected readonly steps = { product: 1, condition: 2, goal: 3 } as const;
   protected readonly canManage = computed(
     () =>
       this.organizations
@@ -103,6 +110,24 @@ export class OwnedProductIntakePage {
     );
   }
 
+  protected visibleCountries(): readonly MarketCountry[] {
+    const query = this.countrySearch().trim().toLocaleLowerCase();
+    const selected = new Set(this.form.controls.target_country_codes.value);
+    const countries = this.countriesForSelectedContinent().filter(
+      (country) =>
+        query === '' ||
+        this.countryName(country).toLocaleLowerCase().includes(query) ||
+        country.code.toLocaleLowerCase().includes(query),
+    );
+    const sorted = [...countries].sort((left, right) => {
+      const selectedDifference = Number(selected.has(right.code)) - Number(selected.has(left.code));
+
+      return selectedDifference || this.countryName(left).localeCompare(this.countryName(right));
+    });
+
+    return this.showAllCountries() || query !== '' ? sorted : sorted.slice(0, 12);
+  }
+
   protected countryName(country: MarketCountry): string {
     return this.i18n.regionName(country.code, country.name);
   }
@@ -120,6 +145,79 @@ export class OwnedProductIntakePage {
         validCodes.has(code),
       ),
     );
+    this.countrySearch.set('');
+    this.showAllCountries.set(false);
+  }
+
+  protected updateCountrySearch(event: Event): void {
+    this.countrySearch.set((event.target as HTMLInputElement).value);
+  }
+
+  protected toggleCountry(countryCode: string, event: Event): void {
+    const checked = (event.target as HTMLInputElement).checked;
+    const selected = new Set(this.form.controls.target_country_codes.value);
+
+    if (checked) {
+      selected.add(countryCode);
+    } else {
+      selected.delete(countryCode);
+    }
+
+    this.form.controls.target_country_codes.setValue([...selected]);
+    this.form.controls.target_country_codes.markAsTouched();
+  }
+
+  protected isCountrySelected(countryCode: string): boolean {
+    return this.form.controls.target_country_codes.value.includes(countryCode);
+  }
+
+  protected conditionLabel(condition: OwnedProductCondition): string {
+    const keys = {
+      unknown: 'ownedProduct.condition.unknown',
+      new: 'ownedProduct.condition.new',
+      like_new: 'ownedProduct.condition.like_new',
+      used_good: 'ownedProduct.condition.used_good',
+      used_fair: 'ownedProduct.condition.used_fair',
+      used_poor: 'ownedProduct.condition.used_poor',
+      broken: 'ownedProduct.condition.broken',
+    } as const;
+
+    return this.i18n.translate(keys[condition]);
+  }
+
+  protected goToStep(step: IntakeStep): void {
+    if (step <= this.furthestStep()) {
+      this.currentStep.set(step);
+      this.scrollToTop();
+    }
+  }
+
+  protected isStepComplete(step: IntakeStep): boolean {
+    return this.furthestStep() > step;
+  }
+
+  protected canVisitStep(step: IntakeStep): boolean {
+    return this.furthestStep() >= step;
+  }
+
+  protected nextStep(): void {
+    const step = this.currentStep();
+
+    if (step === 3 || (step === 2 && !this.validateConditionStep())) {
+      return;
+    }
+
+    const next = Math.min(3, step + 1) as IntakeStep;
+    this.furthestStep.update((visited) => Math.max(visited, next) as IntakeStep);
+    this.currentStep.set(next);
+    this.error.set(null);
+    this.scrollToTop();
+  }
+
+  protected previousStep(): void {
+    this.currentStep.set(Math.max(1, this.currentStep() - 1) as IntakeStep);
+    this.error.set(null);
+    this.scrollToTop();
   }
 
   protected selectFiles(event: Event): void {
@@ -310,11 +408,33 @@ export class OwnedProductIntakePage {
     return trimmed === '' ? null : trimmed;
   }
 
+  private validateConditionStep(): boolean {
+    const ageControl = this.form.controls.age_months;
+    ageControl.markAsTouched();
+
+    if (ageControl.invalid) {
+      this.error.set(this.i18n.translate('ownedProduct.intake.ageError'));
+      return false;
+    }
+
+    return true;
+  }
+
+  private scrollToTop(): void {
+    if (globalThis.document !== undefined) {
+      globalThis.document.documentElement.scrollTop = 0;
+    }
+  }
+
   private reset(): void {
     this.catalog.set(null);
     this.categories.set([]);
     this.selectedFiles.set([]);
     this.createdOwnedProductId.set(null);
+    this.currentStep.set(1);
+    this.furthestStep.set(1);
+    this.countrySearch.set('');
+    this.showAllCountries.set(false);
     this.form.reset({
       product_category_id: '',
       brand_name: '',

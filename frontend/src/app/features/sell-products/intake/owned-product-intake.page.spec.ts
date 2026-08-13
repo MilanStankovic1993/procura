@@ -79,11 +79,23 @@ describe('OwnedProductIntakePage', () => {
     const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
     fixture.detectChanges();
 
+    let nextButton = fixture.nativeElement.querySelector(
+      'button.button-primary',
+    ) as HTMLButtonElement;
+    nextButton.click();
+    fixture.detectChanges();
+
     const ageInput = fixture.nativeElement.querySelector(
       'input[type="number"]',
     ) as HTMLInputElement;
     ageInput.value = '18';
     ageInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    nextButton = fixture.nativeElement.querySelector(
+      'button.button-primary',
+    ) as HTMLButtonElement;
+    nextButton.click();
     fixture.detectChanges();
 
     const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;

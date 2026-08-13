@@ -1,12 +1,15 @@
 <div class="page">
+  <a class="back" routerLink="/app/buy">{{ 'listingIntake.back' | t }}</a>
+
   <header>
     <div>
-      <a class="back" routerLink="/app/buy">{{ 'listingIntake.back' | t }}</a>
-      <p class="eyebrow">{{ 'listingIntake.eyebrow' | t }}</p>
+      <p class="eyebrow">{{ 'listingIntake.guidedEyebrow' | t }}</p>
       <h1>{{ 'listingIntake.title' | t }}</h1>
-      <p>{{ 'listingIntake.description' | t }}</p>
+      <p>{{ 'listingIntake.guidedDescription' | t }}</p>
     </div>
-    <span class="scope">{{ 'listingIntake.scope' | t }}</span>
+    <span class="scope">
+      {{ 'guidedIntake.step' | t: { current: currentStep(), total: steps.evidence } }}
+    </span>
   </header>
 
   @if (error()) {
@@ -36,185 +39,262 @@
       </div>
     }
 
+    <nav class="stepper" [attr.aria-label]="'guidedIntake.progress' | t">
+      <button
+        type="button"
+        [class.active]="currentStep() === steps.source"
+        [class.complete]="isStepComplete(steps.source)"
+        (click)="goToStep(steps.source)"
+      >
+        <span>{{ steps.source }}</span>
+        <strong>{{ 'listingIntake.stepSource' | t }}</strong>
+      </button>
+      <button
+        type="button"
+        [class.active]="currentStep() === steps.market"
+        [class.complete]="isStepComplete(steps.market)"
+        [disabled]="!canVisitStep(steps.market)"
+        (click)="goToStep(steps.market)"
+      >
+        <span>{{ steps.market }}</span>
+        <strong>{{ 'listingIntake.stepMarket' | t }}</strong>
+      </button>
+      <button
+        type="button"
+        [class.active]="currentStep() === steps.evidence"
+        [disabled]="!canVisitStep(steps.evidence)"
+        (click)="goToStep(steps.evidence)"
+      >
+        <span>{{ steps.evidence }}</span>
+        <strong>{{ 'listingIntake.stepEvidence' | t }}</strong>
+      </button>
+    </nav>
+
     <form [formGroup]="form" (ngSubmit)="submit()">
       <fieldset [disabled]="createdListingId() !== null || saving()">
-        <section class="panel">
-          <div class="section-heading">
-            <div><p class="eyebrow">01</p><h2>{{ 'listingIntake.sourceIdentity' | t }}</h2></div>
-            <span>{{ 'listingIntake.provenance' | t }}</span>
-          </div>
-          <div class="fields three">
-            <div>
-              <label for="connector">{{ 'listingIntake.connector' | t }}</label>
-              <select id="connector" formControlName="marketplace_source_key">
-                @for (source of sources(); track source.key) {
-                  <option [value]="source.key">{{ source.name }}</option>
-                }
-              </select>
+        @if (currentStep() === steps.source) {
+          <section class="panel guided-panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">{{ 'listingIntake.stepSource' | t }}</p>
+                <h2>{{ 'listingIntake.sourceQuestion' | t }}</h2>
+                <p>{{ 'listingIntake.sourceHelp' | t }}</p>
+              </div>
+              <span>01</span>
             </div>
-            <div>
-              <label for="marketplace-name">{{ 'listingIntake.marketplaceName' | t }}</label>
-              <input id="marketplace-name" formControlName="marketplace_name" />
-            </div>
-            <div>
-              <label for="external-id">{{ 'listingIntake.externalId' | t }}</label>
-              <input id="external-id" formControlName="external_id" />
-            </div>
-            <div class="wide">
-              <label for="source-url">{{ 'listingIntake.sourceUrl' | t }}</label>
-              <input
-                id="source-url"
-                type="url"
-                formControlName="source_url"
-                placeholder="https://marketplace.example/listing/…"
-              />
-            </div>
-          </div>
-        </section>
 
-        <section class="panel">
-          <div class="section-heading">
-            <div><p class="eyebrow">02</p><h2>{{ 'listingIntake.facts' | t }}</h2></div>
-            <span>{{ 'listingIntake.noAi' | t }}</span>
-          </div>
-          <div class="fields two">
-            <div class="wide">
-              <label for="listing-title">{{ 'listingIntake.titleField' | t }}</label>
-              <input id="listing-title" formControlName="title" />
+            <div class="fields one">
+              <div>
+                <label for="source-url">{{ 'listingIntake.sourceUrlPrompt' | t }}</label>
+                <input
+                  id="source-url"
+                  type="url"
+                  formControlName="source_url"
+                  placeholder="https://marketplace.example/listing/..."
+                  (blur)="inferMarketplaceName()"
+                />
+                <small>{{ 'listingIntake.sourceUrlHint' | t }}</small>
+              </div>
+              <div>
+                <label for="listing-title">{{ 'listingIntake.titleField' | t }}</label>
+                <input id="listing-title" formControlName="title" />
+              </div>
+              <div>
+                <label for="description">{{ 'listingIntake.descriptionField' | t }}</label>
+                <textarea id="description" rows="5" formControlName="description"></textarea>
+              </div>
             </div>
-            <div class="wide">
-              <label for="description">{{ 'listingIntake.descriptionField' | t }}</label>
-              <textarea id="description" rows="6" formControlName="description"></textarea>
-            </div>
-            <div>
-              <label for="asking-price">{{ 'listingIntake.askingPrice' | t }}</label>
-              <input
-                id="asking-price"
-                inputmode="decimal"
-                formControlName="price"
-                placeholder="129.99"
-                aria-describedby="price-help"
-              />
-              <small id="price-help">{{ 'listingIntake.priceHelp' | t }}</small>
-              @if (priceError()) { <span class="field-error">{{ priceError() }}</span> }
-            </div>
-            <div>
-              <label for="currency">{{ 'listingIntake.currency' | t }}</label>
-              <select id="currency" formControlName="currency_code">
-                <option value="">{{ 'listingIntake.chooseCurrency' | t }}</option>
-                @for (currency of catalog()?.currencies ?? []; track currency.code) {
-                  <option [value]="currency.code">{{ currency.code }} · {{ currencyName(currency.code, currency.name) }}</option>
-                }
-              </select>
-            </div>
-            <div>
-              <label for="status">{{ 'listingIntake.lifecycle' | t }}</label>
-              <select id="status" formControlName="status">
-                <option value="active">{{ 'listing.status.active' | t }}</option>
-                <option value="reserved">{{ 'listing.status.reserved' | t }}</option>
-                <option value="sold">{{ 'listing.status.sold' | t }}</option>
-                <option value="removed">{{ 'listing.status.removed' | t }}</option>
-                <option value="expired">{{ 'listing.status.expired' | t }}</option>
-                <option value="unknown">{{ 'listing.status.unknown' | t }}</option>
-              </select>
-            </div>
-            <div>
-              <label for="location">{{ 'listingIntake.location' | t }}</label>
-              <input id="location" formControlName="location" />
-            </div>
-            <div class="wide">
-              <label for="seller">{{ 'listingIntake.seller' | t }}</label>
-              <textarea id="seller" rows="3" formControlName="seller_information"></textarea>
-            </div>
-          </div>
-        </section>
 
-        <section class="panel">
-          <div class="section-heading">
-            <div><p class="eyebrow">03</p><h2>{{ 'listingIntake.marketRoute' | t }}</h2></div>
-            <span>{{ 'listingIntake.explicitRoute' | t }}</span>
-          </div>
-          <div class="fields two">
-            <div>
-              <label for="source-country">{{ 'listingIntake.sourceCountry' | t }}</label>
-              <select id="source-country" formControlName="source_country_code">
-                <option value="">{{ 'listingIntake.chooseCountry' | t }}</option>
-                @for (continent of catalog()?.continents ?? []; track continent.code) {
-                  <optgroup [label]="continentName(continent.code, continent.name)">
-                    @for (country of continent.countries; track country.code) {
-                      <option [value]="country.code">{{ countryName(country.code, country.name) }} ({{ country.code }})</option>
+            <details class="optional-details">
+              <summary>{{ 'listingIntake.sourceDetails' | t }}</summary>
+              <div class="fields two">
+                <div>
+                  <label for="marketplace-name">{{ 'listingIntake.marketplaceName' | t }}</label>
+                  <input id="marketplace-name" formControlName="marketplace_name" />
+                </div>
+                <div>
+                  <label for="external-id">{{ 'listingIntake.externalId' | t }}</label>
+                  <input id="external-id" formControlName="external_id" />
+                </div>
+              </div>
+            </details>
+          </section>
+        }
+
+        @if (currentStep() === steps.market) {
+          <section class="panel guided-panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">{{ 'listingIntake.stepMarket' | t }}</p>
+                <h2>{{ 'listingIntake.marketQuestion' | t }}</h2>
+                <p>{{ 'listingIntake.marketHelp' | t }}</p>
+              </div>
+              <span>02</span>
+            </div>
+
+            <div class="route-card">
+              <div class="fields two">
+                <div>
+                  <label for="source-continent">{{ 'listingIntake.sourceContinent' | t }}</label>
+                  <select
+                    id="source-continent"
+                    [value]="sourceContinentCode()"
+                    (change)="sourceContinentCode.set($any($event.target).value); changeContinent('source')"
+                  >
+                    <option value="">{{ 'ownedProduct.intake.chooseContinent' | t }}</option>
+                    @for (continent of catalog()?.continents ?? []; track continent.code) {
+                      <option [value]="continent.code">{{ continentName(continent.code, continent.name) }}</option>
                     }
-                  </optgroup>
-                }
-              </select>
-            </div>
-            <div>
-              <label for="target-country">{{ 'listingIntake.targetCountry' | t }}</label>
-              <select id="target-country" formControlName="target_country_code">
-                <option value="">{{ 'listingIntake.chooseCountry' | t }}</option>
-                @for (continent of catalog()?.continents ?? []; track continent.code) {
-                  <optgroup [label]="continentName(continent.code, continent.name)">
-                    @for (country of continent.countries; track country.code) {
-                      <option [value]="country.code">{{ countryName(country.code, country.name) }} ({{ country.code }})</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="source-country">{{ 'listingIntake.sourceCountry' | t }}</label>
+                  <select id="source-country" formControlName="source_country_code" (change)="changeSourceCountry()">
+                    <option value="">{{ 'listingIntake.chooseCountry' | t }}</option>
+                    @for (country of countriesForContinent(sourceContinentCode()); track country.code) {
+                      <option [value]="country.code">{{ countryName(country.code, country.name) }}</option>
                     }
-                  </optgroup>
-                }
-              </select>
+                  </select>
+                </div>
+                <div>
+                  <label for="target-continent">{{ 'listingIntake.targetContinent' | t }}</label>
+                  <select
+                    id="target-continent"
+                    [value]="targetContinentCode()"
+                    (change)="targetContinentCode.set($any($event.target).value); changeContinent('target')"
+                  >
+                    <option value="">{{ 'ownedProduct.intake.chooseContinent' | t }}</option>
+                    @for (continent of catalog()?.continents ?? []; track continent.code) {
+                      <option [value]="continent.code">{{ continentName(continent.code, continent.name) }}</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label for="target-country">{{ 'listingIntake.targetCountry' | t }}</label>
+                  <select id="target-country" formControlName="target_country_code">
+                    <option value="">{{ 'listingIntake.chooseCountry' | t }}</option>
+                    @for (country of countriesForContinent(targetContinentCode()); track country.code) {
+                      <option [value]="country.code">{{ countryName(country.code, country.name) }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
             </div>
-            <div class="wide">
-              <label for="notes">{{ 'listingIntake.notes' | t }}</label>
-              <textarea id="notes" rows="4" formControlName="notes"></textarea>
-            </div>
-          </div>
-        </section>
 
-        <section class="panel">
-          <div class="section-heading">
-            <div><p class="eyebrow">04</p><h2>{{ 'listingIntake.evidence' | t }}</h2></div>
-            <span>{{ 'listingIntake.evidencePolicy' | t }}</span>
-          </div>
-          <div class="upload-grid">
-            <label class="upload" for="product-images">
-              <strong>{{ 'listingIntake.productImages' | t }}</strong>
-              <span>{{ 'listingIntake.productImageLimit' | t }}</span>
-              <input
-                id="product-images"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-                (change)="selectFiles($event, 'product')"
-              />
-              <small>{{ 'common.selectedCount' | t: { count: productImages().length } }}</small>
-            </label>
-            <label class="upload" for="screenshots">
-              <strong>{{ 'listingIntake.screenshots' | t }}</strong>
-              <span>{{ 'listingIntake.screenshotLimit' | t }}</span>
-              <input
-                id="screenshots"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-                (change)="selectFiles($event, 'screenshot')"
-              />
-              <small>{{ 'common.selectedCount' | t: { count: screenshots().length } }}</small>
-            </label>
-          </div>
-        </section>
+            <div class="fields one price-row">
+              <div>
+                <label for="asking-price">{{ 'listingIntake.askingPrice' | t }}</label>
+                <div class="price-input">
+                  <input id="asking-price" inputmode="decimal" formControlName="price" placeholder="129.99" />
+                  <span>{{ form.controls.currency_code.value }}</span>
+                </div>
+                @if (priceError()) { <span class="field-error">{{ priceError() }}</span> }
+              </div>
+            </div>
+            <details class="currency-details">
+              <summary>{{ 'listingIntake.currency' | t }}: {{ form.controls.currency_code.value }}</summary>
+              <div class="currency-select">
+                <select id="currency" formControlName="currency_code">
+                  <option value="">{{ 'listingIntake.chooseCurrency' | t }}</option>
+                  @for (currency of catalog()?.currencies ?? []; track currency.code) {
+                    <option [value]="currency.code">{{ currency.code }} · {{ currencyName(currency.code, currency.name) }}</option>
+                  }
+                </select>
+              </div>
+            </details>
+          </section>
+        }
+
+        @if (currentStep() === steps.evidence) {
+          <section class="panel guided-panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">{{ 'listingIntake.stepEvidence' | t }}</p>
+                <h2>{{ 'listingIntake.evidenceQuestion' | t }}</h2>
+                <p>{{ 'listingIntake.evidenceHelp' | t }}</p>
+              </div>
+              <span>03</span>
+            </div>
+
+            <div class="upload-grid">
+              <label class="upload" for="product-images">
+                <strong>{{ 'listingIntake.productImages' | t }}</strong>
+                <span>{{ 'listingIntake.productImageLimit' | t }}</span>
+                <input id="product-images" type="file" accept="image/jpeg,image/png,image/webp" multiple (change)="selectFiles($event, 'product')" />
+                <small>{{ 'common.selectedCount' | t: { count: productImages().length } }}</small>
+              </label>
+              <label class="upload" for="screenshots">
+                <strong>{{ 'listingIntake.screenshots' | t }}</strong>
+                <span>{{ 'listingIntake.screenshotLimit' | t }}</span>
+                <input id="screenshots" type="file" accept="image/jpeg,image/png,image/webp" multiple (change)="selectFiles($event, 'screenshot')" />
+                <small>{{ 'common.selectedCount' | t: { count: screenshots().length } }}</small>
+              </label>
+            </div>
+
+            <section class="review-card">
+              <p class="eyebrow">{{ 'guidedIntake.review' | t }}</p>
+              <h3>{{ form.controls.title.value }}</h3>
+              <dl>
+                <div>
+                  <dt>{{ 'listingIntake.reviewSource' | t }}</dt>
+                  <dd>{{ form.controls.marketplace_name.value }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'listingIntake.reviewRoute' | t }}</dt>
+                  <dd>{{ form.controls.source_country_code.value }} → {{ form.controls.target_country_code.value }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'listingIntake.reviewFiles' | t }}</dt>
+                  <dd>{{ productImages().length + screenshots().length }}</dd>
+                </div>
+              </dl>
+            </section>
+
+            <details class="optional-details">
+              <summary>{{ 'guidedIntake.optionalDetails' | t }}</summary>
+              <div class="fields two">
+                <div>
+                  <label for="location">{{ 'listingIntake.location' | t }}</label>
+                  <input id="location" formControlName="location" />
+                </div>
+                <div>
+                  <label for="seller">{{ 'listingIntake.seller' | t }}</label>
+                  <textarea id="seller" rows="3" formControlName="seller_information"></textarea>
+                </div>
+                <div class="wide">
+                  <label for="notes">{{ 'listingIntake.notes' | t }}</label>
+                  <textarea id="notes" rows="3" formControlName="notes"></textarea>
+                </div>
+              </div>
+            </details>
+          </section>
+        }
       </fieldset>
 
       <footer>
-        <p>
-          {{ 'listingIntake.footer' | t }}
-        </p>
-        <button class="button button-primary" type="submit" [disabled]="saving()">
-          @if (saving()) {
-            {{ 'common.saving' | t }}
-          } @else if (createdListingId()) {
-            {{ 'listingIntake.retryUploads' | t }}
-          } @else {
-            {{ 'listingIntake.save' | t }}
-          }
-        </button>
+        @if (currentStep() !== steps.source) {
+          <button class="button button-quiet" type="button" (click)="previousStep()">
+            {{ 'guidedIntake.back' | t }}
+          </button>
+        } @else {
+          <span></span>
+        }
+
+        @if (currentStep() !== steps.evidence) {
+          <button class="button button-primary" type="button" (click)="nextStep()">
+            {{ 'guidedIntake.next' | t }}
+          </button>
+        } @else {
+          <button class="button button-primary" type="submit" [disabled]="saving()">
+            @if (saving()) {
+              {{ 'common.saving' | t }}
+            } @else if (createdListingId()) {
+              {{ 'listingIntake.retryUploads' | t }}
+            } @else {
+              {{ 'listingIntake.save' | t }}
+            }
+          </button>
+        }
       </footer>
     </form>
   }

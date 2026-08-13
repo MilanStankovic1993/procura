@@ -26,6 +26,8 @@ interface UploadBatch {
   readonly files: readonly File[];
 }
 
+type IntakeStep = 1 | 2 | 3;
+
 @Component({
   selector: 'app-listing-intake-page',
   imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
@@ -51,6 +53,11 @@ export class ListingIntakePage {
   protected readonly screenshots = signal<readonly File[]>([]);
   protected readonly createdListingId = signal<string | null>(null);
   protected readonly uploadedKinds = signal<ReadonlySet<ListingImageKind>>(new Set());
+  protected readonly currentStep = signal<IntakeStep>(1);
+  protected readonly furthestStep = signal<IntakeStep>(1);
+  protected readonly sourceContinentCode = signal('');
+  protected readonly targetContinentCode = signal('');
+  protected readonly steps = { source: 1, market: 2, evidence: 3 } as const;
   protected readonly canManage = computed(
     () =>
       this.organizations.activeOrganization()?.capabilities.includes('listings.manage') ===
@@ -88,6 +95,100 @@ export class ListingIntakePage {
 
   protected retryReferenceData(): void {
     this.loadReferenceData();
+  }
+
+  protected countriesForContinent(continentCode: string) {
+    return (
+      this.catalog()?.continents.find((continent) => continent.code === continentCode)
+        ?.countries ?? []
+    );
+  }
+
+  protected changeContinent(kind: 'source' | 'target'): void {
+    const continentCode =
+      kind === 'source' ? this.sourceContinentCode() : this.targetContinentCode();
+    const control =
+      kind === 'source'
+        ? this.form.controls.source_country_code
+        : this.form.controls.target_country_code;
+    const validCodes = new Set(
+      this.countriesForContinent(continentCode).map((country) => country.code),
+    );
+
+    if (!validCodes.has(control.value)) {
+      control.setValue('');
+    }
+  }
+
+  protected changeSourceCountry(): void {
+    const sourceCountryCode = this.form.controls.source_country_code.value;
+    const currencyCode = this.catalog()?.continents
+      .flatMap((continent) => continent.countries)
+      .find((country) => country.code === sourceCountryCode)?.currency_code;
+
+    if (currencyCode != null) {
+      this.form.controls.currency_code.setValue(currencyCode);
+    }
+  }
+
+  protected inferMarketplaceName(): void {
+    const sourceUrl = this.form.controls.source_url.value.trim();
+
+    if (sourceUrl === '') {
+      return;
+    }
+
+    try {
+      const normalizedUrl = /^https?:\/\//i.test(sourceUrl)
+        ? sourceUrl
+        : `https://${sourceUrl}`;
+      const hostname = new URL(normalizedUrl).hostname.replace(/^www\./, '');
+      if (hostname !== '') {
+        this.form.controls.source_url.setValue(normalizedUrl);
+        this.form.controls.marketplace_name.setValue(hostname);
+      }
+    } catch {
+      // The API validation remains the source of truth for an incomplete URL.
+    }
+  }
+
+  protected goToStep(step: IntakeStep): void {
+    if (step <= this.furthestStep()) {
+      this.currentStep.set(step);
+      this.scrollToTop();
+    }
+  }
+
+  protected isStepComplete(step: IntakeStep): boolean {
+    return this.furthestStep() > step;
+  }
+
+  protected canVisitStep(step: IntakeStep): boolean {
+    return this.furthestStep() >= step;
+  }
+
+  protected nextStep(): void {
+    const step = this.currentStep();
+
+    if (step === 1 && !this.validateSourceStep()) {
+      return;
+    }
+
+    if (step === 2 && !this.validateMarketStep()) {
+      return;
+    }
+
+    const next = Math.min(3, step + 1) as IntakeStep;
+    this.furthestStep.update((visited) => Math.max(visited, next) as IntakeStep);
+    this.currentStep.set(next);
+    this.error.set(null);
+    this.scrollToTop();
+  }
+
+  protected previousStep(): void {
+    this.currentStep.set(Math.max(1, this.currentStep() - 1) as IntakeStep);
+    this.error.set(null);
+    this.scrollToTop();
   }
 
   protected selectFiles(event: Event, kind: ListingImageKind): void {
@@ -140,6 +241,8 @@ export class ListingIntakePage {
       this.uploadPending(this.createdListingId() as string);
       return;
     }
+
+    this.ensureMarketplaceName();
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -239,7 +342,7 @@ export class ListingIntakePage {
       marketplace_source_key: 'manual',
       source_url: '',
       external_id: '',
-      marketplace_name: '',
+      marketplace_name: 'Manual entry',
       title: '',
       description: '',
       price: '',
@@ -257,6 +360,10 @@ export class ListingIntakePage {
     this.screenshots.set([]);
     this.createdListingId.set(null);
     this.uploadedKinds.set(new Set());
+    this.currentStep.set(1);
+    this.furthestStep.set(1);
+    this.sourceContinentCode.set('');
+    this.targetContinentCode.set('');
     this.priceError.set(null);
   }
 
@@ -280,7 +387,90 @@ export class ListingIntakePage {
       source_country_code: sourceCountry,
       target_country_code: targetCountry,
       currency_code: preferences.reporting_currency_code ?? countryCurrency ?? '',
+      marketplace_name: sources[0]?.name ?? 'Manual entry',
     });
+
+    this.sourceContinentCode.set(
+      catalog.continents.find((continent) =>
+        continent.countries.some((country) => country.code === sourceCountry),
+      )?.code ?? '',
+    );
+    this.targetContinentCode.set(
+      catalog.continents.find((continent) =>
+        continent.countries.some((country) => country.code === targetCountry),
+      )?.code ?? '',
+    );
+  }
+
+  private validateSourceStep(): boolean {
+    this.inferMarketplaceName();
+    this.ensureMarketplaceName();
+    const controls = [
+      this.form.controls.title,
+      this.form.controls.marketplace_name,
+    ];
+    controls.forEach((control) => control.markAsTouched());
+
+    if (controls.some((control) => control.invalid)) {
+      this.error.set(this.i18n.translate('listingIntake.requiredError'));
+      return false;
+    }
+
+    return true;
+  }
+
+  private validateMarketStep(): boolean {
+    const controls = [
+      this.form.controls.source_country_code,
+      this.form.controls.target_country_code,
+    ];
+    controls.forEach((control) => control.markAsTouched());
+
+    if (controls.some((control) => control.invalid)) {
+      this.error.set(this.i18n.translate('listingIntake.requiredError'));
+      return false;
+    }
+
+    const value = this.form.getRawValue();
+    this.priceError.set(null);
+
+    if (value.price.trim() !== '' && value.currency_code === '') {
+      this.priceError.set(this.i18n.translate('listingIntake.choosePriceCurrency'));
+      this.error.set(this.i18n.translate('listingIntake.priceReview'));
+      return false;
+    }
+
+    try {
+      if (value.price.trim() !== '') {
+        const minorUnit =
+          this.catalog()?.currencies.find(
+            (currency) => currency.code === value.currency_code,
+          )?.minor_unit ?? 2;
+        parseMoneyToMinor(value.price, minorUnit);
+      }
+    } catch {
+      this.priceError.set(this.i18n.translate('listingIntake.priceInvalid'));
+      this.error.set(this.i18n.translate('listingIntake.priceReview'));
+      return false;
+    }
+
+    return true;
+  }
+
+  private ensureMarketplaceName(): void {
+    if (this.form.controls.marketplace_name.value.trim() !== '') {
+      return;
+    }
+
+    this.form.controls.marketplace_name.setValue(
+      this.sources()[0]?.name ?? 'Manual entry',
+    );
+  }
+
+  private scrollToTop(): void {
+    if (globalThis.document !== undefined) {
+      globalThis.document.documentElement.scrollTop = 0;
+    }
   }
 
   private uploadPending(listingId: string): void {
