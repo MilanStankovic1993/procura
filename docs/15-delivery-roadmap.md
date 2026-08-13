@@ -20,6 +20,9 @@ Duration: 2–3 weeks.
 Deliverables:
 
 - Laravel setup,
+- user-first workspace action center (complete: two capability-aware Buy/Sell entry points,
+  recent tenant work, explicit loading/error/empty states, responsive five-language interface,
+  and no infrastructure diagnostics in customer-facing copy),
 - authentication,
 - organizations,
 - roles,

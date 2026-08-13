@@ -2,6 +2,12 @@
 
 Last updated: 2026-08-11
 
+The authenticated overview is now a user action center rather than a technical readiness page.
+It routes directly to the guided Buy and Sell intake flows, respects workspace capabilities, and
+loads only the three most recent tenant listings and owned products for quick continuation.
+Infrastructure readiness remains exclusively in the protected Filament operations dashboard and
+machine health contracts.
+
 This document is the persistent handoff for continuing Procura development on another computer or
 in a new Codex task. Read it after the preceding product and architecture documents and verify the
 repository before making changes. `docs/19-production-go-live.md` is the separate mandatory source
