@@ -1,6 +1,6 @@
 # 18 - Development Handoff
 
-Last updated: 2026-08-06
+Last updated: 2026-08-11
 
 This document is the persistent handoff for continuing Procura development on another computer or
 in a new Codex task. Read it after the preceding product and architecture documents and verify the
@@ -437,7 +437,7 @@ Local verification completed for this task:
 ```text
 php artisan migrate:status          passed through batch 48 on MySQL 8.4.3; 51 migrations retained
 $env:XDEBUG_MODE='off'; php -d memory_limit=512M vendor/bin/pest --compact
-                                    392 passed (5149 assertions) in 220.84 seconds
+                                    403 passed (5213 assertions) in 144.20 seconds
 production preflight targeted       17 passed (398 assertions), including cached-config inspection,
                                     secret-safe JSON, strict warning enforcement, sanitized
                                     production-template/UTC validation, and trusted proxy rejection
@@ -454,11 +454,12 @@ commission calculator targeted      2 passed (5 assertions), including half-up b
 capacity/Admin/Analysis/readiness   53 passed (439 assertions), including a 2,000-row capacity
 targeted                            fixture, cache recovery, tenant query bounds, queue dispatch,
                                     exact JSON, catalog parity, and safe rendered projections
-performance contracts targeted      34 passed (195 assertions), including 2,000-row `12/1/2` query
+performance contracts targeted      50 passed (294 assertions), including 2,000-row `12/1/2` query
                                     budgets, queue receipt integrity, actor-bound Analysis workload
-                                    permits, sealed browser scenario permits, and Analysis/Sell
-                                    stage-ledger, multi-scope, percentile, retention, fail-open,
-                                    version and redaction gates
+                                    permits, sealed browser scenario permits, strict saturation/soak
+                                    schema/release/recovery gates, and Analysis/Sell stage-ledger,
+                                    multi-scope, percentile, retention, fail-open, version and
+                                    redaction gates
 API/Admin localization targeted     33 passed (1454 assertions), including regional browser tags,
                                     authenticated preference, fallback, request-state reset, every
                                     current validator rule/field, 23 typed conflict codes, 179 typed
@@ -1403,9 +1404,16 @@ The current performance/capacity application boundary is now complete:
     staging-only report requires exact reviewed comparable operations/scopes, real multi-scope and
     fresh projection work, one version set and passing p95 budgets; writes fail open, production
     aggregation is forbidden, retention is daily/bounded, and production preflight requires it.
-13. Production-shaped staging execution with approved non-fake providers plus real Sell and sealed
-    browser evidence, saturation, and soak scenarios remain mandatory in
-    `docs/19-production-go-live.md`.
+13. `operations:verify-saturation-soak-evidence` validates one exact-release external monitoring
+    export from ignored private storage. Its closed v1 contract covers ordered baseline,
+    saturation, soak and recovery samples; database/Redis/host utilization; application/event
+    counters; and every configured queue/worker pool. It rejects extra fields, path escape, malformed
+    timelines, decreasing counters, weak pressure, over-budget p95/queue age, errors/restarts and
+    incomplete recovery. Production has no override and local rehearsal is never release evidence.
+14. Production-shaped staging execution with approved non-fake providers plus real Sell, sealed
+    browser and passing saturation/soak evidence remain mandatory in
+    `docs/19-production-go-live.md`. The verifier does not generate load or replace external
+    monitoring and independent approval.
 
 Do not expand payment processing beyond the reviewed Stripe hosted-subscription boundary, or add
 escrow, marketplace mutations, scraping, external AI credentials, browser extensions, or
@@ -1429,8 +1437,9 @@ personal organizations and memberships (complete)
    switch (complete; external provider and production values pending)
 -> deterministic capacity fixture, dashboard snapshot, `12/1/2` query budgets, guarded read CLI,
    bounded Redis queue throughput/p50/p95/p99, and staging-only full Analysis API/pipeline workload
-   plus six-stage attribution harnesses (application complete; staging execution, Sell/browser
-   attribution, saturation, and soak evidence pending)
+   plus six-stage attribution and exact-release saturation/soak verification harnesses (application
+   complete; production-shaped staging execution and real Sell/browser/infrastructure evidence
+   pending)
 -> central five-language API/Fortify validation and request-locale isolation (complete)
 -> typed five-language API domain-conflict presentation and raw-message exclusion (complete)
 -> Phase 2 manual listing intake foundation (complete)
@@ -1565,18 +1574,16 @@ personal organizations and memberships (complete)
 - A slow parallel validation run crossed a one-second boundary between initial and duplicate
   comparable fixture timestamps, correctly producing a new evidence record and exposing a flaky
   test. The test now derives both payloads from one fixed base timestamp. That checkpoint passed
-  163 tests and 1139 assertions; the current suite passes 362 tests and 4928 assertions after the
-  later Sell, outcome, monitoring, billing, connector, normalization, privacy, Analysis
-  Operations, operational-readiness, deterministic capacity/queue throughput/Analysis workload,
-  server/API
-  localization, typed
-  platform-validation, privacy fulfillment/erasure, broker workflow/report/payment-case, and
-  production-preflight boundaries: 368 tests and 4970 assertions.
+  163 tests and 1139 assertions. The current suite passes 403 tests and 5213 assertions after the
+  later Sell, outcome, monitoring, billing, connector, normalization, privacy, Analysis Operations,
+  operational-readiness, deterministic capacity/queue throughput/Analysis workload, browser,
+  saturation/soak, server/API localization, typed platform-validation, privacy fulfillment/erasure,
+  broker workflow/report/payment-case, and production-preflight boundaries.
 - The local Wamp PHP CLI loads Xdebug in `develop` mode and defaults to a 128 MB memory limit.
   Repeated bare `php artisan test` attempts exhausted that local profile while Pest retained a
   large historical result cache; no assertion failed. The documented CI-equivalent command
   (`php -d xdebug.mode=off -d memory_limit=512M vendor/bin/pest`) passed the then-current 304-test
-  checkpoint. The current 368-test suite also passes with the documented 512 MB boundary. Keep
+  checkpoint. The current 403-test suite also passes with the documented 512 MB boundary. Keep
   using that runner instead of treating the machine-specific 128 MB/Xdebug profile as the project
   test contract.
 - The DealScore migration uses explicit bounded index names and completed directly as MySQL batch

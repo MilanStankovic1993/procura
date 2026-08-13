@@ -55,8 +55,9 @@ Deliverables:
   evidence remains part of each release record),
 - deterministic scale fixture, versioned dashboard/operations/tenant-list query budgets,
   stampede-protected dashboard snapshot, guarded read-capacity CLI, and bounded Redis
-  queue-throughput/percentile workload (application harness complete; production-shaped staging
-  execution, full Analysis/API concurrency, saturation, and soak evidence remain launch work),
+  queue-throughput/percentile workload plus a release-bound, vendor-neutral saturation/soak
+  telemetry verifier (application harness complete; production-shaped staging execution and the
+  resulting real Analysis/Sell/browser/infrastructure evidence remain launch work),
 - test foundation.
 
 ## Phase 2 — Buy Analysis MVP

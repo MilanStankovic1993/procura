@@ -1,6 +1,6 @@
 # 19 - Production Go-Live Register
 
-Last updated: 2026-08-05
+Last updated: 2026-08-11
 
 This file is the single operational source of truth for everything that must be configured outside
 the Procura codebase before a production release can be activated. It contains variable names,
@@ -260,8 +260,8 @@ Incident and rollback boundary:
 ### 3.6 Capacity baseline, queue throughput, Analysis pipeline load/stage attribution, and dashboard aggregate cache
 
 Status: **deterministic query, bounded queue-workload, full Analysis API/pipeline workload,
-six-stage attribution, and critical-browser percentile harnesses complete; production-shaped
-staging execution and broader saturation/soak evidence pending**
+six-stage attribution, critical-browser percentile, and saturation/soak verification harnesses
+complete; production-shaped staging execution and real release evidence pending**
 
 Application controls now present:
 
@@ -309,6 +309,21 @@ Application controls now present:
   more than 1 second, route-ready p95 no more than 4 seconds, LCP p95 no more than 2.5 seconds, CLS
   p95 no more than 0.1, the exact `browser-desktop-profile:v1`, and the exact
   `browser-workload-budget:v1`. An undersampled rehearsal is always ineligible;
+- `operations:verify-saturation-soak-evidence` reads at most 10 MiB only from ignored
+  `storage/app/private/performance-evidence`, binds the input to the expected immutable release,
+  rejects every field outside the closed
+  `tools/performance/saturation-soak-evidence.schema.json` contract, and permanently refuses
+  production. A local `--allow-local-rehearsal` run is always marked `release_evidence=false`;
+- the v1 infrastructure contract requires 15-to-60-second UTC samples with no gap greater than two
+  intervals, monotonically increasing counters, exact `analyses`, `connectors`, `notifications` and
+  `default` queue/worker maps, and ordered baseline/saturation/soak/recovery phases lasting at least
+  5/15/60/10 minutes. The default gate requires at least 1,000 HTTP requests and 100 processed jobs
+  within the saturation/soak load window,
+  at least 50% database/Redis/every-worker pressure through the median soak sample, bounded
+  resource/queue p95 and age, zero server
+  errors, job failures, deadlocks, Redis evictions/rejections and worker restarts, then empty queues
+  and recovered utilization. The report contains only aggregates, fixed queue names, the release
+  commit and timestamps;
 - every terminal AI attempt writes one immutable best-effort metric row with fixed microsecond
   timings for provider analysis, product matching, comparable selection, price/rate estimation,
   risk assessment, finalization and total. It stores no request/result/error payload, tenant/user/
@@ -546,9 +561,33 @@ node tools/performance/browser-workload.mjs > browser-workload-report.json
     scenario keys, zero failure and HTTP-error counts, the reviewed Chromium major version and all
     versioned p95 budgets. Delete both private files after review and disable the staging switch.
     `--allow-undersampled-rehearsal` is contract testing only and cannot pass the release gate.
-17. Continue with the remaining performance plan: database/cache/worker saturation beyond the
-    bounded runs and an approved soak window. Queue throughput, Analysis, Sell, and browser reports
-    prove only their covered boundaries.
+17. In a separately approved isolated staging window, use the production-shaped synthetic dataset,
+    real workers and approved load generators to exercise database, Redis, host and all four worker
+    pools. External monitoring must sample every field in
+    `tools/performance/saturation-soak-evidence.schema.json`; do not add host names, connection
+    strings, tenant/user/business identifiers, URLs, provider payloads or credentials. Record the
+    exact immutable release and use `baseline -> saturation -> soak -> recovery` in that order.
+    The schema proves structure only; the application verifier additionally enforces duration,
+    continuity, monotonic counters and budgets.
+18. Export the raw JSON directly to ignored private storage, set permissions for the release
+    operator only, and verify the same release on the staging application host:
+
+```bash
+mkdir -p storage/app/private/performance-evidence
+php artisan operations:verify-saturation-soak-evidence \
+  --input=<private-evidence-file.json> \
+  --expected-release=<exact-immutable-git-commit> \
+  --json > saturation-soak-report.json
+```
+
+    Require exit code zero, `status=passed`, `release_evidence=true`, exact
+    `capacity-saturation-soak-report:v1` and `capacity-saturation-soak-budget:v1`, the expected
+    release, all four minimum phase durations, no `failed_checks`, and an independent match between
+    the aggregate report and the approved external dashboard window. A local
+    `--allow-local-rehearsal` result is contract verification only and cannot pass the release gate.
+    Delete the raw private export after independent review under the evidence-retention policy;
+    retain only the aggregate report and external dashboard/ticket references. Queue throughput,
+    Analysis, Sell, browser and saturation/soak reports each prove only their covered boundary.
 
 Production diagnostic boundary:
 
@@ -562,6 +601,8 @@ Production diagnostic boundary:
 - `operations:sell-price-intelligence-stage-metrics` is always rejected in production. Ordinary
   production Sell metrics and the scheduled 02:50 retention purge remain active; never use the
   staging aggregator as a production load or diagnostic command;
+- `operations:verify-saturation-soak-evidence` is always rejected in production. It validates an
+  exact-release staging export only and must never ingest production monitoring data;
 - normal production monitoring uses real latency, slow-query, queue, saturation, and error-rate
   telemetry, not repeated capacity commands;
 - one production read-baseline run requires an approved maintenance/incident ticket, an off-peak
@@ -1560,7 +1601,8 @@ system, with evidence. At minimum:
   monitor confirms controlled failure and recovery,
 - production-shaped staging capacity evidence passes the versioned query/duration budgets, every
   configured worker pool passes the bounded queue-throughput completion/p95/p99 target, and the
-  remaining full-pipeline concurrent load/saturation/soak scenarios meet the approved launch target,
+  full-pipeline concurrent load plus exact-release saturation/soak report pass their versioned
+  launch gates,
 - privacy, terms, billing, tax, refund, retention, and incident-response procedures are approved,
 - load, security, tenancy, authorization, localization, accessibility, and disaster-recovery checks
   meet the launch target,
