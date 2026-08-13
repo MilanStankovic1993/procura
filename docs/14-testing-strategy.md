@@ -206,6 +206,11 @@ The initial catalog-matching fixture set is implemented in feature tests and cov
 - region-incompatible variants requiring review,
 - authenticated, validated, and bounded catalog search/read responses,
 - tenant isolation of match results.
+- verified-super-admin-only confirmation and rejection of the exact current match head,
+- immutable review evidence, UUID replay safety, stale-head refusal, and platform audit evidence,
+- existing active model/variant enforcement, optional target-market alias creation, and dependent
+  Buy recalculation,
+- localized Filament review-queue action delegation.
 
 The initial comparable-selection fixture set is implemented in feature tests and covers:
 

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use LogicException;
 
 class ProductMatch extends Model
@@ -69,6 +70,33 @@ class ProductMatch extends Model
             ])) {
                 throw new LogicException('Product match evidence is immutable after creation.');
             }
+
+            if ($match->isDirty([
+                'review_status',
+                'reviewed_by_user_id',
+                'reviewed_at',
+            ])) {
+                $validDecision = $match->getRawOriginal('review_status')
+                    === ProductMatchReviewStatus::Pending->value
+                    && in_array($match->review_status, [
+                        ProductMatchReviewStatus::Confirmed,
+                        ProductMatchReviewStatus::Rejected,
+                    ], true)
+                    && $match->reviewed_by_user_id !== null
+                    && $match->reviewed_at !== null;
+
+                if (! $validDecision) {
+                    throw new LogicException(
+                        'A product match review decision is final and evidence-bound.',
+                    );
+                }
+            }
+        });
+
+        static::deleting(function (): never {
+            throw new LogicException(
+                'Product match evidence cannot be deleted individually.',
+            );
         });
     }
 
@@ -105,5 +133,18 @@ class ProductMatch extends Model
     public function riskAssessments(): HasMany
     {
         return $this->hasMany(RiskAssessment::class)->orderByDesc('run_number');
+    }
+
+    public function reviewEvent(): HasOne
+    {
+        return $this->hasOne(ProductMatchReviewEvent::class);
+    }
+
+    public function resultingReviewEvent(): HasOne
+    {
+        return $this->hasOne(
+            ProductMatchReviewEvent::class,
+            'result_product_match_id',
+        );
     }
 }

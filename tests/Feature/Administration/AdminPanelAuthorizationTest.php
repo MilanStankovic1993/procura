@@ -32,6 +32,7 @@ use App\Filament\Resources\Organizations\OrganizationResource;
 use App\Filament\Resources\PlanFeatures\PlanFeatureResource;
 use App\Filament\Resources\Plans\PlanResource;
 use App\Filament\Resources\PrivacyRequests\PrivacyRequestResource;
+use App\Filament\Resources\ProductMatchReviews\ProductMatchReviewResource;
 use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use App\Filament\Resources\TelegramConnections\TelegramConnectionResource;
 use App\Filament\Resources\Usages\UsageResource;
@@ -93,7 +94,8 @@ test('verified super administrators can access operational resources while resou
         ->and(BrokerCommissionResource::canCreate())->toBeFalse()
         ->and(BrokerPaymentCaseResource::canCreate())->toBeFalse()
         ->and(BrokerReportResource::canCreate())->toBeFalse()
-        ->and(PrivacyRequestResource::canCreate())->toBeFalse();
+        ->and(PrivacyRequestResource::canCreate())->toBeFalse()
+        ->and(ProductMatchReviewResource::canCreate())->toBeFalse();
 
     $this->actingAs($admin)
         ->get(route('filament.admin.pages.dashboard'))
@@ -124,6 +126,7 @@ test('verified super administrators can access operational resources while resou
         BrokerPaymentCaseResource::class,
         BrokerReportResource::class,
         PrivacyRequestResource::class,
+        ProductMatchReviewResource::class,
     ] as $resource) {
         $this->actingAs($admin)
             ->get($resource::getUrl())

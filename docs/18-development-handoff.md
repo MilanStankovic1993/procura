@@ -205,8 +205,13 @@ and reason codes, and returns explicit matched, unmatched, or review-required st
 region-incompatible evidence never creates or silently selects a product. Authenticated bounded
 catalog search/read endpoints are available, and Angular explains the chosen product, confidence,
 matcher version, review state, reasons, and candidates. The real development catalog is
-intentionally empty until a verified import or audited administration workflow is implemented;
-test catalog fixtures are test-only.
+intentionally empty until a verified import workflow is implemented; test catalog fixtures are
+test-only. The audited operator review boundary is now implemented in Filament: a verified super
+administrator can confirm the exact current pending match against an existing active canonical
+model and optional valid variant, optionally create a target-market alias, or reject the evidence.
+Every decision requires a reason and UUID idempotency, preserves the original matcher evidence,
+appends an immutable review event and platform audit event, and recalculates dependent Buy evidence
+after confirmation. Catalog model creation remains outside this review action.
 
 The immutable comparable-evidence and deterministic-selection boundary is now implemented.
 Tenant-owned `ComparableRecord` rows preserve the approved manual source, canonical model and
@@ -813,7 +818,7 @@ The following remain intentionally unimplemented:
   attribution harnesses, plus the real staging Sell, browser, saturation, and soak evidence beyond
   the deterministic dashboard/operations/tenant-list query baseline,
 - a real external AI provider and production provider credentials/budgets,
-- verified production catalog import/administration and operator match review,
+- verified production catalog import and broader catalog administration,
 - approved external exchange-rate ingestion, provider monitoring, and retention operations beyond
   the explicit immutable manual recording command,
 - authorized email-feed, contracted partner-feed, and approved official-API marketplace
@@ -885,6 +890,9 @@ The Laragon development environment uses MySQL 8.4 LTS with a local `procura` da
   search fields, active lifecycle, regional attributes, and explicit alias market scope.
 - `product_matches` stores tenant-owned append-only evidence linked to an analysis and exact AI
   attempt. Composite foreign keys keep any selected variant attached to its selected model.
+- `product_match_review_events` stores one immutable, idempotent operator decision for the exact
+  tenant/analysis/source-match head, including the resulting reviewed match, selected canonical
+  model/variant, optional scoped alias, actor, reason, payload hash, and review timestamp.
 - `comparable_records` stores tenant-owned immutable source evidence with deduplication and evidence
   hashes, original money and market facts, normalized classifications, and a canonical model plus
   optional compatible variant.
@@ -1446,6 +1454,7 @@ personal organizations and memberships (complete)
 -> Buy Analysis request and queue boundary (complete)
 -> audited Analysis Operations and manual-retry boundary (complete; production kill switch off)
 -> canonical product identification and matching boundary (complete)
+-> audited operator product-match review queue (complete)
 -> immutable comparable records and deterministic selection boundary (complete)
 -> exchange-rate provenance and reproducible price-estimation boundary (complete)
 -> explicit Buy cross-market comparable normalization boundary (complete)
@@ -1685,6 +1694,11 @@ personal organizations and memberships (complete)
   total duration, and bounded retention/report indexes. It has no foreign key, tenant/user/product/
   market identifier, evidence hash or payload column. The table started empty, the daily bounded
   purge runs independently at 02:50, and the local migration ledger contains 51 rows.
+- The product-match review migration completed locally on SQLite as batch 3 and raises that local
+  ledger to 52 migrations. It adds the immutable review-event table, exact source/result
+  match-tenant-analysis foreign-key chains, one-review-per-source and idempotency uniqueness, and
+  bounded decision/actor/hash indexes. The branch MySQL/Redis CI contract remains the required
+  MySQL evidence before merge.
 
 ## 10. Required completion behavior
 

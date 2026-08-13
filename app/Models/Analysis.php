@@ -137,6 +137,12 @@ class Analysis extends Model
         return $this->hasMany(ProductMatch::class)->orderByDesc('run_number');
     }
 
+    public function productMatchReviewEvents(): HasMany
+    {
+        return $this->hasMany(ProductMatchReviewEvent::class)
+            ->orderByDesc('reviewed_at');
+    }
+
     public function currentProductMatch(): HasOne
     {
         return $this->hasOne(ProductMatch::class)->latestOfMany('run_number');

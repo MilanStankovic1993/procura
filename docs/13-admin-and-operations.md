@@ -21,17 +21,24 @@ Phase 1 currently implements:
 - Sell Comparable Market Normalizations
 - Privacy Requests
 - Analysis Operations
+- Product Match Reviews
 - Broker Requests
 - Broker Offers
 - Broker Transactions
 - Broker Commissions
 
-These resources are read-only except for organization plan assignment and the narrowly scoped
-Analysis Operations manual retry. Both delegate to transactional application actions and require a
+These resources are read-only except for organization plan assignment, the narrowly scoped
+Analysis Operations manual retry, and Product Match Review confirmation/rejection. All delegate to
+transactional application actions and require a
 verified super administrator plus a reason of at least ten characters. Plan assignment records the
 administrator, organization, old and new values, IP address, user agent, and timestamp. Analysis
 retry additionally requires the exact current dispatch, UUID idempotency, terminal/no-auto-retry
 state, bounded run/attempt policy, one immutable retry event, and one platform audit event. The
+product-match queue requires the exact current match head and UUID idempotency. Confirmation
+selects only an existing active canonical model and optional valid variant, may create one scoped
+operator alias, appends a reviewed match plus an immutable review event, and recalculates dependent
+Buy evidence. Rejection preserves the original candidates and leaves the analysis explicitly
+blocked for better identification evidence. Both decisions append one platform audit event. The
 first super administrator can only be initialized once through the audit-producing
 `admin:bootstrap-super-admin` command.
 
@@ -75,7 +82,7 @@ phases:
 
 Admin review queues:
 
-- unmatched products,
+- unmatched and ambiguous products (implemented),
 - low-confidence analyses,
 - failed AI jobs,
 - failed notifications,

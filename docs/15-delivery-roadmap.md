@@ -70,6 +70,10 @@ Deliverables:
 - images,
 - AI extraction,
 - product matching,
+- audited operator product-match review queue (complete: verified-super-admin confirmation or
+  rejection, existing canonical model/variant selection, optional scoped alias creation,
+  immutable idempotent review evidence, downstream Buy recalculation, and five-language Filament
+  workflow),
 - manual comparables,
 - price estimate,
 - cost calculator,
