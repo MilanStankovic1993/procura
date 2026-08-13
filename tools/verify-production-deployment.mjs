@@ -117,6 +117,7 @@ requireCondition(
 const expectedPrograms = new Map([
   ['procura-analysis-worker', { queues: 'analyses,default', timeout: 60, tries: 3 }],
   ['procura-connector-worker', { queues: 'connectors', timeout: 900, tries: 4 }],
+  ['procura-catalog-import-worker', { queues: 'imports', timeout: 900, tries: 3 }],
   ['procura-notification-worker', { queues: 'notifications', timeout: 30, tries: 4 }],
 ]);
 const programs = parseSupervisorPrograms(supervisor);
@@ -160,7 +161,7 @@ requireCondition(
   'REDIS_QUEUE_RETRY_AFTER must exceed the longest production worker timeout.',
 );
 requireCondition(
-  environment.get('OPERATIONS_QUEUE_HEARTBEAT_QUEUES') === 'analyses,connectors,notifications,default',
+  environment.get('OPERATIONS_QUEUE_HEARTBEAT_QUEUES') === 'analyses,connectors,imports,notifications,default',
   'The production heartbeat queues must exactly cover every worker queue.',
 );
 requireCondition(

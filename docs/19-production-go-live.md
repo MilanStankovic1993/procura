@@ -171,7 +171,7 @@ language catalogs separately.
   `GET /api/v1/products/search?q=--` using `Accept-Language: fr-FR`. Require a read-only `422`,
   `Content-Language: fr`, and the expected French `product_search_too_short` catalog message, with
   no database change or internal diagnostic.
-- Queue jobs are consumed from `analyses`, `connectors`, `notifications`, and `default`.
+- Queue jobs are consumed from `analyses`, `connectors`, `imports`, `notifications`, and `default`.
 - All scheduled commands have a recent successful run.
 - No browser console error, server exception, failed job, or unexpected outbound provider call is
   produced by the smoke session.
@@ -407,7 +407,7 @@ php artisan operations:capacity-baseline \
    in the retained JSON.
 6. Record an approved per-pool target that is at least as strict as the repository baseline. With
    real Supervisor workers and normal staging monitoring active, run the bounded queue workload
-   separately for `analyses`, `connectors`, `notifications`, and `default`:
+   separately for `analyses`, `connectors`, `imports`, `notifications`, and `default`:
 
 ```bash
 php artisan operations:queue-throughput \

@@ -45,3 +45,19 @@ redirect_stderr=true
 stdout_logfile=/var/log/supervisor/procura-notification-worker.log
 stdout_logfile_maxbytes=50MB
 stdout_logfile_backups=10
+
+[program:procura-catalog-import-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=/usr/bin/php /var/www/procura/current/artisan queue:work --queue=imports --sleep=1 --tries=3 --timeout=900 --max-time=3600
+directory=/var/www/procura/current
+user=www-data
+numprocs=2
+autostart=true
+autorestart=true
+stopasgroup=true
+killasgroup=true
+stopwaitsecs=930
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/procura-catalog-import-worker.log
+stdout_logfile_maxbytes=50MB
+stdout_logfile_backups=10

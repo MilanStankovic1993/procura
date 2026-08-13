@@ -767,7 +767,7 @@ states; queue names, connection names, exception text, infrastructure drivers, a
 remain internal.
 
 The singleton scheduler dispatches one lightweight `RecordQueueHeartbeat` job per minute to
-`analyses`, `connectors`, `notifications`, and `default`. Each worker writes only a short-lived
+`analyses`, `connectors`, `imports`, `notifications`, and `default`. Each worker writes only a short-lived
 shared-cache projection containing dispatch time, processing time, and latency. A distributed lock
 prevents an older delayed job from replacing newer evidence. No heartbeat row is added to the
 business database and expired cache state is intentionally unrecoverable.

@@ -14,8 +14,8 @@ ownership, attempts, timeouts, hourly recycling, graceful shutdown allowance, he
 and Redis `retry_after` relationship. Run it in the immutable release before installing the target-
 specific Supervisor file.
 
-The example starts four analysis processes, two connector processes, and four notification
-processes. The analysis pool gives
+The example starts four analysis processes, two connector processes, two catalog-import processes,
+and four notification processes. The analysis pool gives
 the latency-sensitive `analyses` queue priority over the general `default` queue. Its jobs own their
 three-attempt backoff policy; the worker timeout is 60 seconds and must remain below the selected
 queue connection's `retry_after` value. The 90-second Supervisor shutdown allowance lets an active
@@ -28,6 +28,11 @@ large validated batches. Set the queue connection's `retry_after` above 900 seco
 database-queue value is 960) and keep the Supervisor shutdown allowance above the worker timeout.
 Scale this pool from queue age, row throughput, rejection rate, object-storage latency, database
 pressure, and failed jobs.
+
+The isolated `imports` pool processes reviewed global product-catalog datasets without delaying
+tenant listing imports or analyses. Catalog jobs enforce the configured 10 MB/5,000-row limits,
+reject conflicting canonical identities, and have a 900-second worker timeout. Scale this pool
+from queue age, row throughput, rejection rate, object-storage latency, and database pressure.
 
 The isolated `notifications` pool prevents provider latency or a delivery spike from consuming
 analysis capacity. Email and Telegram jobs own their four-attempt backoff policy and have a
@@ -42,6 +47,7 @@ sudo supervisorctl reread
 sudo supervisorctl update
 sudo supervisorctl status procura-analysis-worker:*
 sudo supervisorctl status procura-connector-worker:*
+sudo supervisorctl status procura-catalog-import-worker:*
 sudo supervisorctl status procura-notification-worker:*
 ```
 
@@ -55,6 +61,7 @@ cd /var/www/procura/current
 php artisan queue:restart
 sudo supervisorctl status procura-analysis-worker:*
 sudo supervisorctl status procura-connector-worker:*
+sudo supervisorctl status procura-catalog-import-worker:*
 sudo supervisorctl status procura-notification-worker:*
 ```
 
@@ -78,7 +85,7 @@ The scheduler re-dispatches pending marketplace imports and imports whose proces
 Unique job locks plus immutable import-row keys make replay inert for already processed rows.
 
 When `OPERATIONS_QUEUE_HEARTBEATS_ENABLED=true`, the scheduler also dispatches one lightweight
-heartbeat to `analyses`, `connectors`, `notifications`, and `default`. The job is processed by the
+heartbeat to `analyses`, `connectors`, `imports`, `notifications`, and `default`. The job is processed by the
 same pool as real work and writes only bounded short-lived state to the configured shared cache.
 An old delayed job cannot replace newer heartbeat evidence. Run only one production scheduler; the
 schedule also uses a cluster-wide one-server mutex.
@@ -90,6 +97,7 @@ cd /var/www/procura/current
 php artisan schedule:list
 php artisan analyses:dispatch-pending --limit=100
 php artisan marketplace-imports:dispatch-pending --limit=100
+php artisan catalog-imports:dispatch-pending --limit=100
 php artisan notifications:recover-email-deliveries --limit=100
 php artisan notifications:recover-telegram-deliveries --limit=100
 php artisan notifications:expire-telegram-connections --limit=100
