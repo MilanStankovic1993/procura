@@ -10,10 +10,13 @@ use App\Actions\BrokerRequests\TransitionBrokerRequest;
 use App\Actions\BrokerRequests\TransitionBrokerTransaction;
 use App\Actions\Markets\SyncMarketReferenceData;
 use App\Actions\Privacy\CreatePrivacyRequest;
+use App\Enums\Analyses\AnalysisStatus;
+use App\Enums\Analyses\AnalysisType;
 use App\Enums\BrokerRequests\BrokerPaymentCaseType;
 use App\Enums\BrokerRequests\BrokerRequestStatus;
 use App\Enums\BrokerRequests\BrokerTransactionStatus;
 use App\Enums\Localization\SupportedLocale;
+use App\Filament\Resources\Analyses\AnalysisResource;
 use App\Filament\Resources\AnalysisOperations\AnalysisOperationResource;
 use App\Filament\Resources\AuditEvents\AuditEventResource;
 use App\Filament\Resources\BillingProviderEvents\BillingProviderEventResource;
@@ -43,9 +46,12 @@ use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use App\Filament\Resources\TelegramConnections\TelegramConnectionResource;
 use App\Filament\Resources\Usages\UsageResource;
 use App\Filament\Resources\Users\UserResource;
+use App\Models\Analysis;
 use App\Models\BillingProviderEvent;
 use App\Models\Brand;
 use App\Models\BrokerRequestEvent;
+use App\Models\Listing;
+use App\Models\ListingSnapshot;
 use App\Models\Organization;
 use App\Models\OrganizationMembership;
 use App\Models\Plan;
@@ -99,6 +105,7 @@ test('verified super administrators can access operational resources while resou
         ->and(PlanResource::canCreate())->toBeFalse()
         ->and(AuditEventResource::canCreate())->toBeFalse()
         ->and(AnalysisOperationResource::canCreate())->toBeFalse()
+        ->and(AnalysisResource::canCreate())->toBeFalse()
         ->and(ComparableMarketNormalizationResource::canCreate())->toBeFalse()
         ->and(BrokerRequestOfferResource::canCreate())->toBeFalse()
         ->and(BrokerRequestResource::canCreate())->toBeFalse()
@@ -139,6 +146,7 @@ test('verified super administrators can access operational resources while resou
         ProductAliasResource::class,
         AuditEventResource::class,
         AnalysisOperationResource::class,
+        AnalysisResource::class,
         NotificationDeliveryResource::class,
         TelegramConnectionResource::class,
         BillingProviderEventResource::class,
@@ -156,6 +164,79 @@ test('verified super administrators can access operational resources while resou
             ->get($resource::getUrl())
             ->assertOk();
     }
+});
+
+test('analysis explorer exposes safe pipeline projections only to verified super administrators', function () {
+    app(SyncMarketReferenceData::class)->sync();
+
+    $requester = User::factory()->create();
+    $organization = Organization::factory()->create([
+        'name' => 'Analysis Support Workspace',
+    ]);
+    $listing = Listing::factory()->create([
+        'organization_id' => $organization,
+        'created_by_user_id' => $requester,
+        'title' => 'Support-visible cordless drill',
+        'source_country_code' => 'DE',
+        'target_country_code' => 'AT',
+    ]);
+    $snapshot = ListingSnapshot::query()->create([
+        'listing_id' => $listing->getKey(),
+        'sequence' => 1,
+        'captured_by_user_id' => $requester->getKey(),
+        'captured_at' => now(),
+        'source_url' => $listing->source_url,
+        'external_id' => $listing->external_id,
+        'marketplace_name' => $listing->marketplace_name,
+        'marketplace_key' => $listing->marketplace_key,
+        'title' => $listing->title,
+        'description' => $listing->description,
+        'asking_price_minor' => $listing->asking_price_minor,
+        'currency_code' => $listing->currency_code,
+        'seller_information' => $listing->seller_information,
+        'location' => $listing->location,
+        'source_country_code' => $listing->source_country_code,
+        'target_country_code' => $listing->target_country_code,
+        'status' => $listing->status,
+        'notes' => $listing->notes,
+        'raw_payload' => ['private' => 'snapshot-secret-must-not-render'],
+        'content_hash' => hash('sha256', 'admin-analysis-explorer-snapshot'),
+    ]);
+    Analysis::query()->create([
+        'organization_id' => $organization->getKey(),
+        'listing_id' => $listing->getKey(),
+        'listing_snapshot_id' => $snapshot->getKey(),
+        'requested_by_user_id' => $requester->getKey(),
+        'analysis_type' => AnalysisType::Buy,
+        'status' => AnalysisStatus::Completed,
+        'source_country_code' => 'DE',
+        'target_country_code' => 'AT',
+        'pipeline_version' => 'buy-analysis-pipeline:v1',
+        'request_payload' => ['private' => 'request-secret-must-not-render'],
+        'request_hash' => hash('sha256', 'admin-analysis-explorer-request'),
+        'result_payload' => ['private' => 'result-secret-must-not-render'],
+        'processing_attempts' => 1,
+        'submitted_at' => now()->subMinute(),
+        'finished_at' => now(),
+        'last_error_message' => 'internal-error-must-not-render',
+    ]);
+
+    $this->actingAs(User::factory()->create())
+        ->get(AnalysisResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs(superAdmin())
+        ->get(AnalysisResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Analysis Support Workspace')
+        ->assertSeeText('Support-visible cordless drill')
+        ->assertSeeText('Buy analysis')
+        ->assertSeeText('DE -> AT')
+        ->assertSeeText('Completed')
+        ->assertDontSee('snapshot-secret-must-not-render')
+        ->assertDontSee('request-secret-must-not-render')
+        ->assertDontSee('result-secret-must-not-render')
+        ->assertDontSee('internal-error-must-not-render');
 });
 
 test('catalog explorer exposes canonical relationships only to verified super administrators', function () {

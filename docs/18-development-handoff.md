@@ -219,6 +219,11 @@ deterministic fake extraction provider. Angular exposes recent requests on listi
 separate draft/submit/status/result page with five-second polling for active jobs. Risk, profit,
 and deal scoring remain explicitly pending whenever their required upstream evidence is absent;
 completed downstream evidence is projected only after its own versioned boundary succeeds.
+Filament now also exposes a verified-super-admin-only read-only Analysis Explorer for support. It
+eager-loads and projects only organization, listing, market route, lifecycle, canonical-product,
+current price, current risk, and current deal-score state; raw request/result payloads, snapshots,
+hashes, AI evidence, provider errors, and internal diagnostics are deliberately absent. The
+existing Analysis Operations queue remains the only manual-retry surface.
 
 The canonical product-identification boundary is now implemented. A global ULID catalog separates
 categories, brands, models, regional variants, market applicability, and scoped aliases from

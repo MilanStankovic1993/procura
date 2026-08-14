@@ -85,6 +85,9 @@ Deliverables:
   rejection, existing canonical model/variant selection, optional scoped alias creation,
   immutable idempotent review evidence, downstream Buy recalculation, and five-language Filament
   workflow),
+- read-only analysis support explorer (complete: verified-super-admin-only tenant overview,
+  relationship-bounded current product/price/risk/deal projections, five-language filters, and
+  explicit exclusion of raw request/result/AI/error evidence),
 - manual comparables,
 - price estimate,
 - cost calculator,

@@ -28,6 +28,7 @@ Phase 1 currently implements:
 - Buy Comparable Market Normalizations
 - Sell Comparable Market Normalizations
 - Privacy Requests
+- Analysis Explorer
 - Analysis Operations
 - Product Match Reviews
 - Broker Requests
@@ -71,11 +72,17 @@ English is the reference key contract; all five catalogs must contain the same n
 Application-owned Filament vendor overrides fill upstream gaps for required accessibility labels,
 notifications, boolean states, and result counts without modifying files under `vendor/`.
 
+The read-only **Analysis Explorer** gives verified super administrators one support-oriented view
+of every tenant analysis. It projects organization, listing, market route, lifecycle status,
+canonical product, current price estimate, current risk assessment, and current deal score through
+bounded eager-loaded relationships. It intentionally excludes request and result payloads, listing
+snapshots, hashes, AI input/output, provider errors, and internal diagnostic messages. Failed heads
+that are eligible for intervention remain separately owned by **Analysis Operations**.
+
 The following broader product/operations resources remain scheduled for their corresponding
 phases:
 
 - Marketplace Sources
-- general tenant Analyses beyond the focused exception queue
 - Listings
 - AI Analyses
 - Price Estimates
