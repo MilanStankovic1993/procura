@@ -33,6 +33,7 @@ Phase 1 currently implements:
 - Analysis Explorer
 - AI Analyses Explorer
 - Price Estimates Explorer
+- Risk Assessments Explorer
 - Analysis Operations
 - Product Match Reviews
 - Broker Requests
@@ -57,7 +58,24 @@ blocked for better identification evidence. Both decisions append one platform a
 first super administrator can only be initialized once through the audit-producing
 `admin:bootstrap-super-admin` command.
 
-### 1.1 Admin interface localization
+### 1.1 Administrative authority model
+
+Super administrators have full operational authority, not unrestricted raw-table CRUD. The admin
+surface follows three explicit mutation classes:
+
+- global master/configuration records may receive controlled create/edit/deactivate workflows only
+  through validated application actions, policies, and platform audit evidence;
+- tenant and commercial lifecycle changes use named transactional domain actions with exact-head,
+  idempotency, reason/evidence, entitlement, and kill-switch controls where applicable;
+- immutable evidence, event ledgers, provider receipts, analyses, estimates, assessments, and
+  scores remain read-only. Corrections append a new version/event or use a dedicated retention or
+  privacy action; even a super administrator cannot rewrite or generically delete history.
+
+Direct Filament CRUD must never be enabled merely because an actor is a super administrator. Each
+new mutation requires an approved business transition, backend authorization, audit design,
+concurrency/idempotency behavior, negative tests, and rollback/operations documentation.
+
+### 1.2 Admin interface localization
 
 The complete Filament administration surface ships in English, German, Spanish, French, and
 Serbian Latin. The authenticated user's validated `users.preferred_locale` is authoritative for
@@ -96,6 +114,12 @@ range, confidence, aggregate input/included/outlier/unresolved counts, dispersio
 rate-resolver versions. It does not load estimate items and never renders input/estimate hashes,
 reason or confidence JSON, input snapshots, comparable identities, or item-level FX evidence.
 
+The read-only **Risk Assessments Explorer** provides the global critical-risk/low-confidence queue:
+tenant and parent listing, market route, immutable run/status, score, level, confidence, and
+aggregate signal/unknown counts, with optional evaluator version and support IDs. It does not load
+signals and never renders input/assessment hashes, reason or confidence JSON, verification actions,
+input snapshots, upstream evidence IDs, signal codes/sources, or signal-level evidence/actions.
+
 The read-only **Listing Explorer** provides the corresponding global intake overview. It exposes
 only organization, title, marketplace, ISO-minor-unit-aware asking price, market route, lifecycle
 status, and aggregate image/analysis counts, with optional support identifiers hidden by default.
@@ -112,7 +136,6 @@ attribution rules, and internal review notes are never rendered.
 The following broader product/operations resources remain scheduled for their corresponding
 phases:
 
-- Risk Assessments
 - Deal Scores
 - Saved Searches
 - Alerts

@@ -94,6 +94,9 @@ Deliverables:
 - read-only price-estimate support explorer (complete: verified-super-admin-only immutable pricing
   heads, localized target market, exact minor-unit-aware ranges, confidence and aggregate sample
   quality in five languages, without hashes, snapshots, explanation JSON, or item evidence),
+- read-only risk-assessment support explorer (complete: verified-super-admin-only critical-risk and
+  low-confidence projections, score/level/confidence and aggregate signal quality in five
+  languages, without hashes, snapshots, explanation/action JSON, or signal evidence),
 - read-only listing support explorer (complete: verified-super-admin-only global intake overview,
   ISO-minor-unit-aware pricing, bounded relationship counts and filters, and explicit exclusion of
   source URLs, descriptions, seller/location details, notes, and raw input),

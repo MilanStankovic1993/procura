@@ -957,7 +957,10 @@ The Laragon development environment uses MySQL 8.4 LTS with a local `procura` da
 - `risk_assessments` stores tenant-owned append-only evaluator versions, stable input hashes and
   snapshots, exact upstream evidence links, score/level, confidence, unknowns, reason codes, and
   verification actions. `risk_signals` stores every immutable category/severity contribution,
-  evidence snapshot, source, confidence, unknown state, and next check.
+  evidence snapshot, source, confidence, unknown state, and next check. The verified-super-admin-
+  only read-only explorer exposes parent/listing/market route, run/status, score/level, confidence,
+  aggregate signal/unknown counts, and optional version/IDs; hashes, keys, explanation/action JSON,
+  snapshots, upstream evidence IDs, and signal-level details remain excluded.
 - `cost_inputs` and `cost_input_items` store tenant-owned append-only explicit cost confirmations,
   exact upstream price/risk links, known-versus-unknown state, input versions/hashes/snapshots, and
   ordered category evidence.
@@ -1627,7 +1630,7 @@ personal organizations and memberships (complete)
 - A slow parallel validation run crossed a one-second boundary between initial and duplicate
   comparable fixture timestamps, correctly producing a new evidence record and exposing a flaky
   test. The test now derives both payloads from one fixed base timestamp. That checkpoint passed
-  163 tests and 1139 assertions. The current suite passes 419 tests and 5433 assertions after the
+  163 tests and 1139 assertions. The current suite passes 420 tests and 5457 assertions after the
   later Sell, outcome, monitoring, billing, connector, normalization, privacy, Analysis Operations,
   operational-readiness, deterministic capacity/queue throughput/Analysis workload, browser,
   saturation/soak, server/API localization, typed platform-validation, privacy fulfillment/erasure,
