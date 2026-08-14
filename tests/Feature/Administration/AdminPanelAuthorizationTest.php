@@ -31,6 +31,7 @@ use App\Filament\Resources\ComparableMarketNormalizations\ComparableMarketNormal
 use App\Filament\Resources\Countries\CountryResource;
 use App\Filament\Resources\Currencies\CurrencyResource;
 use App\Filament\Resources\Listings\ListingResource;
+use App\Filament\Resources\MarketplaceSources\MarketplaceSourceResource;
 use App\Filament\Resources\Memberships\MembershipResource;
 use App\Filament\Resources\NotificationDeliveries\NotificationDeliveryResource;
 use App\Filament\Resources\Organizations\OrganizationResource;
@@ -53,6 +54,7 @@ use App\Models\Brand;
 use App\Models\BrokerRequestEvent;
 use App\Models\Listing;
 use App\Models\ListingSnapshot;
+use App\Models\MarketplaceSource;
 use App\Models\Organization;
 use App\Models\OrganizationMembership;
 use App\Models\Plan;
@@ -108,6 +110,7 @@ test('verified super administrators can access operational resources while resou
         ->and(AnalysisOperationResource::canCreate())->toBeFalse()
         ->and(AnalysisResource::canCreate())->toBeFalse()
         ->and(ListingResource::canCreate())->toBeFalse()
+        ->and(MarketplaceSourceResource::canCreate())->toBeFalse()
         ->and(ComparableMarketNormalizationResource::canCreate())->toBeFalse()
         ->and(BrokerRequestOfferResource::canCreate())->toBeFalse()
         ->and(BrokerRequestResource::canCreate())->toBeFalse()
@@ -150,6 +153,7 @@ test('verified super administrators can access operational resources while resou
         AnalysisOperationResource::class,
         AnalysisResource::class,
         ListingResource::class,
+        MarketplaceSourceResource::class,
         NotificationDeliveryResource::class,
         TelegramConnectionResource::class,
         BillingProviderEventResource::class,
@@ -167,6 +171,53 @@ test('verified super administrators can access operational resources while resou
             ->get($resource::getUrl())
             ->assertOk();
     }
+});
+
+test('marketplace source explorer exposes compliance projections without internal governance data', function () {
+    $source = MarketplaceSource::factory()->create([
+        'key' => 'regional_partner_feed',
+        'name' => 'Regional Partner Feed',
+        'connector_type' => 'partner_feed',
+        'capabilities' => ['import', 'incremental_sync'],
+        'geographic_coverage' => 'Europe and North America',
+        'cross_border_supported' => true,
+        'compliance_status' => 'pending_review',
+        'terms_reviewed_at' => '2026-08-01',
+        'legal_basis' => 'private-legal-basis-must-not-render',
+        'allowed_operations' => 'private-allowed-operations-must-not-render',
+        'prohibited_operations' => 'private-prohibited-operations-must-not-render',
+        'data_retention_rules' => 'private-retention-rules-must-not-render',
+        'contact_person' => 'private-contact-must-not-render',
+        'review_notes' => 'private-review-notes-must-not-render',
+        'reliability_score' => 82,
+        'freshness_score' => 74,
+        'completeness_score' => 91,
+        'asking_price_only' => true,
+        'transaction_price_supported' => false,
+        'active' => true,
+    ]);
+
+    $this->actingAs(User::factory()->create())
+        ->get(MarketplaceSourceResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs(superAdmin())
+        ->get(MarketplaceSourceResource::getUrl())
+        ->assertOk()
+        ->assertSeeText($source->name)
+        ->assertSeeText($source->key)
+        ->assertSeeText('Partner feed')
+        ->assertSeeText('Pending review')
+        ->assertSeeText('Europe and North America')
+        ->assertSeeText('82 / 100')
+        ->assertSeeText('74 / 100')
+        ->assertSeeText('91 / 100')
+        ->assertDontSee('private-legal-basis-must-not-render')
+        ->assertDontSee('private-allowed-operations-must-not-render')
+        ->assertDontSee('private-prohibited-operations-must-not-render')
+        ->assertDontSee('private-retention-rules-must-not-render')
+        ->assertDontSee('private-contact-must-not-render')
+        ->assertDontSee('private-review-notes-must-not-render');
 });
 
 test('listing explorer exposes bounded global support fields without private listing content', function () {

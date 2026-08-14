@@ -165,7 +165,8 @@ Duration: source-dependent.
 Deliverables:
 
 - connector registry (complete: typed normalization contract, capability declaration, compliance
-  gate, environment kill switch),
+  gate, environment kill switch, and a five-language read-only admin explorer with bounded public
+  operational fields and data-driven compliance filtering),
 - CSV (complete application boundary: private tenant upload, bounded queued parsing, immutable row
   evidence, idempotency, quarantine/duplicate outcomes, five-language UI and Admin operations),
 - email feeds (pending source and mailbox approval),

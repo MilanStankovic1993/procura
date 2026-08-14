@@ -15,6 +15,7 @@ Phase 1 currently implements:
 - Currencies
 - Catalog Imports
 - Catalog Import Rows
+- Marketplace Sources Explorer
 - Brands
 - Product Categories
 - Product Models
@@ -86,10 +87,16 @@ status, and aggregate image/analysis counts, with optional support identifiers h
 Description, seller information, location, notes, raw input, and source URL are never rendered.
 Filtering is available by status, connector, source market, target market, and currency.
 
+The read-only **Marketplace Sources Explorer** exposes the global connector registry's public
+operational projection: connector type, compliance state, geographic coverage, listing/import
+counts, quality scores, cross-border capability, active state, and optional capability/terms
+metadata. Compliance filtering is data-driven because the stored status is deliberately not a
+closed enum. Contact people, legal basis, allowed/prohibited operations, rate limits, retention and
+attribution rules, and internal review notes are never rendered.
+
 The following broader product/operations resources remain scheduled for their corresponding
 phases:
 
-- Marketplace Sources
 - AI Analyses
 - Price Estimates
 - Risk Assessments

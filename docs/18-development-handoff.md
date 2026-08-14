@@ -907,7 +907,10 @@ The Laragon development environment uses MySQL 8.4 LTS with a local `procura` da
   stores only the provider reconciliation head needed for enforcement.
 - `marketplace_sources` stores global connector capability, compliance, coverage, and quality
   metadata. Application sources are the policy-limited `manual` connector and the production
-  environment-gated `authorized_csv` connector.
+  environment-gated `authorized_csv` connector. Filament provides a verified-super-admin-only
+  read-only explorer for public operational fields, aggregate listing/import usage, connector type,
+  data-driven compliance filtering, coverage, and quality. It never renders contact, legal,
+  allowed/prohibited-operation, rate-limit, retention, attribution, or internal review data.
 - `marketplace_imports` stores tenant, actor, connector, idempotency, private file metadata/hash,
   authorization attestation, schema/delimiter, processing lease, counters, and sanitized failure
   head. `marketplace_import_rows` is the immutable per-row raw/normalized validation and listing
