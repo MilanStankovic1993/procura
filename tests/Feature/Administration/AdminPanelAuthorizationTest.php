@@ -58,6 +58,7 @@ use App\Filament\Resources\ProductModels\ProductModelResource;
 use App\Filament\Resources\ProductVariantMarkets\ProductVariantMarketResource;
 use App\Filament\Resources\ProductVariants\ProductVariantResource;
 use App\Filament\Resources\RiskAssessments\RiskAssessmentResource;
+use App\Filament\Resources\SavedSearches\SavedSearchResource;
 use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use App\Filament\Resources\TelegramConnections\TelegramConnectionResource;
 use App\Filament\Resources\Usages\UsageResource;
@@ -89,6 +90,7 @@ use App\Models\ProductVariant;
 use App\Models\ProductVariantMarket;
 use App\Models\ProfitEstimate;
 use App\Models\RiskAssessment;
+use App\Models\SavedSearch;
 use App\Models\User;
 use Database\Seeders\PlanSeeder;
 use Filament\Facades\Filament;
@@ -483,6 +485,7 @@ test('verified super administrators can access operational resources while resou
         ->and(PriceEstimateResource::canCreate())->toBeFalse()
         ->and(RiskAssessmentResource::canCreate())->toBeFalse()
         ->and(DealScoreResource::canCreate())->toBeFalse()
+        ->and(SavedSearchResource::canCreate())->toBeFalse()
         ->and(ListingResource::canCreate())->toBeFalse()
         ->and(MarketplaceSourceResource::canCreate())->toBeFalse()
         ->and(ComparableMarketNormalizationResource::canCreate())->toBeFalse()
@@ -530,6 +533,7 @@ test('verified super administrators can access operational resources while resou
         PriceEstimateResource::class,
         RiskAssessmentResource::class,
         DealScoreResource::class,
+        SavedSearchResource::class,
         ListingResource::class,
         MarketplaceSourceResource::class,
         NotificationDeliveryResource::class,
@@ -954,6 +958,90 @@ test('deal score explorer exposes bounded recommendations without private eviden
         ->assertDontSee('private-deal-action-must-not-render')
         ->assertDontSee('private-deal-input-must-not-render')
         ->assertDontSee('private-deal-item-must-not-render');
+});
+
+test('saved search explorer exposes lifecycle aggregates without private criteria', function () {
+    app(SyncMarketReferenceData::class)->sync();
+
+    $owner = User::factory()->create([
+        'email' => 'saved-search-owner@example.test',
+    ]);
+    $organization = Organization::factory()->create([
+        'name' => 'Saved Search Operations Workspace',
+    ]);
+    $search = SavedSearch::query()->forceCreate([
+        'organization_id' => $organization->getKey(),
+        'owner_user_id' => $owner->getKey(),
+        'title' => 'private-search-title-must-not-render',
+        'active' => false,
+        'version_sequence' => 0,
+        'archived_at' => now(),
+    ]);
+    $privateCriteriaHash = hash('sha256', 'private-search-criteria-source');
+    $privatePayloadHash = hash('sha256', 'private-search-payload-source');
+    $version = $search->versions()->create([
+        'organization_id' => $organization->getKey(),
+        'changed_by_user_id' => $owner->getKey(),
+        'sequence' => 1,
+        'title' => 'private-version-title-must-not-render',
+        'active' => false,
+        'product_category_id' => null,
+        'brand_id' => null,
+        'product_model_id' => null,
+        'minimum_price_minor' => 111111,
+        'maximum_price_minor' => 222222,
+        'price_currency_code' => 'EUR',
+        'continent_code' => 'EU',
+        'country_codes' => ['DE', 'AT'],
+        'city' => 'private-search-city-must-not-render',
+        'radius_km' => 75,
+        'include_cross_border' => true,
+        'required_keywords' => ['private-required-keyword-must-not-render'],
+        'excluded_keywords' => ['private-excluded-keyword-must-not-render'],
+        'minimum_profit_minor' => 333333,
+        'profit_currency_code' => 'EUR',
+        'minimum_margin_basis_points' => 4444,
+        'minimum_deal_score_basis_points' => 5555,
+        'maximum_risk_score' => 66,
+        'notification_channels' => ['in_app', 'email'],
+        'reason_code' => 'private-search-reason-must-not-render',
+        'idempotency_key' => (string) Str::uuid(),
+        'criteria_hash' => $privateCriteriaHash,
+        'payload_hash' => $privatePayloadHash,
+        'criteria_snapshot' => [
+            'private' => 'private-search-snapshot-must-not-render',
+        ],
+        'created_at' => now(),
+    ]);
+    $search->forceFill([
+        'current_version_id' => $version->getKey(),
+        'version_sequence' => 1,
+    ])->save();
+
+    $this->actingAs(User::factory()->create())
+        ->get(SavedSearchResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs(superAdmin())
+        ->get(SavedSearchResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Saved Search Operations Workspace')
+        ->assertSeeText('saved-search-owner@example.test')
+        ->assertSeeText('Archived')
+        ->assertDontSee('private-search-title-must-not-render')
+        ->assertDontSee('private-version-title-must-not-render')
+        ->assertDontSee('private-search-city-must-not-render')
+        ->assertDontSee('private-required-keyword-must-not-render')
+        ->assertDontSee('private-excluded-keyword-must-not-render')
+        ->assertDontSee('private-search-reason-must-not-render')
+        ->assertDontSee($privateCriteriaHash)
+        ->assertDontSee($privatePayloadHash)
+        ->assertDontSee('private-search-snapshot-must-not-render')
+        ->assertDontSee('111111')
+        ->assertDontSee('222222')
+        ->assertDontSee('333333')
+        ->assertDontSee('4444')
+        ->assertDontSee('5555');
 });
 
 test('catalog explorer exposes canonical relationships only to verified super administrators', function () {

@@ -1263,6 +1263,13 @@ The Phase 5 tenant-owned saved-search and notification foundation is now complet
     deployment is explicit through `notifications:configure-telegram-webhook`; no real provider
     credentials or network calls are part of the local implementation.
 
+Verified super administrators now have a five-language read-only Saved Searches Explorer for
+global lifecycle and capacity support. It exposes only tenant, owner, active/paused/archived state,
+aggregate version/match/alert counts, and optional archive/support identifiers. Free-form titles,
+current versions, all product/location/price/profit/risk/deal-score criteria, keywords, channels,
+actors, reasons, idempotency and stable hashes, criteria snapshots, match evidence, and alert
+payloads are deliberately neither loaded nor rendered.
+
 The subject-scoped privacy-request foundation is now complete:
 
 1. Verified users can submit, list, and cancel personal data-export/account-deletion requests

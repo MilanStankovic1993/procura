@@ -127,6 +127,12 @@ support IDs. It does not load score items and never renders input/score hashes, 
 cap decisions, reasons, confidence JSON, factors, assumptions, verification actions, snapshots,
 upstream evidence IDs, or component-level evidence.
 
+The read-only **Saved Searches Explorer** provides a privacy-minimized global lifecycle overview:
+tenant, owner, active/paused/archived state, and aggregate version, match, and alert counts, with
+archive time and support identifiers hidden by default. It never loads or renders the free-form
+search title, current criteria version, product/location/price/profit/risk/deal-score criteria,
+keywords, notification channels, actor/reason/idempotency/hash evidence, or criteria snapshots.
+
 The read-only **Listing Explorer** provides the corresponding global intake overview. It exposes
 only organization, title, marketplace, ISO-minor-unit-aware asking price, market route, lifecycle
 status, and aggregate image/analysis counts, with optional support identifiers hidden by default.
@@ -143,7 +149,6 @@ attribution rules, and internal review notes are never rendered.
 The following broader product/operations resources remain scheduled for their corresponding
 phases:
 
-- Saved Searches
 - Alerts
 - Settings
 - Audit Logs

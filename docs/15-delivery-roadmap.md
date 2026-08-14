@@ -158,6 +158,9 @@ Deliverables:
 
 - plans and backend saved-search limits (complete),
 - immutable tenant-owned saved searches (complete),
+- read-only saved-search support explorer (complete: verified-super-admin-only lifecycle and
+  aggregate version/match/alert visibility in five languages, without titles, criteria, keywords,
+  notification preferences, hashes, snapshots, or version evidence),
 - bounded deterministic matching pipeline (complete),
 - append-only in-app alert and notification ledger (complete),
 - localized saved-search and notification Angular workflows (complete: EN/DE/ES/FR/sr-Latn),
