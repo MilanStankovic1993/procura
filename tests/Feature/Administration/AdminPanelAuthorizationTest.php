@@ -30,6 +30,7 @@ use App\Filament\Resources\BrokerTransactionResource;
 use App\Filament\Resources\ComparableMarketNormalizations\ComparableMarketNormalizationResource;
 use App\Filament\Resources\Countries\CountryResource;
 use App\Filament\Resources\Currencies\CurrencyResource;
+use App\Filament\Resources\Listings\ListingResource;
 use App\Filament\Resources\Memberships\MembershipResource;
 use App\Filament\Resources\NotificationDeliveries\NotificationDeliveryResource;
 use App\Filament\Resources\Organizations\OrganizationResource;
@@ -106,6 +107,7 @@ test('verified super administrators can access operational resources while resou
         ->and(AuditEventResource::canCreate())->toBeFalse()
         ->and(AnalysisOperationResource::canCreate())->toBeFalse()
         ->and(AnalysisResource::canCreate())->toBeFalse()
+        ->and(ListingResource::canCreate())->toBeFalse()
         ->and(ComparableMarketNormalizationResource::canCreate())->toBeFalse()
         ->and(BrokerRequestOfferResource::canCreate())->toBeFalse()
         ->and(BrokerRequestResource::canCreate())->toBeFalse()
@@ -147,6 +149,7 @@ test('verified super administrators can access operational resources while resou
         AuditEventResource::class,
         AnalysisOperationResource::class,
         AnalysisResource::class,
+        ListingResource::class,
         NotificationDeliveryResource::class,
         TelegramConnectionResource::class,
         BillingProviderEventResource::class,
@@ -164,6 +167,53 @@ test('verified super administrators can access operational resources while resou
             ->get($resource::getUrl())
             ->assertOk();
     }
+});
+
+test('listing explorer exposes bounded global support fields without private listing content', function () {
+    app(SyncMarketReferenceData::class)->sync();
+
+    $creator = User::factory()->create();
+    $organization = Organization::factory()->create([
+        'name' => 'Global Listing Support Workspace',
+    ]);
+    Listing::factory()->create([
+        'organization_id' => $organization,
+        'created_by_user_id' => $creator,
+        'source_url' => 'https://private.example/listing-source-must-not-render',
+        'external_id' => 'TOKYO-DRILL-42',
+        'marketplace_name' => 'Tokyo Tool Market',
+        'title' => 'Makita cordless drill set',
+        'description' => 'private-description-must-not-render',
+        'asking_price_minor' => 12345,
+        'currency_code' => 'JPY',
+        'seller_information' => 'private-seller-must-not-render',
+        'location' => 'private-location-must-not-render',
+        'source_country_code' => 'JP',
+        'target_country_code' => 'US',
+        'status' => 'reserved',
+        'notes' => 'private-notes-must-not-render',
+        'raw_input' => ['private' => 'raw-input-must-not-render'],
+    ]);
+
+    $this->actingAs(User::factory()->create())
+        ->get(ListingResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs(superAdmin())
+        ->get(ListingResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Global Listing Support Workspace')
+        ->assertSeeText('Makita cordless drill set')
+        ->assertSeeText('Tokyo Tool Market')
+        ->assertSeeText('12,345 JPY')
+        ->assertSeeText('JP -> US')
+        ->assertSeeText('Reserved')
+        ->assertDontSee('listing-source-must-not-render')
+        ->assertDontSee('private-description-must-not-render')
+        ->assertDontSee('private-seller-must-not-render')
+        ->assertDontSee('private-location-must-not-render')
+        ->assertDontSee('private-notes-must-not-render')
+        ->assertDontSee('raw-input-must-not-render');
 });
 
 test('analysis explorer exposes safe pipeline projections only to verified super administrators', function () {

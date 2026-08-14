@@ -224,6 +224,10 @@ eager-loads and projects only organization, listing, market route, lifecycle, ca
 current price, current risk, and current deal-score state; raw request/result payloads, snapshots,
 hashes, AI evidence, provider errors, and internal diagnostics are deliberately absent. The
 existing Analysis Operations queue remains the only manual-retry surface.
+The adjacent Listing Explorer projects only organization, title, marketplace, ISO-minor-unit-aware
+asking price, market route, lifecycle status, and aggregate image/analysis counts. It supports
+status, connector, country, and currency filtering while never rendering source URLs,
+descriptions, seller/location details, notes, or raw listing input.
 
 The canonical product-identification boundary is now implemented. A global ULID catalog separates
 categories, brands, models, regional variants, market applicability, and scoped aliases from

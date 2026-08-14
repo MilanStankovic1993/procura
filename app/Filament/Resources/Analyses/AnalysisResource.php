@@ -7,6 +7,7 @@ use App\Enums\Analyses\AnalysisType;
 use App\Filament\Resources\Analyses\Pages\ListAnalyses;
 use App\Filament\Resources\ReadOnlyResource;
 use App\Filament\Support\AdminLabel;
+use App\Filament\Support\AdminMoney;
 use App\Models\Analysis;
 use App\Models\Country;
 use App\Models\User;
@@ -190,13 +191,10 @@ final class AnalysisResource extends ReadOnlyResource
             return AdminLabel::value('price_estimate_status', $estimate->status);
         }
 
-        $minorUnit = $estimate->targetCurrency?->minor_unit ?? 2;
-        $divisor = 10 ** $minorUnit;
-
-        return sprintf(
-            '%s %s',
-            number_format($estimate->estimate_minor / $divisor, $minorUnit, '.', ','),
+        return AdminMoney::minor(
+            $estimate->estimate_minor,
             $estimate->target_currency_code,
+            $estimate->targetCurrency?->minor_unit,
         );
     }
 

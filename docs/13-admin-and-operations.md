@@ -28,6 +28,7 @@ Phase 1 currently implements:
 - Buy Comparable Market Normalizations
 - Sell Comparable Market Normalizations
 - Privacy Requests
+- Listing Explorer
 - Analysis Explorer
 - Analysis Operations
 - Product Match Reviews
@@ -79,11 +80,16 @@ bounded eager-loaded relationships. It intentionally excludes request and result
 snapshots, hashes, AI input/output, provider errors, and internal diagnostic messages. Failed heads
 that are eligible for intervention remain separately owned by **Analysis Operations**.
 
+The read-only **Listing Explorer** provides the corresponding global intake overview. It exposes
+only organization, title, marketplace, ISO-minor-unit-aware asking price, market route, lifecycle
+status, and aggregate image/analysis counts, with optional support identifiers hidden by default.
+Description, seller information, location, notes, raw input, and source URL are never rendered.
+Filtering is available by status, connector, source market, target market, and currency.
+
 The following broader product/operations resources remain scheduled for their corresponding
 phases:
 
 - Marketplace Sources
-- Listings
 - AI Analyses
 - Price Estimates
 - Risk Assessments
