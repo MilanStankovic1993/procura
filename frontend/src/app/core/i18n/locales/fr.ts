@@ -1533,6 +1533,57 @@ export const FR_TRANSLATIONS = {
     'Le produit a été enregistré, mais pas ses images. Réessayez pour terminer le transfert.',
   'ownedProduct.detail.back': '← Produits possédés',
   'ownedProduct.detail.loading': 'Chargement des preuves du produit…',
+  'ownedProduct.journey.eyebrow': 'Votre plan de vente',
+  'ownedProduct.journey.progressLabel': 'Progression du parcours de vente',
+  'ownedProduct.journey.step1.title': 'Connaître le produit',
+  'ownedProduct.journey.step1.description': 'Préparez et identifiez exactement ce que vous vendez.',
+  'ownedProduct.journey.step2.title': 'Fixer le prix',
+  'ownedProduct.journey.step2.description': 'Créez une fourchette étayée par des preuves.',
+  'ownedProduct.journey.step3.title': "Créer l'annonce",
+  'ownedProduct.journey.step3.description': 'Rédigez un texte honnête et vérifiez les photos.',
+  'ownedProduct.journey.step4.title': 'Suivre la vente',
+  'ownedProduct.journey.step4.description': 'Consignez publication, résultat, coûts et bénéfice.',
+  'ownedProduct.journey.loading.title': 'Vérification de votre progression…',
+  'ownedProduct.journey.loading.description':
+    "Procura aligne en sécurité les dernières preuves du produit, du prix, de l'annonce et de la vente.",
+  'ownedProduct.journey.loading.label': 'Recherche de votre prochaine étape…',
+  'ownedProduct.journey.error.title': 'Cette étape nécessite une actualisation',
+  'ownedProduct.journey.error.description':
+    "Vos preuves enregistrées sont inchangées. Ouvrez l'étape actuelle et relancez la vérification.",
+  'ownedProduct.journey.error.action': "Ouvrir l'étape actuelle",
+  'ownedProduct.journey.prepare.title': 'Terminer la préparation du produit',
+  'ownedProduct.journey.prepare.description':
+    'Vérifiez les faits et les photos privées, puis marquez le produit comme prêt lorsque les preuves sont complètes.',
+  'ownedProduct.journey.prepare.action': 'Ouvrir la préparation',
+  'ownedProduct.journey.assessment.title': 'Identifier et évaluer le produit',
+  'ownedProduct.journey.assessment.description':
+    "Lancez ou examinez l'évaluation de l'identité et de l'état avant de calculer un prix.",
+  'ownedProduct.journey.assessment.action': "Ouvrir l'évaluation",
+  'ownedProduct.journey.pricing.title': 'Établir un prix de vente défendable',
+  'ownedProduct.journey.pricing.description':
+    'Ajoutez des comparables jusqu’à ce que Procura puisse expliquer une fourchette pratique.',
+  'ownedProduct.journey.pricing.action': 'Ouvrir les preuves de prix',
+  'ownedProduct.journey.listing.title': "Préparer l'annonce et les photos",
+  'ownedProduct.journey.listing.description':
+    'Choisissez une stratégie, générez un texte factuel et complétez la liste des photos.',
+  'ownedProduct.journey.listing.action': "Ouvrir la préparation de l'annonce",
+  'ownedProduct.journey.portfolio.title': 'Publier ou mettre à jour la vente',
+  'ownedProduct.journey.portfolio.description':
+    "Créez l'entrée et consignez la publication réelle ou l'événement de la place de marché.",
+  'ownedProduct.journey.portfolio.action': 'Ouvrir le suivi de vente',
+  'ownedProduct.journey.outcome.title': "Consigner ce qui s'est réellement passé",
+  'ownedProduct.journey.outcome.description':
+    'Enregistrez le résultat et les coûts connus pour calculer le bénéfice réel et la précision.',
+  'ownedProduct.journey.outcome.action': 'Ouvrir le suivi du résultat',
+  'ownedProduct.journey.complete.title': 'Ce dossier de vente est complet',
+  'ownedProduct.journey.complete.description':
+    "Le produit, le prix, l'annonce, le cycle du marché et le résultat final sont reliés.",
+  'ownedProduct.journey.complete.action': 'Examiner le résultat complet',
+  'ownedProduct.journey.archived.title': 'Ce produit est archivé',
+  'ownedProduct.journey.archived.description':
+    'Les preuves restent consultables, mais le parcours de vente est en lecture seule.',
+  'ownedProduct.journey.readOnly':
+    "Vous pouvez consulter ce parcours, mais un gestionnaire de l'espace doit enregistrer l'action suivante.",
   'ownedProduct.detail.idMissing': 'La route du produit possédé est incomplète.',
   'ownedProduct.detail.loadError':
     'Ce produit n’a pas pu être chargé dans l’espace actif.',

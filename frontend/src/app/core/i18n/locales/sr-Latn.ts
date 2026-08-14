@@ -1520,6 +1520,57 @@ export const SR_LATN_TRANSLATIONS = {
     'Proizvod je sačuvan, ali slike nisu. Ponovite da završite upload.',
   'ownedProduct.detail.back': '← Proizvodi u vlasništvu',
   'ownedProduct.detail.loading': 'Učitavanje dokaza o proizvodu…',
+  'ownedProduct.journey.eyebrow': 'Vaš plan prodaje',
+  'ownedProduct.journey.progressLabel': 'Napredak prodajnog toka',
+  'ownedProduct.journey.step1.title': 'Upoznajte proizvod',
+  'ownedProduct.journey.step1.description': 'Pripremite i tačno identifikujte ono što prodajete.',
+  'ownedProduct.journey.step2.title': 'Odredite cenu',
+  'ownedProduct.journey.step2.description': 'Napravite raspon cene potkrepljen dokazima.',
+  'ownedProduct.journey.step3.title': 'Napravite oglas',
+  'ownedProduct.journey.step3.description': 'Pripremite iskren tekst i proverite fotografije.',
+  'ownedProduct.journey.step4.title': 'Pratite prodaju',
+  'ownedProduct.journey.step4.description': 'Zabeležite objavu, ishod, troškove i zaradu.',
+  'ownedProduct.journey.loading.title': 'Proveravamo najnoviji napredak prodaje…',
+  'ownedProduct.journey.loading.description':
+    'Procura bezbedno usklađuje najnovije dokaze o proizvodu, ceni, oglasu i prodaji.',
+  'ownedProduct.journey.loading.label': 'Pronalazimo vaš sledeći korak…',
+  'ownedProduct.journey.error.title': 'Ovom koraku je potrebna provera statusa',
+  'ownedProduct.journey.error.description':
+    'Sačuvani dokazi nisu promenjeni. Otvorite trenutni korak i ponovite proveru.',
+  'ownedProduct.journey.error.action': 'Otvori trenutni korak',
+  'ownedProduct.journey.prepare.title': 'Završite pripremu proizvoda',
+  'ownedProduct.journey.prepare.description':
+    'Pregledajte podatke i privatne fotografije, pa označite proizvod spremnim kada su dokazi potpuni.',
+  'ownedProduct.journey.prepare.action': 'Otvori pripremu',
+  'ownedProduct.journey.assessment.title': 'Identifikujte i procenite proizvod',
+  'ownedProduct.journey.assessment.description':
+    'Pokrenite ili pregledajte procenu identiteta i stanja pre računanja cene.',
+  'ownedProduct.journey.assessment.action': 'Otvori procenu proizvoda',
+  'ownedProduct.journey.pricing.title': 'Napravite odbranjivu prodajnu cenu',
+  'ownedProduct.journey.pricing.description':
+    'Dodajte uporedive tržišne dokaze dok Procura ne može da objasni praktičan raspon cene.',
+  'ownedProduct.journey.pricing.action': 'Otvori dokaze o ceni',
+  'ownedProduct.journey.listing.title': 'Pripremite oglas i fotografije',
+  'ownedProduct.journey.listing.description':
+    'Izaberite strategiju, napravite tekst iz činjenica i završite proveru fotografija.',
+  'ownedProduct.journey.listing.action': 'Otvori pripremu oglasa',
+  'ownedProduct.journey.portfolio.title': 'Objavite ili ažurirajte prodaju',
+  'ownedProduct.journey.portfolio.description':
+    'Napravite portfolio zapis i zabeležite stvarnu objavu ili događaj na tržištu.',
+  'ownedProduct.journey.portfolio.action': 'Otvori praćenje prodaje',
+  'ownedProduct.journey.outcome.title': 'Zabeležite šta se stvarno dogodilo',
+  'ownedProduct.journey.outcome.description':
+    'Unesite ishod i poznate troškove da Procura izračuna stvarnu zaradu i tačnost.',
+  'ownedProduct.journey.outcome.action': 'Otvori praćenje ishoda',
+  'ownedProduct.journey.complete.title': 'Ovaj zapis prodaje je potpun',
+  'ownedProduct.journey.complete.description':
+    'Proizvod, cena, oglas, tržišni tok i konačni ishod su povezani.',
+  'ownedProduct.journey.complete.action': 'Pregledaj završen ishod',
+  'ownedProduct.journey.archived.title': 'Ovaj proizvod je arhiviran',
+  'ownedProduct.journey.archived.description':
+    'Dokazi ostaju dostupni za pregled, ali je prodajni tok samo za čitanje.',
+  'ownedProduct.journey.readOnly':
+    'Možete pregledati tok, ali menadžer radnog prostora mora zabeležiti sledeću radnju.',
   'ownedProduct.detail.idMissing': 'Ruta proizvoda u vlasništvu nije potpuna.',
   'ownedProduct.detail.loadError':
     'Ovaj proizvod nije mogao da se učita u aktivnom radnom prostoru.',

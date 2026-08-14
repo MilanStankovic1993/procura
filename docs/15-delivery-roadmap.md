@@ -102,6 +102,9 @@ Deliverables:
 
 - owned-product intake (complete: tenant-safe API, immutable snapshots, private images, localized
   list/create/detail UI),
+- guided Sell continuation (complete: first-incomplete-step coordination across preparation,
+  assessment, pricing, listing, portfolio publication, and actual outcome without duplicate API
+  requests; one action, four-phase responsive progress, and all five languages),
 - owned-product identification and condition assessment (complete: exact snapshot/image
   provenance, canonical matching, append-only results, localized stale-evidence UI),
 - Sell comparable evidence and price bands (complete: assessment-bound append-only evidence,

@@ -16,6 +16,14 @@ status lookup failures, responsive, and localized in all five browser languages.
 facts, evidence, snapshots, and lifecycle controls remain available below it without becoming the
 entry point.
 
+The Sell detail now has the equivalent production-safe journey coordinator without duplicating
+backend requests. Existing assessment, price-intelligence, listing-draft, sale-portfolio, and
+outcome panels emit only bounded UI projection states from data they already loaded. The parent
+selects the first incomplete step across preparation, identification, pricing, listing, publication,
+and actual outcome, then exposes one localized action that scrolls to the authoritative panel. A
+four-phase responsive progress model covers loading, partial projection failure, read-only,
+archived, and fully complete states while every detailed ledger remains available below.
+
 This document is the persistent handoff for continuing Procura development on another computer or
 in a new Codex task. Read it after the preceding product and architecture documents and verify the
 repository before making changes. `docs/19-production-go-live.md` is the separate mandatory source

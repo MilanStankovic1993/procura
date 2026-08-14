@@ -1523,6 +1523,57 @@ export const ES_TRANSLATIONS = {
     'El producto se guardó, pero sus imágenes no. Reintenta para completar la carga.',
   'ownedProduct.detail.back': '← Productos propios',
   'ownedProduct.detail.loading': 'Cargando evidencia del producto…',
+  'ownedProduct.journey.eyebrow': 'Tu plan de venta',
+  'ownedProduct.journey.progressLabel': 'Progreso del flujo de venta',
+  'ownedProduct.journey.step1.title': 'Conoce el producto',
+  'ownedProduct.journey.step1.description': 'Prepara e identifica exactamente lo que vendes.',
+  'ownedProduct.journey.step2.title': 'Fija el precio',
+  'ownedProduct.journey.step2.description': 'Crea un rango respaldado por pruebas.',
+  'ownedProduct.journey.step3.title': 'Crea el anuncio',
+  'ownedProduct.journey.step3.description': 'Genera un texto honesto y comprueba las fotos.',
+  'ownedProduct.journey.step4.title': 'Sigue la venta',
+  'ownedProduct.journey.step4.description': 'Registra publicación, resultado, costes y beneficio.',
+  'ownedProduct.journey.loading.title': 'Comprobando el progreso más reciente…',
+  'ownedProduct.journey.loading.description':
+    'Procura está alineando de forma segura las pruebas del producto, precio, anuncio y venta.',
+  'ownedProduct.journey.loading.label': 'Buscando tu siguiente paso…',
+  'ownedProduct.journey.error.title': 'Este paso necesita actualizar su estado',
+  'ownedProduct.journey.error.description':
+    'Tus pruebas guardadas no han cambiado. Abre el paso actual y reintenta la comprobación.',
+  'ownedProduct.journey.error.action': 'Abrir paso actual',
+  'ownedProduct.journey.prepare.title': 'Termina de preparar el producto',
+  'ownedProduct.journey.prepare.description':
+    'Revisa los datos y las fotos privadas y marca el producto como listo cuando las pruebas estén completas.',
+  'ownedProduct.journey.prepare.action': 'Abrir preparación',
+  'ownedProduct.journey.assessment.title': 'Identifica y evalúa el producto',
+  'ownedProduct.journey.assessment.description':
+    'Ejecuta o revisa la evaluación de identidad y estado antes de calcular un precio.',
+  'ownedProduct.journey.assessment.action': 'Abrir evaluación',
+  'ownedProduct.journey.pricing.title': 'Crea un precio de venta defendible',
+  'ownedProduct.journey.pricing.description':
+    'Añade comparables hasta que Procura pueda explicar un rango de precio práctico.',
+  'ownedProduct.journey.pricing.action': 'Abrir pruebas de precio',
+  'ownedProduct.journey.listing.title': 'Prepara el anuncio y las fotos',
+  'ownedProduct.journey.listing.description':
+    'Elige una estrategia, genera texto basado en datos y resuelve la lista de fotos.',
+  'ownedProduct.journey.listing.action': 'Abrir preparación del anuncio',
+  'ownedProduct.journey.portfolio.title': 'Publica o actualiza la venta',
+  'ownedProduct.journey.portfolio.description':
+    'Crea la entrada y registra la publicación real o el evento del mercado.',
+  'ownedProduct.journey.portfolio.action': 'Abrir seguimiento de venta',
+  'ownedProduct.journey.outcome.title': 'Registra lo que ocurrió realmente',
+  'ownedProduct.journey.outcome.description':
+    'Guarda el resultado y los costes conocidos para calcular beneficio real y precisión.',
+  'ownedProduct.journey.outcome.action': 'Abrir seguimiento del resultado',
+  'ownedProduct.journey.complete.title': 'Este registro de venta está completo',
+  'ownedProduct.journey.complete.description':
+    'El producto, precio, anuncio, ciclo del mercado y resultado final están conectados.',
+  'ownedProduct.journey.complete.action': 'Revisar resultado completo',
+  'ownedProduct.journey.archived.title': 'Este producto está archivado',
+  'ownedProduct.journey.archived.description':
+    'Las pruebas siguen disponibles, pero el flujo de venta es de solo lectura.',
+  'ownedProduct.journey.readOnly':
+    'Puedes revisar el flujo, pero un gestor del espacio debe registrar la siguiente acción.',
   'ownedProduct.detail.idMissing': 'La ruta del producto propio está incompleta.',
   'ownedProduct.detail.loadError':
     'No se pudo cargar este producto en el espacio activo.',

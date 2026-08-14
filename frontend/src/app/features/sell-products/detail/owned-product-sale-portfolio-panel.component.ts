@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -20,6 +20,7 @@ import {
   SellListingDraft,
 } from '../../../core/owned-product.models';
 import { OwnedProductService } from '../../../core/owned-product.service';
+import { SellJourneyPanelState } from './sell-journey-state';
 
 @Component({
   selector: 'app-owned-product-sale-portfolio-panel',
@@ -38,6 +39,7 @@ export class OwnedProductSalePortfolioPanelComponent {
 
   readonly record = input.required<OwnedProduct>();
   readonly canManage = input(false);
+  readonly journeyState = output<SellJourneyPanelState>();
 
   protected readonly projection = signal<SalePortfolioProjection | null>(null);
   protected readonly marketCatalog = signal<MarketReferenceCatalog | null>(
@@ -112,6 +114,7 @@ export class OwnedProductSalePortfolioPanelComponent {
         this.load();
       }
     });
+    effect(() => this.journeyState.emit(this.panelJourneyState()));
   }
 
   protected reload(): void {
@@ -389,6 +392,27 @@ export class OwnedProductSalePortfolioPanelComponent {
           );
         },
       });
+  }
+
+  private panelJourneyState(): SellJourneyPanelState {
+    if (this.loading()) {
+      return 'loading';
+    }
+
+    const projection = this.projection();
+
+    if (projection === null) {
+      return this.error() === null ? 'blocked' : 'error';
+    }
+
+    if (projection.entries.some((entry) => entry.current_event !== null)) {
+      return 'complete';
+    }
+
+    return projection.entries.length > 0 ||
+      projection.available_listing_drafts.length > 0
+      ? 'ready'
+      : 'blocked';
   }
 
   private resetEventDetails(entryId: string): void {

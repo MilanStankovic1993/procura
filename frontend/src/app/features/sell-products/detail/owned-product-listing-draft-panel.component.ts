@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -24,6 +24,7 @@ import {
   SellPriceStrategy,
 } from '../../../core/owned-product.models';
 import { OwnedProductService } from '../../../core/owned-product.service';
+import { SellJourneyPanelState } from './sell-journey-state';
 
 @Component({
   selector: 'app-owned-product-listing-draft-panel',
@@ -41,6 +42,7 @@ export class OwnedProductListingDraftPanelComponent {
 
   readonly record = input.required<OwnedProduct>();
   readonly canManage = input(false);
+  readonly journeyState = output<SellJourneyPanelState>();
 
   protected readonly projection = signal<SellListingDraftProjection | null>(
     null,
@@ -106,6 +108,7 @@ export class OwnedProductListingDraftPanelComponent {
         this.load();
       }
     });
+    effect(() => this.journeyState.emit(this.panelJourneyState()));
   }
 
   protected reload(): void {
@@ -355,6 +358,31 @@ export class OwnedProductListingDraftPanelComponent {
           );
         },
       });
+  }
+
+  private panelJourneyState(): SellJourneyPanelState {
+    if (this.loading()) {
+      return 'loading';
+    }
+
+    const projection = this.projection();
+
+    if (projection === null) {
+      return this.error() === null ? 'blocked' : 'error';
+    }
+
+    if (
+      projection.current_drafts.some(
+        (draft) =>
+          draft.status === 'ready' && draft.photo_readiness_status === 'ready',
+      )
+    ) {
+      return 'complete';
+    }
+
+    return projection.assessment_current && projection.available_price_bands.length > 0
+      ? 'ready'
+      : 'blocked';
   }
 
   private range(

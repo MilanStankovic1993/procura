@@ -35,32 +35,97 @@
       </div>
     </header>
 
+    <section class="journey" [attr.data-stage]="journeyStage()" aria-labelledby="sell-next-step">
+      <div class="journey-content">
+        <p class="eyebrow">{{ 'ownedProduct.journey.eyebrow' | t }}</p>
+        <h2 id="sell-next-step">{{ journeyTitleKey() | t }}</h2>
+        <p class="journey-description">{{ journeyDescriptionKey() | t }}</p>
+
+        @if (!canManage() && journeyStage() !== 'complete' && journeyStage() !== 'archived') {
+          <p class="journey-readonly">{{ 'ownedProduct.journey.readOnly' | t }}</p>
+        }
+
+        <div class="journey-action">
+          @if (currentJourneyPanelState() === 'loading') {
+            <span class="journey-wait" aria-live="polite">
+              {{ 'ownedProduct.journey.loading.label' | t }}
+            </span>
+          } @else if (journeyStage() !== 'archived') {
+            <a class="button button-primary" [attr.href]="journeyTarget()">
+              {{ journeyActionKey() | t }}
+              <span aria-hidden="true">↓</span>
+            </a>
+          }
+        </div>
+      </div>
+
+      <ol class="journey-steps" [attr.aria-label]="'ownedProduct.journey.progressLabel' | t">
+        <li [attr.data-state]="journeyStepState(1)">
+          <span class="step-marker" aria-hidden="true">1</span>
+          <div>
+            <strong>{{ 'ownedProduct.journey.step1.title' | t }}</strong>
+            <small>{{ 'ownedProduct.journey.step1.description' | t }}</small>
+          </div>
+        </li>
+        <li [attr.data-state]="journeyStepState(2)">
+          <span class="step-marker" aria-hidden="true">2</span>
+          <div>
+            <strong>{{ 'ownedProduct.journey.step2.title' | t }}</strong>
+            <small>{{ 'ownedProduct.journey.step2.description' | t }}</small>
+          </div>
+        </li>
+        <li [attr.data-state]="journeyStepState(3)">
+          <span class="step-marker" aria-hidden="true">3</span>
+          <div>
+            <strong>{{ 'ownedProduct.journey.step3.title' | t }}</strong>
+            <small>{{ 'ownedProduct.journey.step3.description' | t }}</small>
+          </div>
+        </li>
+        <li [attr.data-state]="journeyStepState(4)">
+          <span class="step-marker" aria-hidden="true">4</span>
+          <div>
+            <strong>{{ 'ownedProduct.journey.step4.title' | t }}</strong>
+            <small>{{ 'ownedProduct.journey.step4.description' | t }}</small>
+          </div>
+        </li>
+      </ol>
+    </section>
+
     <section class="layout">
       <div class="main-column">
         <app-owned-product-assessment-panel
+          id="sell-assessment"
           [record]="product"
           [canManage]="canManage()"
           (assessmentRecorded)="retry()"
         />
 
         <app-owned-product-price-intelligence-panel
+          id="sell-pricing"
           [record]="product"
           [canManage]="canManage()"
+          (journeyState)="updateJourneyState('pricing', $event)"
         />
 
         <app-owned-product-listing-draft-panel
+          id="sell-listing"
           [record]="product"
           [canManage]="canManage()"
+          (journeyState)="updateJourneyState('listing', $event)"
         />
 
         <app-owned-product-sale-portfolio-panel
+          id="sell-portfolio"
           [record]="product"
           [canManage]="canManage()"
+          (journeyState)="updateJourneyState('portfolio', $event)"
         />
 
         <app-owned-product-outcome-panel
+          id="sell-outcome"
           [record]="product"
           [canManage]="canManage()"
+          (journeyState)="updateJourneyState('outcome', $event)"
         />
 
         <article class="panel facts">
@@ -240,7 +305,7 @@
       </div>
 
       <aside>
-        <section class="panel lifecycle">
+        <section id="sell-lifecycle" class="panel lifecycle">
           <p class="eyebrow">{{ 'ownedProduct.common.lifecycle' | t }}</p>
           <h2>{{ 'ownedProduct.detail.lifecycleTitle' | t }}</h2>
           @if (canMutate()) {

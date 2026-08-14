@@ -1493,6 +1493,57 @@ export const EN_TRANSLATIONS = {
     'The product was saved, but its images were not. Retry to finish the upload.',
   'ownedProduct.detail.back': '← Owned products',
   'ownedProduct.detail.loading': 'Loading owned-product evidence…',
+  'ownedProduct.journey.eyebrow': 'Your sale plan',
+  'ownedProduct.journey.progressLabel': 'Sell workflow progress',
+  'ownedProduct.journey.step1.title': 'Know the product',
+  'ownedProduct.journey.step1.description': 'Prepare and identify exactly what you are selling.',
+  'ownedProduct.journey.step2.title': 'Set the price',
+  'ownedProduct.journey.step2.description': 'Build an evidence-backed price range.',
+  'ownedProduct.journey.step3.title': 'Build the listing',
+  'ownedProduct.journey.step3.description': 'Create honest copy and verify the photos.',
+  'ownedProduct.journey.step4.title': 'Track the sale',
+  'ownedProduct.journey.step4.description': 'Record publication, outcome, costs, and profit.',
+  'ownedProduct.journey.loading.title': 'Checking your latest sale progress…',
+  'ownedProduct.journey.loading.description':
+    'Procura is safely aligning the latest product, pricing, listing, and sale evidence.',
+  'ownedProduct.journey.loading.label': 'Finding your next step…',
+  'ownedProduct.journey.error.title': 'This step needs a status refresh',
+  'ownedProduct.journey.error.description':
+    'Your saved evidence is unchanged. Open the current step and retry its status check.',
+  'ownedProduct.journey.error.action': 'Open current step',
+  'ownedProduct.journey.prepare.title': 'Finish preparing the product',
+  'ownedProduct.journey.prepare.description':
+    'Review the facts and private photos, then mark the product ready when its evidence is complete.',
+  'ownedProduct.journey.prepare.action': 'Open preparation controls',
+  'ownedProduct.journey.assessment.title': 'Identify and assess the product',
+  'ownedProduct.journey.assessment.description':
+    'Run or review the current identity and condition assessment before calculating a price.',
+  'ownedProduct.journey.assessment.action': 'Open product assessment',
+  'ownedProduct.journey.pricing.title': 'Build a defensible sale price',
+  'ownedProduct.journey.pricing.description':
+    'Add comparable market evidence until Procura can explain a practical price range.',
+  'ownedProduct.journey.pricing.action': 'Open price evidence',
+  'ownedProduct.journey.listing.title': 'Prepare the listing and photos',
+  'ownedProduct.journey.listing.description':
+    'Choose a strategy, generate disclosed copy, and resolve the photo-readiness checklist.',
+  'ownedProduct.journey.listing.action': 'Open listing preparation',
+  'ownedProduct.journey.portfolio.title': 'Publish or update the sale',
+  'ownedProduct.journey.portfolio.description':
+    'Create the portfolio entry and record the real marketplace publication or lifecycle event.',
+  'ownedProduct.journey.portfolio.action': 'Open sale tracking',
+  'ownedProduct.journey.outcome.title': 'Record what actually happened',
+  'ownedProduct.journey.outcome.description':
+    'Capture the sale outcome and known costs so Procura can calculate actual profit and accuracy.',
+  'ownedProduct.journey.outcome.action': 'Open outcome tracking',
+  'ownedProduct.journey.complete.title': 'This sale record is complete',
+  'ownedProduct.journey.complete.description':
+    'The product, pricing, listing, marketplace lifecycle, and final outcome are connected.',
+  'ownedProduct.journey.complete.action': 'Review completed outcome',
+  'ownedProduct.journey.archived.title': 'This product is archived',
+  'ownedProduct.journey.archived.description':
+    'Its evidence remains available for review, but the Sell workflow is read-only.',
+  'ownedProduct.journey.readOnly':
+    'You can review this workflow, but a workspace manager must record the next action.',
   'ownedProduct.detail.idMissing': 'The owned-product route is incomplete.',
   'ownedProduct.detail.loadError':
     'This owned product could not be loaded in the active workspace.',

@@ -1525,6 +1525,57 @@ export const DE_TRANSLATIONS = {
     'Das Produkt wurde gespeichert, die Bilder jedoch nicht. Wiederholen Sie den Upload.',
   'ownedProduct.detail.back': '← Eigene Produkte',
   'ownedProduct.detail.loading': 'Produktnachweise werden geladen…',
+  'ownedProduct.journey.eyebrow': 'Ihr Verkaufsplan',
+  'ownedProduct.journey.progressLabel': 'Fortschritt des Verkaufsablaufs',
+  'ownedProduct.journey.step1.title': 'Produkt kennen',
+  'ownedProduct.journey.step1.description': 'Bereiten Sie genau vor und identifizieren Sie, was Sie verkaufen.',
+  'ownedProduct.journey.step2.title': 'Preis festlegen',
+  'ownedProduct.journey.step2.description': 'Erstellen Sie eine nachweisgestützte Preisspanne.',
+  'ownedProduct.journey.step3.title': 'Angebot erstellen',
+  'ownedProduct.journey.step3.description': 'Erstellen Sie ehrliche Texte und prüfen Sie die Fotos.',
+  'ownedProduct.journey.step4.title': 'Verkauf verfolgen',
+  'ownedProduct.journey.step4.description': 'Erfassen Sie Veröffentlichung, Ergebnis, Kosten und Gewinn.',
+  'ownedProduct.journey.loading.title': 'Aktueller Verkaufsfortschritt wird geprüft…',
+  'ownedProduct.journey.loading.description':
+    'Procura gleicht die neuesten Produkt-, Preis-, Angebots- und Verkaufsnachweise sicher ab.',
+  'ownedProduct.journey.loading.label': 'Nächster Schritt wird ermittelt…',
+  'ownedProduct.journey.error.title': 'Dieser Schritt benötigt eine Statusaktualisierung',
+  'ownedProduct.journey.error.description':
+    'Ihre gespeicherten Nachweise sind unverändert. Öffnen Sie den aktuellen Schritt und wiederholen Sie die Statusprüfung.',
+  'ownedProduct.journey.error.action': 'Aktuellen Schritt öffnen',
+  'ownedProduct.journey.prepare.title': 'Produktvorbereitung abschließen',
+  'ownedProduct.journey.prepare.description':
+    'Prüfen Sie Fakten und private Fotos und markieren Sie das Produkt als bereit, wenn die Nachweise vollständig sind.',
+  'ownedProduct.journey.prepare.action': 'Vorbereitung öffnen',
+  'ownedProduct.journey.assessment.title': 'Produkt identifizieren und bewerten',
+  'ownedProduct.journey.assessment.description':
+    'Führen Sie die aktuelle Identitäts- und Zustandsbewertung durch oder prüfen Sie sie vor der Preisberechnung.',
+  'ownedProduct.journey.assessment.action': 'Produktbewertung öffnen',
+  'ownedProduct.journey.pricing.title': 'Begründbaren Verkaufspreis erstellen',
+  'ownedProduct.journey.pricing.description':
+    'Fügen Sie vergleichbare Marktnachweise hinzu, bis Procura eine praktische Preisspanne erklären kann.',
+  'ownedProduct.journey.pricing.action': 'Preisnachweise öffnen',
+  'ownedProduct.journey.listing.title': 'Angebot und Fotos vorbereiten',
+  'ownedProduct.journey.listing.description':
+    'Wählen Sie eine Strategie, erstellen Sie offengelegte Texte und erfüllen Sie die Foto-Checkliste.',
+  'ownedProduct.journey.listing.action': 'Angebotsvorbereitung öffnen',
+  'ownedProduct.journey.portfolio.title': 'Verkauf veröffentlichen oder aktualisieren',
+  'ownedProduct.journey.portfolio.description':
+    'Erstellen Sie den Portfolioeintrag und erfassen Sie die echte Marktplatzveröffentlichung oder das Ereignis.',
+  'ownedProduct.journey.portfolio.action': 'Verkaufsverfolgung öffnen',
+  'ownedProduct.journey.outcome.title': 'Tatsächliches Ergebnis erfassen',
+  'ownedProduct.journey.outcome.description':
+    'Erfassen Sie Verkaufsergebnis und bekannte Kosten, damit Procura Gewinn und Genauigkeit berechnen kann.',
+  'ownedProduct.journey.outcome.action': 'Ergebnisverfolgung öffnen',
+  'ownedProduct.journey.complete.title': 'Dieser Verkaufsdatensatz ist vollständig',
+  'ownedProduct.journey.complete.description':
+    'Produkt, Preis, Angebot, Marktplatzverlauf und Endergebnis sind verbunden.',
+  'ownedProduct.journey.complete.action': 'Vollständiges Ergebnis prüfen',
+  'ownedProduct.journey.archived.title': 'Dieses Produkt ist archiviert',
+  'ownedProduct.journey.archived.description':
+    'Die Nachweise bleiben einsehbar, aber der Verkaufsablauf ist schreibgeschützt.',
+  'ownedProduct.journey.readOnly':
+    'Sie können den Ablauf prüfen, aber ein Arbeitsbereichsmanager muss den nächsten Schritt erfassen.',
   'ownedProduct.detail.idMissing': 'Die Route zum eigenen Produkt ist unvollständig.',
   'ownedProduct.detail.loadError':
     'Dieses Produkt konnte im aktiven Arbeitsbereich nicht geladen werden.',

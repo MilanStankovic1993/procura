@@ -23,6 +23,11 @@ import { OwnedProductListingDraftPanelComponent } from './owned-product-listing-
 import { OwnedProductOutcomePanelComponent } from './owned-product-outcome-panel.component';
 import { OwnedProductPriceIntelligencePanelComponent } from './owned-product-price-intelligence-panel.component';
 import { OwnedProductSalePortfolioPanelComponent } from './owned-product-sale-portfolio-panel.component';
+import {
+  nextSellJourneyStage,
+  SellJourneyPanelState,
+  SellJourneyStage,
+} from './sell-journey-state';
 
 @Component({
   selector: 'app-owned-product-detail-page',
@@ -55,6 +60,10 @@ export class OwnedProductDetailPage {
   protected readonly success = signal<TranslationKey | null>(null);
   protected readonly selectedFiles = signal<readonly File[]>([]);
   protected readonly removingImageIds = signal<ReadonlySet<string>>(new Set());
+  private readonly pricingJourneyState = signal<SellJourneyPanelState>('loading');
+  private readonly listingJourneyState = signal<SellJourneyPanelState>('loading');
+  private readonly portfolioJourneyState = signal<SellJourneyPanelState>('loading');
+  private readonly outcomeJourneyState = signal<SellJourneyPanelState>('loading');
   protected readonly canManage = computed(
     () =>
       this.organizations
@@ -64,6 +73,34 @@ export class OwnedProductDetailPage {
   protected readonly canMutate = computed(
     () => this.canManage() && this.record()?.status !== 'archived',
   );
+  protected readonly journeyStage = computed<SellJourneyStage>(() => {
+    const record = this.record();
+
+    if (record === null) {
+      return 'prepare';
+    }
+
+    return nextSellJourneyStage({
+      productStatus: record.status,
+      assessmentStatus: record.current_assessment?.status ?? null,
+      pricing: this.pricingJourneyState(),
+      listing: this.listingJourneyState(),
+      portfolio: this.portfolioJourneyState(),
+      outcome: this.outcomeJourneyState(),
+    });
+  });
+  protected readonly currentJourneyPanelState = computed<SellJourneyPanelState>(() => {
+    const states: Partial<Record<SellJourneyStage, SellJourneyPanelState>> = {
+      pricing: this.pricingJourneyState(),
+      listing: this.listingJourneyState(),
+      portfolio: this.portfolioJourneyState(),
+      outcome: this.outcomeJourneyState(),
+      complete: 'complete',
+      archived: 'blocked',
+    };
+
+    return states[this.journeyStage()] ?? 'ready';
+  });
   protected readonly lifecycleForm = this.formBuilder.nonNullable.group({
     status: ['draft' as OwnedProductStatus],
     notes: [''],
@@ -83,6 +120,7 @@ export class OwnedProductDetailPage {
 
       if (contextKey !== null && contextKey !== this.loadedContextKey) {
         this.loadedContextKey = contextKey;
+        this.resetJourneyPanelStates();
         this.load();
       }
     });
@@ -305,6 +343,91 @@ export class OwnedProductDetailPage {
     return `${hash.slice(0, 10)}…${hash.slice(-6)}`;
   }
 
+  protected updateJourneyState(
+    stage: 'pricing' | 'listing' | 'portfolio' | 'outcome',
+    state: SellJourneyPanelState,
+  ): void {
+    const signals = {
+      pricing: this.pricingJourneyState,
+      listing: this.listingJourneyState,
+      portfolio: this.portfolioJourneyState,
+      outcome: this.outcomeJourneyState,
+    };
+
+    signals[stage].set(state);
+  }
+
+  protected journeyTitleKey(): TranslationKey {
+    const state = this.currentJourneyPanelState();
+
+    if (state === 'loading') {
+      return 'ownedProduct.journey.loading.title';
+    }
+
+    if (state === 'error') {
+      return 'ownedProduct.journey.error.title';
+    }
+
+    return `ownedProduct.journey.${this.journeyStage()}.title` as TranslationKey;
+  }
+
+  protected journeyDescriptionKey(): TranslationKey {
+    const state = this.currentJourneyPanelState();
+
+    if (state === 'loading') {
+      return 'ownedProduct.journey.loading.description';
+    }
+
+    if (state === 'error') {
+      return 'ownedProduct.journey.error.description';
+    }
+
+    return `ownedProduct.journey.${this.journeyStage()}.description` as TranslationKey;
+  }
+
+  protected journeyActionKey(): TranslationKey {
+    if (this.currentJourneyPanelState() === 'error') {
+      return 'ownedProduct.journey.error.action';
+    }
+
+    return `ownedProduct.journey.${this.journeyStage()}.action` as TranslationKey;
+  }
+
+  protected journeyTarget(): string {
+    const targets: Readonly<Record<SellJourneyStage, string>> = {
+      prepare: '#sell-lifecycle',
+      assessment: '#sell-assessment',
+      pricing: '#sell-pricing',
+      listing: '#sell-listing',
+      portfolio: '#sell-portfolio',
+      outcome: '#sell-outcome',
+      complete: '#sell-outcome',
+      archived: '#sell-lifecycle',
+    };
+
+    return targets[this.journeyStage()];
+  }
+
+  protected journeyStepState(step: 1 | 2 | 3 | 4): 'complete' | 'current' | 'upcoming' {
+    if (this.journeyStage() === 'complete') {
+      return 'complete';
+    }
+
+    const indices: Readonly<Record<SellJourneyStage, number>> = {
+      prepare: 1,
+      assessment: 1,
+      pricing: 2,
+      listing: 3,
+      portfolio: 4,
+      outcome: 4,
+      complete: 4,
+      archived: 1,
+    };
+    const current = indices[this.journeyStage()];
+
+    return step < current ? 'complete' : step === current ? 'current' : 'upcoming';
+  }
+
   private load(preserveMessages = false): void {
     const ownedProductId = this.ownedProductId();
 
@@ -352,5 +475,12 @@ export class OwnedProductDetailPage {
     const trimmed = value.trim();
 
     return trimmed === '' ? null : trimmed;
+  }
+
+  private resetJourneyPanelStates(): void {
+    this.pricingJourneyState.set('loading');
+    this.listingJourneyState.set('loading');
+    this.portfolioJourneyState.set('loading');
+    this.outcomeJourneyState.set('loading');
   }
 }

@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -22,6 +22,7 @@ import {
   SalePortfolioEntry,
 } from '../../../core/owned-product.models';
 import { OwnedProductService } from '../../../core/owned-product.service';
+import { SellJourneyPanelState } from './sell-journey-state';
 
 const COST_CATEGORIES: readonly ActualCostCategory[] = [
   'transport',
@@ -62,6 +63,7 @@ export class OwnedProductOutcomePanelComponent {
 
   readonly record = input.required<OwnedProduct>();
   readonly canManage = input(false);
+  readonly journeyState = output<SellJourneyPanelState>();
 
   protected readonly projection = signal<OutcomeTrackingProjection | null>(null);
   protected readonly marketCatalog = signal<MarketReferenceCatalog | null>(null);
@@ -206,6 +208,7 @@ export class OwnedProductOutcomePanelComponent {
         this.load();
       }
     });
+    effect(() => this.journeyState.emit(this.panelJourneyState()));
   }
 
   protected reload(): void {
@@ -703,6 +706,28 @@ export class OwnedProductOutcomePanelComponent {
             apiErrorMessage(error, this.i18n.translate('ownedProduct.outcomes.loadError')),
           ),
       });
+  }
+
+  private panelJourneyState(): SellJourneyPanelState {
+    if (this.loading()) {
+      return 'loading';
+    }
+
+    const projection = this.projection();
+
+    if (projection === null) {
+      return this.error() === null ? 'blocked' : 'error';
+    }
+
+    if (projection.complete) {
+      return 'complete';
+    }
+
+    return projection.sale_portfolio_entries.some(
+      (entry) => entry.current_event !== null,
+    )
+      ? 'ready'
+      : 'blocked';
   }
 
   private loadAccuracyCandidates(search: string | null = null): void {

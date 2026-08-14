@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 
@@ -20,6 +20,7 @@ import {
 } from '../../../core/owned-product.models';
 import { OwnedProductService } from '../../../core/owned-product.service';
 import { SellComparableMarketNormalizationComponent } from './sell-comparable-market-normalization/sell-comparable-market-normalization.component';
+import { SellJourneyPanelState } from './sell-journey-state';
 
 @Component({
   selector: 'app-owned-product-price-intelligence-panel',
@@ -41,6 +42,7 @@ export class OwnedProductPriceIntelligencePanelComponent {
 
   readonly record = input.required<OwnedProduct>();
   readonly canManage = input(false);
+  readonly journeyState = output<SellJourneyPanelState>();
 
   protected readonly intelligence = signal<SellPriceIntelligence | null>(null);
   protected readonly marketCatalog = signal<MarketReferenceCatalog | null>(null);
@@ -101,6 +103,7 @@ export class OwnedProductPriceIntelligencePanelComponent {
       this.marketCatalog();
       this.applyDefaults();
     });
+    effect(() => this.journeyState.emit(this.panelJourneyState()));
   }
 
   protected reload(): void {
@@ -326,6 +329,31 @@ export class OwnedProductPriceIntelligencePanelComponent {
           );
         },
       });
+  }
+
+  private panelJourneyState(): SellJourneyPanelState {
+    if (this.loading()) {
+      return 'loading';
+    }
+
+    const intelligence = this.intelligence();
+
+    if (intelligence === null) {
+      return this.error() === null ? 'blocked' : 'error';
+    }
+
+    if (
+      intelligence.current_price_bands.some(
+        (band) => band.status === 'ready' || band.status === 'low_confidence',
+      )
+    ) {
+      return 'complete';
+    }
+
+    return intelligence.assessment_current &&
+      this.record().current_assessment?.status === 'ready'
+      ? 'ready'
+      : 'blocked';
   }
 
   private applyDefaults(): void {
