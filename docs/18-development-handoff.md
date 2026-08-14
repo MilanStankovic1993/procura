@@ -922,7 +922,10 @@ The Laragon development environment uses MySQL 8.4 LTS with a local `procura` da
 - `analyses` stores an immutable tenant request anchored to one listing snapshot, explicit market
   scope, pipeline version, request hash, result, workflow timestamps, and bounded retry metadata.
 - `analysis_dispatches` is the idempotent outbox/recovery boundary; `ai_analyses` stores append-only
-  structured provider attempts, validation, confidence, timing, cost, and errors.
+  structured provider attempts, validation, confidence, timing, cost, and errors. A verified-super-
+  admin-only read-only explorer exposes bounded tenant/parent, lifecycle, provider/version,
+  confidence, duration, and match-count projections without input hashes/snapshots, structured
+  results, provider errors, tokens, or cost.
 - `product_categories`, `brands`, `product_models`, `product_variants`,
   `product_variant_markets`, and `product_aliases` form the global canonical catalog with normalized
   search fields, active lifecycle, regional attributes, and explicit alias market scope.
@@ -1621,7 +1624,7 @@ personal organizations and memberships (complete)
 - A slow parallel validation run crossed a one-second boundary between initial and duplicate
   comparable fixture timestamps, correctly producing a new evidence record and exposing a flaky
   test. The test now derives both payloads from one fixed base timestamp. That checkpoint passed
-  163 tests and 1139 assertions. The current suite passes 403 tests and 5213 assertions after the
+  163 tests and 1139 assertions. The current suite passes 418 tests and 5417 assertions after the
   later Sell, outcome, monitoring, billing, connector, normalization, privacy, Analysis Operations,
   operational-readiness, deterministic capacity/queue throughput/Analysis workload, browser,
   saturation/soak, server/API localization, typed platform-validation, privacy fulfillment/erasure,

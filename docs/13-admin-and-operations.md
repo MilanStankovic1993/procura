@@ -31,6 +31,7 @@ Phase 1 currently implements:
 - Privacy Requests
 - Listing Explorer
 - Analysis Explorer
+- AI Analyses Explorer
 - Analysis Operations
 - Product Match Reviews
 - Broker Requests
@@ -81,6 +82,13 @@ bounded eager-loaded relationships. It intentionally excludes request and result
 snapshots, hashes, AI input/output, provider errors, and internal diagnostic messages. Failed heads
 that are eligible for intervention remain separately owned by **Analysis Operations**.
 
+The read-only **AI Analyses Explorer** exposes the append-only provider-attempt ledger needed for
+support and quality monitoring: tenant, parent analysis/listing, attempt, lifecycle and validation
+status, provider/model/prompt version, confidence, elapsed time, and aggregate product-match count.
+It never renders the input hash or snapshot, structured result, provider error, token counts, or
+estimated cost. Mutations and retries remain outside this resource and continue through the
+existing guarded Analysis Operations boundary.
+
 The read-only **Listing Explorer** provides the corresponding global intake overview. It exposes
 only organization, title, marketplace, ISO-minor-unit-aware asking price, market route, lifecycle
 status, and aggregate image/analysis counts, with optional support identifiers hidden by default.
@@ -97,7 +105,6 @@ attribution rules, and internal review notes are never rendered.
 The following broader product/operations resources remain scheduled for their corresponding
 phases:
 
-- AI Analyses
 - Price Estimates
 - Risk Assessments
 - Deal Scores

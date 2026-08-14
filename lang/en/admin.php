@@ -39,6 +39,7 @@ return [
         'privacy_requests' => ['singular' => 'privacy request', 'plural' => 'privacy requests', 'navigation' => 'Privacy requests'],
         'analysis_operations' => ['singular' => 'analysis operation', 'plural' => 'analysis operations', 'navigation' => 'Analysis operations'],
         'analyses' => ['singular' => 'analysis', 'plural' => 'analyses', 'navigation' => 'Analysis explorer'],
+        'ai_analyses' => ['singular' => 'AI analysis', 'plural' => 'AI analyses', 'navigation' => 'AI analyses'],
         'listings' => ['singular' => 'listing', 'plural' => 'listings', 'navigation' => 'Listing explorer'],
         'product_match_reviews' => ['singular' => 'product match review', 'plural' => 'product match reviews', 'navigation' => 'Product match reviews'],
         'broker_requests' => ['singular' => 'broker request', 'plural' => 'broker requests', 'navigation' => 'Broker requests'],
@@ -210,6 +211,13 @@ return [
         'artifact_expires_at' => 'Artifact expires',
         'backup_purge_due_at' => 'Backups purged by',
         'completed_at' => 'Completed',
+        'started_at' => 'Started',
+        'validation_status' => 'Validation',
+        'provider' => 'Provider',
+        'provider_model' => 'Provider model',
+        'prompt_version' => 'Prompt version',
+        'duration' => 'Duration',
+        'product_matches' => 'Product matches',
         'title' => 'Title',
         'requester' => 'Requester',
         'condition' => 'Condition',
@@ -447,6 +455,16 @@ return [
         ],
         'analysis_type' => [
             'buy' => 'Buy analysis',
+        ],
+        'ai_analysis_status' => [
+            'processing' => 'Processing',
+            'completed' => 'Completed',
+            'failed' => 'Failed',
+        ],
+        'ai_validation_status' => [
+            'pending' => 'Pending',
+            'valid' => 'Valid',
+            'invalid' => 'Invalid',
         ],
         'listing_status' => [
             'active' => 'Active',

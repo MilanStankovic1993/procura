@@ -39,6 +39,7 @@ return [
         'privacy_requests' => ['singular' => 'solicitud de privacidad', 'plural' => 'solicitudes de privacidad', 'navigation' => 'Solicitudes de privacidad'],
         'analysis_operations' => ['singular' => 'operación de análisis', 'plural' => 'operaciones de análisis', 'navigation' => 'Operaciones de análisis'],
         'analyses' => ['singular' => 'análisis', 'plural' => 'análisis', 'navigation' => 'Explorador de análisis'],
+        'ai_analyses' => ['singular' => 'análisis de IA', 'plural' => 'análisis de IA', 'navigation' => 'Análisis de IA'],
         'listings' => ['singular' => 'anuncio', 'plural' => 'anuncios', 'navigation' => 'Explorador de anuncios'],
         'product_match_reviews' => ['singular' => 'revisión de coincidencia', 'plural' => 'revisiones de coincidencias', 'navigation' => 'Coincidencias de productos'],
         'broker_requests' => ['singular' => 'solicitud de intermediación', 'plural' => 'solicitudes de intermediación', 'navigation' => 'Solicitudes de intermediación'],
@@ -210,6 +211,13 @@ return [
         'artifact_expires_at' => 'Caducidad del artefacto',
         'backup_purge_due_at' => 'Copias eliminadas antes de',
         'completed_at' => 'Completado',
+        'started_at' => 'Iniciado',
+        'validation_status' => 'Validación',
+        'provider' => 'Proveedor',
+        'provider_model' => 'Modelo del proveedor',
+        'prompt_version' => 'Versión del prompt',
+        'duration' => 'Duración',
+        'product_matches' => 'Coincidencias de producto',
         'title' => 'Título',
         'requester' => 'Solicitante',
         'condition' => 'Estado',
@@ -411,6 +419,16 @@ return [
         ],
         'analysis_type' => [
             'buy' => 'Análisis de compra',
+        ],
+        'ai_analysis_status' => [
+            'processing' => 'Procesando',
+            'completed' => 'Completado',
+            'failed' => 'Fallido',
+        ],
+        'ai_validation_status' => [
+            'pending' => 'Pendiente',
+            'valid' => 'Válida',
+            'invalid' => 'No válida',
         ],
         'listing_status' => [
             'active' => 'Activo',

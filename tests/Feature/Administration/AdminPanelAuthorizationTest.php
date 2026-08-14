@@ -10,12 +10,15 @@ use App\Actions\BrokerRequests\TransitionBrokerRequest;
 use App\Actions\BrokerRequests\TransitionBrokerTransaction;
 use App\Actions\Markets\SyncMarketReferenceData;
 use App\Actions\Privacy\CreatePrivacyRequest;
+use App\Enums\Analyses\AiAnalysisStatus;
+use App\Enums\Analyses\AiValidationStatus;
 use App\Enums\Analyses\AnalysisStatus;
 use App\Enums\Analyses\AnalysisType;
 use App\Enums\BrokerRequests\BrokerPaymentCaseType;
 use App\Enums\BrokerRequests\BrokerRequestStatus;
 use App\Enums\BrokerRequests\BrokerTransactionStatus;
 use App\Enums\Localization\SupportedLocale;
+use App\Filament\Resources\AiAnalyses\AiAnalysisResource;
 use App\Filament\Resources\Analyses\AnalysisResource;
 use App\Filament\Resources\AnalysisOperations\AnalysisOperationResource;
 use App\Filament\Resources\AuditEvents\AuditEventResource;
@@ -48,6 +51,7 @@ use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use App\Filament\Resources\TelegramConnections\TelegramConnectionResource;
 use App\Filament\Resources\Usages\UsageResource;
 use App\Filament\Resources\Users\UserResource;
+use App\Models\AiAnalysis;
 use App\Models\Analysis;
 use App\Models\BillingProviderEvent;
 use App\Models\Brand;
@@ -109,6 +113,7 @@ test('verified super administrators can access operational resources while resou
         ->and(AuditEventResource::canCreate())->toBeFalse()
         ->and(AnalysisOperationResource::canCreate())->toBeFalse()
         ->and(AnalysisResource::canCreate())->toBeFalse()
+        ->and(AiAnalysisResource::canCreate())->toBeFalse()
         ->and(ListingResource::canCreate())->toBeFalse()
         ->and(MarketplaceSourceResource::canCreate())->toBeFalse()
         ->and(ComparableMarketNormalizationResource::canCreate())->toBeFalse()
@@ -152,6 +157,7 @@ test('verified super administrators can access operational resources while resou
         AuditEventResource::class,
         AnalysisOperationResource::class,
         AnalysisResource::class,
+        AiAnalysisResource::class,
         ListingResource::class,
         MarketplaceSourceResource::class,
         NotificationDeliveryResource::class,
@@ -338,6 +344,105 @@ test('analysis explorer exposes safe pipeline projections only to verified super
         ->assertDontSee('request-secret-must-not-render')
         ->assertDontSee('result-secret-must-not-render')
         ->assertDontSee('internal-error-must-not-render');
+});
+
+test('AI analysis explorer exposes operational attempt data without private provider evidence', function () {
+    app(SyncMarketReferenceData::class)->sync();
+
+    $requester = User::factory()->create();
+    $organization = Organization::factory()->create([
+        'name' => 'AI Operations Workspace',
+    ]);
+    $listing = Listing::factory()->create([
+        'organization_id' => $organization,
+        'created_by_user_id' => $requester,
+        'title' => 'AI-visible pressure washer',
+        'source_country_code' => 'DE',
+        'target_country_code' => 'FR',
+    ]);
+    $snapshot = ListingSnapshot::query()->create([
+        'listing_id' => $listing->getKey(),
+        'sequence' => 1,
+        'captured_by_user_id' => $requester->getKey(),
+        'captured_at' => now(),
+        'source_url' => $listing->source_url,
+        'external_id' => $listing->external_id,
+        'marketplace_name' => $listing->marketplace_name,
+        'marketplace_key' => $listing->marketplace_key,
+        'title' => $listing->title,
+        'description' => $listing->description,
+        'asking_price_minor' => $listing->asking_price_minor,
+        'currency_code' => $listing->currency_code,
+        'seller_information' => $listing->seller_information,
+        'location' => $listing->location,
+        'source_country_code' => $listing->source_country_code,
+        'target_country_code' => $listing->target_country_code,
+        'status' => $listing->status,
+        'notes' => $listing->notes,
+        'raw_payload' => [],
+        'content_hash' => hash('sha256', 'admin-ai-analysis-snapshot'),
+    ]);
+    $analysis = Analysis::query()->create([
+        'organization_id' => $organization->getKey(),
+        'listing_id' => $listing->getKey(),
+        'listing_snapshot_id' => $snapshot->getKey(),
+        'requested_by_user_id' => $requester->getKey(),
+        'analysis_type' => AnalysisType::Buy,
+        'status' => AnalysisStatus::Completed,
+        'source_country_code' => 'DE',
+        'target_country_code' => 'FR',
+        'pipeline_version' => 'buy-analysis-pipeline:v1',
+        'request_payload' => [],
+        'request_hash' => hash('sha256', 'admin-ai-analysis-request'),
+        'result_payload' => [],
+        'processing_attempts' => 1,
+        'submitted_at' => now()->subMinutes(3),
+        'finished_at' => now(),
+    ]);
+    AiAnalysis::query()->create([
+        'organization_id' => $organization->getKey(),
+        'analysis_id' => $analysis->getKey(),
+        'attempt_number' => 1,
+        'status' => AiAnalysisStatus::Completed,
+        'provider' => 'operations-provider',
+        'model' => 'operations-model-v7',
+        'prompt_version' => 'prompt:v7',
+        'input_hash' => hash('sha256', 'private-input-hash-source'),
+        'input_snapshot' => ['private' => 'private-ai-input-must-not-render'],
+        'result_json' => ['private' => 'private-ai-result-must-not-render'],
+        'validation_status' => AiValidationStatus::Valid,
+        'confidence_basis_points' => 8765,
+        'tokens_in' => 123456,
+        'tokens_out' => 654321,
+        'estimated_cost_minor' => 7654321,
+        'estimated_cost_currency' => 'EUR',
+        'started_at' => now()->subMinutes(2),
+        'completed_at' => now(),
+        'error' => 'private-provider-error-must-not-render',
+    ]);
+
+    $this->actingAs(User::factory()->create())
+        ->get(AiAnalysisResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs(superAdmin())
+        ->get(AiAnalysisResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('AI Operations Workspace')
+        ->assertSeeText('AI-visible pressure washer')
+        ->assertSeeText('Completed')
+        ->assertSeeText('Valid')
+        ->assertSeeText('operations-provider')
+        ->assertSeeText('operations-model-v7')
+        ->assertSeeText('prompt:v7')
+        ->assertSeeText('87.65%')
+        ->assertSeeText('2 minutes')
+        ->assertDontSee('private-ai-input-must-not-render')
+        ->assertDontSee('private-ai-result-must-not-render')
+        ->assertDontSee('private-provider-error-must-not-render')
+        ->assertDontSee('123456')
+        ->assertDontSee('654321')
+        ->assertDontSee('7654321');
 });
 
 test('catalog explorer exposes canonical relationships only to verified super administrators', function () {

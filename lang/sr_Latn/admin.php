@@ -39,6 +39,7 @@ return [
         'privacy_requests' => ['singular' => 'zahtev za privatnost', 'plural' => 'zahtevi za privatnost', 'navigation' => 'Zahtevi za privatnost'],
         'analysis_operations' => ['singular' => 'operacija analize', 'plural' => 'operacije analiza', 'navigation' => 'Operacije analiza'],
         'analyses' => ['singular' => 'analiza', 'plural' => 'analize', 'navigation' => 'Pregled analiza'],
+        'ai_analyses' => ['singular' => 'AI analiza', 'plural' => 'AI analize', 'navigation' => 'AI analize'],
         'listings' => ['singular' => 'oglas', 'plural' => 'oglasi', 'navigation' => 'Pregled oglasa'],
         'product_match_reviews' => ['singular' => 'provera podudaranja proizvoda', 'plural' => 'provere podudaranja proizvoda', 'navigation' => 'Podudaranja proizvoda'],
         'broker_requests' => ['singular' => 'zahtev posredniku', 'plural' => 'zahtevi posredniku', 'navigation' => 'Zahtevi posredniku'],
@@ -210,6 +211,13 @@ return [
         'artifact_expires_at' => 'Artefakt ističe',
         'backup_purge_due_at' => 'Rezervne kopije uklonjene do',
         'completed_at' => 'Završeno',
+        'started_at' => 'Započeto',
+        'validation_status' => 'Validacija',
+        'provider' => 'Pružalac',
+        'provider_model' => 'Model pružaoca',
+        'prompt_version' => 'Verzija prompta',
+        'duration' => 'Trajanje',
+        'product_matches' => 'Podudaranja proizvoda',
         'title' => 'Naslov',
         'requester' => 'Podnosilac',
         'condition' => 'Stanje',
@@ -411,6 +419,16 @@ return [
         ],
         'analysis_type' => [
             'buy' => 'Analiza kupovine',
+        ],
+        'ai_analysis_status' => [
+            'processing' => 'Obrada u toku',
+            'completed' => 'Završeno',
+            'failed' => 'Neuspešno',
+        ],
+        'ai_validation_status' => [
+            'pending' => 'Na čekanju',
+            'valid' => 'Ispravna',
+            'invalid' => 'Neispravna',
         ],
         'listing_status' => [
             'active' => 'Aktivan',

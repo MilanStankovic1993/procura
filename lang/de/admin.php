@@ -39,6 +39,7 @@ return [
         'privacy_requests' => ['singular' => 'Datenschutzanfrage', 'plural' => 'Datenschutzanfragen', 'navigation' => 'Datenschutzanfragen'],
         'analysis_operations' => ['singular' => 'Analysebetrieb', 'plural' => 'Analysebetriebe', 'navigation' => 'Analysebetrieb'],
         'analyses' => ['singular' => 'Analyse', 'plural' => 'Analysen', 'navigation' => 'Analyseübersicht'],
+        'ai_analyses' => ['singular' => 'KI-Analyse', 'plural' => 'KI-Analysen', 'navigation' => 'KI-Analysen'],
         'listings' => ['singular' => 'Inserat', 'plural' => 'Inserate', 'navigation' => 'Inseratübersicht'],
         'product_match_reviews' => ['singular' => 'Produktzuordnungsprüfung', 'plural' => 'Produktzuordnungsprüfungen', 'navigation' => 'Produktzuordnungen'],
         'broker_requests' => ['singular' => 'Makleranfrage', 'plural' => 'Makleranfragen', 'navigation' => 'Makleranfragen'],
@@ -210,6 +211,13 @@ return [
         'artifact_expires_at' => 'Artefakt läuft ab',
         'backup_purge_due_at' => 'Sicherungen gelöscht bis',
         'completed_at' => 'Abgeschlossen',
+        'started_at' => 'Begonnen',
+        'validation_status' => 'Validierung',
+        'provider' => 'Anbieter',
+        'provider_model' => 'Anbietermodell',
+        'prompt_version' => 'Prompt-Version',
+        'duration' => 'Dauer',
+        'product_matches' => 'Produktzuordnungen',
         'title' => 'Titel',
         'requester' => 'Anfragende Person',
         'condition' => 'Zustand',
@@ -411,6 +419,16 @@ return [
         ],
         'analysis_type' => [
             'buy' => 'Kaufanalyse',
+        ],
+        'ai_analysis_status' => [
+            'processing' => 'Verarbeitung',
+            'completed' => 'Abgeschlossen',
+            'failed' => 'Fehlgeschlagen',
+        ],
+        'ai_validation_status' => [
+            'pending' => 'Ausstehend',
+            'valid' => 'Gültig',
+            'invalid' => 'Ungültig',
         ],
         'listing_status' => [
             'active' => 'Aktiv',

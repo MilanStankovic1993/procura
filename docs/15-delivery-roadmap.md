@@ -88,6 +88,9 @@ Deliverables:
 - read-only analysis support explorer (complete: verified-super-admin-only tenant overview,
   relationship-bounded current product/price/risk/deal projections, five-language filters, and
   explicit exclusion of raw request/result/AI/error evidence),
+- read-only AI-attempt support explorer (complete: verified-super-admin-only provider-attempt
+  lifecycle, validation, version, confidence, duration, and match-count projections in five
+  languages, with AI input/output, errors, hashes, tokens, and cost excluded),
 - read-only listing support explorer (complete: verified-super-admin-only global intake overview,
   ISO-minor-unit-aware pricing, bounded relationship counts and filters, and explicit exclusion of
   source URLs, descriptions, seller/location details, notes, and raw input),
