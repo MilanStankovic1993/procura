@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Markets\MeasurementSystem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class OrganizationMarketPreference extends Model
 {
@@ -45,5 +46,17 @@ class OrganizationMarketPreference extends Model
     public function reportingCurrency(): BelongsTo
     {
         return $this->belongsTo(Currency::class, 'reporting_currency_code');
+    }
+
+    public function countries(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Country::class,
+            'organization_market_countries',
+            'organization_id',
+            'country_code',
+            'organization_id',
+            'code',
+        )->withPivot('sort_order')->orderByPivot('sort_order');
     }
 }

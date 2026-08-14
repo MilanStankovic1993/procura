@@ -135,6 +135,14 @@ action backed by the existing locale-update application action. Custom resources
 columns, actions, modals, dashboard metrics, known values, localized country/currency names, and
 required vendor accessibility/status strings are covered without modifying `vendor/`.
 
+The existing tenant-owned `OrganizationMarketPreference` boundary now also has a five-language
+read-only Organization Settings Explorer for verified super administrators. It exposes localized
+home-country and reporting-currency defaults, locale, time zone, measurement system, cross-border
+preference, and only the aggregate number of selected market countries. Filament cannot mutate
+these values: authorized tenant owners/administrators still use the validated transactional API.
+No generic key/value settings store, secrets, provider credentials, environment configuration, or
+raw configuration editor has been introduced.
+
 Phase 2 manual listing intake is now implemented in Angular with lazy list, create, and detail
 routes. It includes cursor pagination, search and status filters, exact minor-unit price conversion,
 global source/target market selection, retry-safe two-stage record/file submission, private

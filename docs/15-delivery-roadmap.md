@@ -29,7 +29,9 @@ Deliverables:
 - policies,
 - Filament,
 - global country and currency reference data,
-- organization market preferences,
+- organization market preferences (complete: role-validated transactional tenant API plus a
+  five-language verified-super-admin read-only global settings explorer with localized market
+  defaults and aggregate selected-country visibility),
 - plans,
 - usage tracking,
 - complete five-language Filament operations interface with one shared personal locale preference,

@@ -49,6 +49,7 @@ use App\Filament\Resources\MarketplaceSources\MarketplaceSourceResource;
 use App\Filament\Resources\Memberships\MembershipResource;
 use App\Filament\Resources\NotificationDeliveries\NotificationDeliveryResource;
 use App\Filament\Resources\Organizations\OrganizationResource;
+use App\Filament\Resources\OrganizationSettings\OrganizationSettingResource;
 use App\Filament\Resources\PlanFeatures\PlanFeatureResource;
 use App\Filament\Resources\Plans\PlanResource;
 use App\Filament\Resources\PriceEstimates\PriceEstimateResource;
@@ -80,6 +81,7 @@ use App\Models\MarketplaceSource;
 use App\Models\OpportunityAssessment;
 use App\Models\OpportunityInput;
 use App\Models\Organization;
+use App\Models\OrganizationMarketPreference;
 use App\Models\OrganizationMembership;
 use App\Models\Plan;
 use App\Models\PlatformAuditEvent;
@@ -490,6 +492,7 @@ test('verified super administrators can access operational resources while resou
         ->and(DealScoreResource::canCreate())->toBeFalse()
         ->and(SavedSearchResource::canCreate())->toBeFalse()
         ->and(AlertResource::canCreate())->toBeFalse()
+        ->and(OrganizationSettingResource::canCreate())->toBeFalse()
         ->and(ListingResource::canCreate())->toBeFalse()
         ->and(MarketplaceSourceResource::canCreate())->toBeFalse()
         ->and(ComparableMarketNormalizationResource::canCreate())->toBeFalse()
@@ -539,6 +542,7 @@ test('verified super administrators can access operational resources while resou
         DealScoreResource::class,
         SavedSearchResource::class,
         AlertResource::class,
+        OrganizationSettingResource::class,
         ListingResource::class,
         MarketplaceSourceResource::class,
         NotificationDeliveryResource::class,
@@ -1134,6 +1138,42 @@ test('alert explorer exposes delivery aggregates without private match payloads'
         ->assertDontSee('private-alert-external-id-must-not-render')
         ->assertDontSee('https://private.example/alert-listing-must-not-render')
         ->assertDontSee('15000');
+});
+
+test('organization settings explorer exposes validated global market defaults', function () {
+    app(SyncMarketReferenceData::class)->sync();
+
+    $organization = Organization::factory()->create([
+        'name' => 'Vienna Global Trading',
+    ]);
+    OrganizationMarketPreference::query()->create([
+        'organization_id' => $organization->getKey(),
+        'home_country_code' => 'AT',
+        'reporting_currency_code' => 'EUR',
+        'locale' => 'de-AT',
+        'timezone' => 'Europe/Vienna',
+        'measurement_system' => 'metric',
+        'include_cross_border' => true,
+    ]);
+    DB::table('organization_market_countries')->insert([
+        ['organization_id' => $organization->getKey(), 'country_code' => 'AT', 'sort_order' => 0, 'created_at' => now(), 'updated_at' => now()],
+        ['organization_id' => $organization->getKey(), 'country_code' => 'DE', 'sort_order' => 1, 'created_at' => now(), 'updated_at' => now()],
+        ['organization_id' => $organization->getKey(), 'country_code' => 'HU', 'sort_order' => 2, 'created_at' => now(), 'updated_at' => now()],
+    ]);
+
+    $this->actingAs(User::factory()->create())
+        ->get(OrganizationSettingResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs(superAdmin())
+        ->get(OrganizationSettingResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Vienna Global Trading')
+        ->assertSeeText('Austria (AT)')
+        ->assertSeeText('EUR - Euro')
+        ->assertSeeText('de-AT')
+        ->assertSeeText('Europe/Vienna')
+        ->assertSeeText('Metric');
 });
 
 test('catalog explorer exposes canonical relationships only to verified super administrators', function () {

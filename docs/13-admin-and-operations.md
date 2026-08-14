@@ -10,6 +10,7 @@ Phase 1 currently implements:
 - Plans
 - Plan Entitlements
 - Organization Plan Assignments
+- Organization Settings Explorer
 - Subscription Usage
 - Countries
 - Currencies
@@ -139,6 +140,13 @@ saved-search/listing/alert support identifiers hidden by default. It never loads
 payloads or keys, saved-search titles/criteria, listing content, match reasons/unknowns/evidence,
 notification payloads, delivery errors, actors, prior event links, or idempotency evidence.
 
+The read-only **Organization Settings Explorer** projects the existing tenant-owned market
+preference boundary: organization, localized home country/reporting currency, locale, time zone,
+measurement system, cross-border preference, and aggregate selected-market count. Super
+administrators cannot mutate these preferences from Filament; authorized tenant owners/admins
+continue through the validated transactional market-preferences API. No generic settings key/value
+store, secret/provider configuration, environment values, or raw configuration editing is exposed.
+
 The read-only **Listing Explorer** provides the corresponding global intake overview. It exposes
 only organization, title, marketplace, ISO-minor-unit-aware asking price, market route, lifecycle
 status, and aggregate image/analysis counts, with optional support identifiers hidden by default.
@@ -155,7 +163,6 @@ attribution rules, and internal review notes are never rendered.
 The following broader product/operations resources remain scheduled for their corresponding
 phases:
 
-- Settings
 - Audit Logs
 
 ## 2. Operational queues
