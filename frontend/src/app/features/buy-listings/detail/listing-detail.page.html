@@ -25,6 +25,70 @@
       <strong class="price">{{ price(record) }}</strong>
     </header>
 
+    <section class="journey" [attr.data-state]="journeyState()" aria-labelledby="buy-next-step">
+      <div class="journey-content">
+        <p class="eyebrow">{{ 'listingDetail.journey.eyebrow' | t }}</p>
+        <h2 id="buy-next-step">{{ journeyTitleKey() | t }}</h2>
+        <p class="journey-description">{{ journeyDescriptionKey() | t }}</p>
+
+        <div class="journey-action">
+          @if (journeyState() === 'loading') {
+            <span class="journey-wait" aria-live="polite">
+              {{ 'listingDetail.analysisLoading' | t }}
+            </span>
+          } @else if (journeyState() === 'unavailable') {
+            <button class="button button-primary" type="button" (click)="retryAnalyses()">
+              {{ 'common.retry' | t }}
+            </button>
+          } @else if (primaryAnalysis(); as analysis) {
+            <a
+              class="button button-primary"
+              [routerLink]="['/app/buy', record.id, 'analysis', analysis.id]"
+            >
+              {{ journeyActionKey() | t }}
+              <span aria-hidden="true">→</span>
+            </a>
+          } @else if (canManageAnalyses()) {
+            <button
+              class="button button-primary"
+              type="button"
+              [disabled]="creatingDraft()"
+              (click)="createAnalysisDraft()"
+            >
+              {{ (creatingDraft() ? 'listingDetail.creatingDraft' : journeyActionKey()) | t }}
+              <span aria-hidden="true">→</span>
+            </button>
+          } @else {
+            <span class="journey-readonly">{{ 'listingDetail.analysisReadOnly' | t }}</span>
+          }
+        </div>
+      </div>
+
+      <ol class="journey-steps" [attr.aria-label]="'listingDetail.journey.progressLabel' | t">
+        <li [attr.data-state]="journeyStepState(1)">
+          <span class="step-marker" aria-hidden="true">1</span>
+          <div>
+            <strong>{{ 'listingDetail.journey.step1.title' | t }}</strong>
+            <small>{{ 'listingDetail.journey.step1.description' | t }}</small>
+          </div>
+        </li>
+        <li [attr.data-state]="journeyStepState(2)">
+          <span class="step-marker" aria-hidden="true">2</span>
+          <div>
+            <strong>{{ 'listingDetail.journey.step2.title' | t }}</strong>
+            <small>{{ 'listingDetail.journey.step2.description' | t }}</small>
+          </div>
+        </li>
+        <li [attr.data-state]="journeyStepState(3)">
+          <span class="step-marker" aria-hidden="true">3</span>
+          <div>
+            <strong>{{ 'listingDetail.journey.step3.title' | t }}</strong>
+            <small>{{ 'listingDetail.journey.step3.description' | t }}</small>
+          </div>
+        </li>
+      </ol>
+    </section>
+
     <section class="layout">
       <div class="main-column">
         <article class="panel facts">
@@ -155,16 +219,7 @@
           } @else if (analysisRecords().length === 0 && !analysesError()) {
             <div class="analysis-empty">
               <p>{{ 'listingDetail.noAnalysis' | t }}</p>
-              @if (canManageAnalyses()) {
-                <button
-                  class="button button-primary"
-                  type="button"
-                  [disabled]="creatingDraft()"
-                  (click)="createAnalysisDraft()"
-                >
-                  {{ (creatingDraft() ? 'listingDetail.creatingDraft' : 'listingDetail.createDraft') | t }}
-                </button>
-              } @else {
+              @if (!canManageAnalyses()) {
                 <small>{{ 'listingDetail.analysisReadOnly' | t }}</small>
               }
             </div>
@@ -190,7 +245,10 @@
               }
             </div>
 
-            @if (canManageAnalyses()) {
+            @if (
+              canManageAnalyses() &&
+              (journeyState() === 'completed' || journeyState() === 'failed')
+            ) {
               <button
                 class="button button-quiet new-analysis"
                 type="button"
@@ -200,9 +258,7 @@
                 {{
                   (creatingDraft()
                     ? 'listingDetail.openingDraft'
-                    : openDraft()
-                      ? 'listingDetail.continueDraft'
-                      : 'listingDetail.createAnotherDraft'
+                    : 'listingDetail.createAnotherDraft'
                 ) | t }}
               </button>
             }

@@ -1,12 +1,20 @@
 # 18 - Development Handoff
 
-Last updated: 2026-08-11
+Last updated: 2026-08-14
 
 The authenticated overview is now a user action center rather than a technical readiness page.
 It routes directly to the guided Buy and Sell intake flows, respects workspace capabilities, and
 loads only the three most recent tenant listings and owned products for quick continuation.
 Infrastructure readiness remains exclusively in the protected Filament operations dashboard and
 machine health contracts.
+
+The Buy listing detail now continues that user-first flow. A state-derived journey card appears
+before provenance and lifecycle controls, presents one primary next action, and routes safely to
+the existing draft, active run, required input, completed report, or failed-run recovery. Its
+three-step listing-analysis-decision progress model is capability-aware, resilient to analysis
+status lookup failures, responsive, and localized in all five browser languages. Technical source
+facts, evidence, snapshots, and lifecycle controls remain available below it without becoming the
+entry point.
 
 This document is the persistent handoff for continuing Procura development on another computer or
 in a new Codex task. Read it after the preceding product and architecture documents and verify the
@@ -23,11 +31,12 @@ Project name: Procura
 Current development branch: develop
 ```
 
-`main` is the protected production-ready branch. `develop` is the long-lived integration branch.
-New work uses short-lived `feature/*` or `fix/*` branches from `develop`; release promotion enters
-`main` through a green pull request. The complete policy and PR checklist live in
-`CONTRIBUTING.md`. Direct development commits, force pushes, and deletion of long-lived branches
-are prohibited.
+`main` is the protected production-ready branch. `develop` is the long-lived working and
+integration branch; normal sequential work is committed directly there only after its task-level
+checks pass. Do not create `codex/*` branches. Short-lived branches are optional for parallel or
+risky work, while release promotion enters `main` only through a green pull request. The complete
+policy and release checklist live in `CONTRIBUTING.md`. Force pushes, direct commits to `main`, and
+deletion of long-lived branches are prohibited.
 
 Foundation commits preceding the authentication branch:
 

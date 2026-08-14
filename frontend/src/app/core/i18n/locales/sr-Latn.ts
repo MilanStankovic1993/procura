@@ -687,6 +687,47 @@ export const SR_LATN_TRANSLATIONS = {
     'Oglas je sačuvan, ali neke datoteke nisu poslate. Bezbedno ponovite slanje ispod.',
   'listingDetail.back': '← Izvorni oglasi',
   'listingDetail.loading': 'Učitavanje porekla oglasa…',
+  'listingDetail.journey.eyebrow': 'Vaš sledeći korak',
+  'listingDetail.journey.progressLabel': 'Napredak analize kupovine',
+  'listingDetail.journey.step1.title': 'Oglas je sačuvan',
+  'listingDetail.journey.step1.description': 'Izvor i tržišni podaci su bezbedno zabeleženi.',
+  'listingDetail.journey.step2.title': 'Pokrenite analizu',
+  'listingDetail.journey.step2.description': 'Proverite identitet, cenu, troškove, rizik i priliku.',
+  'listingDetail.journey.step3.title': 'Donesite odluku',
+  'listingDetail.journey.step3.description': 'Pregledajte dokaze i izaberite sledeći potez.',
+  'listingDetail.journey.loading.title': 'Proveravamo status analize…',
+  'listingDetail.journey.loading.description':
+    'Procura pronalazi najnoviji rad za ovaj oglas.',
+  'listingDetail.journey.unavailable.title': 'Status analize trenutno nije dostupan',
+  'listingDetail.journey.unavailable.description':
+    'Oglas je bezbedan. Ponovite proveru bez pravljenja duplog rada.',
+  'listingDetail.journey.ready.title': 'Spremni da proverite ovu ponudu?',
+  'listingDetail.journey.ready.description':
+    'Pokrenite vođenu analizu. Pre slanja možete pregledati tačan, nepromenljiv snimak oglasa.',
+  'listingDetail.journey.ready.action': 'Pokreni vođenu analizu',
+  'listingDetail.journey.draft.title': 'Analiza je spremna za slanje',
+  'listingDetail.journey.draft.description':
+    'Nastavite sačuvani nacrt, proverite tačan tržišni opseg i pošaljite ga kada budete spremni.',
+  'listingDetail.journey.draft.action': 'Nastavi analizu',
+  'listingDetail.journey.running.title': 'Procura proverava ponudu',
+  'listingDetail.journey.running.description':
+    'Pratite status dok se obrada dokaza završava u pozadini.',
+  'listingDetail.journey.running.action': 'Prikaži napredak',
+  'listingDetail.journey.needs_input.title': 'Jedna odluka zahteva vašu pažnju',
+  'listingDetail.journey.needs_input.description':
+    'Pregledajte sačuvane dokaze i unesite samo potvrdu koja nedostaje.',
+  'listingDetail.journey.needs_input.action': 'Pregledaj potrebnu potvrdu',
+  'listingDetail.journey.completed.title': 'Izveštaj za odluku je spreman',
+  'listingDetail.journey.completed.description':
+    'Pregledajte dokaze o ceni, troškove, rizik, pouzdanost i preporučeni sledeći potez.',
+  'listingDetail.journey.completed.action': 'Pregledaj rezultate',
+  'listingDetail.journey.failed.title': 'Analiza zahteva pažnju',
+  'listingDetail.journey.failed.description':
+    'Otvorite analizu i pogledajte bezbedan način oporavka. Oglas i raniji dokazi ostaju nepromenjeni.',
+  'listingDetail.journey.failed.action': 'Pregledaj problem',
+  'listingDetail.journey.read_only.title': 'Oglas je spreman za analizu',
+  'listingDetail.journey.read_only.description':
+    'Član radnog prostora sa dozvolom za analize može pokrenuti sledeći korak.',
   'listingDetail.captured': 'Sačuvano {{date}}',
   'listingDetail.factsEyebrow': 'Originalne činjenice izvora',
   'listingDetail.record': 'Zapis oglasa',

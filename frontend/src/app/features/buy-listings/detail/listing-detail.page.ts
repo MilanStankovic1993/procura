@@ -19,6 +19,17 @@ import {
 import { ListingService } from '../../../core/listing.service';
 import { OrganizationContextService } from '../../../core/organizations/organization-context.service';
 
+type BuyJourneyState =
+  | 'loading'
+  | 'unavailable'
+  | 'ready'
+  | 'draft'
+  | 'running'
+  | 'needs_input'
+  | 'completed'
+  | 'failed'
+  | 'read_only';
+
 @Component({
   selector: 'app-listing-detail-page',
   imports: [ReactiveFormsModule, RouterLink, TranslatePipe],
@@ -55,6 +66,16 @@ export class ListingDetailPage {
   protected readonly openDraft = computed(
     () => this.analysisRecords().find((analysis) => analysis.status === 'draft') ?? null,
   );
+  protected readonly primaryAnalysis = computed(
+    () =>
+      this.analysisRecords().find((analysis) =>
+        ['needs_input', 'processing', 'queued', 'draft'].includes(analysis.status),
+      ) ??
+      this.analysisRecords().find((analysis) =>
+        ['completed', 'failed'].includes(analysis.status),
+      ) ??
+      null,
+  );
   protected readonly canManage = computed(
     () =>
       this.organizations.activeOrganization()?.capabilities.includes('listings.manage') ===
@@ -65,6 +86,33 @@ export class ListingDetailPage {
       this.organizations.activeOrganization()?.capabilities.includes('analyses.manage') ===
       true,
   );
+  protected readonly journeyState = computed<BuyJourneyState>(() => {
+    if (this.analysesLoading() && this.analysisRecords().length === 0) {
+      return 'loading';
+    }
+
+    if (this.analysesError() !== null && this.analysisRecords().length === 0) {
+      return 'unavailable';
+    }
+
+    const analysis = this.primaryAnalysis();
+
+    if (analysis === null) {
+      return this.canManageAnalyses() ? 'ready' : 'read_only';
+    }
+
+    const states: Readonly<Record<AnalysisStatus, BuyJourneyState>> = {
+      draft: 'draft',
+      queued: 'running',
+      processing: 'running',
+      needs_input: 'needs_input',
+      completed: 'completed',
+      failed: 'failed',
+      archived: this.canManageAnalyses() ? 'ready' : 'read_only',
+    };
+
+    return states[analysis.status];
+  });
   protected readonly lifecycleForm = this.formBuilder.nonNullable.group({
     status: ['unknown' as ListingStatus],
     notes: [''],
@@ -323,6 +371,30 @@ export class ListingDetailPage {
     };
 
     return this.i18n.translate(keys[status]);
+  }
+
+  protected journeyTitleKey(): TranslationKey {
+    return `listingDetail.journey.${this.journeyState()}.title` as TranslationKey;
+  }
+
+  protected journeyDescriptionKey(): TranslationKey {
+    return `listingDetail.journey.${this.journeyState()}.description` as TranslationKey;
+  }
+
+  protected journeyActionKey(): TranslationKey {
+    return `listingDetail.journey.${this.journeyState()}.action` as TranslationKey;
+  }
+
+  protected journeyStepState(step: 1 | 2 | 3): 'complete' | 'current' | 'upcoming' {
+    if (step === 1) {
+      return 'complete';
+    }
+
+    if (this.journeyState() === 'completed') {
+      return step === 2 ? 'complete' : 'current';
+    }
+
+    return step === 2 ? 'current' : 'upcoming';
   }
 
   protected imageKindLabel(kind: ListingImageKind): string {

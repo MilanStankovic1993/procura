@@ -693,6 +693,47 @@ export const DE_TRANSLATIONS = {
     'Das Angebot wurde gespeichert, aber einige Dateien wurden nicht hochgeladen. Wiederholen Sie den Upload unten sicher.',
   'listingDetail.back': '← Quellangebote',
   'listingDetail.loading': 'Angebotsherkunft wird geladen…',
+  'listingDetail.journey.eyebrow': 'Ihr nächster Schritt',
+  'listingDetail.journey.progressLabel': 'Fortschritt der Kaufanalyse',
+  'listingDetail.journey.step1.title': 'Angebot gespeichert',
+  'listingDetail.journey.step1.description': 'Quelle und Marktdaten sind sicher erfasst.',
+  'listingDetail.journey.step2.title': 'Analyse durchführen',
+  'listingDetail.journey.step2.description': 'Identität, Preis, Kosten, Risiko und Chance prüfen.',
+  'listingDetail.journey.step3.title': 'Entscheidung treffen',
+  'listingDetail.journey.step3.description': 'Nachweise prüfen und den nächsten Schritt wählen.',
+  'listingDetail.journey.loading.title': 'Analysestatus wird geprüft…',
+  'listingDetail.journey.loading.description':
+    'Procura sucht die neuesten Arbeiten zu diesem Angebot.',
+  'listingDetail.journey.unavailable.title': 'Der Analysestatus ist vorübergehend nicht verfügbar',
+  'listingDetail.journey.unavailable.description':
+    'Ihr Angebot ist sicher. Wiederholen Sie die Statusprüfung, ohne doppelte Arbeit anzulegen.',
+  'listingDetail.journey.ready.title': 'Bereit, dieses Angebot zu prüfen?',
+  'listingDetail.journey.ready.description':
+    'Starten Sie die geführte Analyse. Vor dem ausdrücklichen Absenden können Sie den fixierten Angebotsschnappschuss prüfen.',
+  'listingDetail.journey.ready.action': 'Geführte Analyse starten',
+  'listingDetail.journey.draft.title': 'Ihre Analyse kann abgesendet werden',
+  'listingDetail.journey.draft.description':
+    'Setzen Sie den gespeicherten Entwurf fort, prüfen Sie den genauen Marktumfang und senden Sie ihn ab, wenn Sie bereit sind.',
+  'listingDetail.journey.draft.action': 'Analyse fortsetzen',
+  'listingDetail.journey.running.title': 'Procura prüft das Angebot',
+  'listingDetail.journey.running.description':
+    'Verfolgen Sie den Live-Status, während die Nachweisverarbeitung im Hintergrund abgeschlossen wird.',
+  'listingDetail.journey.running.action': 'Live-Fortschritt ansehen',
+  'listingDetail.journey.needs_input.title': 'Eine Entscheidung benötigt Ihre Aufmerksamkeit',
+  'listingDetail.journey.needs_input.description':
+    'Prüfen Sie die erhaltenen Nachweise und bestätigen Sie nur die fehlende Angabe.',
+  'listingDetail.journey.needs_input.action': 'Erforderliche Angabe prüfen',
+  'listingDetail.journey.completed.title': 'Ihr Entscheidungsbericht ist bereit',
+  'listingDetail.journey.completed.description':
+    'Prüfen Sie Preisnachweise, Kosten, Risiko, Konfidenz und den empfohlenen nächsten Schritt.',
+  'listingDetail.journey.completed.action': 'Ergebnisse prüfen',
+  'listingDetail.journey.failed.title': 'Die Analyse benötigt Aufmerksamkeit',
+  'listingDetail.journey.failed.description':
+    'Öffnen Sie die Analyse für den sicheren Wiederherstellungsweg. Angebot und bisherige Nachweise bleiben unverändert.',
+  'listingDetail.journey.failed.action': 'Problem prüfen',
+  'listingDetail.journey.read_only.title': 'Dieses Angebot ist analysebereit',
+  'listingDetail.journey.read_only.description':
+    'Ein Arbeitsbereichsmitglied mit Analyseberechtigung kann den nächsten Schritt starten.',
   'listingDetail.captured': 'Erfasst {{date}}',
   'listingDetail.factsEyebrow': 'Ursprüngliche Quellenfakten',
   'listingDetail.record': 'Angebotseintrag',

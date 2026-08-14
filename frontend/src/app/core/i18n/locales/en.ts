@@ -667,6 +667,47 @@ export const EN_TRANSLATIONS = {
     'The listing was saved, but some files were not uploaded. Retry safely below.',
   'listingDetail.back': '← Source listings',
   'listingDetail.loading': 'Loading listing provenance…',
+  'listingDetail.journey.eyebrow': 'Your next step',
+  'listingDetail.journey.progressLabel': 'Buy analysis progress',
+  'listingDetail.journey.step1.title': 'Listing saved',
+  'listingDetail.journey.step1.description': 'Source and market details are safely recorded.',
+  'listingDetail.journey.step2.title': 'Run the analysis',
+  'listingDetail.journey.step2.description': 'Check identity, price, costs, risk, and opportunity.',
+  'listingDetail.journey.step3.title': 'Make your decision',
+  'listingDetail.journey.step3.description': 'Review the evidence and choose the next move.',
+  'listingDetail.journey.loading.title': 'Checking your analysis status…',
+  'listingDetail.journey.loading.description':
+    'Procura is finding the latest work for this listing.',
+  'listingDetail.journey.unavailable.title': 'Analysis status is temporarily unavailable',
+  'listingDetail.journey.unavailable.description':
+    'Your listing is safe. Retry the status check without creating duplicate work.',
+  'listingDetail.journey.ready.title': 'Ready to check this deal?',
+  'listingDetail.journey.ready.description':
+    'Start a guided analysis. You can review the frozen listing snapshot before explicitly submitting it.',
+  'listingDetail.journey.ready.action': 'Start guided analysis',
+  'listingDetail.journey.draft.title': 'Your analysis is ready to submit',
+  'listingDetail.journey.draft.description':
+    'Continue the saved draft, review its exact market scope, and submit when you are ready.',
+  'listingDetail.journey.draft.action': 'Continue analysis',
+  'listingDetail.journey.running.title': 'Procura is checking the deal',
+  'listingDetail.journey.running.description':
+    'Follow the live status while the evidence pipeline completes in the background.',
+  'listingDetail.journey.running.action': 'View live progress',
+  'listingDetail.journey.needs_input.title': 'One decision needs your attention',
+  'listingDetail.journey.needs_input.description':
+    'Review the preserved evidence and provide only the missing confirmation.',
+  'listingDetail.journey.needs_input.action': 'Review required input',
+  'listingDetail.journey.completed.title': 'Your decision report is ready',
+  'listingDetail.journey.completed.description':
+    'Review the price evidence, costs, risk, confidence, and recommended next move.',
+  'listingDetail.journey.completed.action': 'Review results',
+  'listingDetail.journey.failed.title': 'The analysis needs attention',
+  'listingDetail.journey.failed.description':
+    'Open the analysis to see the safe recovery path. Your listing and prior evidence remain unchanged.',
+  'listingDetail.journey.failed.action': 'Review the problem',
+  'listingDetail.journey.read_only.title': 'This listing is ready for analysis',
+  'listingDetail.journey.read_only.description':
+    'A workspace member with analysis permission can start the next step.',
   'listingDetail.captured': 'Captured {{date}}',
   'listingDetail.factsEyebrow': 'Original source facts',
   'listingDetail.record': 'Listing record',

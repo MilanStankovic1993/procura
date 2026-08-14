@@ -70,6 +70,9 @@ Duration: 3–5 weeks.
 Deliverables:
 
 - listing intake,
+- guided Buy listing continuation (complete: one state-derived next action for first analysis,
+  existing draft, live processing, required input, completed result, and safe failure recovery;
+  three-step responsive progress model in all five languages),
 - images,
 - AI extraction,
 - product matching,

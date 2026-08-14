@@ -693,6 +693,47 @@ export const FR_TRANSLATIONS = {
     "L'annonce a été enregistrée, mais certains fichiers n'ont pas été envoyés. Réessayez en toute sécurité ci-dessous.",
   'listingDetail.back': '← Annonces sources',
   'listingDetail.loading': "Chargement de la provenance de l'annonce…",
+  'listingDetail.journey.eyebrow': 'Votre prochaine étape',
+  'listingDetail.journey.progressLabel': "Progression de l'analyse d'achat",
+  'listingDetail.journey.step1.title': 'Annonce enregistrée',
+  'listingDetail.journey.step1.description': 'La source et les données de marché sont enregistrées en sécurité.',
+  'listingDetail.journey.step2.title': "Lancer l'analyse",
+  'listingDetail.journey.step2.description': "Vérifiez l'identité, le prix, les coûts, le risque et l'opportunité.",
+  'listingDetail.journey.step3.title': 'Prendre votre décision',
+  'listingDetail.journey.step3.description': "Examinez les preuves et choisissez l'étape suivante.",
+  'listingDetail.journey.loading.title': "Vérification de l'état de l'analyse…",
+  'listingDetail.journey.loading.description':
+    'Procura recherche le travail le plus récent pour cette annonce.',
+  'listingDetail.journey.unavailable.title': "L'état de l'analyse est temporairement indisponible",
+  'listingDetail.journey.unavailable.description':
+    "Votre annonce est en sécurité. Réessayez la vérification sans créer de travail en double.",
+  'listingDetail.journey.ready.title': 'Prêt à vérifier cette affaire ?',
+  'listingDetail.journey.ready.description':
+    "Lancez une analyse guidée. Vous pourrez vérifier l'instantané figé de l'annonce avant de l'envoyer explicitement.",
+  'listingDetail.journey.ready.action': "Lancer l'analyse guidée",
+  'listingDetail.journey.draft.title': 'Votre analyse est prête à être envoyée',
+  'listingDetail.journey.draft.description':
+    "Reprenez le brouillon enregistré, vérifiez son périmètre de marché exact et envoyez-le quand vous êtes prêt.",
+  'listingDetail.journey.draft.action': "Poursuivre l'analyse",
+  'listingDetail.journey.running.title': "Procura vérifie l'affaire",
+  'listingDetail.journey.running.description':
+    "Suivez l'état en direct pendant que le traitement des preuves se termine en arrière-plan.",
+  'listingDetail.journey.running.action': 'Voir la progression',
+  'listingDetail.journey.needs_input.title': 'Une décision requiert votre attention',
+  'listingDetail.journey.needs_input.description':
+    'Examinez les preuves conservées et fournissez uniquement la confirmation manquante.',
+  'listingDetail.journey.needs_input.action': "Vérifier l'information requise",
+  'listingDetail.journey.completed.title': 'Votre rapport de décision est prêt',
+  'listingDetail.journey.completed.description':
+    "Examinez les preuves de prix, les coûts, le risque, la confiance et l'étape suivante recommandée.",
+  'listingDetail.journey.completed.action': 'Examiner les résultats',
+  'listingDetail.journey.failed.title': "L'analyse requiert votre attention",
+  'listingDetail.journey.failed.description':
+    "Ouvrez l'analyse pour voir la procédure de reprise sûre. Votre annonce et les preuves précédentes restent inchangées.",
+  'listingDetail.journey.failed.action': 'Examiner le problème',
+  'listingDetail.journey.read_only.title': 'Cette annonce est prête à être analysée',
+  'listingDetail.journey.read_only.description':
+    "Un membre de l'espace autorisé à gérer les analyses peut lancer l'étape suivante.",
   'listingDetail.captured': 'Capturée {{date}}',
   'listingDetail.factsEyebrow': "Faits de la source d'origine",
   'listingDetail.record': "Fiche de l'annonce",

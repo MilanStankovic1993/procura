@@ -688,6 +688,47 @@ export const ES_TRANSLATIONS = {
     'El anuncio se guardó, pero algunos archivos no se cargaron. Reinténtalo de forma segura abajo.',
   'listingDetail.back': '← Anuncios de origen',
   'listingDetail.loading': 'Cargando procedencia del anuncio…',
+  'listingDetail.journey.eyebrow': 'Tu siguiente paso',
+  'listingDetail.journey.progressLabel': 'Progreso del análisis de compra',
+  'listingDetail.journey.step1.title': 'Anuncio guardado',
+  'listingDetail.journey.step1.description': 'El origen y los datos de mercado están guardados de forma segura.',
+  'listingDetail.journey.step2.title': 'Ejecutar el análisis',
+  'listingDetail.journey.step2.description': 'Comprueba identidad, precio, costes, riesgo y oportunidad.',
+  'listingDetail.journey.step3.title': 'Toma tu decisión',
+  'listingDetail.journey.step3.description': 'Revisa las pruebas y elige el siguiente paso.',
+  'listingDetail.journey.loading.title': 'Comprobando el estado del análisis…',
+  'listingDetail.journey.loading.description':
+    'Procura está buscando el trabajo más reciente de este anuncio.',
+  'listingDetail.journey.unavailable.title': 'El estado del análisis no está disponible temporalmente',
+  'listingDetail.journey.unavailable.description':
+    'Tu anuncio está seguro. Reintenta la comprobación sin crear trabajo duplicado.',
+  'listingDetail.journey.ready.title': '¿Listo para comprobar esta oportunidad?',
+  'listingDetail.journey.ready.description':
+    'Inicia un análisis guiado. Podrás revisar la instantánea fija del anuncio antes de enviarla de forma explícita.',
+  'listingDetail.journey.ready.action': 'Iniciar análisis guiado',
+  'listingDetail.journey.draft.title': 'Tu análisis está listo para enviarse',
+  'listingDetail.journey.draft.description':
+    'Continúa el borrador guardado, revisa su alcance de mercado exacto y envíalo cuando estés listo.',
+  'listingDetail.journey.draft.action': 'Continuar análisis',
+  'listingDetail.journey.running.title': 'Procura está comprobando la oportunidad',
+  'listingDetail.journey.running.description':
+    'Sigue el estado en directo mientras el proceso de pruebas termina en segundo plano.',
+  'listingDetail.journey.running.action': 'Ver progreso en directo',
+  'listingDetail.journey.needs_input.title': 'Una decisión necesita tu atención',
+  'listingDetail.journey.needs_input.description':
+    'Revisa las pruebas conservadas y aporta únicamente la confirmación que falta.',
+  'listingDetail.journey.needs_input.action': 'Revisar dato requerido',
+  'listingDetail.journey.completed.title': 'Tu informe de decisión está listo',
+  'listingDetail.journey.completed.description':
+    'Revisa las pruebas de precio, costes, riesgo, confianza y el siguiente paso recomendado.',
+  'listingDetail.journey.completed.action': 'Revisar resultados',
+  'listingDetail.journey.failed.title': 'El análisis necesita atención',
+  'listingDetail.journey.failed.description':
+    'Abre el análisis para ver la recuperación segura. Tu anuncio y las pruebas anteriores no cambian.',
+  'listingDetail.journey.failed.action': 'Revisar el problema',
+  'listingDetail.journey.read_only.title': 'Este anuncio está listo para analizarse',
+  'listingDetail.journey.read_only.description':
+    'Un miembro del espacio con permiso de análisis puede iniciar el siguiente paso.',
   'listingDetail.captured': 'Capturado {{date}}',
   'listingDetail.factsEyebrow': 'Datos originales de origen',
   'listingDetail.record': 'Registro del anuncio',
