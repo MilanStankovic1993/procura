@@ -1270,6 +1270,13 @@ current versions, all product/location/price/profit/risk/deal-score criteria, ke
 actors, reasons, idempotency and stable hashes, criteria snapshots, match evidence, and alert
 payloads are deliberately neither loaded nor rendered.
 
+The five-language read-only Alerts Explorer now provides the adjacent immutable trigger overview
+for verified super administrators. It exposes tenant, recipient, localized type, trigger time,
+aggregate delivery-event count, and optional support identifiers only. Alert keys/payloads,
+saved-search titles and criteria, listing content, match reasons/unknowns/evidence, notification
+payloads/errors, actors, previous-ledger links, and idempotency evidence are neither loaded nor
+rendered; delivery-attempt diagnosis remains in the separate Notification Deliveries resource.
+
 The subject-scoped privacy-request foundation is now complete:
 
 1. Verified users can submit, list, and cancel personal data-export/account-deletion requests

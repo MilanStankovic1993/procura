@@ -133,6 +133,12 @@ archive time and support identifiers hidden by default. It never loads or render
 search title, current criteria version, product/location/price/profit/risk/deal-score criteria,
 keywords, notification channels, actor/reason/idempotency/hash evidence, or criteria snapshots.
 
+The read-only **Alerts Explorer** provides the corresponding immutable trigger overview: tenant,
+recipient, localized alert type, trigger time, and aggregate delivery-ledger event count, with
+saved-search/listing/alert support identifiers hidden by default. It never loads or renders alert
+payloads or keys, saved-search titles/criteria, listing content, match reasons/unknowns/evidence,
+notification payloads, delivery errors, actors, prior event links, or idempotency evidence.
+
 The read-only **Listing Explorer** provides the corresponding global intake overview. It exposes
 only organization, title, marketplace, ISO-minor-unit-aware asking price, market route, lifecycle
 status, and aggregate image/analysis counts, with optional support identifiers hidden by default.
@@ -149,7 +155,6 @@ attribution rules, and internal review notes are never rendered.
 The following broader product/operations resources remain scheduled for their corresponding
 phases:
 
-- Alerts
 - Settings
 - Audit Logs
 

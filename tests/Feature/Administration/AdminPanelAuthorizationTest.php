@@ -9,6 +9,7 @@ use App\Actions\BrokerRequests\PresentBrokerRequestOffer;
 use App\Actions\BrokerRequests\TransitionBrokerRequest;
 use App\Actions\BrokerRequests\TransitionBrokerTransaction;
 use App\Actions\Markets\SyncMarketReferenceData;
+use App\Actions\Monitoring\EvaluateSavedSearchMatch;
 use App\Actions\Privacy\CreatePrivacyRequest;
 use App\Enums\Analyses\AiAnalysisStatus;
 use App\Enums\Analyses\AiValidationStatus;
@@ -27,6 +28,7 @@ use App\Enums\Risk\RiskAssessmentStatus;
 use App\Enums\Risk\RiskConfidenceLevel;
 use App\Enums\Risk\RiskLevel;
 use App\Filament\Resources\AiAnalyses\AiAnalysisResource;
+use App\Filament\Resources\Alerts\AlertResource;
 use App\Filament\Resources\Analyses\AnalysisResource;
 use App\Filament\Resources\AnalysisOperations\AnalysisOperationResource;
 use App\Filament\Resources\AuditEvents\AuditEventResource;
@@ -64,6 +66,7 @@ use App\Filament\Resources\TelegramConnections\TelegramConnectionResource;
 use App\Filament\Resources\Usages\UsageResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\AiAnalysis;
+use App\Models\Alert;
 use App\Models\Analysis;
 use App\Models\BillingProviderEvent;
 use App\Models\Brand;
@@ -486,6 +489,7 @@ test('verified super administrators can access operational resources while resou
         ->and(RiskAssessmentResource::canCreate())->toBeFalse()
         ->and(DealScoreResource::canCreate())->toBeFalse()
         ->and(SavedSearchResource::canCreate())->toBeFalse()
+        ->and(AlertResource::canCreate())->toBeFalse()
         ->and(ListingResource::canCreate())->toBeFalse()
         ->and(MarketplaceSourceResource::canCreate())->toBeFalse()
         ->and(ComparableMarketNormalizationResource::canCreate())->toBeFalse()
@@ -534,6 +538,7 @@ test('verified super administrators can access operational resources while resou
         RiskAssessmentResource::class,
         DealScoreResource::class,
         SavedSearchResource::class,
+        AlertResource::class,
         ListingResource::class,
         MarketplaceSourceResource::class,
         NotificationDeliveryResource::class,
@@ -1042,6 +1047,93 @@ test('saved search explorer exposes lifecycle aggregates without private criteri
         ->assertDontSee('333333')
         ->assertDontSee('4444')
         ->assertDontSee('5555');
+});
+
+test('alert explorer exposes delivery aggregates without private match payloads', function () {
+    app(SyncMarketReferenceData::class)->sync();
+    $this->seed(PlanSeeder::class);
+
+    $owner = User::factory()->create([
+        'email' => 'alert-recipient@example.test',
+    ]);
+    $organization = Organization::factory()->create([
+        'name' => 'Alert Operations Workspace',
+    ]);
+    OrganizationMembership::factory()->owner()->create([
+        'organization_id' => $organization,
+        'user_id' => $owner,
+    ]);
+    $owner->update(['current_organization_id' => $organization->getKey()]);
+
+    $searchId = $this->actingAs($owner)
+        ->postJson(route('api.v1.saved-searches.store'), [
+            'title' => 'private-alert-search-title-must-not-render',
+            'active' => true,
+            'minimum_price_minor' => 10000,
+            'maximum_price_minor' => 20000,
+            'price_currency_code' => 'EUR',
+            'continent_code' => 'EU',
+            'country_codes' => ['DE'],
+            'include_cross_border' => false,
+            'required_keywords' => ['PrivateMatchToken'],
+            'excluded_keywords' => ['broken'],
+            'notification_channels' => ['in_app'],
+            'reason_code' => 'private-alert-reason-must-not-render',
+            'idempotency_key' => (string) Str::uuid(),
+        ])
+        ->assertCreated()
+        ->json('data.id');
+    $listingId = $this->actingAs($owner)
+        ->postJson(route('api.v1.listings.store'), [
+            'marketplace_source_key' => 'manual',
+            'source_url' => 'https://private.example/alert-listing-must-not-render',
+            'external_id' => 'private-alert-external-id-must-not-render',
+            'marketplace_name' => 'Private Alert Market',
+            'title' => 'PrivateMatchToken private listing title must not render',
+            'description' => 'private-alert-description-must-not-render',
+            'asking_price_minor' => 15000,
+            'currency_code' => 'EUR',
+            'seller_information' => 'private-alert-seller-must-not-render',
+            'location' => 'private-alert-location-must-not-render',
+            'source_country_code' => 'DE',
+            'target_country_code' => 'DE',
+            'status' => 'active',
+            'notes' => 'private-alert-notes-must-not-render',
+        ])
+        ->assertCreated()
+        ->json('data.id');
+    $search = SavedSearch::query()->findOrFail($searchId);
+    $snapshot = Listing::query()
+        ->findOrFail($listingId)
+        ->snapshots()
+        ->firstOrFail();
+    app(EvaluateSavedSearchMatch::class)->evaluate(
+        $search->currentVersion()->firstOrFail(),
+        $snapshot,
+    );
+    $alert = Alert::query()->sole();
+
+    $this->actingAs(User::factory()->create())
+        ->get(AlertResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs(superAdmin())
+        ->get(AlertResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Alert Operations Workspace')
+        ->assertSeeText('alert-recipient@example.test')
+        ->assertSeeText('Saved-search match')
+        ->assertDontSee($alert->alert_key)
+        ->assertDontSee('private-alert-search-title-must-not-render')
+        ->assertDontSee('PrivateMatchToken private listing title must not render')
+        ->assertDontSee('private-alert-description-must-not-render')
+        ->assertDontSee('private-alert-seller-must-not-render')
+        ->assertDontSee('private-alert-location-must-not-render')
+        ->assertDontSee('private-alert-notes-must-not-render')
+        ->assertDontSee('private-alert-reason-must-not-render')
+        ->assertDontSee('private-alert-external-id-must-not-render')
+        ->assertDontSee('https://private.example/alert-listing-must-not-render')
+        ->assertDontSee('15000');
 });
 
 test('catalog explorer exposes canonical relationships only to verified super administrators', function () {

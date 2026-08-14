@@ -163,6 +163,9 @@ Deliverables:
   notification preferences, hashes, snapshots, or version evidence),
 - bounded deterministic matching pipeline (complete),
 - append-only in-app alert and notification ledger (complete),
+- read-only alert support explorer (complete: verified-super-admin-only immutable trigger context
+  and aggregate delivery-ledger visibility in five languages, without alert/match/notification
+  payloads, keys, saved-search or listing content, delivery evidence, or replay identifiers),
 - localized saved-search and notification Angular workflows (complete: EN/DE/ES/FR/sr-Latn),
 - queued localized email adapter with retry/failure operations (complete),
 - secure personal Telegram connection, localized queued adapter, retry/recovery, and read-only
