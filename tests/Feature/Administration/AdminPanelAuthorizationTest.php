@@ -17,6 +17,7 @@ use App\Enums\Localization\SupportedLocale;
 use App\Filament\Resources\AnalysisOperations\AnalysisOperationResource;
 use App\Filament\Resources\AuditEvents\AuditEventResource;
 use App\Filament\Resources\BillingProviderEvents\BillingProviderEventResource;
+use App\Filament\Resources\Brands\BrandResource;
 use App\Filament\Resources\BrokerCommissionResource;
 use App\Filament\Resources\BrokerPaymentCaseResource;
 use App\Filament\Resources\BrokerReportResource;
@@ -32,18 +33,29 @@ use App\Filament\Resources\Organizations\OrganizationResource;
 use App\Filament\Resources\PlanFeatures\PlanFeatureResource;
 use App\Filament\Resources\Plans\PlanResource;
 use App\Filament\Resources\PrivacyRequests\PrivacyRequestResource;
+use App\Filament\Resources\ProductAliases\ProductAliasResource;
+use App\Filament\Resources\ProductCategories\ProductCategoryResource;
 use App\Filament\Resources\ProductMatchReviews\ProductMatchReviewResource;
+use App\Filament\Resources\ProductModels\ProductModelResource;
+use App\Filament\Resources\ProductVariantMarkets\ProductVariantMarketResource;
+use App\Filament\Resources\ProductVariants\ProductVariantResource;
 use App\Filament\Resources\Subscriptions\SubscriptionResource;
 use App\Filament\Resources\TelegramConnections\TelegramConnectionResource;
 use App\Filament\Resources\Usages\UsageResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\BillingProviderEvent;
+use App\Models\Brand;
 use App\Models\BrokerRequestEvent;
 use App\Models\Organization;
 use App\Models\OrganizationMembership;
 use App\Models\Plan;
 use App\Models\PlatformAuditEvent;
 use App\Models\PrivacyRequest;
+use App\Models\ProductAlias;
+use App\Models\ProductCategory;
+use App\Models\ProductModel;
+use App\Models\ProductVariant;
+use App\Models\ProductVariantMarket;
 use App\Models\User;
 use Database\Seeders\PlanSeeder;
 use Filament\Facades\Filament;
@@ -95,6 +107,12 @@ test('verified super administrators can access operational resources while resou
         ->and(BrokerPaymentCaseResource::canCreate())->toBeFalse()
         ->and(BrokerReportResource::canCreate())->toBeFalse()
         ->and(PrivacyRequestResource::canCreate())->toBeFalse()
+        ->and(BrandResource::canCreate())->toBeFalse()
+        ->and(ProductCategoryResource::canCreate())->toBeFalse()
+        ->and(ProductModelResource::canCreate())->toBeFalse()
+        ->and(ProductVariantResource::canCreate())->toBeFalse()
+        ->and(ProductVariantMarketResource::canCreate())->toBeFalse()
+        ->and(ProductAliasResource::canCreate())->toBeFalse()
         ->and(ProductMatchReviewResource::canCreate())->toBeFalse();
 
     $this->actingAs($admin)
@@ -113,6 +131,12 @@ test('verified super administrators can access operational resources while resou
         UsageResource::class,
         CountryResource::class,
         CurrencyResource::class,
+        BrandResource::class,
+        ProductCategoryResource::class,
+        ProductModelResource::class,
+        ProductVariantResource::class,
+        ProductVariantMarketResource::class,
+        ProductAliasResource::class,
         AuditEventResource::class,
         AnalysisOperationResource::class,
         NotificationDeliveryResource::class,
@@ -132,6 +156,93 @@ test('verified super administrators can access operational resources while resou
             ->get($resource::getUrl())
             ->assertOk();
     }
+});
+
+test('catalog explorer exposes canonical relationships only to verified super administrators', function () {
+    app(SyncMarketReferenceData::class)->sync();
+
+    $category = ProductCategory::query()->create([
+        'name' => 'Cordless drills',
+        'slug' => 'cordless-drills',
+        'active' => true,
+    ]);
+    $brand = Brand::query()->create([
+        'name' => 'Atlas Tools',
+        'active' => true,
+    ]);
+    $productModel = ProductModel::query()->create([
+        'brand_id' => $brand->getKey(),
+        'product_category_id' => $category->getKey(),
+        'name' => 'Atlas Pro Drill',
+        'model_number' => 'APD-18',
+        'canonical_key' => 'atlas-tools:apd-18',
+        'active' => true,
+    ]);
+    $variant = ProductVariant::query()->create([
+        'product_model_id' => $productModel->getKey(),
+        'name' => 'EU kit',
+        'canonical_key' => 'atlas-tools:apd-18:eu-kit',
+        'sku' => 'APD-18-EU',
+        'active' => true,
+    ]);
+    ProductVariantMarket::query()->create([
+        'product_variant_id' => $variant->getKey(),
+        'country_code' => 'DE',
+        'market_model_number' => 'APD-18-DE',
+        'voltage_millivolts' => 230000,
+        'plug_type' => 'F',
+        'measurement_system' => 'metric',
+        'warranty_applicable' => true,
+    ]);
+    ProductAlias::query()->create([
+        'product_model_id' => $productModel->getKey(),
+        'product_variant_id' => $variant->getKey(),
+        'alias' => 'Atlas Akkubohrer 18V',
+        'locale' => 'de-DE',
+        'country_code' => 'DE',
+        'source' => 'catalog',
+        'active' => true,
+    ]);
+
+    $resources = [
+        BrandResource::class,
+        ProductCategoryResource::class,
+        ProductModelResource::class,
+        ProductVariantResource::class,
+        ProductVariantMarketResource::class,
+        ProductAliasResource::class,
+    ];
+
+    foreach ($resources as $resource) {
+        $this->actingAs(User::factory()->create())
+            ->get($resource::getUrl())
+            ->assertForbidden();
+    }
+
+    $admin = superAdmin();
+
+    $this->actingAs($admin)->get(BrandResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Atlas Tools');
+    $this->actingAs($admin)->get(ProductCategoryResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Cordless drills');
+    $this->actingAs($admin)->get(ProductModelResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Atlas Pro Drill')
+        ->assertSeeText('APD-18');
+    $this->actingAs($admin)->get(ProductVariantResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('EU kit')
+        ->assertSeeText('APD-18-EU');
+    $this->actingAs($admin)->get(ProductVariantMarketResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('APD-18-DE')
+        ->assertSeeText('230 V');
+    $this->actingAs($admin)->get(ProductAliasResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Atlas Akkubohrer 18V')
+        ->assertSeeText('de-DE');
 });
 
 test('privacy operations expose workflow evidence without internal request hashes', function () {

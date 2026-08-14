@@ -13,6 +13,14 @@ Phase 1 currently implements:
 - Subscription Usage
 - Countries
 - Currencies
+- Catalog Imports
+- Catalog Import Rows
+- Brands
+- Product Categories
+- Product Models
+- Product Variants
+- Product Variant Markets
+- Product Aliases
 - Platform Audit Events
 - Notification Deliveries
 - Telegram Connections
@@ -27,10 +35,12 @@ Phase 1 currently implements:
 - Broker Transactions
 - Broker Commissions
 
-These resources are read-only except for organization plan assignment, the narrowly scoped
-Analysis Operations manual retry, and Product Match Review confirmation/rejection. All delegate to
-transactional application actions and require a
-verified super administrator plus a reason of at least ten characters. Plan assignment records the
+These resources are read-only except for controlled catalog import, organization plan assignment,
+the narrowly scoped Analysis Operations manual retry, and Product Match Review
+confirmation/rejection. All mutations delegate to transactional application actions and require a
+verified super administrator. Catalog import separately requires dataset provenance, licensing,
+and explicit source-rights confirmation; assignment, retry, and review actions require a reason of
+at least ten characters. Plan assignment records the
 administrator, organization, old and new values, IP address, user agent, and timestamp. Analysis
 retry additionally requires the exact current dispatch, UUID idempotency, terminal/no-auto-retry
 state, bounded run/attempt policy, one immutable retry event, and one platform audit event. The
@@ -67,8 +77,6 @@ phases:
 - Marketplace Sources
 - general tenant Analyses beyond the focused exception queue
 - Listings
-- Products
-- Product Aliases
 - AI Analyses
 - Price Estimates
 - Risk Assessments
@@ -515,6 +523,12 @@ reference table. Import processing is queued on `CATALOG_IMPORT_QUEUE`; operator
 jobs in **Catalog imports** and every imported, unchanged, or rejected row in **Catalog import
 rows**. Existing canonical identities are never silently overwritten: identical records are marked
 unchanged and conflicting records are rejected with row-level evidence.
+
+The read-only catalog explorer exposes the resulting **Brands**, **Product Categories**, **Product
+Models**, **Product Variants**, **Variant Markets**, and **Product Aliases** to verified super
+administrators. These tables provide relationship-aware search, sorting, and operational filters,
+but intentionally expose no direct create, edit, or delete action. Canonical mutations remain owned
+by the provenance-preserving import and product-match review boundaries.
 
 The scheduler runs `catalog-imports:dispatch-pending --limit=100` every minute to recover pending
 or stale processing heads. Production workers and queue-heartbeat monitoring must include the

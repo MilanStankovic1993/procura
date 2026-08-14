@@ -79,7 +79,8 @@ Deliverables:
 - controlled global catalog ingestion (complete application boundary: private verified-super-admin
   CSV upload, source/license/version provenance, checksum audit, bounded queued processing,
   idempotent canonical creation, fail-closed identity conflicts, and localized row-level operations
-  review; approved production datasets remain acquisition work),
+  review, plus a five-language read-only explorer for categories, brands, models, variants, market
+  applicability, and aliases; approved production datasets remain acquisition work),
 - audited operator product-match review queue (complete: verified-super-admin confirmation or
   rejection, existing canonical model/variant selection, optional scoped alias creation,
   immutable idempotent review evidence, downstream Buy recalculation, and five-language Filament

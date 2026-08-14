@@ -227,9 +227,11 @@ versioned `ProductMatch` evidence for the exact AI attempt, preserves bounded ca
 and reason codes, and returns explicit matched, unmatched, or review-required states. Ambiguous and
 region-incompatible evidence never creates or silently selects a product. Authenticated bounded
 catalog search/read endpoints are available, and Angular explains the chosen product, confidence,
-matcher version, review state, reasons, and candidates. The real development catalog is
-intentionally empty until a verified import workflow is implemented; test catalog fixtures are
-test-only. The audited operator review boundary is now implemented in Filament: a verified super
+matcher version, review state, reasons, and candidates. The audited verified-super-admin catalog
+import now owns provenance-preserving canonical creation, and Filament exposes read-only localized
+explorer tables for categories, brands, models, variants, market applicability, and aliases. Direct
+catalog editing and deletion remain unavailable. The audited operator review boundary is now
+implemented in Filament: a verified super
 administrator can confirm the exact current pending match against an existing active canonical
 model and optional valid variant, optionally create a target-market alias, or reject the evidence.
 Every decision requires a reason and UUID idempotency, preserves the original matcher evidence,
@@ -841,7 +843,8 @@ The following remain intentionally unimplemented:
   attribution harnesses, plus the real staging Sell, browser, saturation, and soak evidence beyond
   the deterministic dashboard/operations/tenant-list query baseline,
 - a real external AI provider and production provider credentials/budgets,
-- verified production catalog import and broader catalog administration,
+- approved production catalog datasets and verified production import execution; broader direct
+  catalog mutation remains intentionally unavailable,
 - approved external exchange-rate ingestion, provider monitoring, and retention operations beyond
   the explicit immutable manual recording command,
 - authorized email-feed, contracted partner-feed, and approved official-API marketplace
