@@ -91,6 +91,9 @@ Deliverables:
 - read-only AI-attempt support explorer (complete: verified-super-admin-only provider-attempt
   lifecycle, validation, version, confidence, duration, and match-count projections in five
   languages, with AI input/output, errors, hashes, tokens, and cost excluded),
+- read-only price-estimate support explorer (complete: verified-super-admin-only immutable pricing
+  heads, localized target market, exact minor-unit-aware ranges, confidence and aggregate sample
+  quality in five languages, without hashes, snapshots, explanation JSON, or item evidence),
 - read-only listing support explorer (complete: verified-super-admin-only global intake overview,
   ISO-minor-unit-aware pricing, bounded relationship counts and filters, and explicit exclusion of
   source URLs, descriptions, seller/location details, notes, and raw input),

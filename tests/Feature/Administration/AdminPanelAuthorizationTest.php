@@ -17,7 +17,12 @@ use App\Enums\Analyses\AnalysisType;
 use App\Enums\BrokerRequests\BrokerPaymentCaseType;
 use App\Enums\BrokerRequests\BrokerRequestStatus;
 use App\Enums\BrokerRequests\BrokerTransactionStatus;
+use App\Enums\Catalog\ProductMatchReviewStatus;
+use App\Enums\Catalog\ProductMatchStatus;
+use App\Enums\Comparables\ComparableSetStatus;
 use App\Enums\Localization\SupportedLocale;
+use App\Enums\Pricing\PriceConfidenceLevel;
+use App\Enums\Pricing\PriceEstimateStatus;
 use App\Filament\Resources\AiAnalyses\AiAnalysisResource;
 use App\Filament\Resources\Analyses\AnalysisResource;
 use App\Filament\Resources\AnalysisOperations\AnalysisOperationResource;
@@ -40,6 +45,7 @@ use App\Filament\Resources\NotificationDeliveries\NotificationDeliveryResource;
 use App\Filament\Resources\Organizations\OrganizationResource;
 use App\Filament\Resources\PlanFeatures\PlanFeatureResource;
 use App\Filament\Resources\Plans\PlanResource;
+use App\Filament\Resources\PriceEstimates\PriceEstimateResource;
 use App\Filament\Resources\PrivacyRequests\PrivacyRequestResource;
 use App\Filament\Resources\ProductAliases\ProductAliasResource;
 use App\Filament\Resources\ProductCategories\ProductCategoryResource;
@@ -56,6 +62,7 @@ use App\Models\Analysis;
 use App\Models\BillingProviderEvent;
 use App\Models\Brand;
 use App\Models\BrokerRequestEvent;
+use App\Models\ComparableSet;
 use App\Models\Listing;
 use App\Models\ListingSnapshot;
 use App\Models\MarketplaceSource;
@@ -63,9 +70,11 @@ use App\Models\Organization;
 use App\Models\OrganizationMembership;
 use App\Models\Plan;
 use App\Models\PlatformAuditEvent;
+use App\Models\PriceEstimate;
 use App\Models\PrivacyRequest;
 use App\Models\ProductAlias;
 use App\Models\ProductCategory;
+use App\Models\ProductMatch;
 use App\Models\ProductModel;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantMarket;
@@ -114,6 +123,7 @@ test('verified super administrators can access operational resources while resou
         ->and(AnalysisOperationResource::canCreate())->toBeFalse()
         ->and(AnalysisResource::canCreate())->toBeFalse()
         ->and(AiAnalysisResource::canCreate())->toBeFalse()
+        ->and(PriceEstimateResource::canCreate())->toBeFalse()
         ->and(ListingResource::canCreate())->toBeFalse()
         ->and(MarketplaceSourceResource::canCreate())->toBeFalse()
         ->and(ComparableMarketNormalizationResource::canCreate())->toBeFalse()
@@ -158,6 +168,7 @@ test('verified super administrators can access operational resources while resou
         AnalysisOperationResource::class,
         AnalysisResource::class,
         AiAnalysisResource::class,
+        PriceEstimateResource::class,
         ListingResource::class,
         MarketplaceSourceResource::class,
         NotificationDeliveryResource::class,
@@ -443,6 +454,181 @@ test('AI analysis explorer exposes operational attempt data without private prov
         ->assertDontSee('123456')
         ->assertDontSee('654321')
         ->assertDontSee('7654321');
+});
+
+test('price estimate explorer exposes bounded pricing projections without private evidence', function () {
+    app(SyncMarketReferenceData::class)->sync();
+
+    $requester = User::factory()->create();
+    $organization = Organization::factory()->create([
+        'name' => 'Pricing Operations Workspace',
+    ]);
+    $listing = Listing::factory()->create([
+        'organization_id' => $organization,
+        'created_by_user_id' => $requester,
+        'title' => 'Pricing-visible camera body',
+        'source_country_code' => 'DE',
+        'target_country_code' => 'US',
+    ]);
+    $snapshot = ListingSnapshot::query()->create([
+        'listing_id' => $listing->getKey(),
+        'sequence' => 1,
+        'captured_by_user_id' => $requester->getKey(),
+        'captured_at' => now(),
+        'source_url' => $listing->source_url,
+        'external_id' => $listing->external_id,
+        'marketplace_name' => $listing->marketplace_name,
+        'marketplace_key' => $listing->marketplace_key,
+        'title' => $listing->title,
+        'description' => $listing->description,
+        'asking_price_minor' => $listing->asking_price_minor,
+        'currency_code' => $listing->currency_code,
+        'seller_information' => $listing->seller_information,
+        'location' => $listing->location,
+        'source_country_code' => $listing->source_country_code,
+        'target_country_code' => $listing->target_country_code,
+        'status' => $listing->status,
+        'notes' => $listing->notes,
+        'raw_payload' => [],
+        'content_hash' => hash('sha256', 'admin-price-estimate-snapshot'),
+    ]);
+    $analysis = Analysis::query()->create([
+        'organization_id' => $organization->getKey(),
+        'listing_id' => $listing->getKey(),
+        'listing_snapshot_id' => $snapshot->getKey(),
+        'requested_by_user_id' => $requester->getKey(),
+        'analysis_type' => AnalysisType::Buy,
+        'status' => AnalysisStatus::Completed,
+        'source_country_code' => 'DE',
+        'target_country_code' => 'US',
+        'pipeline_version' => 'buy-analysis-pipeline:v1',
+        'request_payload' => [],
+        'request_hash' => hash('sha256', 'admin-price-estimate-request'),
+        'result_payload' => [],
+        'processing_attempts' => 1,
+        'submitted_at' => now()->subMinutes(5),
+        'finished_at' => now(),
+    ]);
+    $aiAnalysis = AiAnalysis::query()->create([
+        'organization_id' => $organization->getKey(),
+        'analysis_id' => $analysis->getKey(),
+        'attempt_number' => 1,
+        'status' => AiAnalysisStatus::Completed,
+        'provider' => 'pricing-fixture-provider',
+        'model' => 'pricing-fixture-model',
+        'prompt_version' => 'prompt:v1',
+        'input_hash' => hash('sha256', 'admin-price-estimate-ai-input'),
+        'input_snapshot' => [],
+        'result_json' => [],
+        'validation_status' => AiValidationStatus::Valid,
+        'confidence_basis_points' => 9000,
+        'started_at' => now()->subMinutes(4),
+        'completed_at' => now()->subMinutes(3),
+    ]);
+    $category = ProductCategory::query()->create([
+        'name' => 'Pricing cameras',
+        'slug' => 'pricing-cameras',
+        'active' => true,
+    ]);
+    $brand = Brand::query()->create([
+        'name' => 'Pricing Optics',
+        'active' => true,
+    ]);
+    $productModel = ProductModel::query()->create([
+        'brand_id' => $brand->getKey(),
+        'product_category_id' => $category->getKey(),
+        'name' => 'PX-7 Camera',
+        'model_number' => 'PX-7',
+        'canonical_key' => 'pricing-optics:px-7',
+        'active' => true,
+    ]);
+    $productMatch = ProductMatch::query()->create([
+        'organization_id' => $organization->getKey(),
+        'analysis_id' => $analysis->getKey(),
+        'ai_analysis_id' => $aiAnalysis->getKey(),
+        'product_model_id' => $productModel->getKey(),
+        'run_number' => 1,
+        'status' => ProductMatchStatus::Matched,
+        'review_status' => ProductMatchReviewStatus::NotRequired,
+        'method' => 'exact_alias',
+        'matcher_version' => 'matcher:v1',
+        'input_hash' => hash('sha256', 'admin-price-estimate-match-input'),
+        'match_key' => hash('sha256', 'admin-price-estimate-match-key'),
+        'confidence_basis_points' => 9100,
+        'candidate_snapshot' => [],
+        'reason_codes' => [],
+    ]);
+    $comparableSet = ComparableSet::query()->create([
+        'organization_id' => $organization->getKey(),
+        'analysis_id' => $analysis->getKey(),
+        'product_match_id' => $productMatch->getKey(),
+        'run_number' => 1,
+        'status' => ComparableSetStatus::Ready,
+        'selector_version' => 'selector:v1',
+        'input_hash' => hash('sha256', 'admin-price-estimate-set-input'),
+        'selection_key' => hash('sha256', 'admin-price-estimate-selection-key'),
+        'target_country_code' => 'US',
+        'target_currency_code' => 'USD',
+        'candidate_count' => 7,
+        'included_count' => 5,
+        'excluded_count' => 2,
+        'minimum_required' => 3,
+        'reason_codes' => [],
+    ]);
+    $privateInputHash = hash('sha256', 'private-price-input-hash-source');
+    $privateEstimateKey = hash('sha256', 'private-price-estimate-key-source');
+    PriceEstimate::query()->create([
+        'organization_id' => $organization->getKey(),
+        'analysis_id' => $analysis->getKey(),
+        'comparable_set_id' => $comparableSet->getKey(),
+        'run_number' => 1,
+        'status' => PriceEstimateStatus::Estimated,
+        'algorithm_version' => 'price-estimator:v2',
+        'rate_resolver_version' => 'rate-resolver:v2',
+        'input_hash' => $privateInputHash,
+        'estimate_key' => $privateEstimateKey,
+        'calculation_at' => now(),
+        'target_country_code' => 'US',
+        'target_currency_code' => 'USD',
+        'input_count' => 7,
+        'included_count' => 5,
+        'outlier_count' => 1,
+        'unresolved_count' => 1,
+        'estimate_low_minor' => 12000,
+        'estimate_minor' => 13500,
+        'estimate_high_minor' => 15000,
+        'median_minor' => 13400,
+        'weighted_median_minor' => 13500,
+        'q1_minor' => 12200,
+        'q3_minor' => 14800,
+        'mad_minor' => 1300,
+        'dispersion_basis_points' => 1250,
+        'confidence_basis_points' => 8450,
+        'confidence_level' => PriceConfidenceLevel::High,
+        'reason_codes' => ['private-price-reason-must-not-render'],
+        'confidence_components' => ['private-price-component-must-not-render'],
+        'input_snapshot' => ['private-price-input-must-not-render'],
+    ]);
+
+    $this->actingAs(User::factory()->create())
+        ->get(PriceEstimateResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs(superAdmin())
+        ->get(PriceEstimateResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Pricing Operations Workspace')
+        ->assertSeeText('Pricing-visible camera body')
+        ->assertSeeText('Estimated')
+        ->assertSeeText('United States (US) - USD')
+        ->assertSeeText('135.00 USD')
+        ->assertSeeText('120.00 USD - 150.00 USD')
+        ->assertSeeText('84.50% - High')
+        ->assertDontSee($privateInputHash)
+        ->assertDontSee($privateEstimateKey)
+        ->assertDontSee('private-price-reason-must-not-render')
+        ->assertDontSee('private-price-component-must-not-render')
+        ->assertDontSee('private-price-input-must-not-render');
 });
 
 test('catalog explorer exposes canonical relationships only to verified super administrators', function () {

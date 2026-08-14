@@ -950,7 +950,10 @@ The Laragon development environment uses MySQL 8.4 LTS with a local `procura` da
   and snapshot, exact analysis/comparable-set ownership, target market, weighted-median bands,
   statistics, dispersion, confidence, and reason codes. `price_estimate_items` stores every
   original/normalized amount, rate decision and provenance, weight, inclusion/outlier decision,
-  and comparable evidence snapshot.
+  and comparable evidence snapshot. The verified-super-admin-only read-only explorer exposes only
+  parent/listing, run/status, localized target market, minor-unit-aware estimate/range, confidence,
+  aggregate sample quality, dispersion, and versions; hashes, keys, explanation JSON, snapshots,
+  comparable identities, and item-level rate evidence remain excluded.
 - `risk_assessments` stores tenant-owned append-only evaluator versions, stable input hashes and
   snapshots, exact upstream evidence links, score/level, confidence, unknowns, reason codes, and
   verification actions. `risk_signals` stores every immutable category/severity contribution,
@@ -1624,7 +1627,7 @@ personal organizations and memberships (complete)
 - A slow parallel validation run crossed a one-second boundary between initial and duplicate
   comparable fixture timestamps, correctly producing a new evidence record and exposing a flaky
   test. The test now derives both payloads from one fixed base timestamp. That checkpoint passed
-  163 tests and 1139 assertions. The current suite passes 418 tests and 5417 assertions after the
+  163 tests and 1139 assertions. The current suite passes 419 tests and 5433 assertions after the
   later Sell, outcome, monitoring, billing, connector, normalization, privacy, Analysis Operations,
   operational-readiness, deterministic capacity/queue throughput/Analysis workload, browser,
   saturation/soak, server/API localization, typed platform-validation, privacy fulfillment/erasure,

@@ -32,6 +32,7 @@ Phase 1 currently implements:
 - Listing Explorer
 - Analysis Explorer
 - AI Analyses Explorer
+- Price Estimates Explorer
 - Analysis Operations
 - Product Match Reviews
 - Broker Requests
@@ -89,6 +90,12 @@ It never renders the input hash or snapshot, structured result, provider error, 
 estimated cost. Mutations and retries remain outside this resource and continue through the
 existing guarded Analysis Operations boundary.
 
+The read-only **Price Estimates Explorer** projects immutable pricing heads for global support:
+tenant and parent listing, run/status, localized target market, ISO-minor-unit-aware estimate and
+range, confidence, aggregate input/included/outlier/unresolved counts, dispersion, and algorithm/
+rate-resolver versions. It does not load estimate items and never renders input/estimate hashes,
+reason or confidence JSON, input snapshots, comparable identities, or item-level FX evidence.
+
 The read-only **Listing Explorer** provides the corresponding global intake overview. It exposes
 only organization, title, marketplace, ISO-minor-unit-aware asking price, market route, lifecycle
 status, and aggregate image/analysis counts, with optional support identifiers hidden by default.
@@ -105,7 +112,6 @@ attribution rules, and internal review notes are never rendered.
 The following broader product/operations resources remain scheduled for their corresponding
 phases:
 
-- Price Estimates
 - Risk Assessments
 - Deal Scores
 - Saved Searches
