@@ -333,6 +333,13 @@ upstream chains are removed from the current projection without deleting history
 Angular panel exposes capped and uncapped scores, recommendation, all five raw/normalized/weighted
 items, confidence, cap decisions, factors, assumptions, next checks, reasons, and disclaimer.
 
+Verified super administrators now have a five-language read-only Deal Scores Explorer for global
+support. It exposes only tenant/listing context, market route, immutable run/status, final capped
+score, recommendation, confidence, applicable cap, aggregate component count, unknown count, and
+optional calculation/support identifiers. Input and score hashes, uncapped precision, cap/reason/
+confidence/factor/assumption/action JSON, input snapshots, upstream evidence IDs, score-item values,
+and component source snapshots are deliberately neither loaded nor rendered.
+
 The buyer-decision/status event boundary is now implemented. Tenant-owned append-only
 `BuyerDecisionEvent` records link one exact analysis and assessed current DealScore, preserve a
 monotonic analysis sequence, previous event, immutable prior/next state, actor, server timestamp,

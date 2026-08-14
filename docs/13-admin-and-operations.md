@@ -120,6 +120,13 @@ aggregate signal/unknown counts, with optional evaluator version and support IDs
 signals and never renders input/assessment hashes, reason or confidence JSON, verification actions,
 input snapshots, upstream evidence IDs, signal codes/sources, or signal-level evidence/actions.
 
+The read-only **Deal Scores Explorer** projects the final immutable opportunity decision head:
+tenant and parent listing, market route, run/status, capped score, recommendation, confidence,
+applicable cap, and aggregate component/unknown counts, with optional calculation version and
+support IDs. It does not load score items and never renders input/score hashes, uncapped precision,
+cap decisions, reasons, confidence JSON, factors, assumptions, verification actions, snapshots,
+upstream evidence IDs, or component-level evidence.
+
 The read-only **Listing Explorer** provides the corresponding global intake overview. It exposes
 only organization, title, marketplace, ISO-minor-unit-aware asking price, market route, lifecycle
 status, and aggregate image/analysis counts, with optional support identifiers hidden by default.
@@ -136,7 +143,6 @@ attribution rules, and internal review notes are never rendered.
 The following broader product/operations resources remain scheduled for their corresponding
 phases:
 
-- Deal Scores
 - Saved Searches
 - Alerts
 - Settings

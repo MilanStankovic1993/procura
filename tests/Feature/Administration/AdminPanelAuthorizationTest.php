@@ -41,6 +41,7 @@ use App\Filament\Resources\BrokerTransactionResource;
 use App\Filament\Resources\ComparableMarketNormalizations\ComparableMarketNormalizationResource;
 use App\Filament\Resources\Countries\CountryResource;
 use App\Filament\Resources\Currencies\CurrencyResource;
+use App\Filament\Resources\DealScores\DealScoreResource;
 use App\Filament\Resources\Listings\ListingResource;
 use App\Filament\Resources\MarketplaceSources\MarketplaceSourceResource;
 use App\Filament\Resources\Memberships\MembershipResource;
@@ -67,9 +68,13 @@ use App\Models\BillingProviderEvent;
 use App\Models\Brand;
 use App\Models\BrokerRequestEvent;
 use App\Models\ComparableSet;
+use App\Models\CostInput;
+use App\Models\DealScore;
 use App\Models\Listing;
 use App\Models\ListingSnapshot;
 use App\Models\MarketplaceSource;
+use App\Models\OpportunityAssessment;
+use App\Models\OpportunityInput;
 use App\Models\Organization;
 use App\Models\OrganizationMembership;
 use App\Models\Plan;
@@ -82,6 +87,7 @@ use App\Models\ProductMatch;
 use App\Models\ProductModel;
 use App\Models\ProductVariant;
 use App\Models\ProductVariantMarket;
+use App\Models\ProfitEstimate;
 use App\Models\RiskAssessment;
 use App\Models\User;
 use Database\Seeders\PlanSeeder;
@@ -257,6 +263,7 @@ function adminPricingEvidenceFixture(): array
     ]);
 
     return compact(
+        'requester',
         'organization',
         'listing',
         'analysis',
@@ -266,6 +273,183 @@ function adminPricingEvidenceFixture(): array
         'privateInputHash',
         'privateEstimateKey',
     );
+}
+
+/** @return array<string, mixed> */
+function adminDealScoreEvidenceFixture(): array
+{
+    $fixture = adminPricingEvidenceFixture();
+    $riskAssessment = RiskAssessment::query()->create([
+        'organization_id' => $fixture['organization']->getKey(),
+        'analysis_id' => $fixture['analysis']->getKey(),
+        'product_match_id' => $fixture['productMatch']->getKey(),
+        'comparable_set_id' => $fixture['comparableSet']->getKey(),
+        'price_estimate_id' => $fixture['priceEstimate']->getKey(),
+        'run_number' => 1,
+        'status' => RiskAssessmentStatus::Assessed,
+        'evaluator_version' => 'risk-evaluator:v2',
+        'input_hash' => hash('sha256', 'admin-deal-risk-input'),
+        'assessment_key' => hash('sha256', 'admin-deal-risk-key'),
+        'calculation_at' => now(),
+        'score' => 55,
+        'level' => RiskLevel::High,
+        'confidence_basis_points' => 7600,
+        'confidence_level' => RiskConfidenceLevel::High,
+        'signal_count' => 0,
+        'unknown_count' => 0,
+        'reason_codes' => [],
+        'confidence_components' => [],
+        'verification_actions' => [],
+        'input_snapshot' => [],
+    ]);
+    $costInput = CostInput::query()->create([
+        'organization_id' => $fixture['organization']->getKey(),
+        'analysis_id' => $fixture['analysis']->getKey(),
+        'price_estimate_id' => $fixture['priceEstimate']->getKey(),
+        'risk_assessment_id' => $riskAssessment->getKey(),
+        'submitted_by_user_id' => $fixture['requester']->getKey(),
+        'run_number' => 1,
+        'input_version' => 'cost-input:v1',
+        'input_hash' => hash('sha256', 'admin-deal-cost-input'),
+        'input_key' => hash('sha256', 'admin-deal-cost-key'),
+        'currency_code' => 'USD',
+        'source_country_code' => 'DE',
+        'target_country_code' => 'US',
+        'regional_compatibility_confirmed' => true,
+        'known_count' => 9,
+        'unknown_count' => 0,
+        'input_snapshot' => [],
+        'submitted_at' => now(),
+    ]);
+    $profitEstimate = ProfitEstimate::query()->create([
+        'organization_id' => $fixture['organization']->getKey(),
+        'analysis_id' => $fixture['analysis']->getKey(),
+        'price_estimate_id' => $fixture['priceEstimate']->getKey(),
+        'risk_assessment_id' => $riskAssessment->getKey(),
+        'cost_input_id' => $costInput->getKey(),
+        'run_number' => 1,
+        'status' => 'estimated',
+        'calculation_version' => 'profit-calculator:v1',
+        'input_hash' => hash('sha256', 'admin-deal-profit-input'),
+        'estimate_key' => hash('sha256', 'admin-deal-profit-key'),
+        'calculation_at' => now(),
+        'currency_code' => 'USD',
+        'expected_sale_price_minor' => 13500,
+        'purchase_price_minor' => 7000,
+        'gross_margin_minor' => 6500,
+        'known_costs_minor' => 8500,
+        'additional_costs_minor' => 1500,
+        'total_cost_minor' => 8500,
+        'expected_net_profit_minor' => 5000,
+        'profit_margin_basis_points' => 3704,
+        'return_on_invested_capital_basis_points' => 5882,
+        'confidence_basis_points' => 7800,
+        'confidence_level' => 'high',
+        'unknown_count' => 0,
+        'reason_codes' => [],
+        'confidence_components' => [],
+        'input_snapshot' => [],
+    ]);
+    $opportunityInput = OpportunityInput::query()->create([
+        'organization_id' => $fixture['organization']->getKey(),
+        'analysis_id' => $fixture['analysis']->getKey(),
+        'comparable_set_id' => $fixture['comparableSet']->getKey(),
+        'price_estimate_id' => $fixture['priceEstimate']->getKey(),
+        'risk_assessment_id' => $riskAssessment->getKey(),
+        'cost_input_id' => $costInput->getKey(),
+        'profit_estimate_id' => $profitEstimate->getKey(),
+        'submitted_by_user_id' => $fixture['requester']->getKey(),
+        'run_number' => 1,
+        'input_version' => 'opportunity-input:v1',
+        'input_hash' => hash('sha256', 'admin-deal-opportunity-input'),
+        'input_key' => hash('sha256', 'admin-deal-opportunity-key'),
+        'source_country_code' => 'DE',
+        'target_country_code' => 'US',
+        'known_count' => 16,
+        'unknown_count' => 0,
+        'input_snapshot' => [],
+        'submitted_at' => now(),
+    ]);
+    $assessmentAttributes = [
+        'organization_id' => $fixture['organization']->getKey(),
+        'analysis_id' => $fixture['analysis']->getKey(),
+        'comparable_set_id' => $fixture['comparableSet']->getKey(),
+        'price_estimate_id' => $fixture['priceEstimate']->getKey(),
+        'risk_assessment_id' => $riskAssessment->getKey(),
+        'cost_input_id' => $costInput->getKey(),
+        'profit_estimate_id' => $profitEstimate->getKey(),
+        'opportunity_input_id' => $opportunityInput->getKey(),
+        'run_number' => 1,
+        'status' => 'assessed',
+        'confidence_basis_points' => 7300,
+        'confidence_level' => 'medium',
+        'unknown_count' => 0,
+        'reason_codes' => [],
+        'confidence_components' => [],
+        'input_snapshot' => [],
+        'calculated_at' => now(),
+    ];
+    $logisticsAssessment = OpportunityAssessment::query()->create([
+        ...$assessmentAttributes,
+        'component' => 'logistics',
+        'evaluator_version' => 'logistics-evaluator:v1',
+        'input_hash' => hash('sha256', 'admin-deal-logistics-input'),
+        'assessment_key' => hash('sha256', 'admin-deal-logistics-key'),
+        'score' => 82,
+    ]);
+    $demandAssessment = OpportunityAssessment::query()->create([
+        ...$assessmentAttributes,
+        'component' => 'demand',
+        'evaluator_version' => 'demand-evaluator:v1',
+        'input_hash' => hash('sha256', 'admin-deal-demand-input'),
+        'assessment_key' => hash('sha256', 'admin-deal-demand-key'),
+        'score' => 68,
+    ]);
+    $privateInputHash = hash('sha256', 'private-deal-input-hash-source');
+    $privateScoreKey = hash('sha256', 'private-deal-score-key-source');
+    $dealScore = DealScore::query()->create([
+        'organization_id' => $fixture['organization']->getKey(),
+        'analysis_id' => $fixture['analysis']->getKey(),
+        'product_match_id' => $fixture['productMatch']->getKey(),
+        'price_estimate_id' => $fixture['priceEstimate']->getKey(),
+        'risk_assessment_id' => $riskAssessment->getKey(),
+        'profit_estimate_id' => $profitEstimate->getKey(),
+        'opportunity_input_id' => $opportunityInput->getKey(),
+        'logistics_assessment_id' => $logisticsAssessment->getKey(),
+        'demand_assessment_id' => $demandAssessment->getKey(),
+        'run_number' => 1,
+        'status' => 'assessed',
+        'calculation_version' => 'deterministic-deal-score:v1',
+        'input_hash' => $privateInputHash,
+        'score_key' => $privateScoreKey,
+        'calculated_at' => now(),
+        'uncapped_score' => 74,
+        'uncapped_score_basis_points' => 7425,
+        'score' => 60,
+        'score_basis_points' => 6000,
+        'recommendation' => 'needs_verification',
+        'confidence_basis_points' => 7350,
+        'confidence_level' => 'medium',
+        'unknown_count' => 0,
+        'applicable_cap' => 60,
+        'cap_decisions' => ['private-deal-cap-must-not-render'],
+        'reason_codes' => ['private-deal-reason-must-not-render'],
+        'confidence_components' => ['private-deal-confidence-must-not-render'],
+        'factors_increasing' => ['private-deal-increase-must-not-render'],
+        'factors_reducing' => ['private-deal-reduction-must-not-render'],
+        'assumptions' => ['private-deal-assumption-must-not-render'],
+        'verification_actions' => ['private-deal-action-must-not-render'],
+        'input_snapshot' => ['private-deal-input-must-not-render'],
+    ]);
+    $dealScore->items()->createMany([
+        ['position' => 1, 'component' => 'estimated_net_margin', 'weight_basis_points' => 3500, 'raw_value' => 3704, 'raw_value_unit' => 'basis_points', 'normalized_score_basis_points' => 9260, 'weighted_contribution_basis_points' => 3241, 'confidence_basis_points' => 7800, 'impact' => 'strengthens', 'source_snapshot' => ['private-deal-item-must-not-render']],
+        ['position' => 2, 'component' => 'price_confidence', 'weight_basis_points' => 2500, 'raw_value' => 8450, 'raw_value_unit' => 'basis_points', 'normalized_score_basis_points' => 8450, 'weighted_contribution_basis_points' => 2113, 'confidence_basis_points' => 8450, 'impact' => 'strengthens', 'source_snapshot' => []],
+        ['position' => 3, 'component' => 'resale_demand', 'weight_basis_points' => 1500, 'raw_value' => 68, 'raw_value_unit' => 'score', 'normalized_score_basis_points' => 6800, 'weighted_contribution_basis_points' => 1020, 'confidence_basis_points' => 7300, 'impact' => 'neutral', 'source_snapshot' => []],
+        ['position' => 4, 'component' => 'inverse_risk', 'weight_basis_points' => 1500, 'raw_value' => 55, 'raw_value_unit' => 'score', 'normalized_score_basis_points' => 4500, 'weighted_contribution_basis_points' => 675, 'confidence_basis_points' => 7600, 'impact' => 'reduces', 'source_snapshot' => []],
+        ['position' => 5, 'component' => 'logistics_simplicity', 'weight_basis_points' => 1000, 'raw_value' => 82, 'raw_value_unit' => 'score', 'normalized_score_basis_points' => 8200, 'weighted_contribution_basis_points' => 820, 'confidence_basis_points' => 7300, 'impact' => 'strengthens', 'source_snapshot' => []],
+    ]);
+
+    return compact('dealScore', 'privateInputHash', 'privateScoreKey');
 }
 
 test('ordinary and unverified users cannot access the Filament administration panel', function () {
@@ -298,6 +482,7 @@ test('verified super administrators can access operational resources while resou
         ->and(AiAnalysisResource::canCreate())->toBeFalse()
         ->and(PriceEstimateResource::canCreate())->toBeFalse()
         ->and(RiskAssessmentResource::canCreate())->toBeFalse()
+        ->and(DealScoreResource::canCreate())->toBeFalse()
         ->and(ListingResource::canCreate())->toBeFalse()
         ->and(MarketplaceSourceResource::canCreate())->toBeFalse()
         ->and(ComparableMarketNormalizationResource::canCreate())->toBeFalse()
@@ -344,6 +529,7 @@ test('verified super administrators can access operational resources while resou
         AiAnalysisResource::class,
         PriceEstimateResource::class,
         RiskAssessmentResource::class,
+        DealScoreResource::class,
         ListingResource::class,
         MarketplaceSourceResource::class,
         NotificationDeliveryResource::class,
@@ -738,6 +924,36 @@ test('risk assessment explorer exposes critical risk projections without private
         ->assertDontSee('private-risk-unknown-evidence-must-not-render')
         ->assertDontSee('private-risk-unknown-source-must-not-render')
         ->assertDontSee('private-risk-unknown-action-must-not-render');
+});
+
+test('deal score explorer exposes bounded recommendations without private evidence', function () {
+    $fixture = adminDealScoreEvidenceFixture();
+
+    $this->actingAs(User::factory()->create())
+        ->get(DealScoreResource::getUrl())
+        ->assertForbidden();
+
+    $this->actingAs(superAdmin())
+        ->get(DealScoreResource::getUrl())
+        ->assertOk()
+        ->assertSeeText('Pricing Operations Workspace')
+        ->assertSeeText('Pricing-visible camera body')
+        ->assertSeeText('DE -> US')
+        ->assertSeeText('Assessed')
+        ->assertSeeText('60 / 100')
+        ->assertSeeText('Needs verification')
+        ->assertSeeText('73.50% - Medium')
+        ->assertDontSee($fixture['privateInputHash'])
+        ->assertDontSee($fixture['privateScoreKey'])
+        ->assertDontSee('private-deal-cap-must-not-render')
+        ->assertDontSee('private-deal-reason-must-not-render')
+        ->assertDontSee('private-deal-confidence-must-not-render')
+        ->assertDontSee('private-deal-increase-must-not-render')
+        ->assertDontSee('private-deal-reduction-must-not-render')
+        ->assertDontSee('private-deal-assumption-must-not-render')
+        ->assertDontSee('private-deal-action-must-not-render')
+        ->assertDontSee('private-deal-input-must-not-render')
+        ->assertDontSee('private-deal-item-must-not-render');
 });
 
 test('catalog explorer exposes canonical relationships only to verified super administrators', function () {
