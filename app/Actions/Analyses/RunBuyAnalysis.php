@@ -2,7 +2,9 @@
 
 namespace App\Actions\Analyses;
 
+use App\Analysis\Contracts\ConfiguredListingAiAnalyzer;
 use App\Analysis\Contracts\ListingAiAnalyzer;
+use App\Analysis\Data\AiAnalysisData;
 use App\Analysis\Data\AnalysisInputData;
 use App\Analysis\Metrics\AnalysisPipelineStageTimer;
 use App\Analysis\Metrics\Contracts\AnalysisPipelineMetricRecorder;
@@ -17,6 +19,7 @@ use App\Enums\Analyses\AnalysisStatus;
 use App\Enums\Catalog\ProductMatchStatus;
 use App\Enums\Comparables\ComparableSetStatus;
 use App\Enums\Pricing\PriceEstimateStatus;
+use App\Exceptions\AnalysisProviderException;
 use App\Jobs\Monitoring\MatchListingSnapshot;
 use App\Models\AiAnalysis;
 use App\Models\Analysis;
@@ -203,7 +206,7 @@ class RunBuyAnalysis
                     $comparableSet?->getKey(),
                     $priceEstimate?->getKey(),
                     $riskAssessment?->getKey(),
-                    $result->toArray(),
+                    $result,
                 ),
             );
             $this->recordPipelineMetric(
@@ -328,7 +331,9 @@ class RunBuyAnalysis
                 'attempt_number' => $attemptNumber,
                 'status' => AiAnalysisStatus::Processing,
                 'provider' => config('analyses.provider'),
-                'model' => config('analyses.fake_model'),
+                'model' => $this->provider instanceof ConfiguredListingAiAnalyzer
+                    ? $this->provider->model()
+                    : config('analyses.fake_model'),
                 'prompt_version' => config('analyses.prompt_version'),
                 'input_hash' => $analysis->request_hash,
                 'input_snapshot' => $analysis->request_payload,
@@ -340,7 +345,6 @@ class RunBuyAnalysis
         }, attempts: 3);
     }
 
-    /** @param array<string, mixed> $result */
     private function complete(
         string $analysisId,
         string $dispatchId,
@@ -349,7 +353,7 @@ class RunBuyAnalysis
         ?string $comparableSetId,
         ?string $priceEstimateId,
         ?string $riskAssessmentId,
-        array $result,
+        AiAnalysisData $result,
     ): void {
         DB::transaction(function () use (
             $analysisId,
@@ -439,6 +443,7 @@ class RunBuyAnalysis
                 );
             }
 
+            $resultData = $result->toArray();
             $matchNeedsInput = match ($productMatch->status) {
                 ProductMatchStatus::Matched => [],
                 ProductMatchStatus::Unmatched => ['model_uncertain'],
@@ -451,13 +456,13 @@ class RunBuyAnalysis
                     : ['model_confirmation_required'],
             };
             $needsInput = array_values(array_unique([
-                ...($result['needs_input'] ?? []),
+                ...($resultData['needs_input'] ?? []),
                 ...$matchNeedsInput,
             ]));
             $resultPayload = [
                 'schema_version' => 'buy-analysis-extraction-result:v8',
                 'pipeline_version' => $analysis->pipeline_version,
-                ...$result,
+                ...$resultData,
                 'needs_input' => $needsInput,
                 'product_match' => [
                     'id' => $productMatch->getKey(),
@@ -472,7 +477,9 @@ class RunBuyAnalysis
                 ],
                 'completed_steps' => [
                     'normalize_input',
-                    'fake_ai_extraction',
+                    $this->provider instanceof FakeListingAiAnalyzer
+                        ? 'fake_ai_extraction'
+                        : 'ai_extraction',
                     'product_matching',
                 ],
                 'pending_steps' => [
@@ -515,13 +522,13 @@ class RunBuyAnalysis
 
             $aiAnalysis->update([
                 'status' => AiAnalysisStatus::Completed,
-                'result_json' => $result,
+                'result_json' => $resultData,
                 'validation_status' => AiValidationStatus::Valid,
-                'confidence_basis_points' => $result['confidence_basis_points'],
-                'tokens_in' => 0,
-                'tokens_out' => 0,
-                'estimated_cost_minor' => 0,
-                'estimated_cost_currency' => 'USD',
+                'confidence_basis_points' => $result->confidenceBasisPoints,
+                'tokens_in' => $result->tokensIn,
+                'tokens_out' => $result->tokensOut,
+                'estimated_cost_minor' => $result->estimatedCostMinor,
+                'estimated_cost_currency' => $result->estimatedCostCurrency,
                 'completed_at' => now(),
                 'error' => null,
             ]);
@@ -571,7 +578,9 @@ class RunBuyAnalysis
             $delay = (int) ($delays[$attemptNumber - 1] ?? end($delays) ?: 300);
             $retryAt = $canRetry ? now()->addSeconds($delay) : null;
             $message = str($exception->getMessage())->limit(10000)->toString();
-            $errorCode = class_basename($exception);
+            $errorCode = $exception instanceof AnalysisProviderException
+                ? $exception->reasonCode
+                : class_basename($exception);
 
             $aiAnalysis->update([
                 'status' => AiAnalysisStatus::Failed,

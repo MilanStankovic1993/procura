@@ -783,7 +783,28 @@ processing; already-created subscriptions continue to require reconciliation.
 
 ## 7. AI provider
 
-Status: **deterministic fake provider only; production provider pending**
+Status: **Gemini staging and OpenAI production-candidate adapters implemented; activation pending**
+
+Application boundary now present:
+
+- `ANALYSIS_PROVIDER=fake|gemini|openai` resolves only an explicit supported adapter;
+- Gemini uses the native `generateContent` API with JSON schema output; OpenAI uses the Responses
+  API with strict JSON schema, `store=false`, and a stable idempotency key;
+- both external adapters use HTTPS host allowlists, required credentials, bounded connect/request
+  timeouts, bounded output tokens, no automatic HTTP retry, sanitized provider failures, and shared
+  semantic validation;
+- prompts exclude internal identifiers, source URLs, seller/location details, checksums, storage
+  paths, credentials, and image bytes; provider output cannot mutate recorded price, currency,
+  market scope, or evidence count;
+- append-only AI attempts record configured provider/model, prompt version, token usage, and
+  conservatively rounded configured USD cost;
+- production preflight rejects an enabled adapter with invalid configuration and still rejects the
+  deterministic product matcher.
+
+The repository defaults remain `ANALYSIS_PROVIDER=fake` and production
+`ANALYSIS_SUBMISSION_ENABLED=false`. Never place `GEMINI_API_KEY` or `OPENAI_API_KEY` in source,
+committed environment files, logs, tickets, or provider evidence. Supply the selected key through
+the deployment secret manager, rebuild configuration, and restart every web/queue process.
 
 Before activation, record:
 
@@ -793,6 +814,24 @@ Before activation, record:
 - redaction/data-minimization rules,
 - accuracy/evaluation evidence and deterministic fallback behavior,
 - provider outage monitoring and disable switch.
+
+Staging selection: Gemini free-tier evaluation may use only synthetic, non-confidential and
+non-personal fixtures until processor/data-use terms are approved. Configure
+`ANALYSIS_PROVIDER=gemini`, the reviewed Gemini key, exact model/rates and timeouts, then keep the
+submission switch disabled until a controlled operator window. Free-tier availability and rate
+limits are not a capacity or SLA guarantee.
+
+Production candidate: configure `ANALYSIS_PROVIDER=openai`, an approved exact OpenAI model policy,
+secret-manager key, current reviewed rates and timeouts. The repository default model alias is only
+a candidate; pin or approve alias movement before launch. `store=false` reduces application-level
+storage at the API request boundary but does not replace the contractual retention, residency, DPA,
+subprocessor, incident, or deletion review.
+
+Model pricing changes independently of this release. Before every activation and model change,
+verify official pricing and update the configured `*_INPUT_PRICE_USD_PER_MILLION` and
+`*_OUTPUT_PRICE_USD_PER_MILLION` values. Zero Gemini rates are valid only while the selected account
+and model are actually operating within an approved free tier; paid Gemini activation must set its
+current non-zero rates.
 
 Production must never silently fall back to fabricated AI results.
 

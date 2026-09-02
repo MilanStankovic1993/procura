@@ -155,27 +155,38 @@ Based on the available information, estimated net profit is €80–€130. This
 
 ## 11. Current implementation boundary
 
-The Phase 2 foundation implements the documented `ListingAiAnalyzer` interface with a deterministic
-fake provider only. It stores provider, model, prompt version, immutable input hash and snapshot,
-validated structured output, confidence, timing, zero fixture token/cost fields, and errors in one
-append-only `AiAnalysis` row per attempt.
+The Phase 2 foundation implements the documented `ListingAiAnalyzer` interface with three explicit
+bindings: a deterministic `fake` provider for automated tests, a native Gemini adapter for free-tier
+staging evaluation, and an OpenAI Responses API adapter as the first production candidate. The
+external adapters use provider-enforced JSON schemas followed by independent application semantic
+validation. Every attempt stores provider, configured model, prompt version, immutable input hash
+and snapshot, validated structured output, confidence, timing, returned token counts, conservatively
+rounded USD minor-unit cost, and a sanitized error in one append-only `AiAnalysis` row.
 
-The fake AI provider normalizes preserved listing facts and identifies missing price, currency, or
-image evidence. It does not itself claim a canonical product, select market evidence, or claim that
-price estimation, risk assessment, profit calculation, or deal scoring has run. A separate
-`ProductMatcher` contract consumes the validated normalized facts, reads the global catalog, and
-stores append-only, versioned, explainable match evidence. Its deterministic fake implementation
-supports exact, ambiguous, unmatched, and region-incompatible fixtures without silently creating a
-product.
+External prompts are data-minimized. They include listing title, description, marketplace label,
+recorded money, source/target country codes, and a bounded technical evidence summary. They exclude
+tenant/user/listing/snapshot/image identifiers, source URL, external marketplace identifier, seller
+information, location, checksums, private storage paths, credentials, and image bytes. AI may
+normalize title and description only; recorded money, currency, market scope, and evidence count are
+projected from the immutable first-party snapshot and cannot be replaced by provider output.
 
-A separate deterministic `ComparableSelector` consumes only a confirmed product match and
-tenant-owned approved source evidence. It records bounded ranking and exclusion evidence without
-using AI to invent prices, exchange rates, market compatibility, condition, accessories, or seller
-facts. A separately versioned deterministic `PriceEstimator` then consumes one exact ready set,
-uses recorded dated exchange-rate evidence, and appends weighted-median bands, statistical
-decisions, dispersion, and confidence without asking AI to calculate or justify money. A separate
-deterministic `RiskEvaluator` then records bounded, explainable transaction-uncertainty signals
-from that exact evidence chain. Unknown facts remain zero-point unknowns with verification actions;
-AI does not invent seller, condition, ownership, payment, or shipping evidence. A real AI provider
-must retain the extraction contract, validate provider-specific output before persistence, enforce
-budgets, and pass golden-data tests before it can replace the fake binding.
+`gemini-3.7-flash` is the staging default and `gpt-5.6-luna` is the production-candidate default.
+Both are configuration values rather than permanent model aliases. Gemini free-tier evaluation must
+use synthetic, non-confidential data until the processor/data-use review is complete. OpenAI calls
+set `store=false` and use a stable idempotency key. Neither adapter performs an automatic HTTP retry;
+the existing bounded Analysis dispatch and append-only attempt lifecycle remains the only retry
+owner.
+
+The fake provider still supplies deterministic golden fixtures. A separate deterministic
+`ProductMatcher` consumes validated normalized facts, reads the global catalog, and records
+append-only, versioned, explainable match evidence. Deterministic comparable selection, price
+estimation, risk evaluation, profit calculation, and deal scoring remain outside model authority.
+Unknown facts remain zero-point unknowns with verification actions; AI does not invent seller,
+condition, ownership, payment, shipping, market, exchange-rate, tax, customs, or price evidence.
+
+The adapters do not activate production AI by themselves. `ANALYSIS_PROVIDER=fake` remains the
+repository default, `ANALYSIS_SUBMISSION_ENABLED` remains the independent production kill switch,
+and the product matcher is still deterministic rehearsal infrastructure. Production activation
+still requires approved processor/privacy terms, version pinning policy, global and per-organization
+budget enforcement, circuit breaking, provider monitoring, golden-data evaluation, controlled
+staging evidence, and a production-shaped product matcher.

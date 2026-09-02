@@ -112,8 +112,10 @@ Deliverables:
 - deal score,
 - bounded queue recovery plus localized Analysis Operations, immutable manual-retry ledger,
   verified-super-admin retry action/CLI, and production runbook (complete),
-- independent submission kill switch (complete; false by default in code) and approved non-fake AI/
-  product-matching provider activation (pending provider, privacy, evaluation, and cost policy).
+- independent submission kill switch (complete; false by default in code), provider-independent
+  Gemini staging and OpenAI production-candidate `ListingAiAnalyzer` adapters (complete but
+  inactive), and approved non-fake product-matching/provider activation (pending processor/privacy,
+  version, evaluation, budget, circuit-breaker, monitoring, and staging evidence).
 
 ## Phase 3 — Sell Analysis MVP
 

@@ -5,6 +5,7 @@ use App\Actions\Analyses\RunBuyAnalysis;
 use App\Actions\Analyses\SubmitAnalysis;
 use App\Actions\Listings\CreateListing;
 use App\Actions\Markets\SyncMarketReferenceData;
+use App\Analysis\Contracts\ConfiguredListingAiAnalyzer;
 use App\Analysis\Contracts\ListingAiAnalyzer;
 use App\Analysis\Data\AiAnalysisData;
 use App\Analysis\Data\AnalysisInputData;
@@ -19,6 +20,7 @@ use App\Enums\Analyses\AnalysisStatus;
 use App\Enums\Listings\ListingImageKind;
 use App\Enums\Organizations\OrganizationRole;
 use App\Enums\Subscriptions\FeatureCode;
+use App\Exceptions\AnalysisProviderException;
 use App\Jobs\Monitoring\MatchListingSnapshot;
 use App\Jobs\ProcessBuyAnalysis;
 use App\Models\AiAnalysis;
@@ -421,6 +423,74 @@ test('missing price currency and evidence produce a structured needs input state
         ]);
 });
 
+test('a configured provider records its model token usage and estimated cost', function () {
+    Queue::fake();
+    [$owner, $organization] = analysisRequestWorkspace();
+    $listing = analysisRequestListing($owner, $organization, withEvidence: true);
+    $analysis = app(CreateBuyAnalysisDraft::class)->create(
+        $organization,
+        $owner,
+        $listing->getKey(),
+        'DE',
+    );
+    $analysis = app(SubmitAnalysis::class)->submit(
+        $organization,
+        $owner,
+        $analysis->getKey(),
+    );
+    app()->instance(
+        ListingAiAnalyzer::class,
+        new class implements ConfiguredListingAiAnalyzer
+        {
+            public function isConfigured(): bool
+            {
+                return true;
+            }
+
+            public function model(): string
+            {
+                return 'production-model-v1';
+            }
+
+            public function analyze(AnalysisInputData $input): AiAnalysisData
+            {
+                return new AiAnalysisData(
+                    normalizedListing: [
+                        'title' => 'Bosch Professional cordless drill',
+                        'description' => 'Two batteries, charger, and case.',
+                        'marketplace_name' => 'Analysis Market',
+                        'asking_price_minor' => 12999,
+                        'currency_code' => 'EUR',
+                        'source_country_code' => 'AT',
+                        'target_country_code' => 'DE',
+                        'evidence_count' => 1,
+                    ],
+                    confidenceBasisPoints: 9100,
+                    tokensIn: 1234,
+                    tokensOut: 321,
+                    estimatedCostMinor: 2,
+                    estimatedCostCurrency: 'USD',
+                );
+            }
+        },
+    );
+
+    app(RunBuyAnalysis::class)->run(
+        $analysis->getKey(),
+        $analysis->currentDispatch()->valueOrFail('id'),
+    );
+
+    $attempt = AiAnalysis::query()->firstOrFail();
+
+    expect($attempt->model)->toBe('production-model-v1')
+        ->and($attempt->tokens_in)->toBe(1234)
+        ->and($attempt->tokens_out)->toBe(321)
+        ->and($attempt->estimated_cost_minor)->toBe(2)
+        ->and($attempt->estimated_cost_currency)->toBe('USD')
+        ->and($analysis->fresh()->result_payload['completed_steps'])
+        ->toContain('ai_extraction');
+});
+
 test('provider failures record bounded retry metadata and one observable attempt per run', function () {
     Queue::fake();
     [$owner, $organization] = analysisRequestWorkspace();
@@ -437,14 +507,19 @@ test('provider failures record bounded retry metadata and one observable attempt
     {
         public function analyze(AnalysisInputData $input): AiAnalysisData
         {
-            throw new RuntimeException('Deterministic provider failure.');
+            throw new AnalysisProviderException(
+                'analysis_provider_transport_failed',
+            );
         }
     });
     $runner = app(RunBuyAnalysis::class);
 
     for ($attempt = 1; $attempt <= 3; $attempt++) {
         expect(fn () => $runner->run($analysis->getKey(), $dispatch->getKey()))
-            ->toThrow(RuntimeException::class, 'Deterministic provider failure.');
+            ->toThrow(
+                AnalysisProviderException::class,
+                'The analysis provider request failed.',
+            );
     }
 
     $runner->run($analysis->getKey(), $dispatch->getKey());
@@ -453,7 +528,9 @@ test('provider failures record bounded retry metadata and one observable attempt
     expect($analysis->status)->toBe(AnalysisStatus::Failed)
         ->and($analysis->processing_attempts)->toBe(3)
         ->and($analysis->next_retry_at)->toBeNull()
-        ->and($analysis->last_error_code)->toBe('RuntimeException')
+        ->and($analysis->last_error_code)->toBe(
+            'analysis_provider_transport_failed',
+        )
         ->and($dispatch->fresh()->status)->toBe(AnalysisDispatchStatus::Failed)
         ->and(AiAnalysis::query()->count())->toBe(3)
         ->and(AiAnalysis::query()->where('status', AiAnalysisStatus::Failed)->count())->toBe(3)

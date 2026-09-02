@@ -6,6 +6,8 @@ use App\Analysis\Contracts\ListingAiAnalyzer;
 use App\Analysis\Metrics\Contracts\AnalysisPipelineMetricRecorder;
 use App\Analysis\Metrics\DatabaseAnalysisPipelineMetricRecorder;
 use App\Analysis\Providers\FakeListingAiAnalyzer;
+use App\Analysis\Providers\GeminiListingAiAnalyzer;
+use App\Analysis\Providers\OpenAiListingAiAnalyzer;
 use App\Billing\Contracts\BillingProvider;
 use App\Billing\Providers\StripeBillingProvider;
 use App\ComparableSelection\Contracts\ComparableSelector;
@@ -85,6 +87,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ListingAiAnalyzer::class, function (): ListingAiAnalyzer {
             return match (config('analyses.provider')) {
                 'fake' => new FakeListingAiAnalyzer,
+                'gemini' => $this->app->make(GeminiListingAiAnalyzer::class),
+                'openai' => $this->app->make(OpenAiListingAiAnalyzer::class),
                 default => throw new \LogicException('The configured analysis provider is not supported.'),
             };
         });

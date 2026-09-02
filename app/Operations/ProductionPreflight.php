@@ -2,6 +2,7 @@
 
 namespace App\Operations;
 
+use App\Analysis\Contracts\ConfiguredListingAiAnalyzer;
 use App\Analysis\Contracts\ListingAiAnalyzer;
 use App\Analysis\Metrics\AnalysisPipelineMetricsConfiguration;
 use App\Analysis\Providers\FakeListingAiAnalyzer;
@@ -400,7 +401,9 @@ final class ProductionPreflight
             try {
                 $analyzer = app(ListingAiAnalyzer::class);
                 $matcher = app(ProductMatcher::class);
-                $providersValid = ! $analyzer instanceof FakeListingAiAnalyzer
+                $providersValid = $analyzer instanceof ConfiguredListingAiAnalyzer
+                    && $analyzer->isConfigured()
+                    && ! $analyzer instanceof FakeListingAiAnalyzer
                     && ! $matcher instanceof FakeCatalogProductMatcher;
             } catch (Throwable) {
                 $providersValid = false;

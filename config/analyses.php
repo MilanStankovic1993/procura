@@ -14,6 +14,66 @@ return [
     'pipeline_version' => 'buy-analysis-pipeline:v8',
     'prompt_version' => 'buy-analysis-extraction:v1',
     'fake_model' => 'deterministic-fixture-v1',
+    'providers' => [
+        'gemini' => [
+            'api_key' => env('GEMINI_API_KEY'),
+            'base_url' => env(
+                'GEMINI_API_BASE_URL',
+                'https://generativelanguage.googleapis.com/v1beta',
+            ),
+            'allowed_hosts' => ['generativelanguage.googleapis.com'],
+            'model' => env('GEMINI_ANALYSIS_MODEL', 'gemini-3.7-flash'),
+            'connect_timeout_seconds' => (int) env(
+                'GEMINI_ANALYSIS_CONNECT_TIMEOUT_SECONDS',
+                10,
+            ),
+            'timeout_seconds' => (int) env(
+                'GEMINI_ANALYSIS_TIMEOUT_SECONDS',
+                60,
+            ),
+            'max_output_tokens' => (int) env(
+                'GEMINI_ANALYSIS_MAX_OUTPUT_TOKENS',
+                1200,
+            ),
+            'input_price_usd_per_million' => env(
+                'GEMINI_ANALYSIS_INPUT_PRICE_USD_PER_MILLION',
+                '0',
+            ),
+            'output_price_usd_per_million' => env(
+                'GEMINI_ANALYSIS_OUTPUT_PRICE_USD_PER_MILLION',
+                '0',
+            ),
+        ],
+        'openai' => [
+            'api_key' => env('OPENAI_API_KEY'),
+            'base_url' => env(
+                'OPENAI_API_BASE_URL',
+                'https://api.openai.com/v1',
+            ),
+            'allowed_hosts' => ['api.openai.com'],
+            'model' => env('OPENAI_ANALYSIS_MODEL', 'gpt-5.6-luna'),
+            'connect_timeout_seconds' => (int) env(
+                'OPENAI_ANALYSIS_CONNECT_TIMEOUT_SECONDS',
+                10,
+            ),
+            'timeout_seconds' => (int) env(
+                'OPENAI_ANALYSIS_TIMEOUT_SECONDS',
+                60,
+            ),
+            'max_output_tokens' => (int) env(
+                'OPENAI_ANALYSIS_MAX_OUTPUT_TOKENS',
+                1200,
+            ),
+            'input_price_usd_per_million' => env(
+                'OPENAI_ANALYSIS_INPUT_PRICE_USD_PER_MILLION',
+                '0.10',
+            ),
+            'output_price_usd_per_million' => env(
+                'OPENAI_ANALYSIS_OUTPUT_PRICE_USD_PER_MILLION',
+                '0.60',
+            ),
+        ],
+    ],
     'max_processing_attempts' => 3,
     'manual_retry_attempts' => (int) env(
         'ANALYSIS_MANUAL_RETRY_ATTEMPTS',

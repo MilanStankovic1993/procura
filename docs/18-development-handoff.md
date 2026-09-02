@@ -81,10 +81,10 @@ Never commit `.env`, database files, credentials, tokens, generated application 
 Installed and locked foundation:
 
 ```text
-Laravel Framework 13.21.1
+Laravel Framework 13.30.1
 Local web PHP runtime 8.5.8 with Intl; project requirement ^8.3 and ext-intl
 Composer 2.10.2
-Filament 5.7.3
+Filament 5.7.8
 Laravel Fortify 1.37.3
 Laravel Sanctum 4.3.3
 Laravel Cashier 16.6.0
@@ -222,8 +222,11 @@ The Buy Analysis request and queue boundary is also implemented. It includes ten
 analyses linked to exact listing snapshots, immutable request payloads and hashes, explicit
 source/target markets, draft-without-quota behavior, atomic entitlement consumption on submit,
 idempotent outbox dispatch, bounded provider attempts, queue-level failure reconciliation, stale
-processing-lease recovery, append-only AI attempts, a documented provider interface, and a
-deterministic fake extraction provider. Angular exposes recent requests on listing detail and a
+processing-lease recovery, append-only AI attempts, a documented provider interface, a
+deterministic fake extraction provider, and inactive native Gemini/OpenAI extraction adapters.
+The external adapters share one data-minimized prompt/schema and semantic mapper, preserve recorded
+money/market facts outside model authority, record token/cost evidence, sanitize failures, and make
+no automatic HTTP retry. Angular exposes recent requests on listing detail and a
 separate draft/submit/status/result page with five-second polling for active jobs. Risk, profit,
 and deal scoring remain explicitly pending whenever their required upstream evidence is absent;
 completed downstream evidence is projected only after its own versioned boundary succeeds.
@@ -458,7 +461,7 @@ Subscription entitlement enforcement now includes:
 
 Filament platform administration now includes:
 
-- Filament 5.7.3 at `/admin`, with a locale-aware Procura operations brand,
+- Filament 5.7.8 at `/admin`, with a locale-aware Procura operations brand,
 - a verified `is_super_admin` panel-access boundary with `403` for ordinary tenant users,
 - complete EN/DE/ES/FR/sr-Latn resources and dashboard copy, an authenticated personal language
   action, guest browser-locale resolution, and application-owned overrides for upstream Filament
@@ -866,7 +869,10 @@ The following remain intentionally unimplemented:
   staging-only Analysis API/pipeline workload, six-stage internal attribution, and Sell multi-scope
   attribution harnesses, plus the real staging Sell, browser, saturation, and soak evidence beyond
   the deterministic dashboard/operations/tenant-list query baseline,
-- a real external AI provider and production provider credentials/budgets,
+- live external AI activation, provider credentials, processor/privacy approval, version policy,
+  global/per-organization budgets, circuit breaker, provider monitoring, golden-data evaluation,
+  production-shaped product matching, and controlled staging/recovery evidence (Gemini staging and
+  OpenAI production-candidate extraction adapters are implemented but intentionally inactive),
 - approved production catalog datasets and verified production import execution; broader direct
   catalog mutation remains intentionally unavailable,
 - approved external exchange-rate ingestion, provider monitoring, and retention operations beyond
