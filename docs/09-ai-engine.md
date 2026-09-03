@@ -117,6 +117,9 @@ Current controls:
 - a reviewed per-task maximum cost blocks the request before any provider data leaves Procura;
 - persistent provider/model circuit state opens after a bounded failure threshold and permits one
   probe after the reviewed cooldown;
+- one bounded aggregate monitoring query classifies circuit, stale-reservation, uncertain-outcome,
+  rate-limit, server-error, cost-overrun, and monthly budget-pressure signals without exposing
+  provider, tenant, user, analysis, prompt, or response data;
 - input snapshots and retry counts are already bounded, while reusable validated-result caching by
   input hash remains a later optimization and must not bypass attempt/governance evidence.
 
@@ -186,6 +189,13 @@ half-open probe may close it. An abandoned processing lease is reconciled conser
 later attempt. The governance tables contain no prompt, response, credential, listing content, or
 customer-facing identifier beyond the existing internal relational keys.
 
+Operators and external monitoring call `analyses:provider-status --json --fail-on-attention` at
+least every five minutes. The strict form also fails when monitoring is disabled. Its output has
+only aggregate counts and reviewed thresholds; it contains no provider/model names, tenant/user or
+analysis identifiers, prompt/response content, credentials, or raw errors. HTTP 429 and 5xx
+responses are recorded under distinct sanitized reason codes so rate limiting and provider outages
+remain observable without retaining provider response bodies.
+
 `gemini-3.7-flash` is the staging default and `gpt-5.6-luna` is the production-candidate default.
 Both are configuration values rather than permanent model aliases. Gemini free-tier evaluation must
 use synthetic, non-confidential data until the processor/data-use review is complete. OpenAI calls
@@ -204,6 +214,7 @@ The adapters do not activate production AI by themselves. `ANALYSIS_PROVIDER=fak
 repository default, `ANALYSIS_SUBMISSION_ENABLED` remains the independent production kill switch,
 and the product matcher is still deterministic rehearsal infrastructure. Production activation
 still requires approved processor/privacy terms, version pinning policy, global and per-organization
-budget values, provider monitoring, golden-data evaluation, controlled staging evidence, and a
-production-shaped product matcher. Budget enforcement and circuit breaking are implemented but
-remain inactive while the fake provider is selected.
+budget and monitoring threshold values, external alert delivery, golden-data evaluation, controlled
+staging evidence, and a production-shaped product matcher. Budget enforcement, circuit breaking,
+and the provider monitoring contract are implemented but remain inactive while the fake provider
+is selected.

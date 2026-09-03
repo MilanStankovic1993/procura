@@ -40,6 +40,33 @@ return [
             300,
         ),
     ],
+    'provider_monitoring' => [
+        'enabled' => (bool) env('ANALYSIS_AI_MONITORING_ENABLED', false),
+        'stale_reservation_minutes' => (int) env(
+            'ANALYSIS_AI_MONITOR_STALE_RESERVATION_MINUTES',
+            15,
+        ),
+        'recent_window_minutes' => (int) env(
+            'ANALYSIS_AI_MONITOR_RECENT_WINDOW_MINUTES',
+            60,
+        ),
+        'uncertain_outcome_limit' => (int) env(
+            'ANALYSIS_AI_MONITOR_UNCERTAIN_OUTCOME_LIMIT',
+            5,
+        ),
+        'rate_limit_limit' => (int) env(
+            'ANALYSIS_AI_MONITOR_RATE_LIMIT_LIMIT',
+            1,
+        ),
+        'server_error_limit' => (int) env(
+            'ANALYSIS_AI_MONITOR_SERVER_ERROR_LIMIT',
+            3,
+        ),
+        'budget_utilization_basis_points' => (int) env(
+            'ANALYSIS_AI_MONITOR_BUDGET_UTILIZATION_BPS',
+            8_000,
+        ),
+    ],
     'providers' => [
         'gemini' => [
             'api_key' => env('GEMINI_API_KEY'),

@@ -6,6 +6,7 @@ use App\Analysis\Contracts\ConfiguredListingAiAnalyzer;
 use App\Analysis\Contracts\ListingAiAnalyzer;
 use App\Analysis\Governance\AnalysisProviderGovernanceConfiguration;
 use App\Analysis\Metrics\AnalysisPipelineMetricsConfiguration;
+use App\Analysis\Monitoring\AnalysisProviderMonitoringConfiguration;
 use App\Analysis\Providers\FakeListingAiAnalyzer;
 use App\Billing\BillingConfiguration;
 use App\BrokerRequests\Operations\BrokerOperationsConfiguration;
@@ -35,6 +36,7 @@ final class ProductionPreflight
         private readonly AnalysisPipelineMetricsConfiguration $pipelineMetrics,
         private readonly SellPriceIntelligenceMetricsConfiguration $sellMetrics,
         private readonly AnalysisProviderGovernanceConfiguration $analysisGovernance,
+        private readonly AnalysisProviderMonitoringConfiguration $analysisMonitoring,
     ) {}
 
     public function inspect(bool $allowNonProduction = false): ProductionPreflightReport
@@ -331,6 +333,20 @@ final class ProductionPreflight
             $metricsValid,
             'Analysis pipeline metric retention and versioned budgets are valid for the current activation state.',
             'Pipeline metric configuration must be valid, and enabled Analysis submission requires PERFORMANCE_ANALYSIS_METRICS_ENABLED=true.',
+        );
+
+        $monitoringValid = ! (bool) config('analyses.submission_enabled');
+
+        if (! $monitoringValid) {
+            $monitoringValid = $this->analysisMonitoring->enabled()
+                && $this->analysisMonitoring->isValid();
+        }
+
+        $this->result(
+            'operations.analysis_provider_monitoring',
+            $monitoringValid,
+            'AI provider monitoring is valid for the current activation state.',
+            'Enabled analysis submission requires ANALYSIS_AI_MONITORING_ENABLED=true and valid monitoring thresholds.',
         );
 
         $sellMetricsValid = false;

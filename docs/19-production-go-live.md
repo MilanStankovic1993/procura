@@ -783,7 +783,8 @@ processing; already-created subscriptions continue to require reconciliation.
 
 ## 7. AI provider
 
-Status: **adapters, atomic cost governance, and circuit breaker implemented; activation pending**
+Status: **adapters, cost governance, circuit breaker, and monitoring contract implemented;
+activation pending**
 
 Application boundary now present:
 
@@ -804,14 +805,19 @@ Application boundary now present:
 - provider/model circuit state opens after the configured consecutive-failure threshold, rejects
   outbound calls during cooldown, and allows one half-open probe; budget/circuit rejections do not
   consume automatic retries;
+- one indexed aggregate query reports circuit, stale-reservation, uncertain-outcome, rate-limit,
+  server-error, cost-overrun, and current-month budget-pressure counts without provider, tenant,
+  user, analysis, prompt, response, credential, or raw-error data;
 - production preflight rejects invalid governance values or an invalid enabled adapter and still
-  rejects the deterministic product matcher.
+  rejects the deterministic product matcher; enabled submission also requires explicitly enabled,
+  valid provider monitoring.
 
-Deploy migration `2026_09_02_100000_create_analysis_provider_governance_tables.php` through the
-normal release path. Verify the three scope rows are unique per month/scope across all providers
-and models, each usage is
-unique per AI attempt, circuit provider/model identity is unique, foreign keys match the migration,
-and no prompt, response, credential, source URL, listing text, or provider payload is present.
+Deploy migrations `2026_09_02_100000_create_analysis_provider_governance_tables.php` and
+`2026_09_03_080000_add_analysis_provider_monitoring_indexes.php` through the normal release path.
+Verify the three scope rows are unique per month/scope across all providers and models, each usage
+is unique per AI attempt, circuit provider/model identity is unique, foreign keys and monitoring
+indexes match the migrations, and no prompt, response, credential, source URL, listing text, or
+provider payload is present.
 
 The repository defaults remain `ANALYSIS_PROVIDER=fake` and production
 `ANALYSIS_SUBMISSION_ENABLED=false`. Never place `GEMINI_API_KEY` or `OPENAI_API_KEY` in source,
@@ -827,6 +833,13 @@ ANALYSIS_AI_ORGANIZATION_MONTHLY_BUDGET_MINOR=<reviewed-positive-limit>
 ANALYSIS_AI_USER_MONTHLY_BUDGET_MINOR=<reviewed-positive-limit>
 ANALYSIS_AI_CIRCUIT_FAILURE_THRESHOLD=<reviewed-1..100>
 ANALYSIS_AI_CIRCUIT_COOLDOWN_SECONDS=<reviewed-30..86400>
+ANALYSIS_AI_MONITORING_ENABLED=true
+ANALYSIS_AI_MONITOR_STALE_RESERVATION_MINUTES=<reviewed-5..1440>
+ANALYSIS_AI_MONITOR_RECENT_WINDOW_MINUTES=<reviewed-5..1440>
+ANALYSIS_AI_MONITOR_UNCERTAIN_OUTCOME_LIMIT=<reviewed-1..10000>
+ANALYSIS_AI_MONITOR_RATE_LIMIT_LIMIT=<reviewed-1..10000>
+ANALYSIS_AI_MONITOR_SERVER_ERROR_LIMIT=<reviewed-1..10000>
+ANALYSIS_AI_MONITOR_BUDGET_UTILIZATION_BPS=<reviewed-1..10000>
 ```
 
 The hierarchy must satisfy task <= user <= organization <= global. The reservation treats the
@@ -834,6 +847,19 @@ complete structured-request byte length as a conservative input-token ceiling an
 configured maximum output tokens/current rates. A zero-cost free-tier estimate still reserves one
 cent and settles to returned zero. Never weaken rates, output limits, or budget values merely to
 turn preflight green.
+
+Monitoring contract:
+
+```text
+php artisan analyses:provider-status --json
+php artisan analyses:provider-status --json --fail-on-attention
+```
+
+The first command is report-only. Run the strict form at least every five minutes from one monitored
+scheduler or external job and alert on its non-zero exit. It fails when monitoring is disabled or a
+reviewed signal requires attention. Persist only the secret-free aggregate output in the monitoring
+system. Distinct sanitized `analysis_provider_rate_limited` and `analysis_provider_server_error`
+codes support outage classification; provider response bodies are never monitoring evidence.
 
 Before activation, record:
 
@@ -843,7 +869,7 @@ Before activation, record:
   threshold/cooldown, and alert thresholds,
 - redaction/data-minimization rules,
 - accuracy/evaluation evidence and deterministic fallback behavior,
-- provider outage monitoring and disable switch.
+- external alert delivery for the provider-monitoring command and the submission disable switch.
 
 Staging selection: Gemini free-tier evaluation may use only synthetic, non-confidential and
 non-personal fixtures until processor/data-use terms are approved. Configure
@@ -871,9 +897,9 @@ quota, creates no dispatch, and performs no provider call. Before setting it `tr
 
 1. implement and review both configured `ListingAiAnalyzer` and `ProductMatcher` adapters;
 2. prove the container resolves non-fake adapters after configuration is cached;
-3. review the implemented cost-limit, retry, and circuit-breaker controls and complete privacy,
-   retention, regional-processing, provider-outage, evaluation, monitoring, and incident-disable
-   evidence;
+3. review the implemented cost-limit, retry, circuit-breaker, and monitoring controls and complete
+   privacy, retention, regional-processing, provider-outage, evaluation, external alert delivery,
+   and incident-disable evidence;
 4. run controlled staging submissions through every queue/recovery path and record accuracy,
    latency, cost, malformed-response, timeout, rate-limit, and outage evidence;
 5. set the switch true, rebuild configuration, reload web/workers, rerun

@@ -493,6 +493,19 @@ the monitoring/alerting contract. Both outputs contain stable counts and effecti
 they never contain organization/user identifiers, supplier or offer facts, money, private storage,
 evidence, hashes, snapshots, or replay keys.
 
+AI provider operations use the same report-only/alerting split:
+
+```text
+php artisan analyses:provider-status --json
+php artisan analyses:provider-status --json --fail-on-attention
+```
+
+The strict form exits non-zero when monitoring is disabled or any reviewed circuit, stale
+reservation, uncertain outcome, rate-limit, server-error, cost-overrun, or budget-pressure signal
+requires attention. One bounded aggregate query emits counts and effective thresholds only; the
+output excludes provider/model names, tenant/user/analysis identifiers, prompts, responses,
+credentials, raw errors, and budget scope identifiers.
+
 For exact internal queue evidence, operators use:
 
 ```text

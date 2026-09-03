@@ -194,10 +194,19 @@ final class OpenAiListingAiAnalyzer implements ConfiguredListingAiAnalyzer
     {
         if (! $response->successful()) {
             throw new AnalysisProviderException(
-                'analysis_provider_rejected',
+                $this->failureCode($response->status()),
                 $response->status(),
             );
         }
+    }
+
+    private function failureCode(int $status): string
+    {
+        return match (true) {
+            $status === 429 => 'analysis_provider_rate_limited',
+            $status >= 500 => 'analysis_provider_server_error',
+            default => 'analysis_provider_rejected',
+        };
     }
 
     private function invalidResponse(?int $status = null): never

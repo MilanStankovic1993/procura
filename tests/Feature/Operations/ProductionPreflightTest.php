@@ -168,6 +168,24 @@ test('enabled analysis submission requires valid pipeline metrics', function () 
         ->toBe('fail');
 });
 
+test('enabled analysis submission requires active valid provider monitoring', function () {
+    config([
+        'analyses.submission_enabled' => true,
+        'analyses.provider_monitoring.enabled' => false,
+    ]);
+
+    expect(productionPreflightStatus('operations.analysis_provider_monitoring'))
+        ->toBe('fail');
+
+    config([
+        'analyses.provider_monitoring.enabled' => true,
+        'analyses.provider_monitoring.recent_window_minutes' => 0,
+    ]);
+
+    expect(productionPreflightStatus('operations.analysis_provider_monitoring'))
+        ->toBe('fail');
+});
+
 test('Sell price intelligence requires enabled valid production metrics', function () {
     config()->set('performance.sell_price_intelligence_metrics.enabled', false);
 

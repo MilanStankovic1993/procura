@@ -233,7 +233,7 @@ test('provider errors and malformed structured output expose no response body', 
         app(GeminiListingAiAnalyzer::class)->analyze(externalAnalysisInput());
         $this->fail('The provider rejection was accepted.');
     } catch (AnalysisProviderException $exception) {
-        expect($exception->reasonCode)->toBe('analysis_provider_rejected')
+        expect($exception->reasonCode)->toBe('analysis_provider_rate_limited')
             ->and($exception->providerStatus)->toBe(429)
             ->and($exception->getMessage())
             ->not->toContain('provider-sensitive-body');
@@ -246,6 +246,25 @@ test('provider errors and malformed structured output expose no response body', 
         expect($exception->reasonCode)->toBe(
             'analysis_provider_response_invalid',
         );
+    }
+});
+
+test('provider server errors are sanitized and classified for monitoring', function () {
+    config(['analyses.providers.openai.api_key' => 'openai-test-secret']);
+    Http::fake([
+        'https://api.openai.com/*' => Http::response([
+            'error' => ['message' => 'provider-private-outage-body'],
+        ], 503),
+    ]);
+
+    try {
+        app(OpenAiListingAiAnalyzer::class)->analyze(externalAnalysisInput());
+        $this->fail('The provider server failure was accepted.');
+    } catch (AnalysisProviderException $exception) {
+        expect($exception->reasonCode)->toBe('analysis_provider_server_error')
+            ->and($exception->providerStatus)->toBe(503)
+            ->and($exception->getMessage())
+            ->not->toContain('provider-private-outage-body');
     }
 });
 
