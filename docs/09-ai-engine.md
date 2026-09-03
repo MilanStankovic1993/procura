@@ -203,10 +203,25 @@ set `store=false` and use a stable idempotency key. Neither adapter performs an 
 the existing bounded Analysis dispatch and append-only attempt lifecycle remains the only retry
 owner.
 
-The fake provider still supplies deterministic golden fixtures. A separate deterministic
-`ProductMatcher` consumes validated normalized facts, reads the global catalog, and records
-append-only, versioned, explainable match evidence. Deterministic comparable selection, price
-estimation, risk evaluation, profit calculation, and deal scoring remain outside model authority.
+The sealed `listing-extraction-golden:v1` dataset supplies eight synthetic, non-confidential cases
+across multiple languages, complete and incomplete monetary evidence, missing images, and
+untrusted instruction-like listing text. `analyses:evaluate-provider` checks exact normalized
+title/description, needs-input codes, confidence ranges, immutable price/currency/market/evidence
+projection, usage reservation, and aggregate cost. It emits only versioned aggregate metrics and
+the dataset SHA-256; fixture text, case keys, provider bodies, and raw errors are excluded.
+
+Local execution requires `--allow-local-rehearsal`, may resolve only the deterministic `fake`
+provider, and can never become release evidence. External execution is permanently forbidden in
+production. In staging it additionally requires the external-evaluation switch, disabled ordinary
+Analysis submission, an explicit synthetic-call confirmation, configured non-fake credentials,
+exact expected provider/model, exact release SHA, and a preflight total-cost cap. Automated tests
+simulate the provider boundary and make no real external request. A reviewed real staging run has
+not yet been performed.
+
+A separate deterministic `ProductMatcher` consumes validated normalized facts, reads the global
+catalog, and records append-only, versioned, explainable match evidence. Deterministic comparable
+selection, price estimation, risk evaluation, profit calculation, and deal scoring remain outside
+model authority.
 Unknown facts remain zero-point unknowns with verification actions; AI does not invent seller,
 condition, ownership, payment, shipping, market, exchange-rate, tax, customs, or price evidence.
 
@@ -214,7 +229,7 @@ The adapters do not activate production AI by themselves. `ANALYSIS_PROVIDER=fak
 repository default, `ANALYSIS_SUBMISSION_ENABLED` remains the independent production kill switch,
 and the product matcher is still deterministic rehearsal infrastructure. Production activation
 still requires approved processor/privacy terms, version pinning policy, global and per-organization
-budget and monitoring threshold values, external alert delivery, golden-data evaluation, controlled
-staging evidence, and a production-shaped product matcher. Budget enforcement, circuit breaking,
-and the provider monitoring contract are implemented but remain inactive while the fake provider
-is selected.
+budget and monitoring threshold values, external alert delivery, a reviewed real golden-data run,
+controlled staging evidence, and a production-shaped product matcher. The evaluation harness,
+budget enforcement, circuit breaking, and provider monitoring contract are implemented but remain
+inactive while the fake provider is selected.

@@ -67,6 +67,29 @@ return [
             8_000,
         ),
     ],
+    'provider_evaluation' => [
+        'external_calls_enabled' => (bool) env(
+            'ANALYSIS_AI_EVALUATION_EXTERNAL_CALLS_ENABLED',
+            false,
+        ),
+        'dataset_contract_version' => 'analysis-provider-golden-dataset:v1',
+        'report_contract_version' => 'analysis-provider-evaluation-report:v1',
+        'budget_version' => 'analysis-provider-evaluation-budget:v1',
+        'dataset_path' => 'resources/analysis/golden-listing-analysis-v1.json',
+        'minimum_cases' => 8,
+        'maximum_cases' => 50,
+        'maximum_dataset_bytes' => 262_144,
+        'maximum_total_cost_minor' => (int) env(
+            'ANALYSIS_AI_EVALUATION_MAX_COST_MINOR',
+            100,
+        ),
+        'minimum_case_pass_rate_basis_points' => 10_000,
+        'minimum_title_exact_rate_basis_points' => 10_000,
+        'minimum_description_exact_rate_basis_points' => 10_000,
+        'minimum_needs_input_exact_rate_basis_points' => 10_000,
+        'minimum_immutable_projection_rate_basis_points' => 10_000,
+        'minimum_confidence_range_rate_basis_points' => 10_000,
+    ],
     'providers' => [
         'gemini' => [
             'api_key' => env('GEMINI_API_KEY'),

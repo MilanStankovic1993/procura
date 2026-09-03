@@ -783,8 +783,8 @@ processing; already-created subscriptions continue to require reconciliation.
 
 ## 7. AI provider
 
-Status: **adapters, cost governance, circuit breaker, and monitoring contract implemented;
-activation pending**
+Status: **adapters, cost governance, circuit breaker, monitoring, and sealed evaluation harness
+implemented; activation and real staging evidence pending**
 
 Application boundary now present:
 
@@ -840,6 +840,8 @@ ANALYSIS_AI_MONITOR_UNCERTAIN_OUTCOME_LIMIT=<reviewed-1..10000>
 ANALYSIS_AI_MONITOR_RATE_LIMIT_LIMIT=<reviewed-1..10000>
 ANALYSIS_AI_MONITOR_SERVER_ERROR_LIMIT=<reviewed-1..10000>
 ANALYSIS_AI_MONITOR_BUDGET_UTILIZATION_BPS=<reviewed-1..10000>
+ANALYSIS_AI_EVALUATION_EXTERNAL_CALLS_ENABLED=false
+ANALYSIS_AI_EVALUATION_MAX_COST_MINOR=<reviewed-non-negative-limit>
 ```
 
 The hierarchy must satisfy task <= user <= organization <= global. The reservation treats the
@@ -860,6 +862,26 @@ scheduler or external job and alert on its non-zero exit. It fails when monitori
 reviewed signal requires attention. Persist only the secret-free aggregate output in the monitoring
 system. Distinct sanitized `analysis_provider_rate_limited` and `analysis_provider_server_error`
 codes support outage classification; provider response bodies are never monitoring evidence.
+
+Golden-data evaluation contract:
+
+```text
+php artisan analyses:evaluate-provider \
+  --expected-release=<exact-commit-sha> \
+  --expected-provider=<exact-provider> \
+  --expected-model=<exact-model> \
+  --confirm-synthetic-provider-calls \
+  --json
+```
+
+Run this only in staging over the repository-sealed synthetic dataset. Before the controlled
+window, keep ordinary submission disabled, review the dataset hash and cost ceiling, set
+`ANALYSIS_AI_EVALUATION_EXTERNAL_CALLS_ENABLED=true`, and confirm the configured provider/model
+matches the evidence ticket. The command calculates all maximum reservations before its first
+request and refuses the run if their sum exceeds the hard cap. Set the switch back to `false`
+immediately after the run and reload configuration. Its aggregate output contains no case text,
+case identifiers, raw response, credential, or customer data. Local `fake` execution additionally
+requires `--allow-local-rehearsal` and is never release evidence; production has no override.
 
 Before activation, record:
 

@@ -870,7 +870,8 @@ The following remain intentionally unimplemented:
   attribution harnesses, plus the real staging Sell, browser, saturation, and soak evidence beyond
   the deterministic dashboard/operations/tenant-list query baseline,
 - live external AI activation, provider credentials, processor/privacy approval, version policy,
-  approved budget/monitoring values, external alert delivery, golden-data evaluation,
+  approved budget/monitoring/evaluation values, external alert delivery, reviewed real golden-data
+  staging execution,
   production-shaped product matching, and controlled staging/recovery evidence (Gemini staging and
   OpenAI production-candidate extraction adapters plus global/organization/user cost enforcement,
   a persistent circuit breaker, and aggregate provider monitoring are implemented but intentionally
@@ -1546,6 +1547,8 @@ personal organizations and memberships (complete)
    (complete; reviewed production values and activation evidence pending)
 -> bounded AI provider operations monitoring and alerting CLI
    (complete; external alert delivery, reviewed thresholds, and staging evidence pending)
+-> sealed synthetic AI provider golden-data evaluation harness
+   (complete; no live call made, reviewed non-fake staging run and sign-off pending)
 -> audited Analysis Operations and manual-retry boundary (complete; production kill switch off)
 -> canonical product identification and matching boundary (complete)
 -> audited operator product-match review queue (complete)

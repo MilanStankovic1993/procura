@@ -115,9 +115,10 @@ Deliverables:
 - independent submission kill switch (complete; false by default in code), provider-independent
   Gemini staging and OpenAI production-candidate `ListingAiAnalyzer` adapters (complete but
   inactive), durable global/organization/user cost reservations and provider/model circuit breaker
-  plus a bounded secret-free provider monitoring contract (complete but values/activation and
-  external alert delivery unapproved), and approved non-fake product-matching/provider activation
-  (pending processor/privacy, version, evaluation, alert integration, and staging evidence).
+  plus a bounded secret-free provider monitoring contract and sealed synthetic golden-evaluation
+  harness (complete but reviewed values, real staging execution, activation, and external alert
+  delivery remain pending), and approved non-fake product-matching/provider activation (pending
+  processor/privacy, version, evaluation sign-off, alert integration, and staging evidence).
 
 ## Phase 3 — Sell Analysis MVP
 

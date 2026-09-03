@@ -198,6 +198,16 @@ Maintain a curated dataset of product listings with expected:
 
 Use it to detect regression in AI prompts and matching logic.
 
+The initial provider-extraction set is sealed in
+`resources/analysis/golden-listing-analysis-v1.json`. It contains only synthetic,
+non-confidential data and covers five languages, missing price, missing currency, missing images,
+and instruction-like untrusted listing text. `tests/Feature/AnalysisProviderEvaluationTest.php`
+protects its closed schema, immutable SHA-bound aggregate report, exact extraction and evidence
+projection metrics, hard preflight cost cap, local fake-only rehearsal, exact staging
+provider/model/release binding, independent external-call confirmation, disabled ordinary
+submission during evaluation, and permanent production refusal. HTTP is simulated in CI; only a
+reviewed non-fake run in staging can be release evidence.
+
 The initial catalog-matching fixture set is implemented in feature tests and covers:
 
 - exact alias selection with stable evidence and duplicate-delivery idempotency,

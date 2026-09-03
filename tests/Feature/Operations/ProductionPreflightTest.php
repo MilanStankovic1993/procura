@@ -74,6 +74,7 @@ function configureProductionPreflightBaseline(): void
         'logging.channels.stderr.driver' => 'monolog',
         'analyses.provider' => 'fake',
         'analyses.submission_enabled' => false,
+        'analyses.provider_evaluation.external_calls_enabled' => false,
         'product_matching.provider' => 'fake',
         'mail.default' => 'smtp',
         'mail.mailers.smtp.transport' => 'smtp',
@@ -145,6 +146,16 @@ test('production preflight fails when analysis workload permits are enabled', fu
 
 test('production preflight fails when browser workload permits are enabled', function () {
     config()->set('performance.browser_workload.enabled', true);
+
+    expect(productionPreflightStatus('operations.performance_workloads'))
+        ->toBe('fail');
+});
+
+test('production preflight fails when provider evaluation calls remain enabled', function () {
+    config()->set(
+        'analyses.provider_evaluation.external_calls_enabled',
+        true,
+    );
 
     expect(productionPreflightStatus('operations.performance_workloads'))
         ->toBe('fail');

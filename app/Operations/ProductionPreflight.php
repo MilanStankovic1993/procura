@@ -313,9 +313,12 @@ final class ProductionPreflight
         $this->result(
             'operations.performance_workloads',
             config('performance.analysis_pipeline_workload.enabled') === false
-                && config('performance.browser_workload.enabled') === false,
-            'Analysis and browser workload permits are disabled in production.',
-            'PERFORMANCE_ANALYSIS_WORKLOAD_ENABLED and PERFORMANCE_BROWSER_WORKLOAD_ENABLED must remain false in production.',
+                && config('performance.browser_workload.enabled') === false
+                && config(
+                    'analyses.provider_evaluation.external_calls_enabled',
+                ) === false,
+            'Analysis, browser, and provider-evaluation workloads are disabled in production.',
+            'Performance workload switches and ANALYSIS_AI_EVALUATION_EXTERNAL_CALLS_ENABLED must remain false in production.',
         );
 
         $metricsValid = false;
