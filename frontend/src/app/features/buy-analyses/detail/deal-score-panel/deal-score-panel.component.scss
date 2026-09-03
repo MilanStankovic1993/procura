@@ -1,0 +1,264 @@
+:host {
+  display: block;
+}
+
+.panel {
+  min-width: 0;
+  padding: 1.4rem;
+  border: 1px solid rgba(51, 208, 160, 0.22);
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at top right, rgba(51, 208, 160, 0.06), transparent 38%),
+    var(--color-surface);
+}
+
+.heading,
+.section-title,
+.component > div,
+.cap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.heading {
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.heading > div {
+  max-width: 720px;
+}
+
+.heading p:not(.eyebrow),
+.section-title span,
+.explanations p,
+.disclaimer {
+  color: var(--color-muted);
+  font-size: 0.62rem;
+  line-height: 1.55;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: 0.66rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h2,
+h3 {
+  margin: 0.25rem 0;
+}
+
+.recommendation {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.6rem;
+  border-radius: 2rem;
+  background: rgba(51, 208, 160, 0.1);
+  color: var(--color-accent);
+  font-size: 0.65rem;
+  font-weight: 760;
+  text-transform: capitalize;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.75fr) minmax(0, 1.25fr);
+  gap: 1rem;
+  margin: 1rem 0 1.4rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.hero > div {
+  display: grid;
+  align-content: center;
+  gap: 0.25rem;
+}
+
+.hero > div span,
+dt {
+  color: var(--color-subtle);
+  font-size: 0.61rem;
+}
+
+.hero > div strong {
+  color: var(--color-accent);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+
+dl div {
+  min-width: 0;
+}
+
+dd {
+  margin: 0.25rem 0 0;
+  overflow-wrap: anywhere;
+  font-size: 0.64rem;
+  text-transform: capitalize;
+}
+
+section + section {
+  margin-top: 1.3rem;
+}
+
+.section-title {
+  align-items: center;
+  margin-bottom: 0.7rem;
+}
+
+.component-grid,
+.caps,
+.explanations {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.component {
+  position: relative;
+  min-width: 0;
+  padding: 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.7rem;
+}
+
+.component[data-impact='strengthens'] {
+  border-color: rgba(51, 208, 160, 0.22);
+}
+
+.component[data-impact='reduces'] {
+  border-color: rgba(246, 195, 95, 0.24);
+}
+
+.component > div strong {
+  font-size: 0.68rem;
+  text-transform: capitalize;
+}
+
+.component > div span,
+.impact {
+  color: var(--color-muted);
+  font-size: 0.58rem;
+}
+
+.component dl {
+  margin-top: 0.75rem;
+}
+
+.impact {
+  display: inline-block;
+  margin-top: 0.7rem;
+  text-transform: capitalize;
+}
+
+.caps {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cap {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.65rem;
+}
+
+.cap[data-triggered='true'] {
+  border-color: rgba(246, 195, 95, 0.28);
+  background: rgba(246, 195, 95, 0.035);
+}
+
+.cap strong,
+.cap span,
+.cap em {
+  font-size: 0.6rem;
+  text-transform: capitalize;
+}
+
+.cap span,
+.cap em {
+  color: var(--color-muted);
+}
+
+.cap em {
+  font-style: normal;
+}
+
+.explanations > div {
+  min-width: 0;
+  padding: 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.7rem;
+}
+
+ul {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.65rem 0 0;
+  padding-left: 1rem;
+}
+
+li {
+  overflow-wrap: anywhere;
+  color: var(--color-subtle);
+  font-size: 0.61rem;
+  line-height: 1.45;
+  text-transform: capitalize;
+}
+
+.reason-codes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 1rem;
+}
+
+.reason-codes span {
+  padding: 0.3rem 0.45rem;
+  border-radius: 1rem;
+  background: rgba(51, 208, 160, 0.08);
+  color: var(--color-accent);
+  font-size: 0.56rem;
+  text-transform: capitalize;
+}
+
+.disclaimer {
+  margin: 1rem 0 0;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--color-border);
+}
+
+@media (max-width: 800px) {
+  .caps {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .heading,
+  .section-title {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .hero,
+  .component-grid,
+  .explanations,
+  dl {
+    grid-template-columns: 1fr;
+  }
+}

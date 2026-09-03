@@ -1,0 +1,112 @@
+<main class="auth-page">
+  <a class="brand" routerLink="/" [attr.aria-label]="'common.backToProcura' | t">
+    <span class="brand-mark" aria-hidden="true">P</span>
+    <span>Procura</span>
+  </a>
+  <app-language-switcher class="auth-language" />
+
+  <section class="auth-card" aria-labelledby="register-title">
+    <div class="heading">
+      <p class="eyebrow">{{ 'register.eyebrow' | t }}</p>
+      <h1 id="register-title">{{ 'register.title' | t }}</h1>
+      <p>{{ 'register.description' | t }}</p>
+    </div>
+
+    @if (generalError()) {
+      <div class="alert" role="alert">{{ generalError() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <div class="field">
+        <label for="name">{{ 'register.fullName' | t }}</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          autocomplete="name"
+          maxlength="255"
+          [attr.aria-invalid]="form.controls.name.invalid && form.controls.name.touched"
+        />
+        @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+          <p class="field-error">{{ 'register.nameRequired' | t }}</p>
+        } @else if (fieldErrors()['name']?.[0]; as nameError) {
+          <p class="field-error">{{ nameError }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="email">{{ 'register.workEmail' | t }}</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          maxlength="255"
+          [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+        />
+        @if (form.controls.email.touched && form.controls.email.hasError('required')) {
+          <p class="field-error">{{ 'common.emailRequired' | t }}</p>
+        } @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
+          <p class="field-error">{{ 'common.emailInvalid' | t }}</p>
+        } @else if (fieldErrors()['email']?.[0]; as emailError) {
+          <p class="field-error">{{ emailError }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">{{ 'common.password' | t }}</label>
+        <input
+          id="password"
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+          [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
+        />
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <p class="field-error">
+            {{ 'common.passwordPolicy' | t }}
+          </p>
+        } @else if (fieldErrors()['password']?.[0]; as passwordError) {
+          <p class="field-error">{{ passwordError }}</p>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password-confirmation">{{ 'register.confirmPassword' | t }}</label>
+        <input
+          id="password-confirmation"
+          type="password"
+          formControlName="password_confirmation"
+          autocomplete="new-password"
+          [attr.aria-invalid]="
+            form.controls.password_confirmation.touched &&
+            (form.controls.password_confirmation.invalid || form.hasError('passwordMismatch'))
+          "
+        />
+        @if (
+          form.controls.password_confirmation.touched &&
+          (form.controls.password_confirmation.hasError('required') ||
+            form.hasError('passwordMismatch'))
+        ) {
+          <p class="field-error">{{ 'common.passwordsMatch' | t }}</p>
+        }
+      </div>
+
+      <button class="button button-primary submit" type="submit" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          {{ 'register.submitting' | t }}
+        } @else {
+          {{ 'register.createAccount' | t }} <span>→</span>
+        }
+      </button>
+    </form>
+
+    <p class="auth-switch">
+      {{ 'register.alreadyAccount' | t }}
+      <a class="text-link" routerLink="/login">{{ 'common.signIn' | t }}</a>
+    </p>
+    <p class="security-note">{{ 'register.security' | t }}</p>
+  </section>
+
+  <p class="footer-copy">{{ 'common.footer' | t }}</p>
+</main>

@@ -1,0 +1,52 @@
+:host { display: block; }
+.page { width: min(1100px, calc(100% - 4rem)); margin: auto; padding: 3rem 0; }
+header, .plan-card, .section-heading, .feature-title, .usage > div { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+h1 { margin: .35rem 0; font-size: clamp(2rem, 4vw, 3.3rem); letter-spacing: -.04em; }
+h2 { margin: .25rem 0; }
+header p:last-child, .plan-card p, .section-heading span, article p, .billing-note { color: var(--color-muted); }
+.eyebrow { margin: 0; color: var(--color-accent); font-size: .68rem; font-weight: 750; letter-spacing: .12em; text-transform: uppercase; }
+.plan-badge { padding: .45rem .75rem; border: 1px solid rgba(51,208,160,.35); border-radius: 2rem; color: var(--color-accent); font-size: .72rem; }
+.plan-card, .billing, .features { margin-top: 2rem; padding: 1.5rem; border: 1px solid var(--color-border); border-radius: 1rem; background: var(--color-surface); }
+.period { display: grid; gap: .35rem; text-align: right; }
+.period span { color: var(--color-subtle); font-size: .7rem; }
+.period strong { font-size: .8rem; }
+.section-heading { padding-bottom: 1rem; border-bottom: 1px solid var(--color-border); }
+.feature-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; margin-top: 1rem; }
+article { min-width: 0; padding: 1rem; border: 1px solid var(--color-border); border-radius: .75rem; background: #0a1216; }
+article.disabled { opacity: .48; }
+.feature-title strong { font-size: .82rem; }
+.feature-title span { color: var(--color-accent); font-size: .62rem; text-transform: uppercase; }
+article.disabled .feature-title span { color: var(--color-subtle); }
+.usage { margin-top: 1rem; }
+.usage span { color: var(--color-subtle); font-size: .68rem; }
+.usage strong { font-size: .75rem; }
+.track { height: .35rem; margin-top: .55rem; overflow: hidden; border-radius: 1rem; background: #17242a; }
+.track span { display: block; height: 100%; border-radius: inherit; background: var(--color-accent); }
+.billing-note { margin: 1rem 0 0; font-size: .75rem; }
+.billing-message { margin: 1rem 0 0; color: var(--color-muted); }
+.billing-message.small { font-size: .72rem; }
+.billing-boundary { margin-top: 1rem; padding: 1rem; border: 1px solid rgba(255, 190, 92, .25); border-radius: .75rem; background: rgba(255, 190, 92, .06); }
+.billing-boundary p { margin: .45rem 0 0; color: var(--color-muted); }
+.billing-current { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; }
+.billing-current div { display: grid; gap: .25rem; }
+.billing-current span, .offer span { color: var(--color-subtle); font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
+.billing-current p { margin: 0; color: var(--color-muted); font-size: .78rem; }
+.offer-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin-top: 1rem; }
+.offer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.offer h3 { margin: .3rem 0; }
+.price { color: var(--color-accent); }
+.offer button, .primary-action { padding: .7rem .9rem; border: 0; border-radius: .55rem; background: var(--color-accent); color: #05100d; font: inherit; font-size: .75rem; font-weight: 750; cursor: pointer; }
+.offer button:disabled, .primary-action:disabled { cursor: not-allowed; opacity: .5; }
+.alert { display: flex; justify-content: space-between; margin-top: 1rem; padding: .85rem 1rem; border-radius: .65rem; background: rgba(255,116,116,.1); color: var(--color-danger); }
+.alert button { border: 0; background: none; color: inherit; cursor: pointer; }
+.loading { padding: 4rem 0; color: var(--color-muted); }
+@media (max-width: 850px) {
+  .feature-grid, .offer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .page { width: min(100% - 2rem, 1100px); padding: 2rem 0; }
+  header, .plan-card, .section-heading { align-items: flex-start; flex-direction: column; }
+  .period { text-align: left; }
+  .feature-grid, .offer-grid { grid-template-columns: 1fr; }
+  .billing-current, .offer { align-items: flex-start; flex-direction: column; }
+}

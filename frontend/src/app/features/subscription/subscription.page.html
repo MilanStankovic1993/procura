@@ -1,0 +1,142 @@
+<div class="page">
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'subscription.eyebrow' | t }}</p>
+      <h1>{{ 'subscription.title' | t }}</h1>
+      <p>{{ 'subscription.description' | t }}</p>
+    </div>
+    @if (subscription(); as data) {
+      <span class="plan-badge">{{ planName(data.plan) }} · v{{ data.plan.version }}</span>
+    }
+  </header>
+
+  @if (error()) {
+    <div class="alert" role="alert">
+      <span>{{ error() }}</span><button type="button" (click)="retry()">{{ 'common.retry' | t }}</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="loading">{{ 'subscription.loading' | t }}</div>
+  } @else if (subscription(); as data) {
+    <section class="plan-card">
+      <div>
+        <p class="eyebrow">{{ 'subscription.currentPlan' | t }}</p>
+        <h2>{{ planName(data.plan) }}</h2>
+        <p>{{ planDescription(data.plan) }}</p>
+      </div>
+      <div class="period">
+        <span>{{ 'subscription.period' | t }}</span>
+        <strong>{{ date(data.period.starts_at) }} — {{ date(data.period.ends_at) }}</strong>
+      </div>
+    </section>
+
+    <section class="billing">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">{{ 'subscription.billing.eyebrow' | t }}</p>
+          <h2>{{ 'subscription.billing.title' | t }}</h2>
+        </div>
+        <span>{{ 'subscription.billing.secureBoundary' | t }}</span>
+      </div>
+
+      @if (billingError()) {
+        <div class="alert" role="alert">{{ billingError() }}</div>
+      }
+
+      @if (!data.billing.can_manage) {
+        <p class="billing-message">{{ 'subscription.billing.ownerOnly' | t }}</p>
+      } @else if (!data.billing.configured || !data.billing.checkout_enabled) {
+        <div class="billing-boundary">
+          <strong>{{ 'subscription.billing.notConfiguredTitle' | t }}</strong>
+          <p>{{ 'subscription.billing.notConfiguredDescription' | t }}</p>
+        </div>
+      } @else if (data.billing.subscription_status) {
+        <div class="billing-current">
+          <div>
+            <span>{{ 'subscription.billing.providerStatus' | t }}</span>
+            <strong>{{ billingStatus(data.billing.subscription_status) }}</strong>
+          </div>
+          @if (data.billing.ends_at) {
+            <p>
+              {{ 'subscription.billing.endsAt' | t }}:
+              <strong>{{ date(data.billing.ends_at) }}</strong>
+            </p>
+          }
+          @if (data.billing.portal_available) {
+            <button
+              type="button"
+              class="primary-action"
+              [disabled]="processingBillingAction() !== null"
+              (click)="openPortal()"
+            >
+              {{
+                (processingBillingAction() === 'portal'
+                  ? 'subscription.billing.openingPortal'
+                  : 'subscription.billing.manage')
+                  | t
+              }}
+            </button>
+          }
+        </div>
+      } @else {
+        <p class="billing-message">{{ 'subscription.billing.choosePlan' | t }}</p>
+        <div class="offer-grid">
+          @for (offer of data.billing.offers; track offer.plan + ':' + offer.interval) {
+            <article class="offer" [class.disabled]="!offer.available">
+              <div>
+                <span>{{ interval(offer.interval) }}</span>
+                <h3>{{ offerPlanName(offer) }}</h3>
+                <strong class="price">{{ offerPrice(offer) }}</strong>
+              </div>
+              <button
+                type="button"
+                [disabled]="!offer.available || processingBillingAction() !== null"
+                (click)="startCheckout(offer)"
+              >
+                {{
+                  (processingBillingAction() === offer.plan + ':' + offer.interval
+                    ? 'subscription.billing.openingCheckout'
+                    : 'subscription.billing.continueToCheckout')
+                    | t
+                }}
+              </button>
+            </article>
+          }
+        </div>
+        <p class="billing-message small">{{ 'subscription.billing.priceDisclosure' | t }}</p>
+      }
+    </section>
+
+    <section class="features">
+      <div class="section-heading">
+        <div><p class="eyebrow">{{ 'subscription.enforcement' | t }}</p><h2>{{ 'subscription.entitlements' | t }}</h2></div>
+        <span>{{ 'subscription.clientBoundary' | t }}</span>
+      </div>
+      <div class="feature-grid">
+        @for (feature of data.features; track feature.code) {
+          <article [class.disabled]="!feature.enabled">
+            <div class="feature-title">
+              <strong>{{ label(feature) }}</strong>
+              <span>{{ (feature.enabled ? 'common.included' : 'common.unavailable') | t }}</span>
+            </div>
+            @if (feature.metered && feature.enabled) {
+              <div class="usage">
+                <div><span>{{ 'common.used' | t }}</span><strong>{{ feature.used }} / {{ feature.limit ?? ('common.unlimited' | t) }}</strong></div>
+                @if (feature.limit !== null) {
+                  <div class="track" aria-hidden="true"><span [style.width.%]="percent(feature)"></span></div>
+                }
+              </div>
+            } @else if (feature.enabled && feature.limit !== null) {
+              <p>{{ 'common.limit' | t }}: {{ feature.limit }}</p>
+            } @else if (feature.enabled) {
+              <p>{{ 'common.unlimited' | t }}</p>
+            }
+          </article>
+        }
+      </div>
+    </section>
+
+    <p class="billing-note">{{ 'subscription.billingNote' | t }}</p>
+  }
+</div>

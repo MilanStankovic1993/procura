@@ -43,6 +43,11 @@ Read and implement the documents in this order:
 16. `docs/16-codex-development-rules.md`
 17. `docs/17-global-market-model.md`
 18. `docs/18-development-handoff.md`
+19. `docs/19-production-go-live.md`
+
+Repository branching, pull-request checks, and release promotion rules are defined in
+[`CONTRIBUTING.md`](CONTRIBUTING.md). `main` contains reviewed production checkpoints, while
+`develop` is the shared integration branch for the next release.
 
 ## Implementation principle
 

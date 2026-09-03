@@ -1,0 +1,94 @@
+<div class="landing">
+  <header class="nav shell">
+    <a class="brand" routerLink="/" [attr.aria-label]="'route.landing' | t">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>Procura</span>
+    </a>
+
+    <div class="nav-actions">
+      <app-language-switcher />
+      <nav [attr.aria-label]="'landing.primaryNavigation' | t">
+        <a href="#platform">{{ 'landing.platform' | t }}</a>
+        <a href="#approach">{{ 'landing.approach' | t }}</a>
+        <a class="button button-quiet" routerLink="/login">{{ 'common.signIn' | t }}</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero shell">
+      <div class="hero-copy">
+        <p class="eyebrow"><span></span> {{ 'landing.eyebrow' | t }}</p>
+        <h1>{{ 'landing.title' | t }}</h1>
+        <p class="hero-lead">{{ 'landing.lead' | t }}</p>
+        <div class="hero-actions">
+          <a class="button button-primary" routerLink="/login"
+            >{{ 'landing.openWorkspace' | t }} <span>→</span></a
+          >
+          <a class="text-link" href="#platform"
+            >{{ 'landing.explorePlatform' | t }} <span>↓</span></a
+          >
+        </div>
+        <div class="trust-line" [attr.aria-label]="'landing.platformPrinciples' | t">
+          <span>{{ 'landing.countryAware' | t }}</span>
+          <span>{{ 'landing.evidenceBacked' | t }}</span>
+          <span>{{ 'landing.humanReadable' | t }}</span>
+        </div>
+      </div>
+
+      <div class="intelligence-card" [attr.aria-label]="'landing.exampleSignal' | t">
+        <div class="card-top">
+          <div>
+            <span class="caption">{{ 'landing.opportunitySignal' | t }}</span>
+            <strong>{{ 'landing.exampleProduct' | t }}</strong>
+          </div>
+          <span class="score">84</span>
+        </div>
+        <div class="market-row">
+          <div>
+            <span>{{ 'landing.sourceMarket' | t }}</span
+            ><strong>{{ 'landing.germanyEur' | t }}</strong>
+          </div>
+          <div>
+            <span>{{ 'landing.targetMarket' | t }}</span
+            ><strong>{{ 'landing.canadaCad' | t }}</strong>
+          </div>
+        </div>
+        <div class="value">
+          <span>{{ 'landing.expectedMargin' | t }}</span>
+          <strong>18.6%</strong>
+          <small>{{ 'landing.afterCosts' | t }}</small>
+        </div>
+        <div class="signal-bars" aria-hidden="true">
+          <span style="height: 34%"></span><span style="height: 48%"></span>
+          <span style="height: 43%"></span><span style="height: 65%"></span>
+          <span style="height: 58%"></span><span style="height: 78%"></span>
+          <span style="height: 72%"></span><span style="height: 91%"></span>
+        </div>
+        <div class="confidence"><span></span> {{ 'landing.highConfidence' | t }}</div>
+      </div>
+    </section>
+
+    <section id="platform" class="capabilities shell">
+      <div class="section-heading">
+        <p class="eyebrow">{{ 'landing.decisionLayer' | t }}</p>
+        <h2>{{ 'landing.defensibleAnswer' | t }}</h2>
+      </div>
+      <div class="capability-grid">
+        @for (capability of capabilities; track capability.label; let index = $index) {
+          <article>
+            <span class="number">0{{ index + 1 }}</span>
+            <p class="label">{{ capability.label | t }}</p>
+            <h3>{{ capability.title | t }}</h3>
+            <p>{{ capability.description | t }}</p>
+          </article>
+        }
+      </div>
+    </section>
+
+    <section id="approach" class="principle shell">
+      <p>{{ 'landing.wholeMarket' | t }}</p>
+      <a routerLink="/login">{{ 'landing.start' | t }} <span>→</span></a>
+    </section>
+  </main>
+</div>

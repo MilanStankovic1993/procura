@@ -1,0 +1,127 @@
+<div
+  class="page"
+  data-performance-page="sell_index"
+  [attr.data-performance-state]="loading() ? 'loading' : error() ? 'error' : 'ready'"
+>
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'ownedProduct.list.eyebrow' | t }}</p>
+      <h1>{{ 'ownedProduct.list.title' | t }}</h1>
+      <p>{{ 'ownedProduct.list.description' | t }}</p>
+    </div>
+    @if (canManage()) {
+      <a class="button button-primary" routerLink="/app/sell/new">
+        {{ 'ownedProduct.list.add' | t }}
+      </a>
+    }
+  </header>
+
+  <form class="filters" [formGroup]="filters" (ngSubmit)="applyFilters()">
+    <div>
+      <label for="owned-product-search">{{ 'common.search' | t }}</label>
+      <input
+        id="owned-product-search"
+        type="search"
+        formControlName="q"
+        [placeholder]="'ownedProduct.list.searchPlaceholder' | t"
+      />
+    </div>
+    <div>
+      <label for="owned-product-status">{{ 'ownedProduct.common.lifecycle' | t }}</label>
+      <select id="owned-product-status" formControlName="status">
+        <option value="">{{ 'ownedProduct.list.allStatuses' | t }}</option>
+        <option value="draft">{{ 'ownedProduct.status.draft' | t }}</option>
+        <option value="ready">{{ 'ownedProduct.status.ready' | t }}</option>
+        <option value="archived">{{ 'ownedProduct.status.archived' | t }}</option>
+      </select>
+    </div>
+    <button class="button button-primary" type="submit">
+      {{ 'ownedProduct.list.apply' | t }}
+    </button>
+    <button class="button button-quiet" type="button" (click)="clearFilters()">
+      {{ 'common.clear' | t }}
+    </button>
+  </form>
+
+  @if (error()) {
+    <div class="alert" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" (click)="retry()">{{ 'common.retry' | t }}</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <section class="loading" aria-live="polite">
+      <span></span>
+      <p>{{ 'ownedProduct.list.loading' | t }}</p>
+    </section>
+  } @else if (records().length === 0 && !error()) {
+    <section class="empty">
+      <span aria-hidden="true">＋</span>
+      <h2>{{ 'ownedProduct.list.emptyTitle' | t }}</h2>
+      <p>{{ 'ownedProduct.list.emptyDescription' | t }}</p>
+      @if (canManage()) {
+        <a class="button button-primary" routerLink="/app/sell/new">
+          {{ 'ownedProduct.list.addFirst' | t }}
+        </a>
+      } @else {
+        <small>{{ 'ownedProduct.common.readOnly' | t }}</small>
+      }
+    </section>
+  } @else {
+    <section class="product-grid" [attr.aria-label]="'ownedProduct.list.aria' | t">
+      @for (record of records(); track record.id) {
+        <a class="product-card" [routerLink]="['/app/sell', record.id]">
+          <div class="card-top">
+            <span class="status" [attr.data-status]="record.status">
+              {{ statusLabel(record.status) }}
+            </span>
+            <small>{{ date(record.created_at) }}</small>
+          </div>
+          <div>
+            <p>{{ record.category?.name ?? ('ownedProduct.common.categoryUnknown' | t) }}</p>
+            <h2>{{ title(record) }}</h2>
+          </div>
+          <dl>
+            <div>
+              <dt>{{ 'ownedProduct.common.condition' | t }}</dt>
+              <dd>{{ conditionLabel(record.condition) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'ownedProduct.common.targetMarket' | t }}</dt>
+              <dd>
+                {{ continent(record) }} · {{ record.target_country_codes.join(', ') }}
+              </dd>
+            </div>
+            <div>
+              <dt>{{ 'ownedProduct.common.evidence' | t }}</dt>
+              <dd>{{ 'common.files' | t: { count: record.image_count } }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'ownedProduct.common.history' | t }}</dt>
+              <dd>{{ 'common.snapshots' | t: { count: record.snapshot_count } }}</dd>
+            </div>
+          </dl>
+        </a>
+      }
+    </section>
+
+    @if (nextCursor()) {
+      <div class="pagination">
+        <button
+          class="button button-quiet"
+          type="button"
+          [disabled]="loadingMore()"
+          (click)="loadMore()"
+        >
+          {{
+            (loadingMore()
+              ? 'ownedProduct.list.loadingMore'
+              : 'ownedProduct.list.loadMore'
+            ) | t
+          }}
+        </button>
+      </div>
+    }
+  }
+</div>

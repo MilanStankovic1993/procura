@@ -1,0 +1,242 @@
+<div class="page">
+  <a class="back" routerLink="/app/sell">{{ 'ownedProduct.intake.back' | t }}</a>
+
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'ownedProduct.intake.guidedEyebrow' | t }}</p>
+      <h1>{{ 'ownedProduct.intake.title' | t }}</h1>
+      <p>{{ 'ownedProduct.intake.guidedDescription' | t }}</p>
+    </div>
+    <span class="scope">
+      {{ 'guidedIntake.step' | t: { current: currentStep(), total: steps.goal } }}
+    </span>
+  </header>
+
+  @if (error()) {
+    <div class="alert" role="alert">
+      <span>{{ error() }}</span>
+      @if (loading()) {
+        <button type="button" (click)="retryReferenceData()">{{ 'common.retry' | t }}</button>
+      }
+    </div>
+  }
+
+  @if (loading()) {
+    <section class="loading" aria-live="polite">{{ 'ownedProduct.intake.loading' | t }}</section>
+  } @else {
+    <nav class="stepper" [attr.aria-label]="'guidedIntake.progress' | t">
+      <button type="button" [class.active]="currentStep() === steps.product" [class.complete]="isStepComplete(steps.product)" (click)="goToStep(steps.product)">
+        <span>{{ steps.product }}</span>
+        <strong>{{ 'ownedProduct.intake.stepProduct' | t }}</strong>
+      </button>
+      <button type="button" [class.active]="currentStep() === steps.condition" [class.complete]="isStepComplete(steps.condition)" [disabled]="!canVisitStep(steps.condition)" (click)="goToStep(steps.condition)">
+        <span>{{ steps.condition }}</span>
+        <strong>{{ 'ownedProduct.intake.stepCondition' | t }}</strong>
+      </button>
+      <button type="button" [class.active]="currentStep() === steps.goal" [disabled]="!canVisitStep(steps.goal)" (click)="goToStep(steps.goal)">
+        <span>{{ steps.goal }}</span>
+        <strong>{{ 'ownedProduct.intake.stepGoal' | t }}</strong>
+      </button>
+    </nav>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      @if (currentStep() === steps.product) {
+        <section class="panel guided-panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{{ 'ownedProduct.intake.stepProduct' | t }}</p>
+              <h2>{{ 'ownedProduct.intake.identityTitle' | t }}</h2>
+              <p>{{ 'ownedProduct.intake.productHelp' | t }}</p>
+            </div>
+            <span>01</span>
+          </div>
+
+          <div class="form-grid">
+            <div>
+              <label for="owned-category">{{ 'ownedProduct.common.category' | t }}</label>
+              <select id="owned-category" formControlName="product_category_id">
+                <option value="">{{ 'ownedProduct.common.categoryUnknown' | t }}</option>
+                @for (category of categories(); track category.id) {
+                  <option [value]="category.id">{{ category.name }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="owned-brand">{{ 'ownedProduct.common.brand' | t }}</label>
+              <input id="owned-brand" formControlName="brand_name" />
+            </div>
+            <div class="wide">
+              <label for="owned-model">{{ 'ownedProduct.common.model' | t }}</label>
+              <input id="owned-model" formControlName="model_name" />
+            </div>
+          </div>
+
+          <label class="photo-drop" for="owned-images">
+            <span class="photo-mark">+</span>
+            <strong>{{ 'ownedProduct.intake.imagesTitle' | t }}</strong>
+            <small>{{ 'ownedProduct.intake.files' | t }}</small>
+            <input id="owned-images" type="file" multiple accept="image/jpeg,image/png,image/webp" (change)="selectFiles($event)" />
+            <span class="selected-count">{{ 'ownedProduct.intake.selectedFiles' | t: { count: selectedFiles().length } }}</span>
+          </label>
+        </section>
+      }
+
+      @if (currentStep() === steps.condition) {
+        <section class="panel guided-panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{{ 'ownedProduct.intake.stepCondition' | t }}</p>
+              <h2>{{ 'ownedProduct.intake.conditionQuestion' | t }}</h2>
+              <p>{{ 'ownedProduct.intake.conditionHelp' | t }}</p>
+            </div>
+            <span>02</span>
+          </div>
+
+          <div class="form-grid condition-grid">
+            <div>
+              <label for="owned-condition">{{ 'ownedProduct.common.condition' | t }}</label>
+              <select id="owned-condition" formControlName="condition">
+                <option value="unknown">{{ 'ownedProduct.condition.unknown' | t }}</option>
+                <option value="new">{{ 'ownedProduct.condition.new' | t }}</option>
+                <option value="like_new">{{ 'ownedProduct.condition.like_new' | t }}</option>
+                <option value="used_good">{{ 'ownedProduct.condition.used_good' | t }}</option>
+                <option value="used_fair">{{ 'ownedProduct.condition.used_fair' | t }}</option>
+                <option value="used_poor">{{ 'ownedProduct.condition.used_poor' | t }}</option>
+                <option value="broken">{{ 'ownedProduct.condition.broken' | t }}</option>
+              </select>
+            </div>
+            <div>
+              <label for="owned-age">{{ 'ownedProduct.intake.ageMonths' | t }}</label>
+              <input id="owned-age" type="number" min="0" max="1200" formControlName="age_months" [placeholder]="'ownedProduct.intake.agePlaceholder' | t" />
+              <small>{{ 'ownedProduct.intake.zeroAgeHint' | t }}</small>
+            </div>
+          </div>
+
+          <details class="optional-details">
+            <summary>{{ 'ownedProduct.intake.conditionDetails' | t }}</summary>
+            <div class="known-grid">
+              <div>
+                <label class="check">
+                  <input type="checkbox" formControlName="accessories_known" />
+                  <span>{{ 'ownedProduct.intake.accessoriesKnown' | t }}</span>
+                </label>
+                <textarea rows="4" formControlName="accessories" [placeholder]="'ownedProduct.intake.onePerLine' | t" [readOnly]="!form.controls.accessories_known.value"></textarea>
+              </div>
+              <div>
+                <label class="check">
+                  <input type="checkbox" formControlName="defects_known" />
+                  <span>{{ 'ownedProduct.intake.defectsKnown' | t }}</span>
+                </label>
+                <textarea rows="4" formControlName="defects" [placeholder]="'ownedProduct.intake.onePerLine' | t" [readOnly]="!form.controls.defects_known.value"></textarea>
+              </div>
+            </div>
+          </details>
+        </section>
+      }
+
+      @if (currentStep() === steps.goal) {
+        <section class="panel guided-panel">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{{ 'ownedProduct.intake.stepGoal' | t }}</p>
+              <h2>{{ 'ownedProduct.intake.goalQuestion' | t }}</h2>
+              <p>{{ 'ownedProduct.intake.goalHelp' | t }}</p>
+            </div>
+            <span>03</span>
+          </div>
+
+          <div class="form-grid goal-grid">
+            <div>
+              <label for="owned-continent">{{ 'ownedProduct.intake.targetContinent' | t }}</label>
+              <select id="owned-continent" formControlName="target_continent_code" (change)="changeContinent()">
+                <option value="">{{ 'ownedProduct.intake.chooseContinent' | t }}</option>
+                @for (continent of catalog()?.continents ?? []; track continent.code) {
+                  <option [value]="continent.code">{{ continentName(continent.code, continent.name) }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="owned-speed">{{ 'ownedProduct.intake.saleSpeed' | t }}</label>
+              <select id="owned-speed" formControlName="desired_sale_speed">
+                <option value="unknown">{{ 'ownedProduct.speed.unknown' | t }}</option>
+                <option value="fast">{{ 'ownedProduct.speed.fast' | t }}</option>
+                <option value="balanced">{{ 'ownedProduct.speed.balanced' | t }}</option>
+                <option value="maximum_value">{{ 'ownedProduct.speed.maximum_value' | t }}</option>
+              </select>
+            </div>
+            <div class="wide">
+              <label for="owned-border">{{ 'ownedProduct.intake.crossBorder' | t }}</label>
+              <select id="owned-border" formControlName="cross_border_preference">
+                <option value="unknown">{{ 'ownedProduct.border.unknown' | t }}</option>
+                <option value="domestic_only">{{ 'ownedProduct.border.domestic_only' | t }}</option>
+                <option value="cross_border_allowed">{{ 'ownedProduct.border.cross_border_allowed' | t }}</option>
+                <option value="cross_border_preferred">{{ 'ownedProduct.border.cross_border_preferred' | t }}</option>
+              </select>
+            </div>
+          </div>
+
+          @if (form.controls.target_continent_code.value) {
+            <section class="country-picker">
+              <div class="country-picker-heading">
+                <div>
+                  <strong>{{ 'ownedProduct.intake.targetCountries' | t }}</strong>
+                  <small>{{ 'ownedProduct.intake.countryHint' | t }}</small>
+                </div>
+                <input type="search" [placeholder]="'ownedProduct.intake.countrySearch' | t" [value]="countrySearch()" (input)="updateCountrySearch($event)" />
+              </div>
+              <div class="country-grid">
+                @for (country of visibleCountries(); track country.code) {
+                  <label class="country-option" [class.selected]="isCountrySelected(country.code)">
+                    <input type="checkbox" [checked]="isCountrySelected(country.code)" (change)="toggleCountry(country.code, $event)" />
+                    <span>{{ countryName(country) }}</span>
+                    <small>{{ country.code }}</small>
+                  </label>
+                }
+              </div>
+              @if (!showAllCountries() && countrySearch() === '' && countriesForSelectedContinent().length > 12) {
+                <button class="show-all" type="button" (click)="showAllCountries.set(true)">{{ 'ownedProduct.intake.showAllCountries' | t }}</button>
+              }
+            </section>
+          }
+
+          <section class="review-card">
+            <p class="eyebrow">{{ 'guidedIntake.review' | t }}</p>
+            <h3>{{ form.controls.brand_name.value }} {{ form.controls.model_name.value }}</h3>
+            <dl>
+              <div><dt>{{ 'ownedProduct.common.condition' | t }}</dt><dd>{{ conditionLabel(form.controls.condition.value) }}</dd></div>
+              <div><dt>{{ 'ownedProduct.intake.targetCountries' | t }}</dt><dd>{{ form.controls.target_country_codes.value.length }}</dd></div>
+              <div><dt>{{ 'ownedProduct.intake.imagesTitle' | t }}</dt><dd>{{ selectedFiles().length }}</dd></div>
+            </dl>
+          </section>
+
+          <details class="optional-details">
+            <summary>{{ 'guidedIntake.optionalDetails' | t }}</summary>
+            <label class="check history-check">
+              <input type="checkbox" formControlName="purchase_history_known" />
+              <span>{{ 'ownedProduct.intake.purchaseKnown' | t }}</span>
+            </label>
+            <textarea rows="4" formControlName="purchase_history" [placeholder]="'ownedProduct.intake.purchasePlaceholder' | t" [readOnly]="!form.controls.purchase_history_known.value"></textarea>
+            <label for="owned-notes">{{ 'ownedProduct.common.privateNotes' | t }}</label>
+            <textarea id="owned-notes" rows="3" formControlName="notes"></textarea>
+          </details>
+        </section>
+      }
+
+      <div class="actions">
+        @if (currentStep() !== steps.product) {
+          <button class="button button-quiet" type="button" (click)="previousStep()">{{ 'guidedIntake.back' | t }}</button>
+        } @else {
+          <a class="button button-quiet" routerLink="/app/sell">{{ 'common.cancel' | t }}</a>
+        }
+
+        @if (currentStep() !== steps.goal) {
+          <button class="button button-primary" type="button" (click)="nextStep()">{{ 'guidedIntake.next' | t }}</button>
+        } @else {
+          <button class="button button-primary" type="submit" [disabled]="saving() || !canManage()">
+            {{ (saving() ? 'ownedProduct.intake.saving' : createdOwnedProductId() ? 'ownedProduct.intake.retryUpload' : 'ownedProduct.intake.save') | t }}
+          </button>
+        }
+      </div>
+    </form>
+  }
+</div>

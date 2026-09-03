@@ -1,0 +1,14 @@
+<main>
+  <a class="brand" routerLink="/">Procura</a>
+  <app-language-switcher class="invitation-language" />
+  <section>
+    <p>{{ 'invitation.eyebrow' | t }}</p>
+    <h1>{{ 'invitation.title' | t }}</h1>
+    <p>{{ 'invitation.description' | t }}</p>
+    @if (error()) { <div class="error" role="alert">{{ error() }}</div> }
+    <button class="button button-primary" type="button" [disabled]="submitting() || !token()" (click)="accept()">
+      {{ (submitting() ? 'invitation.accepting' : 'invitation.accept') | t }}
+    </button>
+    <a routerLink="/app">{{ 'invitation.return' | t }}</a>
+  </section>
+</main>

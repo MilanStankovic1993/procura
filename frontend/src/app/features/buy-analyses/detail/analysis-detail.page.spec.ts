@@ -1,0 +1,528 @@
+import { signal } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
+import { of } from 'rxjs';
+
+import { Analysis } from '../../../core/analysis.models';
+import { AnalysisService } from '../../../core/analysis.service';
+import { MarketReferenceService } from '../../../core/market-reference.service';
+import { OrganizationContextService } from '../../../core/organizations/organization-context.service';
+import { AnalysisDetailPage } from './analysis-detail.page';
+
+describe('AnalysisDetailPage', () => {
+  it('renders an explainable canonical product match in the routed tenant context', async () => {
+    const analysis: Analysis = {
+      id: '01JANALYSIS',
+      listing: {
+        id: '01JLISTING',
+        title: 'Bosch Professional GSR 18V-55',
+        marketplace_name: 'Golden Catalog Market',
+        asking_price_minor: 18999,
+        currency_code: 'EUR',
+      },
+      analysis_type: 'buy',
+      status: 'completed',
+      source_country_code: 'AT',
+      target_country_code: 'DE',
+      pipeline_version: 'buy-analysis-pipeline:v5',
+      processing_attempts: 1,
+      submitted_at: '2026-07-25T12:00:00Z',
+      finished_at: '2026-07-25T12:01:00Z',
+      failed_at: null,
+      next_retry_at: null,
+      last_error_code: null,
+      created_at: '2026-07-25T12:00:00Z',
+      updated_at: '2026-07-25T12:01:00Z',
+      listing_snapshot_id: '01JSNAPSHOT',
+      request_hash: 'a'.repeat(64),
+      request_payload: {
+        schema_version: 'buy-analysis-request:v1',
+        analysis_type: 'buy',
+        listing: {
+          id: '01JLISTING',
+          snapshot_id: '01JSNAPSHOT',
+          snapshot_sequence: 1,
+          snapshot_content_hash: 'b'.repeat(64),
+          source_url: null,
+          external_id: null,
+          marketplace_name: 'Golden Catalog Market',
+          title: 'Bosch Professional GSR 18V-55',
+          description: null,
+          asking_price_minor: 18999,
+          currency_code: 'EUR',
+          seller_information: null,
+          location: null,
+          listing_status: 'active',
+          captured_at: '2026-07-25T12:00:00Z',
+        },
+        market_scope: {
+          source_country_code: 'AT',
+          target_country_code: 'DE',
+        },
+        evidence: [],
+      },
+      result_payload: null,
+      last_error_message: null,
+      current_dispatch: null,
+      attempts: [],
+      product_match: {
+        id: '01JMATCH',
+        run_number: 1,
+        ai_analysis_id: '01JAI',
+        status: 'matched',
+        review_status: 'not_required',
+        method: 'exact_catalog_alias',
+        matcher_version: 'catalog-alias-matcher:v1',
+        input_hash: 'c'.repeat(64),
+        confidence_basis_points: 9100,
+        product: {
+          id: '01JMODEL',
+          canonical_key: 'bosch-professional:gsr-18v-55',
+          brand: 'Bosch Professional',
+          model: 'GSR 18V-55',
+          model_number: 'GSR 18V-55',
+          category: 'Cordless Drills',
+          variant_id: null,
+          variant: null,
+        },
+        candidates: [
+          {
+            product_model_id: '01JMODEL',
+            product_variant_id: null,
+            brand: 'Bosch Professional',
+            model: 'GSR 18V-55',
+            model_number: 'GSR 18V-55',
+            variant: null,
+            category: 'Cordless Drills',
+            matched_alias: 'GSR 18V-55',
+            alias_scope_country_code: null,
+            region_compatibility: 'unspecified',
+            score: 5100,
+          },
+        ],
+        reason_codes: ['exact_catalog_alias'],
+        reviewed_at: null,
+        created_at: '2026-07-25T12:01:00Z',
+      },
+      comparable_set: {
+        id: '01JSET',
+        run_number: 2,
+        product_match_id: '01JMATCH',
+        status: 'ready',
+        selector_version: 'deterministic-comparable-selector:v1',
+        input_hash: 'd'.repeat(64),
+        target_country_code: 'DE',
+        target_currency_code: 'EUR',
+        candidate_count: 3,
+        included_count: 3,
+        excluded_count: 0,
+        minimum_required: 3,
+        reason_codes: ['minimum_comparable_records_met'],
+        items: [
+          {
+            id: '01JITEM',
+            comparable_record_id: '01JCOMPARABLE',
+            decision: 'included',
+            rank: 1,
+            score_basis_points: 5160,
+            factor_scores: {
+              exact_model: 3000,
+              exact_variant: 1000,
+              geographic_relevance: 1000,
+              source_reliability: 160,
+            },
+            reason_codes: ['exact_model', 'same_country', 'same_currency'],
+            evidence: {
+              id: '01JCOMPARABLE',
+              source_key: 'manual',
+              source_name: 'Manual entry',
+              source_identity_hash: 'e'.repeat(64),
+              evidence_hash: 'f'.repeat(64),
+              marketplace_name: 'Verified Market',
+              source_url: 'https://market.example/listing/1',
+              external_id: 'listing-1',
+              title: 'Bosch GSR 18V-55 with case',
+              listing_type: 'product',
+              condition: 'used_good',
+              seller_type: 'private',
+              asking_price_minor: 21000,
+              currency_code: 'EUR',
+              country_code: 'DE',
+              included_accessories: ['case'],
+              missing_accessories: [],
+              product_variant_id: null,
+              product_variant: null,
+              source_reliability_basis_points: 4000,
+              published_at: null,
+              observed_at: '2026-07-25T11:00:00Z',
+            },
+          },
+          {
+            id: '01JITEM2',
+            comparable_record_id: '01JCOMPARABLE2',
+            decision: 'included',
+            rank: 2,
+            score_basis_points: 5160,
+            factor_scores: {
+              exact_model: 3000,
+              exact_variant: 1000,
+              geographic_relevance: 1000,
+              source_reliability: 160,
+            },
+            reason_codes: ['exact_model', 'same_country', 'same_currency'],
+            evidence: {
+              id: '01JCOMPARABLE2',
+              source_key: 'manual',
+              source_name: 'Manual entry',
+              source_identity_hash: '1'.repeat(64),
+              evidence_hash: '2'.repeat(64),
+              marketplace_name: 'Verified Market',
+              source_url: 'https://market.example/listing/2',
+              external_id: 'listing-2',
+              title: 'Bosch GSR 18V-55 complete kit',
+              listing_type: 'product',
+              condition: 'used_good',
+              seller_type: 'private',
+              asking_price_minor: 22000,
+              currency_code: 'EUR',
+              country_code: 'DE',
+              included_accessories: ['case'],
+              missing_accessories: [],
+              product_variant_id: null,
+              product_variant: null,
+              source_reliability_basis_points: 4000,
+              published_at: null,
+              observed_at: '2026-07-25T10:00:00Z',
+            },
+          },
+          {
+            id: '01JITEM3',
+            comparable_record_id: '01JCOMPARABLE3',
+            decision: 'included',
+            rank: 3,
+            score_basis_points: 5160,
+            factor_scores: {
+              exact_model: 3000,
+              exact_variant: 1000,
+              geographic_relevance: 1000,
+              source_reliability: 160,
+            },
+            reason_codes: ['exact_model', 'same_country', 'same_currency'],
+            evidence: {
+              id: '01JCOMPARABLE3',
+              source_key: 'manual',
+              source_name: 'Manual entry',
+              source_identity_hash: '3'.repeat(64),
+              evidence_hash: '4'.repeat(64),
+              marketplace_name: 'Verified Market',
+              source_url: 'https://market.example/listing/3',
+              external_id: 'listing-3',
+              title: 'Bosch GSR 18V-55 used',
+              listing_type: 'product',
+              condition: 'used_good',
+              seller_type: 'private',
+              asking_price_minor: 23000,
+              currency_code: 'EUR',
+              country_code: 'DE',
+              included_accessories: ['case'],
+              missing_accessories: [],
+              product_variant_id: null,
+              product_variant: null,
+              source_reliability_basis_points: 4000,
+              published_at: null,
+              observed_at: '2026-07-25T09:00:00Z',
+            },
+          },
+        ],
+        created_at: '2026-07-25T12:01:00Z',
+      },
+      price_estimate: {
+        id: '01JESTIMATE',
+        run_number: 1,
+        comparable_set_id: '01JSET',
+        status: 'estimated',
+        algorithm_version: 'deterministic-weighted-median:v1',
+        rate_resolver_version: 'dated-exchange-rate-resolver:v1',
+        input_hash: '5'.repeat(64),
+        calculation_at: '2026-07-25T12:01:00Z',
+        target_country_code: 'DE',
+        target_currency_code: 'EUR',
+        input_count: 3,
+        included_count: 3,
+        outlier_count: 0,
+        unresolved_count: 0,
+        estimate_low_minor: 21000,
+        estimate_minor: 22000,
+        estimate_high_minor: 23000,
+        statistics: {
+          median_minor: 22000,
+          weighted_median_minor: 22000,
+          q1_minor: 21000,
+          q3_minor: 23000,
+          mad_minor: 1000,
+          dispersion_basis_points: 909,
+        },
+        confidence_basis_points: 6500,
+        confidence_level: 'medium',
+        confidence_components: {
+          comparable_count: 1500,
+          product_match: 2275,
+          condition_consistency: 1500,
+          price_consistency: 1225,
+        },
+        reason_codes: ['weighted_median_estimate', 'identity_currency_conversion_only'],
+        items: [
+          {
+            id: '01JESTIMATEITEM',
+            comparable_set_item_id: '01JITEM',
+            comparable_record_id: '01JCOMPARABLE',
+            decision: 'included',
+            position: 1,
+            original_amount_minor: 21000,
+            original_currency_code: 'EUR',
+            target_amount_minor: 21000,
+            target_currency_code: 'EUR',
+            weight_basis_points: 5160,
+            exchange_rate_id: null,
+            rate_direction: 'identity',
+            rate_value: '1',
+            rate_effective_at: '2026-07-25T12:01:00Z',
+            rate_provider: null,
+            rate_provider_reference: null,
+            reason_codes: ['identity_currency_conversion', 'included_in_estimate'],
+            evidence: {
+              comparable_evidence: {
+                id: '01JCOMPARABLE',
+                source_key: 'manual',
+                source_name: 'Manual entry',
+                source_identity_hash: 'e'.repeat(64),
+                evidence_hash: 'f'.repeat(64),
+                marketplace_name: 'Verified Market',
+                source_url: 'https://market.example/listing/1',
+                external_id: 'listing-1',
+                title: 'Bosch GSR 18V-55 with case',
+                listing_type: 'product',
+                condition: 'used_good',
+                seller_type: 'private',
+                asking_price_minor: 21000,
+                currency_code: 'EUR',
+                country_code: 'DE',
+                included_accessories: ['case'],
+                missing_accessories: [],
+                product_variant_id: null,
+                product_variant: null,
+                source_reliability_basis_points: 4000,
+                published_at: null,
+                observed_at: '2026-07-25T11:00:00Z',
+              },
+              selector_rank: 1,
+              selector_score_basis_points: 5160,
+              selector_factor_scores: {
+                exact_model: 3000,
+                exact_variant: 1000,
+                geographic_relevance: 1000,
+                source_reliability: 160,
+              },
+              selector_reason_codes: ['exact_model', 'same_country', 'same_currency'],
+            },
+          },
+        ],
+        created_at: '2026-07-25T12:01:00Z',
+      },
+      risk_assessment: {
+        id: '01JRISK',
+        run_number: 1,
+        product_match_id: '01JMATCH',
+        comparable_set_id: '01JSET',
+        price_estimate_id: '01JESTIMATE',
+        status: 'assessed',
+        evaluator_version: 'deterministic-risk-evaluator:v1',
+        input_hash: '6'.repeat(64),
+        calculation_at: '2026-07-25T12:01:00Z',
+        score: 15,
+        level: 'low',
+        confidence_basis_points: 4095,
+        confidence_level: 'low',
+        signal_count: 3,
+        unknown_count: 1,
+        reason_codes: [
+          'asking_price_below_observed_band',
+          'cross_border_transaction_context',
+          'payment_protection_not_verified',
+          'risk_assessment_has_unknowns',
+        ],
+        confidence_components: {
+          price_evidence: 2275,
+          product_identity: 1820,
+        },
+        verification_actions: [
+          'Verify the listing, seller, product identity, and condition before payment.',
+          'Verify shipping, customs, tax, returns, and regional compatibility before purchase.',
+          'Use a traceable payment method with buyer protection.',
+        ],
+        signals: [
+          {
+            id: '01JRISKSIGNAL1',
+            position: 1,
+            code: 'asking_price_below_observed_band',
+            category: 'listing',
+            severity: 'low',
+            is_unknown: false,
+            weight_points: 5,
+            score_contribution: 5,
+            evidence: {
+              asking_price_minor: 18999,
+              observed_lower_band_minor: 21000,
+              currency_code: 'EUR',
+              deviation_basis_points: 953,
+            },
+            source: 'listing_snapshot+price_estimate',
+            confidence_basis_points: 6500,
+            verification_action:
+              'Verify the listing, seller, product identity, and condition before payment.',
+          },
+          {
+            id: '01JRISKSIGNAL2',
+            position: 2,
+            code: 'cross_border_transaction_context',
+            category: 'transaction',
+            severity: 'medium',
+            is_unknown: false,
+            weight_points: 10,
+            score_contribution: 10,
+            evidence: {
+              source_country_code: 'AT',
+              target_country_code: 'DE',
+            },
+            source: 'analysis_market_scope',
+            confidence_basis_points: 10000,
+            verification_action:
+              'Verify shipping, customs, tax, returns, and regional compatibility before purchase.',
+          },
+          {
+            id: '01JRISKSIGNAL3',
+            position: 3,
+            code: 'payment_protection_not_verified',
+            category: 'transaction',
+            severity: 'low',
+            is_unknown: true,
+            weight_points: 0,
+            score_contribution: 0,
+            evidence: {
+              payment_protection: null,
+            },
+            source: 'analysis_request_contract',
+            confidence_basis_points: 0,
+            verification_action: 'Use a traceable payment method with buyer protection.',
+          },
+        ],
+        created_at: '2026-07-25T12:01:00Z',
+      },
+      cost_input: null,
+      profit_estimate: null,
+      opportunity_input: null,
+      logistics_assessment: null,
+      demand_assessment: null,
+      deal_score: null,
+      buyer_decision: null,
+      buyer_decision_allowed_transitions: [],
+      buyer_decision_history: [],
+      buyer_decision_history_count: 0,
+    };
+
+    TestBed.configureTestingModule({
+      imports: [AnalysisDetailPage],
+      providers: [
+        provideRouter([]),
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            paramMap: of(
+              convertToParamMap({
+                listingId: '01JLISTING',
+                analysisId: '01JANALYSIS',
+              }),
+            ),
+          },
+        },
+        {
+          provide: AnalysisService,
+          useValue: {
+            get: () => of(analysis),
+            createComparable: () => of(),
+          },
+        },
+        {
+          provide: MarketReferenceService,
+          useValue: {
+            catalog: () =>
+              of({
+                version: 'test',
+                continents: [
+                  {
+                    code: 'EU',
+                    name: 'Europe',
+                    countries: [
+                      {
+                        code: 'DE',
+                        alpha3_code: 'DEU',
+                        numeric_code: '276',
+                        name: 'Germany',
+                        currency_code: 'EUR',
+                        measurement_system: 'metric',
+                      },
+                    ],
+                  },
+                ],
+                currencies: [
+                  {
+                    code: 'EUR',
+                    numeric_code: '978',
+                    name: 'Euro',
+                    symbol: '€',
+                    minor_unit: 2,
+                    cash_minor_unit: 2,
+                  },
+                ],
+              }),
+          },
+        },
+        {
+          provide: OrganizationContextService,
+          useValue: {
+            activeOrganization: signal({
+              id: '01JORGANIZATION',
+              capabilities: ['analyses.view', 'analyses.manage'],
+            }),
+          },
+        },
+      ],
+    });
+
+    const fixture = TestBed.createComponent(AnalysisDetailPage);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Canonical catalog boundary');
+    expect(fixture.nativeElement.textContent).toContain('Bosch Professional');
+    expect(fixture.nativeElement.textContent).toContain('GSR 18V-55');
+    expect(fixture.nativeElement.textContent).toContain('Exact Catalog Alias');
+    expect(fixture.nativeElement.textContent).toContain('Comparable selection');
+    expect(fixture.nativeElement.textContent).toContain('Bosch GSR 18V-55 with case');
+    expect(fixture.nativeElement.textContent).toContain('Minimum Comparable Records Met');
+    expect(fixture.nativeElement.textContent).toContain('Price estimate');
+    expect(fixture.nativeElement.textContent).toContain('deterministic-weighted-median:v1');
+    expect(fixture.nativeElement.textContent).toContain('Identity Currency Conversion Only');
+    expect(fixture.nativeElement.textContent).toContain('No external rate required');
+    expect(fixture.nativeElement.textContent).toContain('Risk assessment');
+    expect(fixture.nativeElement.textContent).toContain('Costs & expected profit');
+    expect(fixture.nativeElement.textContent).toContain('15 / 100');
+    expect(fixture.nativeElement.textContent).toContain(
+      'Cross Border Transaction Context',
+    );
+    expect(fixture.nativeElement.textContent).toContain(
+      'This score describes recorded transaction uncertainty, not a fraud verdict.',
+    );
+  });
+});

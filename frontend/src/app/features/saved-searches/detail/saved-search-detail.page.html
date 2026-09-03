@@ -1,0 +1,278 @@
+<div class="page">
+  <a class="back" routerLink="/app/saved-searches">
+    ← {{ 'savedSearchDetail.back' | t }}
+  </a>
+
+  @if (error()) {
+    <div class="alert" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" (click)="load()">{{ 'common.retry' | t }}</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <section class="loading" aria-live="polite">
+      <span></span>
+      <p>{{ 'savedSearchDetail.loading' | t }}</p>
+    </section>
+  } @else if (record(); as search) {
+    <header>
+      <div>
+        <p class="eyebrow">{{ 'savedSearchDetail.eyebrow' | t }}</p>
+        <h1>{{ search.title }}</h1>
+        <div class="header-meta">
+          <span class="status" [attr.data-state]="search.archived ? 'archived' : search.active ? 'active' : 'paused'">
+            {{ state(search) }}
+          </span>
+          <span>{{ 'savedSearchDetail.version' | t: { version: search.version_sequence } }}</span>
+          <span>{{ 'savedSearchDetail.updated' | t: { date: date(search.updated_at) } }}</span>
+        </div>
+      </div>
+      @if (canManage() && !search.archived) {
+        <div class="actions">
+          <a
+            class="button button-quiet"
+            [routerLink]="['/app/saved-searches', search.id, 'edit']"
+          >
+            {{ 'common.edit' | t }}
+          </a>
+          <button
+            class="button button-quiet"
+            type="button"
+            [disabled]="mutating()"
+            (click)="toggleActive()"
+          >
+            {{
+              (search.active
+                ? 'savedSearchDetail.pause'
+                : 'savedSearchDetail.resume'
+              ) | t
+            }}
+          </button>
+          <button
+            class="button danger"
+            type="button"
+            [disabled]="mutating()"
+            (click)="armArchive()"
+          >
+            {{ 'common.archive' | t }}
+          </button>
+        </div>
+      }
+    </header>
+
+    @if (actionError()) {
+      <div class="alert" role="alert">{{ actionError() }}</div>
+    }
+
+    @if (archiveArmed()) {
+      <section class="archive-confirmation">
+        <div>
+          <strong>{{ 'savedSearchDetail.archiveConfirmTitle' | t }}</strong>
+          <p>{{ 'savedSearchDetail.archiveConfirmDescription' | t }}</p>
+        </div>
+        <button class="button button-quiet" type="button" (click)="cancelArchive()">
+          {{ 'common.cancel' | t }}
+        </button>
+        <button
+          class="button danger"
+          type="button"
+          [disabled]="mutating()"
+          (click)="archive()"
+        >
+          {{ 'savedSearchDetail.archiveConfirmAction' | t }}
+        </button>
+      </section>
+    }
+
+    <section class="metrics">
+      <article>
+        <span>{{ 'savedSearchDetail.matchedListings' | t }}</span>
+        <strong>{{ search.matched_count ?? 0 }}</strong>
+      </article>
+      <article>
+        <span>{{ 'savedSearchDetail.totalEvaluations' | t }}</span>
+        <strong>{{ search.match_count }}</strong>
+      </article>
+      <article>
+        <span>{{ 'savedSearchDetail.delivery' | t }}</span>
+        <strong>
+          {{
+            (search.current_version.notification_channels.includes('email') &&
+            search.current_version.notification_channels.includes('telegram')
+              ? 'savedSearchDetail.inAppEmailTelegram'
+              : search.current_version.notification_channels.includes('email')
+                ? 'savedSearchDetail.inAppEmail'
+                : search.current_version.notification_channels.includes('telegram')
+                  ? 'savedSearchDetail.inAppTelegram'
+                  : 'savedSearchDetail.inApp'
+            ) | t
+          }}
+        </strong>
+      </article>
+    </section>
+
+    <section class="criteria">
+      <div class="section-heading">
+        <div>
+          <h2>{{ 'savedSearchDetail.criteriaTitle' | t }}</h2>
+          <p>{{ 'savedSearchDetail.criteriaDescription' | t }}</p>
+        </div>
+      </div>
+      <dl>
+        <div>
+          <dt>{{ 'savedSearchDetail.catalog' | t }}</dt>
+          <dd>
+            {{
+              search.current_version.catalog.brand?.name ||
+                search.current_version.catalog.category?.name ||
+                ('savedSearchDetail.anyProduct' | t)
+            }}
+            @if (search.current_version.catalog.model) {
+              · {{ search.current_version.catalog.model?.name }}
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'savedSearchDetail.market' | t }}</dt>
+          <dd>{{ market(search) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'savedSearchDetail.price' | t }}</dt>
+          <dd>
+            {{ money(search.current_version.criteria.minimum_price_minor, search.current_version.criteria.price_currency_code) }}
+            —
+            {{ money(search.current_version.criteria.maximum_price_minor, search.current_version.criteria.price_currency_code) }}
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'savedSearchDetail.minimumProfit' | t }}</dt>
+          <dd>
+            {{ money(search.current_version.criteria.minimum_profit_minor, search.current_version.criteria.profit_currency_code) }}
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'savedSearchDetail.minimumMargin' | t }}</dt>
+          <dd>{{ percent(search.current_version.criteria.minimum_margin_basis_points) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'savedSearchDetail.dealScore' | t }}</dt>
+          <dd>{{ percent(search.current_version.criteria.minimum_deal_score_basis_points) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'savedSearchDetail.maximumRisk' | t }}</dt>
+          <dd>
+            {{
+              search.current_version.criteria.maximum_risk_score ??
+                ('savedSearch.notConfigured' | t)
+            }}
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'savedSearchDetail.requiredKeywords' | t }}</dt>
+          <dd>
+            {{
+              search.current_version.criteria.required_keywords.join(', ') ||
+                ('savedSearch.notConfigured' | t)
+            }}
+          </dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="matches">
+      <div class="section-heading match-heading">
+        <div>
+          <h2>{{ 'savedSearchDetail.matchesTitle' | t }}</h2>
+          <p>{{ 'savedSearchDetail.matchesDescription' | t }}</p>
+        </div>
+        <form [formGroup]="matchFilters" (ngSubmit)="applyMatchFilter()">
+          <label for="match-status">{{ 'savedSearchDetail.matchFilter' | t }}</label>
+          <select id="match-status" formControlName="status">
+            <option value="">{{ 'savedSearchDetail.allEvaluations' | t }}</option>
+            <option value="matched">{{ 'savedSearch.match.matched' | t }}</option>
+            <option value="not_matched">{{ 'savedSearch.match.notMatched' | t }}</option>
+            <option value="insufficient_evidence">
+              {{ 'savedSearch.match.insufficient' | t }}
+            </option>
+          </select>
+          <button class="button button-quiet" type="submit">
+            {{ 'savedSearchList.apply' | t }}
+          </button>
+        </form>
+      </div>
+
+      @if (matches().length === 0 && !loadingMore()) {
+        <div class="empty">
+          <h3>{{ 'savedSearchDetail.noMatchesTitle' | t }}</h3>
+          <p>{{ 'savedSearchDetail.noMatchesDescription' | t }}</p>
+        </div>
+      } @else {
+        <div class="match-list">
+          @for (match of matches(); track match.id) {
+            <article>
+              <div>
+                <span class="match-status" [attr.data-state]="match.status">
+                  {{ matchState(match.status) }}
+                </span>
+                <small>{{ date(match.evaluated_at) }}</small>
+              </div>
+              <a [routerLink]="['/app/buy', match.listing.id]">
+                {{ match.listing.title || ('savedSearchDetail.unknownListing' | t) }}
+              </a>
+              <strong>
+                {{ money(match.listing.asking_price_minor, match.listing.currency_code) }}
+              </strong>
+              <p>
+                {{ match.listing.source_country_code }}
+                →
+                {{ match.listing.target_country_code }}
+              </p>
+              @if (match.reason_codes.length > 0) {
+                <div class="reason-codes">
+                  @for (reason of match.reason_codes; track reason) {
+                    <code>{{ reason }}</code>
+                  }
+                </div>
+              }
+            </article>
+          }
+        </div>
+      }
+
+      @if (nextCursor()) {
+        <button
+          class="button button-quiet load-more"
+          type="button"
+          [disabled]="loadingMore()"
+          (click)="loadMoreMatches()"
+        >
+          {{
+            (loadingMore()
+              ? 'savedSearchList.loadingMore'
+              : 'savedSearchList.loadMore'
+            ) | t
+          }}
+        </button>
+      }
+    </section>
+
+    <section class="versions">
+      <div class="section-heading">
+        <div>
+          <h2>{{ 'savedSearchDetail.historyTitle' | t }}</h2>
+          <p>{{ 'savedSearchDetail.historyDescription' | t }}</p>
+        </div>
+      </div>
+      <ol>
+        @for (version of search.versions ?? []; track version.id) {
+          <li>
+            <strong>{{ 'savedSearchDetail.version' | t: { version: version.sequence } }}</strong>
+            <span>{{ version.reason_code }}</span>
+            <time>{{ date(version.created_at) }}</time>
+          </li>
+        }
+      </ol>
+    </section>
+  }
+</div>

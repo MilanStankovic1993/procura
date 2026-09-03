@@ -1,0 +1,88 @@
+<div class="workspace">
+  <aside>
+    <a class="brand" routerLink="/">
+      <span class="brand-mark" aria-hidden="true">P</span>
+      <span>Procura</span>
+    </a>
+
+    <app-language-switcher class="language-control" />
+
+    <div class="workspace-switcher">
+      <label for="organization-switcher">{{ 'shell.workspace' | t }}</label>
+      <select
+        id="organization-switcher"
+        [value]="activeOrganization()?.id ?? ''"
+        [disabled]="organizationState() === 'loading' || switchingOrganizationId() !== null"
+        (change)="selectOrganization($event)"
+      >
+        @for (organization of organizations(); track organization.id) {
+          <option [value]="organization.id" [selected]="organization.is_active">
+            {{ organization.name }} · {{ organizationRole(organization.role) }}
+          </option>
+        }
+      </select>
+      @if (switchingOrganizationId() !== null) {
+        <span class="context-status" aria-live="polite">{{
+          'shell.switchingWorkspace' | t
+        }}</span>
+      } @else if (organizationError()) {
+        <span class="context-error" role="alert">{{ organizationError() }}</span>
+        <button class="retry-context" type="button" (click)="retryOrganizations()">
+          {{ 'common.retry' | t }}
+        </button>
+      } @else {
+        <span class="context-status">{{
+          'shell.workspaceKind' | t: { type: organizationType(activeOrganization()?.type) }
+        }}</span>
+      }
+    </div>
+
+    <nav [attr.aria-label]="'shell.navigation' | t">
+      <a routerLink="/app/overview" routerLinkActive="active">
+        <span aria-hidden="true">⌁</span> {{ 'shell.overview' | t }}
+      </a>
+      <a routerLink="/app/organization" routerLinkActive="active">
+        <span aria-hidden="true">⚙</span> {{ 'shell.organization' | t }}
+      </a>
+      <a routerLink="/app/buy" routerLinkActive="active">
+        <span aria-hidden="true">◎</span> {{ 'shell.buyAnalysis' | t }}
+      </a>
+      <a routerLink="/app/sell" routerLinkActive="active">
+        <span aria-hidden="true">↗</span> {{ 'shell.sellAnalysis' | t }}
+      </a>
+      <a routerLink="/app/saved-searches" routerLinkActive="active">
+        <span aria-hidden="true">⌕</span> {{ 'shell.savedSearches' | t }}
+      </a>
+      <a routerLink="/app/notifications" routerLinkActive="active">
+        <span aria-hidden="true">◎</span> {{ 'shell.notifications' | t }}
+      </a>
+      <a routerLink="/app/broker-requests" routerLinkActive="active">
+        <span aria-hidden="true">⌖</span> {{ 'shell.brokerRequests' | t }}
+      </a>
+      <a routerLink="/app/markets" routerLinkActive="active">
+        <span aria-hidden="true">◫</span> {{ 'shell.markets' | t }}
+      </a>
+      <a routerLink="/app/subscription" routerLinkActive="active">
+        <span aria-hidden="true">◇</span> {{ 'shell.planUsage' | t }}
+      </a>
+      <a routerLink="/app/privacy" routerLinkActive="active">
+        <span aria-hidden="true">◉</span> {{ 'shell.privacy' | t }}
+      </a>
+    </nav>
+
+    <div class="profile">
+      <span class="avatar">{{ user()?.name?.charAt(0) ?? 'P' }}</span>
+      <div>
+        <strong>{{ user()?.name }}</strong
+        ><span>{{ user()?.email }}</span>
+      </div>
+      <button type="button" (click)="signOut()" [disabled]="isSigningOut()">
+        {{ (isSigningOut() ? 'common.signingOut' : 'common.signOut') | t }}
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <router-outlet />
+  </main>
+</div>

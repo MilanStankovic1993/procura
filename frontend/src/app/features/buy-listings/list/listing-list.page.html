@@ -1,0 +1,115 @@
+<div
+  class="page"
+  data-performance-page="buy_index"
+  [attr.data-performance-state]="loading() ? 'loading' : error() ? 'error' : 'ready'"
+>
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'listingList.eyebrow' | t }}</p>
+      <h1>{{ 'listingList.title' | t }}</h1>
+      <p>{{ 'listingList.description' | t }}</p>
+    </div>
+    @if (canManage()) {
+      <div class="header-actions">
+        <a class="button button-quiet" routerLink="/app/buy/imports">{{
+          'listingList.importCsv' | t
+        }}</a>
+        <a class="button button-primary" routerLink="/app/buy/new">{{
+          'listingList.add' | t
+        }}</a>
+      </div>
+    }
+  </header>
+
+  <form class="filters" [formGroup]="filters" (ngSubmit)="applyFilters()">
+    <div>
+      <label for="listing-search">{{ 'common.search' | t }}</label>
+      <input
+        id="listing-search"
+        type="search"
+        formControlName="q"
+        [placeholder]="'listingList.searchPlaceholder' | t"
+      />
+    </div>
+    <div>
+      <label for="listing-status">{{ 'listingList.lifecycle' | t }}</label>
+      <select id="listing-status" formControlName="status">
+        <option value="">{{ 'listingList.allStatuses' | t }}</option>
+        <option value="active">{{ 'listing.status.active' | t }}</option>
+        <option value="reserved">{{ 'listing.status.reserved' | t }}</option>
+        <option value="sold">{{ 'listing.status.sold' | t }}</option>
+        <option value="removed">{{ 'listing.status.removed' | t }}</option>
+        <option value="expired">{{ 'listing.status.expired' | t }}</option>
+        <option value="unknown">{{ 'listing.status.unknown' | t }}</option>
+      </select>
+    </div>
+    <button class="button button-primary" type="submit">{{ 'listingList.apply' | t }}</button>
+    <button class="button button-quiet" type="button" (click)="clearFilters()">{{ 'common.clear' | t }}</button>
+  </form>
+
+  @if (error()) {
+    <div class="alert" role="alert">
+      <span>{{ error() }}</span>
+      <button type="button" (click)="retry()">{{ 'common.retry' | t }}</button>
+    </div>
+  }
+
+  @if (loading()) {
+    <section class="loading" aria-live="polite">
+      <span></span>
+      <p>{{ 'listingList.loading' | t }}</p>
+    </section>
+  } @else if (records().length === 0 && !error()) {
+    <section class="empty">
+      <span aria-hidden="true">＋</span>
+      <h2>{{ 'listingList.emptyTitle' | t }}</h2>
+      <p>{{ 'listingList.emptyDescription' | t }}</p>
+      @if (canManage()) {
+        <div class="header-actions">
+          <a class="button button-quiet" routerLink="/app/buy/imports">{{
+            'listingList.importCsv' | t
+          }}</a>
+          <a class="button button-primary" routerLink="/app/buy/new">{{
+            'listingList.addFirst' | t
+          }}</a>
+        </div>
+      } @else {
+        <small>{{ 'listingList.readOnly' | t }}</small>
+      }
+    </section>
+  } @else {
+    <section class="listing-grid" [attr.aria-label]="'listingList.aria' | t">
+      @for (listing of records(); track listing.id) {
+        <a class="listing-card" [routerLink]="['/app/buy', listing.id]">
+          <div class="card-top">
+            <span class="status" [attr.data-status]="listing.status">{{ statusLabel(listing.status) }}</span>
+            <small>{{ date(listing.created_at) }}</small>
+          </div>
+          <div>
+            <p>{{ listing.marketplace_name }}</p>
+            <h2>{{ listing.title }}</h2>
+          </div>
+          <strong class="price">{{ price(listing) }}</strong>
+          <dl>
+            <div><dt>{{ 'listingList.marketRoute' | t }}</dt><dd>{{ listing.source_country_code }} → {{ listing.target_country_code }}</dd></div>
+            <div><dt>{{ 'listingList.evidence' | t }}</dt><dd>{{ 'common.files' | t: { count: listing.image_count } }}</dd></div>
+            <div><dt>{{ 'listingList.history' | t }}</dt><dd>{{ 'common.snapshots' | t: { count: listing.snapshot_count } }}</dd></div>
+          </dl>
+        </a>
+      }
+    </section>
+
+    @if (nextCursor()) {
+      <div class="pagination">
+        <button
+          class="button button-quiet"
+          type="button"
+          [disabled]="loadingMore()"
+          (click)="loadMore()"
+        >
+          {{ (loadingMore() ? 'listingList.loadingMore' : 'listingList.loadMore') | t }}
+        </button>
+      </div>
+    }
+  }
+</div>

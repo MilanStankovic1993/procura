@@ -1,0 +1,28 @@
+<main class="context-page">
+  <a class="brand" routerLink="/" [attr.aria-label]="'common.backToProcura' | t">
+    <span class="brand-mark" aria-hidden="true">P</span>
+    <span>Procura</span>
+  </a>
+  <app-language-switcher class="context-language" />
+
+  <section aria-labelledby="context-title">
+    <p class="eyebrow">{{ 'workspace.eyebrow' | t }}</p>
+    <h1 id="context-title">{{ 'workspace.title' | t }}</h1>
+    <p>
+      {{
+        message() ?? ('workspace.fallback' | t)
+      }}
+    </p>
+    <p class="support">
+      {{ 'workspace.support' | t }}
+    </p>
+    <div class="actions">
+      <button class="button button-primary" type="button" (click)="retry()" [disabled]="isRetrying()">
+        {{ (isRetrying() ? 'workspace.checking' : 'workspace.retry') | t }}
+      </button>
+      <button type="button" class="text-button" (click)="signOut()" [disabled]="isSigningOut()">
+        {{ (isSigningOut() ? 'common.signingOut' : 'common.signOut') | t }}
+      </button>
+    </div>
+  </section>
+</main>

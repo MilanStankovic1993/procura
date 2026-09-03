@@ -1,0 +1,242 @@
+@if (requiresNormalization()) {
+  <div class="market-normalization">
+    <div class="normalization-heading">
+      <div>
+        <p class="eyebrow">{{ 'analysisDetail.normalization.eyebrow' | t }}</p>
+        <strong>{{ 'analysisDetail.normalization.title' | t }}</strong>
+      </div>
+      @if (normalization(); as evidence) {
+        <span [attr.data-status]="evidence.compatibility_status">
+          {{ code(evidence.compatibility_status) }}
+        </span>
+      } @else {
+        <span data-status="missing">
+          {{ 'analysisDetail.normalization.missing' | t }}
+        </span>
+      }
+    </div>
+
+    @if (normalization(); as evidence) {
+      <dl>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.sourceValue' | t }}</dt>
+          <dd>{{ sourceMoney(evidence.source_amount_minor, evidence.source_currency_code) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.normalizedValue' | t }}</dt>
+          <dd>{{ targetMoney(evidence.normalized_amount_minor) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.convertedValue' | t }}</dt>
+          <dd>{{ targetMoney(evidence.converted_amount_minor) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.marketFactor' | t }}</dt>
+          <dd>{{ factor(evidence.market_factor_basis_points) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.marketAdjustedValue' | t }}</dt>
+          <dd>{{ targetMoney(evidence.market_adjusted_amount_minor) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.shipping' | t }}</dt>
+          <dd>{{ targetMoney(evidence.shipping_minor) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.importDuty' | t }}</dt>
+          <dd>{{ targetMoney(evidence.import_duty_minor) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.tax' | t }}</dt>
+          <dd>{{ targetMoney(evidence.tax_minor) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.otherCost' | t }}</dt>
+          <dd>{{ targetMoney(evidence.other_cost_minor) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.rate' | t }}</dt>
+          <dd>
+            {{ evidence.rate_value ?? ('common.unavailable' | t) }}
+            · {{ code(evidence.rate_direction ?? 'unresolved') }}
+          </dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.rateEffective' | t }}</dt>
+          <dd>{{ date(evidence.rate_effective_at) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.rateProvider' | t }}</dt>
+          <dd>{{ evidence.rate_provider ?? ('common.unavailable' | t) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.rateReference' | t }}</dt>
+          <dd>{{ evidence.rate_provider_reference ?? ('common.unavailable' | t) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.reference' | t }}</dt>
+          <dd>{{ evidence.evidence_reference }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.observedAt' | t }}</dt>
+          <dd>{{ date(evidence.observed_at) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.version' | t }}</dt>
+          <dd>{{ evidence.calculation_version }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'analysisDetail.normalization.evidenceHash' | t }}</dt>
+          <dd>{{ evidence.evidence_hash }}</dd>
+        </div>
+      </dl>
+      <p class="note">{{ evidence.compatibility_note }}</p>
+      <div class="reasons">
+        @for (reason of evidence.reason_codes; track $index) {
+          <span>{{ code(reason) }}</span>
+        }
+      </div>
+    } @else {
+      <p class="explanation">{{ 'analysisDetail.normalization.explanation' | t }}</p>
+    }
+
+    @if (error()) {
+      <p class="failure" role="alert">{{ error() }}</p>
+    }
+    @if (success()) {
+      <p class="success" role="status">{{ success() }}</p>
+    }
+
+    @if (canManage() && !open()) {
+      <button type="button" class="button button-quiet" (click)="showForm()">
+        {{ 'analysisDetail.normalization.record' | t }}
+      </button>
+    }
+
+    @if (open()) {
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="normalization-fields">
+          <div>
+            <label for="sell-normalization-status-{{ item().id }}">
+              {{ 'analysisDetail.normalization.compatibility' | t }}
+            </label>
+            <select
+              id="sell-normalization-status-{{ item().id }}"
+              formControlName="compatibility_status"
+            >
+              <option value="compatible">{{ 'analysisLabel.compatible' | t }}</option>
+              <option value="incompatible">{{ 'analysisLabel.incompatible' | t }}</option>
+            </select>
+          </div>
+
+          @if (isCompatible()) {
+            <div>
+              <label for="sell-normalization-factor-{{ item().id }}">
+                {{ 'analysisDetail.normalization.marketFactorPercent' | t }}
+              </label>
+              <input
+                id="sell-normalization-factor-{{ item().id }}"
+                inputmode="decimal"
+                formControlName="market_factor_percent"
+              />
+              <small>{{ 'analysisDetail.normalization.factorHint' | t }}</small>
+            </div>
+            <div>
+              <label for="sell-normalization-shipping-{{ item().id }}">
+                {{ 'analysisDetail.normalization.shipping' | t }}
+              </label>
+              <input
+                id="sell-normalization-shipping-{{ item().id }}"
+                inputmode="decimal"
+                formControlName="shipping"
+              />
+            </div>
+            <div>
+              <label for="sell-normalization-duty-{{ item().id }}">
+                {{ 'analysisDetail.normalization.importDuty' | t }}
+              </label>
+              <input
+                id="sell-normalization-duty-{{ item().id }}"
+                inputmode="decimal"
+                formControlName="import_duty"
+              />
+            </div>
+            <div>
+              <label for="sell-normalization-tax-{{ item().id }}">
+                {{ 'analysisDetail.normalization.tax' | t }}
+              </label>
+              <input
+                id="sell-normalization-tax-{{ item().id }}"
+                inputmode="decimal"
+                formControlName="tax"
+              />
+            </div>
+            <div>
+              <label for="sell-normalization-other-{{ item().id }}">
+                {{ 'analysisDetail.normalization.otherCost' | t }}
+              </label>
+              <input
+                id="sell-normalization-other-{{ item().id }}"
+                inputmode="decimal"
+                formControlName="other_cost"
+              />
+            </div>
+          }
+
+          <div class="wide">
+            <label for="sell-normalization-reference-{{ item().id }}">
+              {{ 'analysisDetail.normalization.reference' | t }}
+            </label>
+            <input
+              id="sell-normalization-reference-{{ item().id }}"
+              formControlName="evidence_reference"
+            />
+          </div>
+          <div class="wide">
+            <label for="sell-normalization-note-{{ item().id }}">
+              {{ 'analysisDetail.normalization.compatibilityNote' | t }}
+            </label>
+            <textarea
+              id="sell-normalization-note-{{ item().id }}"
+              rows="3"
+              formControlName="compatibility_note"
+            ></textarea>
+          </div>
+          <div>
+            <label for="sell-normalization-observed-{{ item().id }}">
+              {{ 'analysisDetail.normalization.observedAt' | t }}
+            </label>
+            <input
+              id="sell-normalization-observed-{{ item().id }}"
+              type="datetime-local"
+              formControlName="observed_at"
+            />
+          </div>
+          <label class="confirmation wide">
+            <input type="checkbox" formControlName="evidence_confirmed" />
+            <span>{{ 'analysisDetail.normalization.attestation' | t }}</span>
+          </label>
+        </div>
+
+        <p class="formula">{{ 'analysisDetail.normalization.formula' | t }}</p>
+        <div class="actions">
+          <button
+            type="button"
+            class="button button-quiet"
+            [disabled]="saving()"
+            (click)="closeForm()"
+          >
+            {{ 'common.cancel' | t }}
+          </button>
+          <button type="submit" class="button" [disabled]="saving()">
+            {{
+              saving()
+                ? ('analysisDetail.normalization.saving' | t)
+                : ('analysisDetail.normalization.save' | t)
+            }}
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+}

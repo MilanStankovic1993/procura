@@ -1,0 +1,93 @@
+@let assessment = record();
+
+<article class="panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">{{ 'risk.eyebrow' | t }}</p>
+      <h2>{{ 'risk.title' | t }}</h2>
+    </div>
+    <strong class="level" [attr.data-level]="assessment.level">
+      {{ assessment.score }} / 100 · {{ label(assessment.level) }}
+    </strong>
+  </div>
+
+  <dl>
+    <div><dt>{{ 'risk.level' | t }}</dt><dd>{{ label(assessment.level) }}</dd></div>
+    <div>
+      <dt>{{ 'risk.confidence' | t }}</dt>
+      <dd>
+        {{ label(assessment.confidence_level) }} /
+        {{ percentage(assessment.confidence_basis_points) }}
+      </dd>
+    </div>
+    <div><dt>{{ 'risk.signals' | t }}</dt><dd>{{ assessment.signal_count }}</dd></div>
+    <div><dt>{{ 'risk.unknownFacts' | t }}</dt><dd>{{ assessment.unknown_count }}</dd></div>
+    <div><dt>{{ 'risk.evaluator' | t }}</dt><dd>{{ assessment.evaluator_version }}</dd></div>
+    <div><dt>{{ 'risk.run' | t }}</dt><dd>#{{ assessment.run_number }}</dd></div>
+    <div><dt>{{ 'risk.calculated' | t }}</dt><dd>{{ date(assessment.calculation_at) }}</dd></div>
+    <div><dt>{{ 'risk.status' | t }}</dt><dd>{{ label(assessment.status) }}</dd></div>
+  </dl>
+
+  <section class="group">
+    <h3>{{ 'risk.coverage' | t }}</h3>
+    <div class="chips">
+      @for (
+        component of componentEntries(assessment.confidence_components);
+        track component.key
+      ) {
+        <span>{{ label(component.key) }} +{{ component.value }}</span>
+      }
+    </div>
+  </section>
+
+  <section class="group">
+    <h3>{{ 'risk.actions' | t }}</h3>
+    <ol class="actions">
+      @for (action of assessment.verification_actions; track action) {
+        <li>{{ verificationAction(action) }}</li>
+      }
+    </ol>
+  </section>
+
+  <div class="signals">
+    @for (signal of assessment.signals; track signal.id) {
+      <section
+        class="signal"
+        [attr.data-severity]="signal.severity"
+        [class.unknown]="signal.is_unknown"
+      >
+        <div class="signal-heading">
+          <div>
+            <span>{{ label(signal.category) }} · {{ label(signal.severity) }}</span>
+            <strong>{{ label(signal.code) }}</strong>
+            <small>{{ 'risk.source' | t: { source: label(signal.source) } }}</small>
+          </div>
+          <b>
+            @if (signal.is_unknown) {
+              {{ 'risk.unknown' | t }}
+            } @else {
+              {{ 'risk.points' | t: { points: signal.score_contribution } }}
+            }
+          </b>
+        </div>
+
+        <dl class="evidence">
+          @for (entry of evidenceEntries(signal); track entry.key) {
+            <div>
+              <dt>{{ label(entry.key) }}</dt>
+              <dd>{{ entry.value }}</dd>
+            </div>
+          }
+        </dl>
+
+        @if (signal.verification_action) {
+          <p>{{ verificationAction(signal.verification_action) }}</p>
+        }
+      </section>
+    }
+  </div>
+
+  <p class="warning">
+    {{ 'risk.warning' | t }}
+  </p>
+</article>

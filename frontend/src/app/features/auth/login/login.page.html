@@ -1,0 +1,79 @@
+<main class="auth-page">
+  <a class="brand" routerLink="/" [attr.aria-label]="'common.backToProcura' | t">
+    <span class="brand-mark" aria-hidden="true">P</span>
+    <span>Procura</span>
+  </a>
+  <app-language-switcher class="auth-language" />
+
+  <section class="auth-card" aria-labelledby="login-title">
+    <div class="heading">
+      <p class="eyebrow">{{ 'login.eyebrow' | t }}</p>
+      <h1 id="login-title">{{ 'login.title' | t }}</h1>
+      <p>{{ 'login.description' | t }}</p>
+    </div>
+
+    @if (generalError()) {
+      <div class="alert" role="alert">{{ generalError() }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label for="email">{{ 'common.emailAddress' | t }}</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        [placeholder]="'login.emailPlaceholder' | t"
+        [attr.aria-invalid]="form.controls.email.invalid && form.controls.email.touched"
+      />
+      @if (form.controls.email.touched && form.controls.email.hasError('required')) {
+        <p class="field-error">{{ 'common.emailRequired' | t }}</p>
+      } @else if (form.controls.email.touched && form.controls.email.hasError('email')) {
+        <p class="field-error">{{ 'common.emailInvalid' | t }}</p>
+      } @else if (fieldErrors()['email']?.[0]; as emailError) {
+        <p class="field-error">{{ emailError }}</p>
+      }
+
+      <div class="password-row">
+        <label for="password">{{ 'common.password' | t }}</label>
+        <a class="text-link" routerLink="/forgot-password">{{
+          'login.forgotPassword' | t
+        }}</a>
+      </div>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+        [placeholder]="'login.passwordPlaceholder' | t"
+        [attr.aria-invalid]="form.controls.password.invalid && form.controls.password.touched"
+      />
+      @if (form.controls.password.touched && form.controls.password.hasError('required')) {
+        <p class="field-error">{{ 'common.passwordRequired' | t }}</p>
+      } @else if (fieldErrors()['password']?.[0]; as passwordError) {
+        <p class="field-error">{{ passwordError }}</p>
+      }
+
+      <label class="remember">
+        <input type="checkbox" formControlName="remember" />
+        <span>{{ 'login.remember' | t }}</span>
+      </label>
+
+      <button class="button button-primary submit" type="submit" [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          {{ 'login.submitting' | t }}
+        } @else {
+          {{ 'common.signIn' | t }} <span>→</span>
+        }
+      </button>
+    </form>
+
+    <p class="auth-switch">
+      {{ 'login.newToProcura' | t }}
+      <a class="text-link" routerLink="/register">{{ 'login.createAccount' | t }}</a>
+    </p>
+    <p class="security-note">{{ 'login.security' | t }}</p>
+  </section>
+
+  <p class="footer-copy">{{ 'common.footer' | t }}</p>
+</main>

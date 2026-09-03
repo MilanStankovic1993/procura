@@ -56,8 +56,9 @@ return [
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'throw' => false,
-            'report' => false,
+            'visibility' => 'private',
+            'throw' => (bool) env('AWS_THROW', false),
+            'report' => (bool) env('AWS_REPORT', false),
         ],
 
     ],

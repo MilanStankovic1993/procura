@@ -1,0 +1,140 @@
+@let estimate = record();
+
+<article class="panel">
+  <div class="section-heading">
+    <div>
+      <p class="eyebrow">{{ 'priceEstimate.eyebrow' | t }}</p>
+      <h2>{{ 'priceEstimate.title' | t }}</h2>
+    </div>
+    <strong class="estimate-status" [attr.data-status]="estimate.status">
+      {{ label(estimate.status) }}
+    </strong>
+  </div>
+
+  <dl>
+    <div>
+      <dt>{{ 'priceEstimate.lowerBand' | t }}</dt>
+      <dd>{{ money(estimate.estimate_low_minor, estimate.target_currency_code) }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'priceEstimate.center' | t }}</dt>
+      <dd>{{ money(estimate.estimate_minor, estimate.target_currency_code) }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'priceEstimate.upperBand' | t }}</dt>
+      <dd>{{ money(estimate.estimate_high_minor, estimate.target_currency_code) }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'priceEstimate.targetMarket' | t }}</dt>
+      <dd>{{ estimate.target_country_code }} / {{ estimate.target_currency_code }}</dd>
+    </div>
+    <div>
+      <dt>{{ 'priceEstimate.usedEvidence' | t }}</dt>
+      <dd>{{ estimate.included_count }} / {{ estimate.input_count }}</dd>
+    </div>
+    <div><dt>{{ 'priceEstimate.outliers' | t }}</dt><dd>{{ estimate.outlier_count }}</dd></div>
+    <div><dt>{{ 'priceEstimate.unresolved' | t }}</dt><dd>{{ estimate.unresolved_count }}</dd></div>
+    <div>
+      <dt>{{ 'priceEstimate.confidence' | t }}</dt>
+      <dd>
+        {{ estimate.confidence_level ? label(estimate.confidence_level) : ('common.pending' | t) }}
+        / {{ percentage(estimate.confidence_basis_points) }}
+      </dd>
+    </div>
+    <div><dt>{{ 'priceEstimate.algorithm' | t }}</dt><dd>{{ estimate.algorithm_version }}</dd></div>
+    <div><dt>{{ 'priceEstimate.rateResolver' | t }}</dt><dd>{{ estimate.rate_resolver_version }}</dd></div>
+    <div><dt>{{ 'priceEstimate.run' | t }}</dt><dd>#{{ estimate.run_number }}</dd></div>
+    <div><dt>{{ 'priceEstimate.calculated' | t }}</dt><dd>{{ date(estimate.calculation_at) }}</dd></div>
+  </dl>
+
+  <div class="statistics">
+    <div>
+      <small>{{ 'priceEstimate.median' | t }}</small>
+      <strong>{{ money(estimate.statistics.median_minor, estimate.target_currency_code) }}</strong>
+    </div>
+    <div>
+      <small>{{ 'priceEstimate.weightedMedian' | t }}</small>
+      <strong>
+        {{ money(estimate.statistics.weighted_median_minor, estimate.target_currency_code) }}
+      </strong>
+    </div>
+    <div>
+      <small>{{ 'priceEstimate.quartiles' | t }}</small>
+      <strong>
+        {{ money(estimate.statistics.q1_minor, estimate.target_currency_code) }}
+        -
+        {{ money(estimate.statistics.q3_minor, estimate.target_currency_code) }}
+      </strong>
+    </div>
+    <div>
+      <small>{{ 'priceEstimate.deviation' | t }}</small>
+      <strong>{{ money(estimate.statistics.mad_minor, estimate.target_currency_code) }}</strong>
+    </div>
+    <div>
+      <small>{{ 'priceEstimate.dispersion' | t }}</small>
+      <strong>{{ percentage(estimate.statistics.dispersion_basis_points) }}</strong>
+    </div>
+  </div>
+
+  <div class="result-group">
+    <h3>{{ 'priceEstimate.confidenceComponents' | t }}</h3>
+    <div class="factor-list">
+      @for (factor of factorEntries(estimate.confidence_components); track factor.key) {
+        <span>{{ label(factor.key) }} +{{ factor.value }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="result-group pending">
+    <h3>{{ 'priceEstimate.calculationEvidence' | t }}</h3>
+    <div class="chips">
+      @for (reason of estimate.reason_codes; track $index) {
+        <span>{{ label(reason) }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="item-list">
+    @for (item of estimate.items; track item.id) {
+      <section class="item" [attr.data-decision]="item.decision">
+        <div class="item-heading">
+          <div>
+            <span>{{ label(item.decision) }}</span>
+            <strong>{{ item.evidence.comparable_evidence.title }}</strong>
+            <small>
+              {{ item.evidence.comparable_evidence.marketplace_name }}
+              / {{ item.evidence.selector_rank === null ? ('priceEstimate.excluded' | t) : ('priceEstimate.selector' | t: { rank: item.evidence.selector_rank }) }}
+              / {{ 'priceEstimate.weight' | t: { weight: item.weight_basis_points } }}
+            </small>
+          </div>
+          <div class="item-score">
+            <strong>{{ itemMoney(item) }} -> {{ itemMoney(item, true) }}</strong>
+            <small>
+              {{ label(item.rate_direction) }}
+              @if (item.rate_value) { / {{ item.rate_value }} }
+            </small>
+          </div>
+        </div>
+        <div class="rate-evidence">
+          @if (item.rate_provider) {
+            <span>{{ item.rate_provider }} / {{ item.rate_provider_reference }}</span>
+          } @else {
+            <span>{{ 'priceEstimate.noRate' | t }}</span>
+          }
+          @if (item.rate_effective_at) {
+            <span>{{ 'priceEstimate.effective' | t: { date: date(item.rate_effective_at) } }}</span>
+          }
+        </div>
+        <div class="reason-list">
+          @for (reason of item.reason_codes; track $index) {
+            <span>{{ label(reason) }}</span>
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+  <p class="warning">
+    {{ 'priceEstimate.warning' | t }}
+  </p>
+</article>

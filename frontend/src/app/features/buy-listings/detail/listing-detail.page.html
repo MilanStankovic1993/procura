@@ -1,0 +1,326 @@
+<div class="page">
+  <a class="back" routerLink="/app/buy">{{ 'listingDetail.back' | t }}</a>
+
+  @if (error()) {
+    <div class="alert error" role="alert">
+      <span>{{ error() }}</span>
+      @if (!listing()) { <button type="button" (click)="retry()">{{ 'common.retry' | t }}</button> }
+    </div>
+  }
+  @if (success()) { <div class="alert success" role="status">{{ success() }}</div> }
+
+  @if (loading() && !listing()) {
+    <section class="loading" aria-live="polite">{{ 'listingDetail.loading' | t }}</section>
+  } @else if (listing(); as record) {
+    <header>
+      <div>
+        <div class="title-meta">
+          <span class="status" [attr.data-status]="record.status">{{ listingStatusLabel(record.status) }}</span>
+          <span>{{ record.marketplace_name }}</span>
+          <span>{{ 'listingDetail.captured' | t: { date: date(record.created_at) } }}</span>
+        </div>
+        <h1>{{ record.title }}</h1>
+        <p>{{ record.source_country_code }} → {{ record.target_country_code }}</p>
+      </div>
+      <strong class="price">{{ price(record) }}</strong>
+    </header>
+
+    <section class="journey" [attr.data-state]="journeyState()" aria-labelledby="buy-next-step">
+      <div class="journey-content">
+        <p class="eyebrow">{{ 'listingDetail.journey.eyebrow' | t }}</p>
+        <h2 id="buy-next-step">{{ journeyTitleKey() | t }}</h2>
+        <p class="journey-description">{{ journeyDescriptionKey() | t }}</p>
+
+        <div class="journey-action">
+          @if (journeyState() === 'loading') {
+            <span class="journey-wait" aria-live="polite">
+              {{ 'listingDetail.analysisLoading' | t }}
+            </span>
+          } @else if (journeyState() === 'unavailable') {
+            <button class="button button-primary" type="button" (click)="retryAnalyses()">
+              {{ 'common.retry' | t }}
+            </button>
+          } @else if (primaryAnalysis(); as analysis) {
+            <a
+              class="button button-primary"
+              [routerLink]="['/app/buy', record.id, 'analysis', analysis.id]"
+            >
+              {{ journeyActionKey() | t }}
+              <span aria-hidden="true">→</span>
+            </a>
+          } @else if (canManageAnalyses()) {
+            <button
+              class="button button-primary"
+              type="button"
+              [disabled]="creatingDraft()"
+              (click)="createAnalysisDraft()"
+            >
+              {{ (creatingDraft() ? 'listingDetail.creatingDraft' : journeyActionKey()) | t }}
+              <span aria-hidden="true">→</span>
+            </button>
+          } @else {
+            <span class="journey-readonly">{{ 'listingDetail.analysisReadOnly' | t }}</span>
+          }
+        </div>
+      </div>
+
+      <ol class="journey-steps" [attr.aria-label]="'listingDetail.journey.progressLabel' | t">
+        <li [attr.data-state]="journeyStepState(1)">
+          <span class="step-marker" aria-hidden="true">1</span>
+          <div>
+            <strong>{{ 'listingDetail.journey.step1.title' | t }}</strong>
+            <small>{{ 'listingDetail.journey.step1.description' | t }}</small>
+          </div>
+        </li>
+        <li [attr.data-state]="journeyStepState(2)">
+          <span class="step-marker" aria-hidden="true">2</span>
+          <div>
+            <strong>{{ 'listingDetail.journey.step2.title' | t }}</strong>
+            <small>{{ 'listingDetail.journey.step2.description' | t }}</small>
+          </div>
+        </li>
+        <li [attr.data-state]="journeyStepState(3)">
+          <span class="step-marker" aria-hidden="true">3</span>
+          <div>
+            <strong>{{ 'listingDetail.journey.step3.title' | t }}</strong>
+            <small>{{ 'listingDetail.journey.step3.description' | t }}</small>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+    <section class="layout">
+      <div class="main-column">
+        <article class="panel facts">
+          <div class="section-heading">
+            <div><p class="eyebrow">{{ 'listingDetail.factsEyebrow' | t }}</p><h2>{{ 'listingDetail.record' | t }}</h2></div>
+            <span>{{ record.marketplace_source.name }}</span>
+          </div>
+          <dl>
+            <div><dt>{{ 'listingDetail.marketplace' | t }}</dt><dd>{{ record.marketplace_name }}</dd></div>
+            <div><dt>{{ 'listingDetail.externalId' | t }}</dt><dd>{{ record.external_id ?? ('common.notProvided' | t) }}</dd></div>
+            <div><dt>{{ 'listingDetail.location' | t }}</dt><dd>{{ record.location ?? ('common.notProvided' | t) }}</dd></div>
+            <div><dt>{{ 'listingDetail.marketRoute' | t }}</dt><dd>{{ record.source_country_code }} → {{ record.target_country_code }}</dd></div>
+          </dl>
+          @if (record.source_url) {
+            <a
+              class="source-link"
+              [href]="record.source_url"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ 'listingDetail.openSource' | t }}
+            </a>
+          }
+          <div class="text-block">
+            <h3>{{ 'listingDetail.description' | t }}</h3>
+            <p>{{ record.description ?? ('listingDetail.noDescription' | t) }}</p>
+          </div>
+          <div class="text-block">
+            <h3>{{ 'listingDetail.seller' | t }}</h3>
+            <p>{{ record.seller_information ?? ('listingDetail.noSeller' | t) }}</p>
+          </div>
+        </article>
+
+        <article class="panel evidence">
+          <div class="section-heading">
+            <div><p class="eyebrow">{{ 'listingDetail.privateStorage' | t }}</p><h2>{{ 'listingDetail.evidence' | t }}</h2></div>
+            <span>{{ 'common.files' | t: { count: record.image_count } }}</span>
+          </div>
+
+          @if ((record.images?.length ?? 0) === 0) {
+            <div class="empty-evidence">
+              {{ 'listingDetail.noEvidence' | t }}
+            </div>
+          } @else {
+            <div class="image-grid">
+              @for (image of record.images ?? []; track image.id) {
+                <figure>
+                  <a [href]="image.content_url" target="_blank" rel="noopener">
+                    <img
+                      [src]="image.content_url"
+                      [alt]="imageKindLabel(image.kind) + ': ' + image.filename"
+                      loading="lazy"
+                    />
+                  </a>
+                  <figcaption>
+                    <div>
+                      <strong>{{ imageKindLabel(image.kind) }}</strong>
+                      <span>{{ image.width }} × {{ image.height }} · {{ fileSize(image.size_bytes) }}</span>
+                    </div>
+                    @if (canManage()) {
+                      <button
+                        type="button"
+                        [disabled]="removingImageIds().has(image.id)"
+                        (click)="removeImage(image)"
+                        [attr.aria-label]="'listingDetail.removeAria' | t: { filename: image.filename }"
+                      >
+                        {{ (removingImageIds().has(image.id) ? 'listingDetail.removing' : 'listingDetail.remove') | t }}
+                      </button>
+                    }
+                  </figcaption>
+                </figure>
+              }
+            </div>
+          }
+
+          @if (canManage()) {
+            <form class="upload-form" [formGroup]="uploadForm" (ngSubmit)="upload()">
+              <div>
+                <label for="evidence-kind">{{ 'listingDetail.evidenceType' | t }}</label>
+                <select id="evidence-kind" formControlName="kind">
+                  <option value="product">{{ 'listingDetail.productImages' | t }}</option>
+                  <option value="screenshot">{{ 'listingDetail.screenshots' | t }}</option>
+                </select>
+              </div>
+              <div class="file-input">
+                <label for="evidence-files">{{ 'listingDetail.filePolicy' | t }}</label>
+                <input
+                  id="evidence-files"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  (change)="selectFiles($event)"
+                />
+              </div>
+              <button
+                class="button button-quiet"
+                type="submit"
+                [disabled]="uploading() || selectedFiles().length === 0"
+              >
+                {{ uploading() ? ('listingDetail.uploading' | t) : ('listingDetail.uploadFiles' | t: { count: selectedFiles().length }) }}
+              </button>
+            </form>
+          }
+          <button class="refresh" type="button" (click)="retry()">
+            {{ 'listingDetail.refreshLinks' | t }}
+          </button>
+        </article>
+
+        <article class="panel analysis-requests">
+          <div class="section-heading">
+            <div><p class="eyebrow">{{ 'listingDetail.analysisEyebrow' | t }}</p><h2>{{ 'listingDetail.analysisTitle' | t }}</h2></div>
+            <span>{{ 'listingDetail.recent' | t: { count: analysisRecords().length } }}</span>
+          </div>
+
+          <p class="analysis-intro">
+            {{ 'listingDetail.analysisIntro' | t }}
+          </p>
+
+          @if (analysesError()) {
+            <div class="inline-error" role="alert">
+              <span>{{ analysesError() }}</span>
+              <button type="button" (click)="retryAnalyses()">{{ 'common.retry' | t }}</button>
+            </div>
+          }
+
+          @if (analysesLoading()) {
+            <div class="analysis-loading" aria-live="polite">{{ 'listingDetail.analysisLoading' | t }}</div>
+          } @else if (analysisRecords().length === 0 && !analysesError()) {
+            <div class="analysis-empty">
+              <p>{{ 'listingDetail.noAnalysis' | t }}</p>
+              @if (!canManageAnalyses()) {
+                <small>{{ 'listingDetail.analysisReadOnly' | t }}</small>
+              }
+            </div>
+          } @else {
+            <div class="analysis-list">
+              @for (analysis of analysisRecords(); track analysis.id) {
+                <a
+                  [routerLink]="['/app/buy', record.id, 'analysis', analysis.id]"
+                  class="analysis-row"
+                >
+                  <span class="analysis-status" [attr.data-status]="analysis.status">
+                    {{ analysisStatusLabel(analysis.status) }}
+                  </span>
+                  <div>
+                    <strong>{{ analysis.pipeline_version }}</strong>
+                    <small>
+                      {{ analysis.source_country_code }} → {{ analysis.target_country_code }} ·
+                      {{ date(analysis.created_at) }}
+                    </small>
+                  </div>
+                  <span aria-hidden="true">→</span>
+                </a>
+              }
+            </div>
+
+            @if (
+              canManageAnalyses() &&
+              (journeyState() === 'completed' || journeyState() === 'failed')
+            ) {
+              <button
+                class="button button-quiet new-analysis"
+                type="button"
+                [disabled]="creatingDraft()"
+                (click)="createAnalysisDraft()"
+              >
+                {{
+                  (creatingDraft()
+                    ? 'listingDetail.openingDraft'
+                    : 'listingDetail.createAnotherDraft'
+                ) | t }}
+              </button>
+            }
+          }
+        </article>
+
+        <article class="panel history">
+          <div class="section-heading">
+            <div><p class="eyebrow">{{ 'listingDetail.provenance' | t }}</p><h2>{{ 'listingDetail.snapshotHistory' | t }}</h2></div>
+            <span>{{ 'common.total' | t: { count: record.snapshot_count } }}</span>
+          </div>
+          <div class="timeline">
+            @for (snapshot of record.snapshots ?? []; track snapshot.id) {
+              <div class="snapshot">
+                <span class="sequence">#{{ snapshot.sequence }}</span>
+                <div>
+                  <strong>{{ listingStatusLabel(snapshot.status) }} · {{ date(snapshot.captured_at) }}</strong>
+                  <p>
+                    {{ snapshot.marketplace_name }} · {{ snapshot.source_country_code }} →
+                    {{ snapshot.target_country_code }}
+                  </p>
+                  <code [title]="snapshot.content_hash">{{ shortHash(snapshot.content_hash) }}</code>
+                </div>
+              </div>
+            }
+          </div>
+        </article>
+      </div>
+
+      <aside>
+        <section class="panel lifecycle">
+          <p class="eyebrow">{{ 'listingDetail.lifecycle' | t }}</p>
+          <h2>{{ 'listingDetail.sourceStatus' | t }}</h2>
+          @if (canManage()) {
+            <form [formGroup]="lifecycleForm" (ngSubmit)="saveLifecycle()">
+              <label for="lifecycle-status">{{ 'listingDetail.observedStatus' | t }}</label>
+              <select id="lifecycle-status" formControlName="status">
+                <option value="active">{{ 'listing.status.active' | t }}</option>
+                <option value="reserved">{{ 'listing.status.reserved' | t }}</option>
+                <option value="sold">{{ 'listing.status.sold' | t }}</option>
+                <option value="removed">{{ 'listing.status.removed' | t }}</option>
+                <option value="expired">{{ 'listing.status.expired' | t }}</option>
+                <option value="unknown">{{ 'listing.status.unknown' | t }}</option>
+              </select>
+              <label for="lifecycle-notes">{{ 'listingDetail.privateNotes' | t }}</label>
+              <textarea id="lifecycle-notes" rows="6" formControlName="notes"></textarea>
+              <button class="button button-primary" type="submit" [disabled]="saving()">
+                {{ (saving() ? 'common.saving' : 'listingDetail.saveSnapshot') | t }}
+              </button>
+            </form>
+          } @else {
+            <p class="readonly">{{ 'listingList.readOnly' | t }}</p>
+            @if (record.notes) { <p class="notes">{{ record.notes }}</p> }
+          }
+        </section>
+
+        <section class="panel boundary">
+          <p class="eyebrow">{{ 'listingDetail.aggregateBoundary' | t }}</p>
+          <h2>{{ 'listingDetail.boundaryTitle' | t }}</h2>
+          <p>{{ 'listingDetail.boundaryDescription' | t }}</p>
+        </section>
+      </aside>
+    </section>
+  }
+</div>

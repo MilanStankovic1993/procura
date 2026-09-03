@@ -1,0 +1,593 @@
+:host {
+  display: block;
+}
+
+.page {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: clamp(1rem, 2.5vw, 2.5rem);
+}
+
+header,
+.request-head,
+.section-heading,
+.submit-card,
+.cancel-card,
+.actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+header p,
+.submit-card p,
+.cancel-card p,
+.timeline p,
+.notes p {
+  margin-top: 0.35rem;
+  color: var(--ink-muted);
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.back {
+  color: var(--accent);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.panel,
+.submit-card,
+.cancel-card {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: clamp(1rem, 2vw, 1.4rem);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.request-head > div {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.request-head small {
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+
+.status,
+.section-heading > span {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 800;
+}
+
+.status[data-status='completed'] {
+  color: var(--success);
+}
+
+.status[data-status='cancelled'] {
+  color: var(--danger);
+}
+
+.description {
+  margin-top: 1.2rem;
+  color: var(--ink-strong);
+  white-space: pre-wrap;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 0;
+}
+
+dt {
+  color: var(--ink-muted);
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+dd {
+  margin: 0.25rem 0 0;
+  color: var(--ink-strong);
+  font-weight: 750;
+}
+
+.notes,
+.timeline {
+  border-top: 1px solid var(--line);
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+}
+
+.offer-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.offer-section .section-heading p,
+.offer-disclosure p,
+.currency-warning p,
+.offer-action p,
+.return-policy p {
+  margin-top: 0.35rem;
+  color: var(--ink-muted);
+}
+
+.offer-disclosure,
+.currency-warning {
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  padding: 0.85rem 1rem;
+  background: var(--surface-muted);
+}
+
+.currency-warning {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+
+.offer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.offer-card {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  padding: 1rem;
+  background: var(--surface);
+}
+
+.offer-card[data-status='accepted'] {
+  border-color: color-mix(in srgb, var(--success) 55%, var(--line));
+}
+
+.offer-card[data-status='not_selected'] {
+  opacity: 0.78;
+}
+
+.offer-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.offer-head > div {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.offer-status {
+  justify-self: start;
+  border-radius: 999px;
+  padding: 0.3rem 0.55rem;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.offer-status[data-status='accepted'] {
+  color: var(--success);
+}
+
+.offer-status[data-status='not_selected'] {
+  color: var(--ink-muted);
+  background: var(--surface-muted);
+}
+
+.offer-total {
+  display: grid;
+  justify-items: end;
+  gap: 0.2rem;
+  color: var(--ink-strong);
+  white-space: nowrap;
+}
+
+.offer-total small {
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.offer-total strong {
+  font-size: 1.15rem;
+}
+
+.offer-description {
+  color: var(--ink-strong);
+  white-space: pre-wrap;
+}
+
+.offer-facts {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.cost-breakdown,
+.return-policy,
+.offer-action {
+  border-top: 1px solid var(--line);
+  padding-top: 0.9rem;
+}
+
+.cost-breakdown dl {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.45rem;
+  margin: 0.7rem 0 0;
+}
+
+.cost-breakdown dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cost-breakdown dd {
+  margin-top: 0;
+  text-align: right;
+}
+
+.cost-breakdown .cost-total {
+  border-top: 1px solid var(--line);
+  margin-top: 0.25rem;
+  padding-top: 0.55rem;
+}
+
+.cost-breakdown .payable-total {
+  border-top: 2px solid var(--line-strong);
+  margin-top: 0.25rem;
+  padding-top: 0.6rem;
+}
+
+.cost-breakdown .payable-total dt,
+.cost-breakdown .payable-total dd {
+  color: var(--ink-strong);
+  font-weight: 900;
+}
+
+.offer-action {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.offer-action .actions {
+  flex-wrap: wrap;
+}
+
+.expired-note {
+  color: var(--danger);
+  font-weight: 750;
+}
+
+.timeline {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.timeline article {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.75rem;
+}
+
+.timeline article > span {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 900;
+}
+
+.timeline small {
+  color: var(--ink-muted);
+}
+
+.transaction-section {
+  display: grid;
+  gap: 1rem;
+}
+
+.transaction-section .section-heading p,
+.transaction-disclosure p,
+.commission-card p,
+.transaction-timeline p {
+  margin-top: 0.35rem;
+  color: var(--ink-muted);
+}
+
+.transaction-status,
+.commission-status {
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-size: 0.78rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.transaction-status[data-status='completed'] {
+  color: var(--success);
+}
+
+.transaction-status[data-status='cancelled'] {
+  color: var(--danger);
+}
+
+.transaction-disclosure,
+.commission-card {
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  background: var(--surface-muted);
+}
+
+.transaction-facts,
+.commission-card dl {
+  margin-top: 0;
+}
+
+.transaction-facts .payable-fact {
+  border-left: 3px solid var(--accent);
+  padding-left: 0.8rem;
+}
+
+.transaction-facts .payable-fact dd {
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.commission-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+}
+
+.commission-card dl {
+  grid-column: 1 / -1;
+}
+
+.transaction-timeline {
+  display: grid;
+  gap: 0.8rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+
+.report-section {
+  display: grid;
+  gap: 0.8rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+
+.payment-case-card small,
+.payment-case-timeline small {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--ink-muted);
+}
+
+.payment-case-boundary {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+
+.payment-case-card {
+  display: grid;
+  gap: 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  padding: 1rem;
+  background: var(--surface-muted);
+}
+
+.payment-case-status[data-status='resolved'] {
+  color: var(--success);
+}
+
+.payment-case-status[data-status='cancelled'] {
+  color: var(--ink-muted);
+}
+
+.payment-case-card dl {
+  margin: 0;
+}
+
+.payment-case-timeline {
+  gap: 0.65rem;
+}
+
+.payment-case-timeline h4 {
+  margin: 0;
+}
+
+.payment-case-timeline p {
+  margin: 0;
+}
+
+.report-section > div:first-child p,
+.report-card p {
+  margin-top: 0.35rem;
+  color: var(--ink-muted);
+}
+
+.report-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.report-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  padding: 0.9rem;
+  background: var(--surface-muted);
+}
+
+.report-card small,
+.report-unavailable {
+  color: var(--ink-muted);
+}
+
+.report-status {
+  border-radius: 999px;
+  padding: 0.35rem 0.6rem;
+  color: var(--success);
+  background: var(--surface);
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.report-status[data-status='purged'] {
+  color: var(--ink-muted);
+}
+
+.transaction-timeline article {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.75rem;
+}
+
+.transaction-timeline article > span {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 900;
+}
+
+.primary,
+.secondary,
+.danger {
+  border: 0;
+  border-radius: 0.7rem;
+  padding: 0.72rem 1rem;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.primary {
+  color: white;
+  background: var(--accent);
+}
+
+.secondary {
+  border: 1px solid var(--line-strong);
+  color: var(--ink-strong);
+  background: var(--surface);
+}
+
+.danger {
+  color: white;
+  background: var(--danger);
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.alert {
+  padding: 0.8rem 0;
+}
+
+.alert.error {
+  color: var(--danger);
+}
+
+.alert.success {
+  color: var(--success);
+}
+
+@media (max-width: 680px) {
+  header,
+  .request-head,
+  .submit-card,
+  .cancel-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  dl {
+    grid-template-columns: 1fr;
+  }
+
+  .offer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .offer-head {
+    flex-direction: column;
+  }
+
+  .offer-total {
+    justify-items: start;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .transaction-section .section-heading,
+  .commission-card {
+    grid-template-columns: 1fr;
+  }
+
+  .transaction-section .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .commission-status {
+    justify-self: start;
+  }
+
+  .report-card {
+    grid-template-columns: 1fr;
+  }
+
+  .report-status {
+    justify-self: start;
+  }
+}

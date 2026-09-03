@@ -1,0 +1,109 @@
+# Replace procura.example.com and certificate paths before enabling this file.
+# Validate with: sudo nginx -t
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name procura.example.com;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/letsencrypt;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name procura.example.com;
+
+    root /var/www/procura/current/public;
+    index index.php;
+    server_tokens off;
+
+    ssl_certificate /etc/letsencrypt/live/procura.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/procura.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 1d;
+    ssl_session_tickets off;
+
+    client_max_body_size 25m;
+
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header Permissions-Policy "camera=(), geolocation=(), microphone=(), payment=(self)" always;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types application/javascript application/json image/svg+xml text/css text/plain;
+
+    # The application shell must revalidate so new deployments are picked up immediately.
+    location = /spa/index.html {
+        internal;
+        try_files $uri =404;
+        add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+    }
+
+    # Angular emits content-hashed JavaScript and CSS into this private asset namespace.
+    location ^~ /spa/ {
+        try_files $uri =404;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+    }
+
+    # The source index uses a root-relative favicon during both development and production.
+    location = /favicon.svg {
+        try_files /spa/favicon.svg =404;
+        add_header Cache-Control "public, max-age=86400" always;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+
+    # These prefixes always belong to Laravel, never to the Angular fallback.
+    location ~ ^/(?:api|sanctum|admin|filament|flux|storage)(?:/|$) {
+        try_files /__procura_backend_route__ @laravel;
+    }
+
+    # Livewire fingerprints its public prefix; route every generated variant to Laravel.
+    location ~ ^/livewire-[A-Za-z0-9_-]+(?:/|$) {
+        try_files /__procura_backend_route__ @laravel;
+    }
+
+    location = /up {
+        try_files /__procura_backend_route__ @laravel;
+    }
+
+    # Browser routes are read-only at the web-server boundary.
+    location / {
+        limit_except GET HEAD {
+            deny all;
+        }
+
+        try_files $uri $uri/ /spa/index.html;
+    }
+
+    location @laravel {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param HTTPS on;
+        fastcgi_param HTTP_PROXY "";
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_read_timeout 60s;
+    }
+
+    # PHP files are reachable only through the named front-controller location above.
+    location ~ \.php$ {
+        return 404;
+    }
+
+}

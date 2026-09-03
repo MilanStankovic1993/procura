@@ -1,0 +1,674 @@
+<div class="page">
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'brokerRequest.eyebrow' | t }}</p>
+      <h1>{{ record()?.title ?? ('brokerRequest.detail.title' | t) }}</h1>
+      <p>{{ 'brokerRequest.detail.description' | t }}</p>
+    </div>
+    <a class="back" routerLink="/app/broker-requests">
+      {{ 'brokerRequest.detail.back' | t }}
+    </a>
+  </header>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+  @if (success()) {
+    <div class="alert success" role="status">{{ success() }}</div>
+  }
+
+  @if (loading()) {
+    <div class="panel">{{ 'brokerRequest.detail.loading' | t }}</div>
+  } @else if (record(); as request) {
+    <section class="panel">
+      <div class="request-head">
+        <div>
+          <span class="status" [attr.data-status]="request.status">
+            {{ statusLabel(request.status) }}
+          </span>
+          <small>{{ request.id }}</small>
+        </div>
+        @if (canManage() && request.status === 'draft') {
+          <a
+            class="secondary"
+            [routerLink]="['/app/broker-requests', request.id, 'edit']"
+          >
+            {{ 'brokerRequest.detail.editDraft' | t }}
+          </a>
+        }
+      </div>
+
+      <p class="description">{{ request.product_description }}</p>
+
+      <dl>
+        <div>
+          <dt>{{ 'brokerRequest.fields.category' | t }}</dt>
+          <dd>{{ request.product_category?.name ?? ('common.notSet' | t) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'brokerRequest.fields.condition' | t }}</dt>
+          <dd>{{ conditionLabel(request.condition_preference) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'brokerRequest.fields.brand' | t }}</dt>
+          <dd>{{ request.brand_preference ?? ('common.notSet' | t) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'brokerRequest.fields.model' | t }}</dt>
+          <dd>{{ request.model_preference ?? ('common.notSet' | t) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'brokerRequest.fields.quantity' | t }}</dt>
+          <dd>{{ request.quantity }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'brokerRequest.fields.budget' | t }}</dt>
+          <dd>{{ money(request) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'brokerRequest.fields.targetCountries' | t }}</dt>
+          <dd>{{ countries(request.target_country_codes) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'brokerRequest.fields.neededBy' | t }}</dt>
+          <dd>{{ date(request.needed_by) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'brokerRequest.detail.requester' | t }}</dt>
+          <dd>{{ request.requester?.name ?? ('common.notSet' | t) }}</dd>
+        </div>
+        <div>
+          <dt>{{ 'brokerRequest.detail.createdAt' | t }}</dt>
+          <dd>{{ date(request.created_at, true) }}</dd>
+        </div>
+      </dl>
+
+      @if (request.notes) {
+        <div class="notes">
+          <strong>{{ 'brokerRequest.fields.notes' | t }}</strong>
+          <p>{{ request.notes }}</p>
+        </div>
+      }
+    </section>
+
+    @if (canManage() && request.status === 'draft') {
+      <section class="submit-card">
+        <div>
+          <strong>{{ 'brokerRequest.detail.submitTitle' | t }}</strong>
+          <p>{{ 'brokerRequest.detail.submitDescription' | t }}</p>
+        </div>
+        <button class="primary" type="button" [disabled]="mutating()" (click)="submit()">
+          {{
+            (mutating()
+              ? 'brokerRequest.detail.submitting'
+              : 'brokerRequest.detail.submit')
+              | t
+          }}
+        </button>
+      </section>
+    }
+
+    @if ((request.offers?.length ?? 0) > 0) {
+      <section class="panel offer-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ 'brokerRequest.offer.eyebrow' | t }}</p>
+            <h2>{{ 'brokerRequest.offer.title' | t }}</h2>
+            <p>{{ 'brokerRequest.offer.description' | t }}</p>
+          </div>
+          <span>{{ request.offers?.length ?? 0 }}</span>
+        </div>
+
+        <div class="offer-disclosure" role="note">
+          <strong>{{ 'brokerRequest.offer.disclosureTitle' | t }}</strong>
+          <p>{{ 'brokerRequest.offer.disclosure' | t }}</p>
+        </div>
+
+        @if (hasMultipleOfferCurrencies()) {
+          <div class="currency-warning" role="note">
+            <strong>{{ 'brokerRequest.offer.currencyWarningTitle' | t }}</strong>
+            <p>{{ 'brokerRequest.offer.currencyWarning' | t }}</p>
+          </div>
+        }
+
+        <div class="offer-grid">
+          @for (offer of request.offers ?? []; track offer.id) {
+            <article class="offer-card" [attr.data-status]="offer.status">
+              <div class="offer-head">
+                <div>
+                  <span class="offer-status" [attr.data-status]="offer.status">
+                    {{ offerStatusLabel(offer.status) }}
+                  </span>
+                  <h3>{{ offer.supplier_display_name }}</h3>
+                </div>
+                <div class="offer-total">
+                  <small>{{ 'brokerRequest.offer.customerPayable' | t }}</small>
+                  <strong>
+                    {{
+                      offerMoney(
+                        offer.payable_total_minor,
+                        offer.currency_code
+                      )
+                    }}
+                  </strong>
+                </div>
+              </div>
+
+              <p class="offer-description">{{ offer.item_description }}</p>
+
+              <dl class="offer-facts">
+                <div>
+                  <dt>{{ 'brokerRequest.offer.condition' | t }}</dt>
+                  <dd>{{ conditionLabel(offer.condition) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'brokerRequest.offer.quantity' | t }}</dt>
+                  <dd>{{ offer.quantity }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'brokerRequest.offer.origin' | t }}</dt>
+                  <dd>
+                    {{
+                      offer.origin_country_code
+                        ? countries([offer.origin_country_code])
+                        : ('common.notSet' | t)
+                    }}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{{ 'brokerRequest.offer.delivery' | t }}</dt>
+                  <dd>{{ date(offer.estimated_delivery_date) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'brokerRequest.offer.validUntil' | t }}</dt>
+                  <dd>{{ date(offer.valid_until, true) }}</dd>
+                </div>
+                <div>
+                  <dt>{{ 'brokerRequest.offer.warranty' | t }}</dt>
+                  <dd>
+                    @if (offer.warranty_months !== null) {
+                      {{ offer.warranty_months }}
+                      {{ 'brokerRequest.offer.months' | t }}
+                    } @else {
+                      {{ 'common.notSet' | t }}
+                    }
+                  </dd>
+                </div>
+              </dl>
+
+              <div class="cost-breakdown">
+                <strong>{{ 'brokerRequest.offer.costBreakdown' | t }}</strong>
+                <dl>
+                  <div>
+                    <dt>{{ 'brokerRequest.offer.unitPrice' | t }}</dt>
+                    <dd>
+                      {{
+                        offerMoney(
+                          offer.unit_price_minor,
+                          offer.currency_code
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'brokerRequest.offer.itemSubtotal' | t }}</dt>
+                    <dd>
+                      {{
+                        offerMoney(
+                          offer.item_subtotal_minor,
+                          offer.currency_code
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'brokerRequest.offer.shipping' | t }}</dt>
+                    <dd>
+                      {{
+                        offerMoney(
+                          offer.shipping_cost_minor,
+                          offer.currency_code
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'brokerRequest.offer.taxDuty' | t }}</dt>
+                    <dd>
+                      {{
+                        offerMoney(
+                          offer.tax_duty_cost_minor,
+                          offer.currency_code
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'brokerRequest.offer.otherCosts' | t }}</dt>
+                    <dd>
+                      {{
+                        offerMoney(
+                          offer.other_cost_minor,
+                          offer.currency_code
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div class="cost-total">
+                    <dt>{{ 'brokerRequest.offer.supplierTotal' | t }}</dt>
+                    <dd>
+                      {{
+                        offerMoney(
+                          offer.total_minor,
+                          offer.currency_code
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>
+                      {{ 'brokerRequest.offer.commission' | t }}
+                      ({{ commissionRate(offer.commission_rate_basis_points) }})
+                    </dt>
+                    <dd>
+                      {{
+                        offerMoney(
+                          offer.commission_amount_minor,
+                          offer.currency_code
+                        )
+                      }}
+                    </dd>
+                  </div>
+                  <div class="payable-total">
+                    <dt>{{ 'brokerRequest.offer.customerPayable' | t }}</dt>
+                    <dd>
+                      {{
+                        offerMoney(
+                          offer.payable_total_minor,
+                          offer.currency_code
+                        )
+                      }}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+
+              @if (offer.return_policy_summary) {
+                <div class="return-policy">
+                  <strong>{{ 'brokerRequest.offer.returnPolicy' | t }}</strong>
+                  <p>{{ offer.return_policy_summary }}</p>
+                </div>
+              }
+
+              @if (offer.is_expired && offer.status === 'presented') {
+                <p class="expired-note">
+                  {{ 'brokerRequest.offer.expired' | t }}
+                </p>
+              }
+
+              @if (canAcceptOffer(offer)) {
+                <div class="offer-action">
+                  @if (acceptanceArmedOfferId() === offer.id) {
+                    <div>
+                      <strong>
+                        {{ 'brokerRequest.offer.confirmTitle' | t }}
+                      </strong>
+                      <p>{{ 'brokerRequest.offer.confirmDescription' | t }}</p>
+                    </div>
+                    <div class="actions">
+                      <button
+                        class="secondary"
+                        type="button"
+                        [disabled]="mutating()"
+                        (click)="keepComparing()"
+                      >
+                        {{ 'brokerRequest.offer.keepComparing' | t }}
+                      </button>
+                      <button
+                        class="primary"
+                        type="button"
+                        [disabled]="mutating()"
+                        (click)="acceptOffer(offer)"
+                      >
+                        {{
+                          (mutating()
+                            ? 'brokerRequest.offer.accepting'
+                            : 'brokerRequest.offer.confirmAccept')
+                            | t
+                        }}
+                      </button>
+                    </div>
+                  } @else {
+                    <button
+                      class="primary"
+                      type="button"
+                      (click)="armOfferAcceptance(offer.id)"
+                    >
+                      {{ 'brokerRequest.offer.accept' | t }}
+                    </button>
+                  }
+                </div>
+              }
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    @if (request.transaction; as transaction) {
+      <section class="panel transaction-section">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ 'brokerRequest.transaction.eyebrow' | t }}</p>
+            <h2>{{ 'brokerRequest.transaction.title' | t }}</h2>
+            <p>{{ 'brokerRequest.transaction.description' | t }}</p>
+          </div>
+          <span class="transaction-status" [attr.data-status]="transaction.status">
+            {{ transactionStatusLabel(transaction.status) }}
+          </span>
+        </div>
+
+        <div class="transaction-disclosure" role="note">
+          <strong>{{ 'brokerRequest.transaction.disclosureTitle' | t }}</strong>
+          <p>{{ 'brokerRequest.transaction.disclosure' | t }}</p>
+        </div>
+
+        <dl class="transaction-facts">
+          <div>
+            <dt>{{ 'brokerRequest.transaction.openedAt' | t }}</dt>
+            <dd>{{ date(transaction.opened_at, true) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'brokerRequest.transaction.statusLabel' | t }}</dt>
+            <dd>{{ transactionStatusLabel(transaction.status) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'brokerRequest.transaction.supplierTotal' | t }}</dt>
+            <dd>
+              {{
+                offerMoney(
+                  transaction.supplier_total_minor,
+                  transaction.currency_code
+                )
+              }}
+            </dd>
+          </div>
+          <div>
+            <dt>{{ 'brokerRequest.transaction.commission' | t }}</dt>
+            <dd>
+              {{
+                offerMoney(
+                  transaction.commission_amount_minor,
+                  transaction.currency_code
+                )
+              }}
+            </dd>
+          </div>
+          <div class="payable-fact">
+            <dt>{{ 'brokerRequest.transaction.payableTotal' | t }}</dt>
+            <dd>
+              {{
+                offerMoney(
+                  transaction.payable_total_minor,
+                  transaction.currency_code
+                )
+              }}
+            </dd>
+          </div>
+        </dl>
+
+        <div class="commission-card">
+          <div>
+            <strong>{{ 'brokerRequest.transaction.commissionTitle' | t }}</strong>
+            <p>{{ 'brokerRequest.transaction.commissionDescription' | t }}</p>
+          </div>
+          <span class="commission-status">
+            {{ commissionStatusLabel(transaction.commission.status) }}
+          </span>
+          <dl>
+            <div>
+              <dt>{{ 'brokerRequest.transaction.commissionRate' | t }}</dt>
+              <dd>{{ commissionRate(transaction.commission.rate_basis_points) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'brokerRequest.transaction.ruleVersion' | t }}</dt>
+              <dd>{{ transaction.commission.rule_version }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'brokerRequest.transaction.recordedAt' | t }}</dt>
+              <dd>{{ date(transaction.commission.recorded_at, true) }}</dd>
+            </div>
+            @if (transaction.commission.earned_at) {
+              <div>
+                <dt>{{ 'brokerRequest.transaction.earnedAt' | t }}</dt>
+                <dd>{{ date(transaction.commission.earned_at, true) }}</dd>
+              </div>
+            }
+            @if (transaction.commission.settled_at) {
+              <div>
+                <dt>{{ 'brokerRequest.transaction.settledAt' | t }}</dt>
+                <dd>{{ date(transaction.commission.settled_at, true) }}</dd>
+              </div>
+            }
+            @if (transaction.commission.waived_at) {
+              <div>
+                <dt>{{ 'brokerRequest.transaction.waivedAt' | t }}</dt>
+                <dd>{{ date(transaction.commission.waived_at, true) }}</dd>
+              </div>
+            }
+          </dl>
+        </div>
+
+        <div class="transaction-timeline">
+          <h3>{{ 'brokerRequest.transaction.timelineTitle' | t }}</h3>
+          @for (event of transaction.events ?? []; track event.id) {
+            <article>
+              <span>{{ event.sequence }}</span>
+              <div>
+                <strong>{{ transactionEventLabel(event) }}</strong>
+                <p>
+                  {{
+                    event.actor?.name ??
+                      ('brokerRequest.detail.systemActor' | t)
+                  }}
+                  · {{ date(event.occurred_at, true) }}
+                </p>
+              </div>
+            </article>
+          }
+        </div>
+
+        @if ((transaction.payment_cases?.length ?? 0) > 0) {
+          <div class="payment-case-section report-section">
+            <div>
+              <h3>{{ 'brokerRequest.paymentCase.title' | t }}</h3>
+              <p>{{ 'brokerRequest.paymentCase.description' | t }}</p>
+            </div>
+            <div
+              class="payment-case-boundary transaction-disclosure"
+              role="note"
+            >
+              {{ 'brokerRequest.paymentCase.boundary' | t }}
+            </div>
+            <div class="payment-case-list report-list">
+              @for (
+                paymentCase of transaction.payment_cases ?? [];
+                track paymentCase.id
+              ) {
+                <article class="payment-case-card">
+                  <div class="payment-case-head section-heading">
+                    <div>
+                      <strong>{{ paymentCaseTypeLabel(paymentCase.type) }}</strong>
+                      <small>
+                        {{ 'brokerRequest.paymentCase.openedAt' | t }}:
+                        {{ date(paymentCase.opened_at, true) }}
+                      </small>
+                    </div>
+                    <span
+                      class="payment-case-status"
+                      [attr.data-status]="paymentCase.status"
+                    >
+                      {{ paymentCaseStatusLabel(paymentCase.status) }}
+                    </span>
+                  </div>
+
+                  <dl>
+                    <div>
+                      <dt>{{ 'brokerRequest.paymentCase.requestedAmount' | t }}</dt>
+                      <dd>{{ paymentCaseAmount(paymentCase) }}</dd>
+                    </div>
+                    <div>
+                      <dt>{{ 'brokerRequest.paymentCase.resolvedAmount' | t }}</dt>
+                      <dd>{{ paymentCaseAmount(paymentCase, true) }}</dd>
+                    </div>
+                    <div>
+                      <dt>{{ 'brokerRequest.paymentCase.outcomeLabel' | t }}</dt>
+                      <dd>
+                        @if (paymentCase.resolution_outcome; as outcome) {
+                          {{ paymentCaseOutcomeLabel(outcome) }}
+                        } @else {
+                          {{ 'common.notSet' | t }}
+                        }
+                      </dd>
+                    </div>
+                    @if (paymentCase.resolved_at) {
+                      <div>
+                        <dt>{{ 'brokerRequest.paymentCase.resolvedAt' | t }}</dt>
+                        <dd>{{ date(paymentCase.resolved_at, true) }}</dd>
+                      </div>
+                    }
+                  </dl>
+
+                  <div class="payment-case-timeline transaction-timeline">
+                    <h4>{{ 'brokerRequest.paymentCase.timelineTitle' | t }}</h4>
+                    @for (event of paymentCase.events ?? []; track event.id) {
+                      <article>
+                        <span>{{ event.sequence }}</span>
+                        <p>
+                          <strong>{{ paymentCaseEventLabel(event) }}</strong>
+                          <small>
+                            {{
+                              event.actor?.name ??
+                                ('brokerRequest.detail.systemActor' | t)
+                            }}
+                            · {{ date(event.occurred_at, true) }}
+                          </small>
+                        </p>
+                      </article>
+                    }
+                  </div>
+                </article>
+              }
+            </div>
+          </div>
+        }
+
+        @if ((transaction.reports?.length ?? 0) > 0) {
+          <div class="report-section">
+            <div>
+              <h3>{{ 'brokerRequest.report.title' | t }}</h3>
+              <p>{{ 'brokerRequest.report.description' | t }}</p>
+            </div>
+            <div class="report-list">
+              @for (report of transaction.reports ?? []; track report.id) {
+                <article class="report-card">
+                  <div>
+                    <strong>
+                      {{ 'brokerRequest.report.label' | t }}
+                      #{{ report.sequence }}
+                    </strong>
+                    <p>
+                      {{ reportLocale(report) }}
+                      Â· {{ report.page_count }}
+                      {{ 'brokerRequest.report.pages' | t }}
+                      Â· {{ reportSize(report.artifact_size_bytes) }}
+                    </p>
+                    <small>
+                      {{ 'brokerRequest.report.generatedAt' | t }}:
+                      {{ date(report.generated_at, true) }}
+                      Â· {{ 'brokerRequest.report.expiresAt' | t }}:
+                      {{ date(report.artifact_expires_at, true) }}
+                    </small>
+                  </div>
+                  <span class="report-status" [attr.data-status]="report.status">
+                    {{ reportStatusLabel(report) }}
+                  </span>
+                  @if (report.download_url) {
+                    <a
+                      class="secondary"
+                      [href]="report.download_url"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {{ 'brokerRequest.report.download' | t }}
+                    </a>
+                  } @else {
+                    <span class="report-unavailable">
+                      {{ 'brokerRequest.report.unavailable' | t }}
+                    </span>
+                  }
+                </article>
+              }
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">{{ 'brokerRequest.detail.timelineEyebrow' | t }}</p>
+          <h2>{{ 'brokerRequest.detail.timelineTitle' | t }}</h2>
+        </div>
+        <span>{{ request.event_sequence }}</span>
+      </div>
+
+      <div class="timeline">
+        @for (event of request.events ?? []; track event.id) {
+          <article>
+            <span>{{ event.sequence }}</span>
+            <div>
+              <strong>{{ eventLabel(event) }}</strong>
+              <p>
+                {{ event.actor?.name ?? ('brokerRequest.detail.systemActor' | t) }}
+                · {{ date(event.occurred_at, true) }}
+              </p>
+              <small>
+                {{ statusLabel(event.to_status) }}
+              </small>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+
+    @if (canCancel()) {
+      <section class="cancel-card">
+        @if (cancelArmed()) {
+          <div>
+            <strong>{{ 'brokerRequest.detail.cancelConfirmTitle' | t }}</strong>
+            <p>{{ 'brokerRequest.detail.cancelConfirmDescription' | t }}</p>
+          </div>
+          <div class="actions">
+            <button class="secondary" type="button" (click)="keepRequest()">
+              {{ 'brokerRequest.detail.keep' | t }}
+            </button>
+            <button
+              class="danger"
+              type="button"
+              [disabled]="mutating()"
+              (click)="cancel()"
+            >
+              {{ 'brokerRequest.detail.confirmCancel' | t }}
+            </button>
+          </div>
+        } @else {
+          <button class="secondary" type="button" (click)="armCancel()">
+            {{ 'brokerRequest.detail.cancel' | t }}
+          </button>
+        }
+      </section>
+    }
+  }
+</div>

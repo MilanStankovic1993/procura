@@ -1,0 +1,720 @@
+<section class="outcome-panel">
+  <header class="section-heading">
+    <div>
+      <p class="eyebrow">{{ 'ownedProduct.outcomes.eyebrow' | t }}</p>
+      <h2>{{ 'ownedProduct.outcomes.title' | t }}</h2>
+      <p>{{ 'ownedProduct.outcomes.description' | t }}</p>
+    </div>
+    <button class="quiet" type="button" [disabled]="loading()" (click)="reload()">
+      {{ 'ownedProduct.outcomes.refresh' | t }}
+    </button>
+  </header>
+
+  @if (error()) {
+    <div class="notice error" role="alert">{{ error() }}</div>
+  }
+  @if (formError()) {
+    <div class="notice error" role="alert">{{ formError() }}</div>
+  }
+  @if (success()) {
+    <div class="notice success" role="status">{{ success() }}</div>
+  }
+
+  @if (loading() && !projection()) {
+    <div class="notice" aria-live="polite">
+      {{ 'ownedProduct.outcomes.loading' | t }}
+    </div>
+  } @else if (projection(); as data) {
+    @if (currentProfit(); as profit) {
+      <article class="profit-card">
+        <div>
+          <p class="eyebrow">{{ 'ownedProduct.outcomes.profitEyebrow' | t }}</p>
+          <h3>{{ 'ownedProduct.outcomes.profitTitle' | t }}</h3>
+          <strong [attr.data-negative]="profit.net_profit_minor < 0">
+            {{ money(profit.net_profit_minor, profit.currency_code) }}
+          </strong>
+        </div>
+        <dl>
+          <div>
+            <dt>{{ 'ownedProduct.outcomes.purchase' | t }}</dt>
+            <dd>{{ money(profit.purchase_price_minor, profit.currency_code) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ownedProduct.outcomes.costs' | t }}</dt>
+            <dd>{{ money(profit.actual_costs_minor, profit.currency_code) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ownedProduct.outcomes.salePrice' | t }}</dt>
+            <dd>{{ money(profit.sale_price_minor, profit.currency_code) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ownedProduct.outcomes.margin' | t }}</dt>
+            <dd>{{ ratio(profit.profit_margin_basis_points) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ownedProduct.outcomes.return' | t }}</dt>
+            <dd>{{ ratio(profit.return_on_invested_capital_basis_points) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'ownedProduct.outcomes.saleDuration' | t }}</dt>
+            <dd>{{ duration(profit.sale_duration_seconds) }}</dd>
+          </div>
+        </dl>
+        <footer>
+          <span>{{ date(profit.calculated_at) }}</span>
+          <code [title]="profit.input_hash">{{ shortHash(profit.input_hash) }}</code>
+        </footer>
+      </article>
+    } @else {
+      <article class="incomplete">
+        <div>
+          <p class="eyebrow">{{ 'ownedProduct.outcomes.incompleteEyebrow' | t }}</p>
+          <h3>{{ 'ownedProduct.outcomes.incompleteTitle' | t }}</h3>
+          <p>{{ 'ownedProduct.outcomes.incompleteDescription' | t }}</p>
+        </div>
+        <ul>
+          @for (fact of data.unknown_facts; track fact) {
+            <li>{{ unknownLabel(fact) }}</li>
+          }
+        </ul>
+      </article>
+    }
+
+    <section class="accuracy-section" aria-labelledby="estimate-accuracy-title">
+      <div class="subheading">
+        <div>
+          <p class="eyebrow">{{ 'ownedProduct.outcomes.accuracyEyebrow' | t }}</p>
+          <h3 id="estimate-accuracy-title">
+            {{ 'ownedProduct.outcomes.accuracyTitle' | t }}
+          </h3>
+          <p>{{ 'ownedProduct.outcomes.accuracyDescription' | t }}</p>
+        </div>
+        @if (currentAccuracy(); as report) {
+          <span class="status-chip" [attr.data-status]="report.status">
+            {{ accuracyStatusLabel(report.status) }}
+          </span>
+        }
+      </div>
+
+      @if (currentAccuracy(); as report) {
+        <article class="accuracy-card">
+          <header>
+            <div>
+              <strong>
+                {{
+                  currentAttribution()?.estimate_source?.listing_title ??
+                    ('ownedProduct.outcomes.accuracyUnknownSource' | t)
+                }}
+              </strong>
+              <span>
+                {{ report.source_currency_code }} â†’ {{ report.reporting_currency_code }} Â·
+                {{ date(report.calculated_at) }}
+              </span>
+            </div>
+            <code [title]="report.input_hash">{{ shortHash(report.input_hash) }}</code>
+          </header>
+
+          <div class="accuracy-grid">
+            @for (entry of metricEntries(report.metrics); track entry[0]) {
+              <article>
+                <h4>{{ accuracyMetricLabel(entry[0]) }}</h4>
+                <dl>
+                  <div>
+                    <dt>{{ 'ownedProduct.outcomes.accuracy.expected' | t }}</dt>
+                    <dd>
+                      {{ money(entry[1].expected_minor, report.reporting_currency_code) }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'ownedProduct.outcomes.accuracy.actual' | t }}</dt>
+                    <dd>
+                      {{ money(entry[1].actual_minor, report.reporting_currency_code) }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'ownedProduct.outcomes.accuracy.signedError' | t }}</dt>
+                    <dd>
+                      {{ money(entry[1].signed_error_minor, report.reporting_currency_code) }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'ownedProduct.outcomes.accuracy.absoluteError' | t }}</dt>
+                    <dd>
+                      {{ money(entry[1].absolute_error_minor, report.reporting_currency_code) }}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>{{ 'ownedProduct.outcomes.accuracy.percentageError' | t }}</dt>
+                    <dd>{{ ratio(entry[1].signed_error_basis_points) }}</dd>
+                  </div>
+                </dl>
+                @if (report.source_currency_code !== report.reporting_currency_code) {
+                  <span class="source-amount">
+                    {{ 'ownedProduct.outcomes.accuracy.sourceExpected' | t }}:
+                    {{ money(entry[1].source_expected_minor, report.source_currency_code) }}
+                  </span>
+                }
+              </article>
+            }
+          </div>
+
+          <div class="accuracy-reasons">
+            <strong>{{ 'ownedProduct.outcomes.accuracy.notes' | t }}</strong>
+            <ul>
+              @for (reason of report.reason_codes; track reason) {
+                <li>{{ accuracyReasonLabel(reason) }}</li>
+              }
+            </ul>
+          </div>
+        </article>
+      } @else {
+        <div class="notice">
+          {{
+            (currentProfit()
+              ? 'ownedProduct.outcomes.accuracyMissing'
+              : 'ownedProduct.outcomes.accuracyNeedsOutcome'
+            ) | t
+          }}
+        </div>
+      }
+
+      @if (canManage() && currentProfit()) {
+        <form class="accuracy-form" [formGroup]="accuracyForm" (ngSubmit)="recordAccuracy()">
+          <div class="subheading">
+            <div>
+              <p class="eyebrow">
+                {{ 'ownedProduct.outcomes.accuracyAttributionEyebrow' | t }}
+              </p>
+              <h3>{{ 'ownedProduct.outcomes.accuracyAttributionTitle' | t }}</h3>
+            </div>
+            <span>{{ 'ownedProduct.outcomes.immutableVersion' | t }}</span>
+          </div>
+          <p>{{ 'ownedProduct.outcomes.accuracyAttributionDescription' | t }}</p>
+          <div class="form-grid">
+            <div class="wide">
+              <label for="outcome-accuracy-search">
+                {{ 'ownedProduct.outcomes.accuracySearchLabel' | t }}
+              </label>
+              <div class="accuracy-search">
+                <input
+                  id="outcome-accuracy-search"
+                  type="search"
+                  [formControl]="accuracySearch"
+                  [placeholder]="'ownedProduct.outcomes.accuracySearchPlaceholder' | t"
+                  (keydown.enter)="$event.preventDefault(); searchAccuracyCandidates()"
+                />
+                <button
+                  id="outcome-accuracy-search-button"
+                  class="quiet"
+                  type="button"
+                  [disabled]="loadingCandidates() || accuracySearch.invalid"
+                  (click)="searchAccuracyCandidates()"
+                >
+                  {{ 'ownedProduct.outcomes.accuracySearchAction' | t }}
+                </button>
+              </div>
+            </div>
+            <div class="wide">
+              <label for="outcome-accuracy-analysis">
+                {{ 'ownedProduct.outcomes.accuracyEstimate' | t }}
+              </label>
+              <select
+                id="outcome-accuracy-analysis"
+                formControlName="analysis_id"
+                [disabled]="loadingCandidates()"
+              >
+                <option value="">
+                  {{
+                    (loadingCandidates()
+                      ? 'ownedProduct.outcomes.accuracyLoadingCandidates'
+                      : 'ownedProduct.outcomes.accuracyChooseEstimate'
+                    ) | t
+                  }}
+                </option>
+                @for (candidate of accuracyCandidates(); track candidate.analysis_id) {
+                  <option [value]="candidate.analysis_id">
+                    {{ candidate.listing.title }} &middot;
+                    {{ money(candidate.expected_net_profit_minor, candidate.currency_code) }}
+                  </option>
+                }
+              </select>
+              @if (!loadingCandidates() && accuracyCandidates().length === 0) {
+                <small>
+                  {{ 'ownedProduct.outcomes.accuracyNoCandidates' | t }}
+                </small>
+              }
+            </div>
+            <div>
+              <label for="outcome-accuracy-reason">
+                {{ 'ownedProduct.outcomes.accuracyReasonCode' | t }}
+              </label>
+              <input id="outcome-accuracy-reason" type="text" formControlName="reason_code" />
+            </div>
+            <div>
+              <label for="outcome-accuracy-evidence">
+                {{ 'ownedProduct.outcomes.evidenceKind' | t }}
+              </label>
+              <select id="outcome-accuracy-evidence" formControlName="evidence_kind">
+                @for (kind of evidenceKinds; track kind) {
+                  <option [value]="kind">{{ evidenceLabel(kind) }}</option>
+                }
+              </select>
+            </div>
+            <div class="wide">
+              <label for="outcome-accuracy-reference">
+                {{ 'ownedProduct.outcomes.evidenceReference' | t }}
+              </label>
+              <input
+                id="outcome-accuracy-reference"
+                type="text"
+                formControlName="evidence_reference"
+              />
+            </div>
+            @if (currentAttribution()) {
+              <div class="wide">
+                <label for="outcome-accuracy-correction">
+                  {{ 'ownedProduct.outcomes.correctionReason' | t }}
+                </label>
+                <input
+                  id="outcome-accuracy-correction"
+                  type="text"
+                  formControlName="correction_reason"
+                  [placeholder]="'ownedProduct.outcomes.accuracyCorrectionExample' | t"
+                />
+              </div>
+            }
+            <div class="wide">
+              <label for="outcome-accuracy-note">
+                {{ 'ownedProduct.outcomes.note' | t }}
+              </label>
+              <textarea id="outcome-accuracy-note" rows="2" formControlName="note"></textarea>
+            </div>
+          </div>
+          <button
+            class="primary"
+            type="submit"
+            [disabled]="savingAccuracy() || loadingCandidates()"
+          >
+            {{
+              (savingAccuracy()
+                ? 'ownedProduct.outcomes.recording'
+                : 'ownedProduct.outcomes.accuracyRecord'
+              ) | t
+            }}
+          </button>
+        </form>
+      }
+    </section>
+
+    <div class="evidence-grid">
+      <article>
+        <p class="eyebrow">{{ 'ownedProduct.outcomes.purchaseEvidence' | t }}</p>
+        @if (currentPurchase(); as purchase) {
+          <h3>{{ money(purchase.source_amount_minor, purchase.source_currency_code) }}</h3>
+          <p>
+            {{ evidenceLabel(purchase.evidence_kind) }} ·
+            {{ date(purchase.occurred_at) }}
+          </p>
+          <span>
+            {{ 'ownedProduct.outcomes.reportingValue' | t }}:
+            {{ money(purchase.reporting_amount_minor, purchase.reporting_currency_code) }}
+          </span>
+          <code [title]="purchase.input_hash">{{ shortHash(purchase.input_hash) }}</code>
+        } @else {
+          <p>{{ 'ownedProduct.outcomes.noPurchase' | t }}</p>
+        }
+      </article>
+
+      <article>
+        <p class="eyebrow">{{ 'ownedProduct.outcomes.costEvidence' | t }}</p>
+        @if (currentCosts(); as costs) {
+          <h3>
+            {{ money(costs.known_reporting_total_minor, costs.reporting_currency_code) }}
+          </h3>
+          <p>
+            {{
+              'ownedProduct.outcomes.costCompleteness'
+                | t: { known: costs.known_count, unknown: costs.unknown_count }
+            }}
+          </p>
+          <div class="mini-list">
+            @for (item of costs.items; track item.id) {
+              <span>
+                {{ costLabel(item.category) }}:
+                {{
+                  item.is_known
+                    ? money(item.reporting_amount_minor, item.reporting_currency_code)
+                    : ('common.unknown' | t)
+                }}
+              </span>
+            }
+          </div>
+          <code [title]="costs.input_hash">{{ shortHash(costs.input_hash) }}</code>
+        } @else {
+          <p>{{ 'ownedProduct.outcomes.noCosts' | t }}</p>
+        }
+      </article>
+
+      <article>
+        <p class="eyebrow">{{ 'ownedProduct.outcomes.saleEvidence' | t }}</p>
+        @if (data.sales.length > 0) {
+          @for (sale of data.sales.slice(0, 3); track sale.id) {
+            <div class="sale-line">
+              <strong>{{ outcomeLabel(sale.outcome_type) }}</strong>
+              <span>
+                {{
+                  sale.outcome_type === 'sold'
+                    ? money(sale.source_amount_minor, sale.source_currency_code)
+                    : sale.reason_code
+                }}
+                · {{ date(sale.occurred_at) }}
+              </span>
+            </div>
+          }
+        } @else {
+          <p>{{ 'ownedProduct.outcomes.noSale' | t }}</p>
+        }
+      </article>
+    </div>
+
+    @if (canManage()) {
+      <div class="forms">
+        <form [formGroup]="purchaseForm" (ngSubmit)="recordPurchase()">
+          <div class="subheading">
+            <div>
+              <p class="eyebrow">{{ 'ownedProduct.outcomes.purchaseFormEyebrow' | t }}</p>
+              <h3>{{ 'ownedProduct.outcomes.purchaseFormTitle' | t }}</h3>
+            </div>
+            <span>{{ 'ownedProduct.outcomes.immutableVersion' | t }}</span>
+          </div>
+          <div class="form-grid">
+            <div>
+              <label for="outcome-purchase-amount">
+                {{ 'ownedProduct.outcomes.actualAmount' | t }}
+              </label>
+              <input
+                id="outcome-purchase-amount"
+                type="text"
+                inputmode="decimal"
+                formControlName="amount"
+              />
+            </div>
+            <div>
+              <label for="outcome-purchase-currency">
+                {{ 'ownedProduct.outcomes.sourceCurrency' | t }}
+              </label>
+              <select id="outcome-purchase-currency" formControlName="currency_code">
+                <option value="">{{ 'ownedProduct.outcomes.chooseCurrency' | t }}</option>
+                @for (currency of marketCatalog()?.currencies ?? []; track currency.code) {
+                  <option [value]="currency.code">{{ currency.code }} · {{ currency.name }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="outcome-purchase-reporting">
+                {{ 'ownedProduct.outcomes.reportingCurrency' | t }}
+              </label>
+              <select id="outcome-purchase-reporting" formControlName="reporting_currency_code">
+                <option value="">{{ 'ownedProduct.outcomes.chooseCurrency' | t }}</option>
+                @for (currency of marketCatalog()?.currencies ?? []; track currency.code) {
+                  <option [value]="currency.code">{{ currency.code }} · {{ currency.name }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="outcome-purchase-time">
+                {{ 'ownedProduct.outcomes.occurredAt' | t }}
+              </label>
+              <input
+                id="outcome-purchase-time"
+                type="datetime-local"
+                formControlName="occurred_at"
+              />
+            </div>
+            <div>
+              <label for="outcome-purchase-evidence">
+                {{ 'ownedProduct.outcomes.evidenceKind' | t }}
+              </label>
+              <select id="outcome-purchase-evidence" formControlName="evidence_kind">
+                <option value="">{{ 'ownedProduct.outcomes.chooseEvidence' | t }}</option>
+                @for (kind of evidenceKinds; track kind) {
+                  <option [value]="kind">{{ evidenceLabel(kind) }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="outcome-purchase-reference">
+                {{ 'ownedProduct.outcomes.evidenceReference' | t }}
+              </label>
+              <input
+                id="outcome-purchase-reference"
+                type="text"
+                formControlName="evidence_reference"
+              />
+            </div>
+            @if (currentPurchase()) {
+              <div class="wide">
+                <label for="outcome-purchase-correction">
+                  {{ 'ownedProduct.outcomes.correctionReason' | t }}
+                </label>
+                <input
+                  id="outcome-purchase-correction"
+                  type="text"
+                  formControlName="correction_reason"
+                  [placeholder]="'ownedProduct.outcomes.correctionExample' | t"
+                />
+              </div>
+            }
+            <div class="wide">
+              <label for="outcome-purchase-note">{{ 'ownedProduct.outcomes.note' | t }}</label>
+              <textarea id="outcome-purchase-note" rows="2" formControlName="note"></textarea>
+            </div>
+          </div>
+          <button class="primary" type="submit" [disabled]="savingPurchase()">
+            {{
+              (savingPurchase()
+                ? 'ownedProduct.outcomes.recording'
+                : 'ownedProduct.outcomes.recordPurchase'
+              ) | t
+            }}
+          </button>
+        </form>
+
+        <form [formGroup]="costForm" (ngSubmit)="recordCosts()">
+          <div class="subheading">
+            <div>
+              <p class="eyebrow">{{ 'ownedProduct.outcomes.costFormEyebrow' | t }}</p>
+              <h3>{{ 'ownedProduct.outcomes.costFormTitle' | t }}</h3>
+            </div>
+            <span>{{ 'ownedProduct.outcomes.blankMeansUnknown' | t }}</span>
+          </div>
+          <div class="cost-grid">
+            @for (category of costCategories; track category) {
+              <div>
+                <label [for]="'outcome-cost-' + category">{{ costLabel(category) }}</label>
+                <input
+                  [id]="'outcome-cost-' + category"
+                  type="text"
+                  inputmode="decimal"
+                  [formControlName]="category"
+                />
+              </div>
+            }
+          </div>
+          <div class="form-grid">
+            <div>
+              <label for="outcome-cost-source-currency">
+                {{ 'ownedProduct.outcomes.sourceCurrency' | t }}
+              </label>
+              <select id="outcome-cost-source-currency" formControlName="source_currency_code">
+                <option value="">{{ 'ownedProduct.outcomes.chooseCurrency' | t }}</option>
+                @for (currency of marketCatalog()?.currencies ?? []; track currency.code) {
+                  <option [value]="currency.code">{{ currency.code }} · {{ currency.name }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="outcome-cost-reporting-currency">
+                {{ 'ownedProduct.outcomes.reportingCurrency' | t }}
+              </label>
+              <select
+                id="outcome-cost-reporting-currency"
+                formControlName="reporting_currency_code"
+              >
+                <option value="">{{ 'ownedProduct.outcomes.chooseCurrency' | t }}</option>
+                @for (currency of marketCatalog()?.currencies ?? []; track currency.code) {
+                  <option [value]="currency.code">{{ currency.code }} · {{ currency.name }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="outcome-cost-time">{{ 'ownedProduct.outcomes.occurredAt' | t }}</label>
+              <input id="outcome-cost-time" type="datetime-local" formControlName="occurred_at" />
+            </div>
+            <div>
+              <label for="outcome-cost-evidence">
+                {{ 'ownedProduct.outcomes.evidenceKind' | t }}
+              </label>
+              <select id="outcome-cost-evidence" formControlName="evidence_kind">
+                <option value="">{{ 'ownedProduct.outcomes.chooseEvidence' | t }}</option>
+                @for (kind of evidenceKinds; track kind) {
+                  <option [value]="kind">{{ evidenceLabel(kind) }}</option>
+                }
+              </select>
+            </div>
+            <div class="wide">
+              <label for="outcome-cost-reference">
+                {{ 'ownedProduct.outcomes.evidenceReference' | t }}
+              </label>
+              <input id="outcome-cost-reference" type="text" formControlName="evidence_reference" />
+            </div>
+            @if (currentCosts()) {
+              <div class="wide">
+                <label for="outcome-cost-correction">
+                  {{ 'ownedProduct.outcomes.correctionReason' | t }}
+                </label>
+                <input
+                  id="outcome-cost-correction"
+                  type="text"
+                  formControlName="correction_reason"
+                  [placeholder]="'ownedProduct.outcomes.correctionExample' | t"
+                />
+              </div>
+            }
+            <div class="wide">
+              <label for="outcome-cost-note">{{ 'ownedProduct.outcomes.note' | t }}</label>
+              <textarea id="outcome-cost-note" rows="2" formControlName="note"></textarea>
+            </div>
+          </div>
+          <button class="primary" type="submit" [disabled]="savingCosts()">
+            {{
+              (savingCosts()
+                ? 'ownedProduct.outcomes.recording'
+                : 'ownedProduct.outcomes.recordCosts'
+              ) | t
+            }}
+          </button>
+        </form>
+
+        <form [formGroup]="saleForm" (ngSubmit)="recordSale()">
+          <div class="subheading">
+            <div>
+              <p class="eyebrow">{{ 'ownedProduct.outcomes.saleFormEyebrow' | t }}</p>
+              <h3>{{ 'ownedProduct.outcomes.saleFormTitle' | t }}</h3>
+            </div>
+            <span>{{ 'ownedProduct.outcomes.exactPortfolioOnly' | t }}</span>
+          </div>
+          <div class="form-grid">
+            <div class="wide">
+              <label for="outcome-sale-entry">{{
+                'ownedProduct.outcomes.portfolioEntry' | t
+              }}</label>
+              <select id="outcome-sale-entry" formControlName="entry_id">
+                <option value="">{{ 'ownedProduct.outcomes.chooseEntry' | t }}</option>
+                @for (entry of data.sale_portfolio_entries; track entry.id) {
+                  <option [value]="entry.id">
+                    #{{ entry.sequence }} ·
+                    {{ entry.listing_title ?? ('ownedProduct.portfolio.untitledDraft' | t) }} ·
+                    {{ entry.current_status }}
+                  </option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="outcome-sale-type">{{ 'ownedProduct.outcomes.outcomeType' | t }}</label>
+              <select id="outcome-sale-type" formControlName="outcome_type">
+                <option value="">{{ 'ownedProduct.outcomes.chooseOutcome' | t }}</option>
+                @for (type of allowedOutcomeTypes(selectedEntry()); track type) {
+                  <option [value]="type">{{ outcomeLabel(type) }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="outcome-sale-time">{{ 'ownedProduct.outcomes.occurredAt' | t }}</label>
+              <input id="outcome-sale-time" type="datetime-local" formControlName="occurred_at" />
+            </div>
+            @if (showSaleMoney()) {
+              <div>
+                <label for="outcome-sale-amount">{{
+                  'ownedProduct.outcomes.actualAmount' | t
+                }}</label>
+                <input
+                  id="outcome-sale-amount"
+                  type="text"
+                  inputmode="decimal"
+                  formControlName="amount"
+                />
+              </div>
+              <div>
+                <label for="outcome-sale-currency">{{
+                  'ownedProduct.outcomes.sourceCurrency' | t
+                }}</label>
+                <select id="outcome-sale-currency" formControlName="currency_code">
+                  <option value="">{{ 'ownedProduct.outcomes.chooseCurrency' | t }}</option>
+                  @for (currency of marketCatalog()?.currencies ?? []; track currency.code) {
+                    <option [value]="currency.code">
+                      {{ currency.code }} · {{ currency.name }}
+                    </option>
+                  }
+                </select>
+              </div>
+              <div class="wide">
+                <label for="outcome-sale-reporting">{{
+                  'ownedProduct.outcomes.reportingCurrency' | t
+                }}</label>
+                <select id="outcome-sale-reporting" formControlName="reporting_currency_code">
+                  <option value="">{{ 'ownedProduct.outcomes.chooseCurrency' | t }}</option>
+                  @for (currency of marketCatalog()?.currencies ?? []; track currency.code) {
+                    <option [value]="currency.code">
+                      {{ currency.code }} · {{ currency.name }}
+                    </option>
+                  }
+                </select>
+              </div>
+            } @else if (selectedOutcomeType() !== '') {
+              <div class="wide">
+                <label for="outcome-sale-reason">{{
+                  'ownedProduct.outcomes.outcomeReason' | t
+                }}</label>
+                <input
+                  id="outcome-sale-reason"
+                  type="text"
+                  formControlName="reason_code"
+                  [placeholder]="'ownedProduct.outcomes.noSaleReasonExample' | t"
+                />
+              </div>
+            }
+            <div>
+              <label for="outcome-sale-evidence">{{
+                'ownedProduct.outcomes.evidenceKind' | t
+              }}</label>
+              <select id="outcome-sale-evidence" formControlName="evidence_kind">
+                <option value="">{{ 'ownedProduct.outcomes.chooseEvidence' | t }}</option>
+                @for (kind of evidenceKinds; track kind) {
+                  <option [value]="kind">{{ evidenceLabel(kind) }}</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label for="outcome-sale-reference">{{
+                'ownedProduct.outcomes.evidenceReference' | t
+              }}</label>
+              <input id="outcome-sale-reference" type="text" formControlName="evidence_reference" />
+            </div>
+            @if (currentSelectedSale()) {
+              <div class="wide">
+                <label for="outcome-sale-correction">
+                  {{ 'ownedProduct.outcomes.correctionReason' | t }}
+                </label>
+                <input
+                  id="outcome-sale-correction"
+                  type="text"
+                  formControlName="correction_reason"
+                  [placeholder]="'ownedProduct.outcomes.correctionExample' | t"
+                />
+              </div>
+            }
+            <div class="wide">
+              <label for="outcome-sale-note">{{ 'ownedProduct.outcomes.note' | t }}</label>
+              <textarea id="outcome-sale-note" rows="2" formControlName="note"></textarea>
+            </div>
+          </div>
+          <button
+            class="primary"
+            type="submit"
+            [disabled]="savingSale() || selectedEntry() === null"
+          >
+            {{
+              (savingSale()
+                ? 'ownedProduct.outcomes.recording'
+                : 'ownedProduct.outcomes.recordSale'
+              ) | t
+            }}
+          </button>
+        </form>
+      </div>
+    }
+
+    <p class="boundary">{{ 'ownedProduct.outcomes.boundary' | t }}</p>
+  }
+</section>

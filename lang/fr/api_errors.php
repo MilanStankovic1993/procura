@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'analysis_workload_permit_rejected' => 'Le permis de charge contrôlée des analyses est invalide ou indisponible.',
+    'browser_workload_permit_rejected' => 'Le permis de charge contrôlée du navigateur est invalide ou indisponible.',
+    'billing_checkout_expired' => 'Cette demande de paiement a expiré. Recommencez avec une nouvelle clé d’idempotence.',
+    'billing_manual_assignment' => 'Un forfait a été attribué à cet espace de travail par un administrateur.',
+    'billing_not_configured' => 'Le paiement n’est pas configuré pour ce forfait et cet intervalle.',
+    'billing_operation_in_progress' => 'Une autre opération de facturation est déjà en cours pour cet espace de travail.',
+    'billing_portal_unavailable' => 'Le portail de facturation n’est pas disponible pour cet espace de travail.',
+    'billing_provider_invalid_response' => 'Le prestataire de paiement a renvoyé une destination non valide.',
+    'billing_provider_unavailable' => 'Le prestataire de paiement est temporairement indisponible.',
+    'billing_subscription_exists' => 'Gérez l’abonnement existant depuis le portail de facturation.',
+    'buyer_decision_idempotency_conflict' => 'La clé d’idempotence a déjà été utilisée avec une autre commande de décision d’achat.',
+    'buyer_decision_stale_state' => 'La décision d’achat a changé. Actualisez l’analyse avant d’enregistrer une autre décision.',
+    'idempotency_payload_mismatch' => 'La clé d’idempotence a déjà été utilisée pour un autre fichier d’importation.',
+    'privacy_request_idempotency_conflict' => 'La clé d’idempotence a déjà été utilisée avec une autre commande de demande de confidentialité.',
+    'privacy_request_stale_state' => 'La demande de confidentialité a changé. Actualisez-la avant d’enregistrer une autre transition.',
+    'sale_portfolio_idempotency_conflict' => 'La clé d’idempotence a déjà été utilisée avec une autre commande de portefeuille de vente.',
+    'sale_portfolio_stale_state' => 'L’état du portefeuille de vente a changé. Actualisez-le avant d’enregistrer un autre événement.',
+    'actual_cost_stale_state' => 'Les justificatifs de coûts réels ont changé. Actualisez-les avant d’enregistrer une correction.',
+    'actual_purchase_stale_state' => 'Les justificatifs d’achat réel ont changé. Actualisez-les avant d’enregistrer une correction.',
+    'actual_sale_stale_portfolio_state' => 'L’état du portefeuille de vente a changé. Actualisez-le avant d’enregistrer le résultat.',
+    'actual_sale_stale_state' => 'Les justificatifs de vente réelle ont changé. Actualisez-les avant d’enregistrer un autre résultat.',
+    'estimate_accuracy_report_stale_state' => 'Le rapport de précision de l’estimation a changé. Actualisez-le avant l’enregistrement.',
+    'estimate_attribution_stale_state' => 'L’attribution de l’estimation a changé. Actualisez-la avant l’enregistrement.',
+    'outcome_idempotency_conflict' => 'La clé d’idempotence a déjà été utilisée avec une autre commande de résultat.',
+];

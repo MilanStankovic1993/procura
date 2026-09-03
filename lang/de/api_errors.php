@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'analysis_workload_permit_rejected' => 'Die Genehmigung für die kontrollierte Analyselast ist ungültig oder nicht verfügbar.',
+    'browser_workload_permit_rejected' => 'Die Genehmigung für die kontrollierte Browserlast ist ungültig oder nicht verfügbar.',
+    'billing_checkout_expired' => 'Diese Checkout-Anfrage ist abgelaufen. Starten Sie erneut mit einem neuen Idempotenzschlüssel.',
+    'billing_manual_assignment' => 'Diesem Arbeitsbereich wurde der Tarif durch einen Administrator zugewiesen.',
+    'billing_not_configured' => 'Der Billing-Checkout ist für diesen Tarif und dieses Intervall nicht konfiguriert.',
+    'billing_operation_in_progress' => 'Für diesen Arbeitsbereich wird bereits ein anderer Abrechnungsvorgang ausgeführt.',
+    'billing_portal_unavailable' => 'Das Abrechnungsportal ist für diesen Arbeitsbereich nicht verfügbar.',
+    'billing_provider_invalid_response' => 'Der Zahlungsanbieter hat ein ungültiges Ziel zurückgegeben.',
+    'billing_provider_unavailable' => 'Der Zahlungsanbieter ist vorübergehend nicht verfügbar.',
+    'billing_subscription_exists' => 'Verwalten Sie das bestehende Abonnement über das Abrechnungsportal.',
+    'buyer_decision_idempotency_conflict' => 'Der Idempotenzschlüssel wurde bereits für einen anderen Kaufentscheidungsbefehl verwendet.',
+    'buyer_decision_stale_state' => 'Die Kaufentscheidung wurde geändert. Aktualisieren Sie die Analyse, bevor Sie eine weitere Entscheidung erfassen.',
+    'idempotency_payload_mismatch' => 'Der Idempotenzschlüssel wurde bereits für eine andere Importdatei verwendet.',
+    'privacy_request_idempotency_conflict' => 'Der Idempotenzschlüssel wurde bereits für einen anderen Datenschutzanfragebefehl verwendet.',
+    'privacy_request_stale_state' => 'Die Datenschutzanfrage wurde geändert. Aktualisieren Sie sie, bevor Sie einen weiteren Übergang erfassen.',
+    'sale_portfolio_idempotency_conflict' => 'Der Idempotenzschlüssel wurde bereits für einen anderen Verkaufsportfoliobefehl verwendet.',
+    'sale_portfolio_stale_state' => 'Der Status des Verkaufsportfolios wurde geändert. Aktualisieren Sie ihn, bevor Sie ein weiteres Ereignis erfassen.',
+    'actual_cost_stale_state' => 'Die tatsächlichen Kostennachweise wurden geändert. Aktualisieren Sie die Daten, bevor Sie eine Korrektur erfassen.',
+    'actual_purchase_stale_state' => 'Die tatsächlichen Kaufnachweise wurden geändert. Aktualisieren Sie die Daten, bevor Sie eine Korrektur erfassen.',
+    'actual_sale_stale_portfolio_state' => 'Der Status des Verkaufsportfolios wurde geändert. Aktualisieren Sie ihn, bevor Sie das Ergebnis erfassen.',
+    'actual_sale_stale_state' => 'Die tatsächlichen Verkaufsnachweise wurden geändert. Aktualisieren Sie die Daten, bevor Sie ein weiteres Ergebnis erfassen.',
+    'estimate_accuracy_report_stale_state' => 'Der Bericht zur Schätzgenauigkeit wurde geändert. Aktualisieren Sie die Daten vor der Erfassung.',
+    'estimate_attribution_stale_state' => 'Die Schätzungszuordnung wurde geändert. Aktualisieren Sie die Daten vor der Erfassung.',
+    'outcome_idempotency_conflict' => 'Der Idempotenzschlüssel wurde bereits für einen anderen Ergebnisbefehl verwendet.',
+];

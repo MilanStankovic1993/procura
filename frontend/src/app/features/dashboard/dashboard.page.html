@@ -1,0 +1,140 @@
+<div
+  class="dashboard"
+  data-performance-page="overview"
+  [attr.data-performance-state]="state()"
+>
+  <header class="welcome">
+    <div>
+      <p class="eyebrow">{{ 'dashboard.actionEyebrow' | t }}</p>
+      <h1>{{ 'dashboard.actionTitle' | t: { name: user()?.name ?? 'Procura' } }}</h1>
+      <p class="lead">{{ 'dashboard.actionLead' | t }}</p>
+    </div>
+    <div class="workspace-context">
+      <span>{{ 'dashboard.activeWorkspace' | t }}</span>
+      <strong>{{ activeOrganization()?.name ?? ('dashboard.workspaceFallback' | t) }}</strong>
+    </div>
+  </header>
+
+  <section class="decision-grid" [attr.aria-label]="'dashboard.chooseAction' | t">
+    <article class="decision-card buy-card">
+      <div class="decision-number" aria-hidden="true">01</div>
+      <div class="decision-copy">
+        <p class="card-label">{{ 'dashboard.buyLabel' | t }}</p>
+        <h2>{{ 'dashboard.buyTitle' | t }}</h2>
+        <p>{{ 'dashboard.buyDescription' | t }}</p>
+        <ul>
+          <li>{{ 'dashboard.buyBenefitPrice' | t }}</li>
+          <li>{{ 'dashboard.buyBenefitRisk' | t }}</li>
+          <li>{{ 'dashboard.buyBenefitDecision' | t }}</li>
+        </ul>
+      </div>
+      @if (canStartBuy()) {
+        <a class="decision-action" routerLink="/app/buy/new">
+          {{ 'dashboard.buyAction' | t }} <span class="arrow" aria-hidden="true"></span>
+        </a>
+      } @else {
+        <span class="decision-action disabled" aria-disabled="true">
+          {{ 'dashboard.permissionRequired' | t }}
+        </span>
+      }
+    </article>
+
+    <article class="decision-card sell-card">
+      <div class="decision-number" aria-hidden="true">02</div>
+      <div class="decision-copy">
+        <p class="card-label">{{ 'dashboard.sellLabel' | t }}</p>
+        <h2>{{ 'dashboard.sellTitle' | t }}</h2>
+        <p>{{ 'dashboard.sellDescription' | t }}</p>
+        <ul>
+          <li>{{ 'dashboard.sellBenefitPrice' | t }}</li>
+          <li>{{ 'dashboard.sellBenefitSpeed' | t }}</li>
+          <li>{{ 'dashboard.sellBenefitListing' | t }}</li>
+        </ul>
+      </div>
+      @if (canStartSell()) {
+        <a class="decision-action" routerLink="/app/sell/new">
+          {{ 'dashboard.sellAction' | t }} <span class="arrow" aria-hidden="true"></span>
+        </a>
+      } @else {
+        <span class="decision-action disabled" aria-disabled="true">
+          {{ 'dashboard.permissionRequired' | t }}
+        </span>
+      }
+    </article>
+  </section>
+
+  <section class="recent" aria-labelledby="recent-title">
+    <div class="section-heading">
+      <div>
+        <p class="eyebrow">{{ 'dashboard.recentEyebrow' | t }}</p>
+        <h2 id="recent-title">{{ 'dashboard.recentTitle' | t }}</h2>
+      </div>
+      <p>{{ 'dashboard.recentDescription' | t }}</p>
+    </div>
+
+    @if (state() === 'loading' || state() === 'idle') {
+      <div class="recent-state" aria-live="polite">
+        <span class="loader" aria-hidden="true"></span>
+        {{ 'dashboard.loadingRecent' | t }}
+      </div>
+    } @else if (state() === 'error') {
+      <div class="recent-state error" role="alert">
+        <p>{{ 'dashboard.recentError' | t }}</p>
+        <button type="button" (click)="retry()">{{ 'common.retry' | t }}</button>
+      </div>
+    } @else if (!hasRecentWork()) {
+      <div class="recent-state empty">
+        <strong>{{ 'dashboard.emptyTitle' | t }}</strong>
+        <p>{{ 'dashboard.emptyDescription' | t }}</p>
+      </div>
+    } @else {
+      <div class="recent-columns">
+        <div class="recent-column">
+          <div class="column-title">
+            <h3>{{ 'dashboard.recentBuy' | t }}</h3>
+            <a routerLink="/app/buy">{{ 'dashboard.viewAll' | t }}</a>
+          </div>
+          @if (recentListings().length === 0) {
+            <p class="column-empty">{{ 'dashboard.noRecentBuy' | t }}</p>
+          } @else {
+            <div class="work-list">
+              @for (listing of recentListings(); track listing.id) {
+                <a [routerLink]="['/app/buy', listing.id]">
+                  <span class="work-type">{{ listing.target_country_code }}</span>
+                  <span class="work-copy">
+                    <strong>{{ listing.title }}</strong>
+                    <small>{{ listing.marketplace_name }} · {{ date(listing.updated_at) }}</small>
+                  </span>
+                  <span class="work-arrow" aria-hidden="true"></span>
+                </a>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="recent-column">
+          <div class="column-title">
+            <h3>{{ 'dashboard.recentSell' | t }}</h3>
+            <a routerLink="/app/sell">{{ 'dashboard.viewAll' | t }}</a>
+          </div>
+          @if (recentProducts().length === 0) {
+            <p class="column-empty">{{ 'dashboard.noRecentSell' | t }}</p>
+          } @else {
+            <div class="work-list">
+              @for (product of recentProducts(); track product.id) {
+                <a [routerLink]="['/app/sell', product.id]">
+                  <span class="work-type">{{ product.target_continent_code }}</span>
+                  <span class="work-copy">
+                    <strong>{{ productTitle(product) }}</strong>
+                    <small>{{ product.category?.name ?? ('dashboard.categoryPending' | t) }} · {{ date(product.updated_at) }}</small>
+                  </span>
+                  <span class="work-arrow" aria-hidden="true"></span>
+                </a>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </section>
+</div>

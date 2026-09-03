@@ -1,0 +1,164 @@
+<article class="panel">
+  <div class="heading">
+    <div>
+      <p class="eyebrow">{{ 'dealScore.eyebrow' | t }}</p>
+      <h2>{{ 'dealScore.title' | t }}</h2>
+      <p>{{ 'dealScore.description' | t }}</p>
+    </div>
+    <span class="recommendation">{{ label(record().recommendation) }}</span>
+  </div>
+
+  <section class="hero" [attr.data-status]="record().status">
+    <div>
+      <span>{{ 'dealScore.final' | t }}</span>
+      <strong>{{ score(record().score) }}</strong>
+    </div>
+    <dl>
+      <div>
+        <dt>{{ 'dealScore.uncapped' | t }}</dt>
+        <dd>{{ score(record().uncapped_score) }}</dd>
+      </div>
+      <div>
+        <dt>{{ 'dealScore.cap' | t }}</dt>
+        <dd>
+          {{
+            record().applicable_cap === null
+              ? ('common.none' | t)
+              : record().applicable_cap + ' / 100'
+          }}
+        </dd>
+      </div>
+      <div>
+        <dt>{{ 'dealScore.confidence' | t }}</dt>
+        <dd>
+          {{ percent(record().confidence_basis_points) }} ·
+          {{ label(record().confidence_level) }}
+        </dd>
+      </div>
+      <div>
+        <dt>{{ 'dealScore.runVersion' | t }}</dt>
+        <dd>#{{ record().run_number }} · {{ record().calculation_version }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="components">
+    <div class="section-title">
+      <h3>{{ 'dealScore.components' | t }}</h3>
+      <span>{{ 'dealScore.totalWeight' | t }}</span>
+    </div>
+    <div class="component-grid">
+      @for (item of record().items; track item.id) {
+        <article class="component" [attr.data-impact]="item.impact">
+          <div>
+            <strong>{{ label(item.component) }}</strong>
+            <span>{{ 'dealScore.weight' | t: { value: percent(item.weight_basis_points) } }}</span>
+          </div>
+          <dl>
+            <div>
+              <dt>{{ 'dealScore.input' | t }}</dt>
+              <dd>{{ raw(item) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'dealScore.normalized' | t }}</dt>
+              <dd>{{ percent(item.normalized_score_basis_points) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'dealScore.contribution' | t }}</dt>
+              <dd>{{ points(item.weighted_contribution_basis_points) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'dealScore.evidenceConfidence' | t }}</dt>
+              <dd>{{ percent(item.confidence_basis_points) }}</dd>
+            </div>
+          </dl>
+          <span class="impact">{{ label(item.impact) }}</span>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section class="explanations">
+    <div>
+      <h3>{{ 'dealScore.increasing' | t }}</h3>
+      @if (record().factors_increasing.length) {
+        <ul>
+          @for (factor of record().factors_increasing; track factor) {
+            <li>{{ label(factor) }}</li>
+          }
+        </ul>
+      } @else {
+        <p>{{ 'dealScore.noIncreasing' | t }}</p>
+      }
+    </div>
+    <div>
+      <h3>{{ 'dealScore.reducing' | t }}</h3>
+      @if (record().factors_reducing.length) {
+        <ul>
+          @for (factor of record().factors_reducing; track factor) {
+            <li>{{ label(factor) }}</li>
+          }
+        </ul>
+      } @else {
+        <p>{{ 'dealScore.noReducing' | t }}</p>
+      }
+    </div>
+  </section>
+
+  <section>
+    <div class="section-title">
+      <h3>{{ 'dealScore.capDecisions' | t }}</h3>
+      <span>{{ 'dealScore.safeguards' | t }}</span>
+    </div>
+    <div class="caps">
+      @for (cap of record().cap_decisions; track cap.code) {
+        <div
+          class="cap"
+          [attr.data-triggered]="cap.triggered"
+          [attr.data-applied]="cap.applied"
+        >
+          <strong>{{ label(cap.code) }}</strong>
+          <span>{{ 'dealScore.maximum' | t: { score: cap.maximum_score } }}</span>
+          <em>
+            {{
+              cap.applied
+                ? ('dealScore.capApplied' | t)
+                : cap.triggered
+                  ? ('dealScore.capBelow' | t)
+                  : ('dealScore.capNotTriggered' | t)
+            }}
+          </em>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="explanations">
+    <div>
+      <h3>{{ 'dealScore.assumptions' | t }}</h3>
+      <ul>
+        @for (assumption of record().assumptions; track assumption) {
+          <li>{{ label(assumption) }}</li>
+        }
+      </ul>
+    </div>
+    <div>
+      <h3>{{ 'dealScore.nextChecks' | t }}</h3>
+      <ul>
+        @for (action of record().verification_actions; track action) {
+          <li>{{ verificationAction(action) }}</li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <div class="reason-codes">
+    @for (reason of record().reason_codes; track reason) {
+      <span>{{ label(reason) }}</span>
+    }
+  </div>
+
+  <p class="disclaimer">
+    {{ 'dealScore.disclaimer' | t }}
+  </p>
+</article>

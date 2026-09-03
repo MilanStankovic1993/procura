@@ -1,0 +1,126 @@
+<div class="page">
+  <header>
+    <div>
+      <p class="eyebrow">{{ 'organizationManagement.eyebrow' | t }}</p>
+      <h1>{{ 'organizationManagement.title' | t }}</h1>
+      <p>{{ 'organizationManagement.description' | t }}</p>
+    </div>
+    @if (activeOrganization()?.role; as role) {
+      <span class="role">{{ roleLabel(role) }}</span>
+    }
+  </header>
+
+  @if (error()) {
+    <div class="alert error" role="alert">{{ error() }}</div>
+  }
+  @if (success()) {
+    <div class="alert success" role="status">{{ success() }}</div>
+  }
+
+  @if (!isBusiness()) {
+    <section class="panel create-panel">
+      <div>
+        <p class="eyebrow">{{ 'organizationManagement.businessWorkspace' | t }}</p>
+        <h2>{{ 'organizationManagement.createTitle' | t }}</h2>
+        <p>{{ 'organizationManagement.createDescription' | t }}</p>
+      </div>
+      <form [formGroup]="createForm" (ngSubmit)="createOrganization()">
+        <label for="new-name">{{ 'organizationManagement.name' | t }}</label>
+        <input id="new-name" formControlName="name" maxlength="160" />
+        <button class="button button-primary" [disabled]="submitting() === 'create'">
+          {{ (submitting() === 'create' ? 'organizationManagement.creating' : 'organizationManagement.create') | t }}
+        </button>
+      </form>
+    </section>
+  } @else if (loading() && !management()) {
+    <div class="loading">{{ 'organizationManagement.loading' | t }}</div>
+  } @else if (management(); as data) {
+    <div class="grid">
+      <section class="panel">
+        <div class="section-heading">
+          <div><p class="eyebrow">{{ 'organizationManagement.settings' | t }}</p><h2>{{ 'organizationManagement.identity' | t }}</h2></div>
+        </div>
+        <form class="inline-form" [formGroup]="renameForm" (ngSubmit)="rename()">
+          <label for="workspace-name">{{ 'organizationManagement.shortName' | t }}</label>
+          <input id="workspace-name" formControlName="name" maxlength="160" />
+          <button class="button button-primary" [disabled]="!can('organization.update') || submitting() === 'rename'">
+            {{ 'common.save' | t }}
+          </button>
+        </form>
+      </section>
+
+      @if (can('organization.members.invite')) {
+        <section class="panel">
+          <div class="section-heading">
+            <div><p class="eyebrow">{{ 'organizationManagement.invitation' | t }}</p><h2>{{ 'organizationManagement.addMember' | t }}</h2></div>
+          </div>
+          <form class="invite-form" [formGroup]="inviteForm" (ngSubmit)="invite()">
+            <div><label for="invite-email">{{ 'organizationManagement.email' | t }}</label><input id="invite-email" type="email" formControlName="email" /></div>
+            <div>
+              <label for="invite-role">{{ 'organizationManagement.role' | t }}</label>
+              <select id="invite-role" formControlName="role">
+                @for (role of data.assignable_roles; track role) { <option [value]="role">{{ roleLabel(role) }}</option> }
+              </select>
+            </div>
+            <button class="button button-primary" [disabled]="submitting() === 'invite'">{{ 'organizationManagement.sendInvitation' | t }}</button>
+          </form>
+        </section>
+      }
+    </div>
+
+    <section class="panel members">
+      <div class="section-heading">
+        <div><p class="eyebrow">{{ 'organizationManagement.access' | t }}</p><h2>{{ 'organizationManagement.members' | t }}</h2></div>
+        <span>{{ 'common.total' | t: { count: data.members.length } }}</span>
+      </div>
+      <div class="table">
+        @for (member of data.members; track member.id) {
+          <article>
+            <div class="identity"><strong>{{ member.name }}</strong><span>{{ member.email }}</span></div>
+            <span class="joined">{{ member.joined_at ? date(member.joined_at) : ('common.member' | t) }}</span>
+            @if (member.role === 'owner' || member.is_current_user || !can('organization.members.manage')) {
+              <span class="role">{{ roleLabel(member.role) }}</span>
+            } @else {
+              <select [value]="member.role" [disabled]="submitting() === member.id" (change)="changeRole(member.id, $event)">
+                @for (role of data.assignable_roles; track role) { <option [value]="role">{{ roleLabel(role) }}</option> }
+              </select>
+            }
+            <div class="actions">
+              @if (can('organization.ownership.transfer') && !member.is_current_user && member.role !== 'owner') {
+                <button type="button" (click)="transfer(member.id, member.name)">{{ 'organizationManagement.makeOwner' | t }}</button>
+              }
+              @if (can('organization.members.manage') && !member.is_current_user && member.role !== 'owner') {
+                <button class="danger" type="button" (click)="remove(member.id, member.name)">{{ 'organizationManagement.remove' | t }}</button>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+
+    @if (can('organization.members.invite')) {
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">{{ 'organizationManagement.pending' | t }}</p><h2>{{ 'organizationManagement.invitations' | t }}</h2></div></div>
+        @for (invitation of data.pending_invitations; track invitation.id) {
+          <div class="invitation">
+            <div><strong>{{ invitation.email }}</strong><span>{{ roleLabel(invitation.role) }} · {{ 'common.expires' | t: { date: date(invitation.expires_at) } }}</span></div>
+            <button type="button" (click)="revoke(invitation.id)">{{ 'organizationManagement.revoke' | t }}</button>
+          </div>
+        } @empty { <p class="empty">{{ 'organizationManagement.noInvitations' | t }}</p> }
+      </section>
+    }
+
+    @if (can('organization.audit.view')) {
+      <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">{{ 'organizationManagement.audit' | t }}</p><h2>{{ 'organizationManagement.activity' | t }}</h2></div></div>
+        <div class="audit">
+          @for (event of data.audit_events; track event.id) {
+            <div><strong>{{ eventLabel(event.event) }}</strong><span>{{ event.actor?.name ?? ('common.system' | t) }} · {{ date(event.created_at, { dateStyle: 'medium', timeStyle: 'short' }) }}</span></div>
+          } @empty { <p class="empty">{{ 'organizationManagement.noActivity' | t }}</p> }
+        </div>
+      </section>
+    }
+  } @else {
+    <button class="button button-quiet" type="button" (click)="load()">{{ 'common.retry' | t }}</button>
+  }
+</div>

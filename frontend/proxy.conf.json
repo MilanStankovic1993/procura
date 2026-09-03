@@ -1,0 +1,18 @@
+{
+  "/api": {
+    "target": "http://127.0.0.1",
+    "secure": false,
+    "changeOrigin": false,
+    "headers": {
+      "Host": "procura.test"
+    }
+  },
+  "/sanctum": {
+    "target": "http://127.0.0.1",
+    "secure": false,
+    "changeOrigin": false,
+    "headers": {
+      "Host": "procura.test"
+    }
+  }
+}
