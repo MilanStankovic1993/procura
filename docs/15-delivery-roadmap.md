@@ -114,8 +114,9 @@ Deliverables:
   verified-super-admin retry action/CLI, and production runbook (complete),
 - independent submission kill switch (complete; false by default in code), provider-independent
   Gemini staging and OpenAI production-candidate `ListingAiAnalyzer` adapters (complete but
-  inactive), and approved non-fake product-matching/provider activation (pending processor/privacy,
-  version, evaluation, budget, circuit-breaker, monitoring, and staging evidence).
+  inactive), durable global/organization/user cost reservations and provider/model circuit breaker
+  (complete but values/activation unapproved), and approved non-fake product-matching/provider
+  activation (pending processor/privacy, version, evaluation, monitoring, and staging evidence).
 
 ## Phase 3 — Sell Analysis MVP
 

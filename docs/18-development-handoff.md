@@ -870,9 +870,10 @@ The following remain intentionally unimplemented:
   attribution harnesses, plus the real staging Sell, browser, saturation, and soak evidence beyond
   the deterministic dashboard/operations/tenant-list query baseline,
 - live external AI activation, provider credentials, processor/privacy approval, version policy,
-  global/per-organization budgets, circuit breaker, provider monitoring, golden-data evaluation,
-  production-shaped product matching, and controlled staging/recovery evidence (Gemini staging and
-  OpenAI production-candidate extraction adapters are implemented but intentionally inactive),
+  approved budget values, provider monitoring, golden-data evaluation, production-shaped product
+  matching, and controlled staging/recovery evidence (Gemini staging and OpenAI
+  production-candidate extraction adapters plus global/organization/user cost enforcement and a
+  persistent circuit breaker are implemented but intentionally inactive),
 - approved production catalog datasets and verified production import execution; broader direct
   catalog mutation remains intentionally unavailable,
 - approved external exchange-rate ingestion, provider monitoring, and retention operations beyond
@@ -947,6 +948,12 @@ The Laragon development environment uses MySQL 8.4 LTS with a local `procura` da
   admin-only read-only explorer exposes bounded tenant/parent, lifecycle, provider/version,
   confidence, duration, and match-count projections without input hashes/snapshots, structured
   results, provider errors, tokens, or cost.
+- `analysis_provider_budget_periods` atomically tracks reserved and consumed USD minor units across
+  all providers/models by month for global, organization, and user scopes.
+  `analysis_provider_usages` is the attempt-bound reservation/settlement ledger, and
+  `analysis_provider_circuits` persists bounded closed/open/half-open provider state. These
+  operational tables store no prompts, provider responses, credentials, listing text, source URLs,
+  or external identifiers.
 - `product_categories`, `brands`, `product_models`, `product_variants`,
   `product_variant_markets`, and `product_aliases` form the global canonical catalog with normalized
   search fields, active lifecycle, regional attributes, and explicit alias market scope.
@@ -1534,6 +1541,8 @@ personal organizations and memberships (complete)
 -> typed five-language API domain-conflict presentation and raw-message exclusion (complete)
 -> Phase 2 manual listing intake foundation (complete)
 -> Buy Analysis request and queue boundary (complete)
+-> external AI global/organization/user cost governance and provider/model circuit breaker
+   (complete; reviewed production values, monitoring, evaluation, and activation evidence pending)
 -> audited Analysis Operations and manual-retry boundary (complete; production kill switch off)
 -> canonical product identification and matching boundary (complete)
 -> audited operator product-match review queue (complete)

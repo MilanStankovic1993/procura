@@ -16,6 +16,8 @@ use App\Enums\Analyses\AiValidationStatus;
 use App\Enums\Analyses\AnalysisDispatchStatus;
 use App\Enums\Analyses\AnalysisPipelineProviderScope;
 use App\Enums\Analyses\AnalysisPipelineStage;
+use App\Enums\Analyses\AnalysisProviderCircuitState;
+use App\Enums\Analyses\AnalysisProviderUsageStatus;
 use App\Enums\Analyses\AnalysisStatus;
 use App\Enums\Listings\ListingImageKind;
 use App\Enums\Organizations\OrganizationRole;
@@ -27,6 +29,9 @@ use App\Models\AiAnalysis;
 use App\Models\Analysis;
 use App\Models\AnalysisDispatch;
 use App\Models\AnalysisPipelineMetric;
+use App\Models\AnalysisProviderBudgetPeriod;
+use App\Models\AnalysisProviderCircuit;
+use App\Models\AnalysisProviderUsage;
 use App\Models\Brand;
 use App\Models\Listing;
 use App\Models\ListingImage;
@@ -137,6 +142,55 @@ function analysisRequestListing(
     }
 
     return $listing;
+}
+
+function analysisRequestSubmittedAnalysis(
+    User $user,
+    Organization $organization,
+    string $suffix,
+): Analysis {
+    $listing = analysisRequestListing(
+        $user,
+        $organization,
+        withEvidence: true,
+        overrides: [
+            'source_url' => "https://market.example/listings/{$suffix}",
+            'external_id' => $suffix,
+        ],
+    );
+    $analysis = app(CreateBuyAnalysisDraft::class)->create(
+        $organization,
+        $user,
+        $listing->getKey(),
+        'DE',
+    );
+
+    return app(SubmitAnalysis::class)->submit(
+        $organization,
+        $user,
+        $analysis->getKey(),
+    );
+}
+
+function analysisRequestExternalResult(int $costMinor = 2): AiAnalysisData
+{
+    return new AiAnalysisData(
+        normalizedListing: [
+            'title' => 'Bosch Professional cordless drill',
+            'description' => 'Two batteries, charger, and case.',
+            'marketplace_name' => 'Analysis Market',
+            'asking_price_minor' => 12999,
+            'currency_code' => 'EUR',
+            'source_country_code' => 'AT',
+            'target_country_code' => 'DE',
+            'evidence_count' => 1,
+        ],
+        confidenceBasisPoints: 9100,
+        tokensIn: 1234,
+        tokensOut: 321,
+        estimatedCostMinor: $costMinor,
+        estimatedCostCurrency: 'USD',
+    );
 }
 
 test('an analyst creates an immutable draft from an exact listing snapshot without using quota', function () {
@@ -452,6 +506,16 @@ test('a configured provider records its model token usage and estimated cost', f
                 return 'production-model-v1';
             }
 
+            public function provider(): string
+            {
+                return 'production-provider';
+            }
+
+            public function maximumCostMinor(AnalysisInputData $input): int
+            {
+                return 5;
+            }
+
             public function analyze(AnalysisInputData $input): AiAnalysisData
             {
                 return new AiAnalysisData(
@@ -481,6 +545,8 @@ test('a configured provider records its model token usage and estimated cost', f
     );
 
     $attempt = AiAnalysis::query()->firstOrFail();
+    $usage = AnalysisProviderUsage::query()->firstOrFail();
+    $circuit = AnalysisProviderCircuit::query()->firstOrFail();
 
     expect($attempt->model)->toBe('production-model-v1')
         ->and($attempt->tokens_in)->toBe(1234)
@@ -488,7 +554,171 @@ test('a configured provider records its model token usage and estimated cost', f
         ->and($attempt->estimated_cost_minor)->toBe(2)
         ->and($attempt->estimated_cost_currency)->toBe('USD')
         ->and($analysis->fresh()->result_payload['completed_steps'])
-        ->toContain('ai_extraction');
+        ->toContain('ai_extraction')
+        ->and($usage->status)->toBe(AnalysisProviderUsageStatus::Completed)
+        ->and($usage->reserved_cost_minor)->toBe(5)
+        ->and($usage->actual_cost_minor)->toBe(2)
+        ->and(AnalysisProviderBudgetPeriod::query()->count())->toBe(3)
+        ->and(AnalysisProviderBudgetPeriod::query()->sum('reserved_cost_minor'))->toBe(0)
+        ->and(AnalysisProviderBudgetPeriod::query()->sum('consumed_cost_minor'))->toBe(6)
+        ->and($circuit->state)->toBe(AnalysisProviderCircuitState::Closed)
+        ->and($circuit->consecutive_failures)->toBe(0);
+});
+
+test('organization AI cost budgets span providers and block a second call without consuming a retry', function () {
+    Queue::fake();
+    config()->set('analyses.provider_governance.task_max_cost_minor', 5);
+    config()->set('analyses.provider_governance.global_monthly_budget_minor', 100);
+    config()->set('analyses.provider_governance.organization_monthly_budget_minor', 6);
+    config()->set('analyses.provider_governance.user_monthly_budget_minor', 6);
+    [$owner, $organization] = analysisRequestWorkspace();
+    $provider = new class implements ConfiguredListingAiAnalyzer
+    {
+        public int $calls = 0;
+
+        public string $providerName = 'budget-provider';
+
+        public string $modelName = 'budget-model-v1';
+
+        public function isConfigured(): bool
+        {
+            return true;
+        }
+
+        public function provider(): string
+        {
+            return $this->providerName;
+        }
+
+        public function model(): string
+        {
+            return $this->modelName;
+        }
+
+        public function maximumCostMinor(AnalysisInputData $input): int
+        {
+            return 5;
+        }
+
+        public function analyze(AnalysisInputData $input): AiAnalysisData
+        {
+            $this->calls++;
+
+            return analysisRequestExternalResult();
+        }
+    };
+    app()->instance(ListingAiAnalyzer::class, $provider);
+    $runner = app(RunBuyAnalysis::class);
+    $first = analysisRequestSubmittedAnalysis($owner, $organization, 'budget-first');
+
+    $runner->run(
+        $first->getKey(),
+        $first->currentDispatch()->valueOrFail('id'),
+    );
+
+    $provider->providerName = 'alternate-budget-provider';
+    $provider->modelName = 'alternate-budget-model-v1';
+    $second = analysisRequestSubmittedAnalysis($owner, $organization, 'budget-second');
+
+    expect(fn () => $runner->run(
+        $second->getKey(),
+        $second->currentDispatch()->valueOrFail('id'),
+    ))->toThrow(AnalysisProviderException::class);
+
+    expect($provider->calls)->toBe(1)
+        ->and(AnalysisProviderUsage::query()->count())->toBe(1)
+        ->and($second->fresh()->last_error_code)
+        ->toBe('analysis_provider_organization_budget_exhausted')
+        ->and($second->fresh()->next_retry_at)->toBeNull();
+});
+
+test('the provider circuit opens after bounded failures and one successful probe closes it', function () {
+    Queue::fake();
+    config()->set('analyses.provider_governance.circuit_failure_threshold', 2);
+    config()->set('analyses.provider_governance.circuit_cooldown_seconds', 300);
+    [$owner, $organization] = analysisRequestWorkspace();
+    $provider = new class implements ConfiguredListingAiAnalyzer
+    {
+        public int $calls = 0;
+
+        public bool $fails = true;
+
+        public function isConfigured(): bool
+        {
+            return true;
+        }
+
+        public function provider(): string
+        {
+            return 'circuit-provider';
+        }
+
+        public function model(): string
+        {
+            return 'circuit-model-v1';
+        }
+
+        public function maximumCostMinor(AnalysisInputData $input): int
+        {
+            return 5;
+        }
+
+        public function analyze(AnalysisInputData $input): AiAnalysisData
+        {
+            $this->calls++;
+
+            if ($this->fails) {
+                throw new AnalysisProviderException(
+                    'analysis_provider_transport_failed',
+                );
+            }
+
+            return analysisRequestExternalResult();
+        }
+    };
+    app()->instance(ListingAiAnalyzer::class, $provider);
+    $runner = app(RunBuyAnalysis::class);
+
+    foreach (['circuit-first', 'circuit-second'] as $suffix) {
+        $analysis = analysisRequestSubmittedAnalysis($owner, $organization, $suffix);
+
+        expect(fn () => $runner->run(
+            $analysis->getKey(),
+            $analysis->currentDispatch()->valueOrFail('id'),
+        ))->toThrow(AnalysisProviderException::class);
+    }
+
+    $blocked = analysisRequestSubmittedAnalysis($owner, $organization, 'circuit-blocked');
+
+    expect(fn () => $runner->run(
+        $blocked->getKey(),
+        $blocked->currentDispatch()->valueOrFail('id'),
+    ))->toThrow(AnalysisProviderException::class);
+
+    $circuit = AnalysisProviderCircuit::query()->firstOrFail();
+    expect($provider->calls)->toBe(2)
+        ->and(AnalysisProviderUsage::query()
+            ->where('status', AnalysisProviderUsageStatus::Uncertain)
+            ->count())->toBe(2)
+        ->and($circuit->state)->toBe(AnalysisProviderCircuitState::Open)
+        ->and($circuit->consecutive_failures)->toBe(2)
+        ->and($blocked->fresh()->last_error_code)
+        ->toBe('analysis_provider_circuit_open')
+        ->and($blocked->fresh()->next_retry_at)->toBeNull();
+
+    $provider->fails = false;
+    $this->travel(301)->seconds();
+    $probe = analysisRequestSubmittedAnalysis($owner, $organization, 'circuit-probe');
+    $runner->run(
+        $probe->getKey(),
+        $probe->currentDispatch()->valueOrFail('id'),
+    );
+
+    $circuit->refresh();
+    expect($provider->calls)->toBe(3)
+        ->and($circuit->state)->toBe(AnalysisProviderCircuitState::Closed)
+        ->and($circuit->consecutive_failures)->toBe(0)
+        ->and($circuit->probe_ai_analysis_id)->toBeNull();
 });
 
 test('provider failures record bounded retry metadata and one observable attempt per run', function () {

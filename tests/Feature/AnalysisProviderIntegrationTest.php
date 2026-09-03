@@ -2,6 +2,7 @@
 
 use App\Analysis\Contracts\ListingAiAnalyzer;
 use App\Analysis\Data\AnalysisInputData;
+use App\Analysis\Governance\AnalysisProviderGovernanceConfiguration;
 use App\Analysis\Providers\GeminiListingAiAnalyzer;
 use App\Analysis\Providers\OpenAiListingAiAnalyzer;
 use App\Exceptions\AnalysisProviderException;
@@ -52,6 +53,14 @@ function externalAnalysisResultJson(): string
     ], JSON_THROW_ON_ERROR);
 }
 
+test('analysis provider governance rejects an unsafe budget hierarchy', function () {
+    config()->set('analyses.provider_governance.task_max_cost_minor', 20);
+    config()->set('analyses.provider_governance.user_monthly_budget_minor', 10);
+
+    expect(app(AnalysisProviderGovernanceConfiguration::class)->isValid())
+        ->toBeFalse();
+});
+
 test('gemini staging provider sends minimized structured input and maps usage', function () {
     config([
         'analyses.providers.gemini.api_key' => 'gemini-test-secret',
@@ -73,9 +82,9 @@ test('gemini staging provider sends minimized structured input and maps usage', 
         ]),
     ]);
 
-    $result = app(GeminiListingAiAnalyzer::class)->analyze(
-        externalAnalysisInput(),
-    );
+    $provider = app(GeminiListingAiAnalyzer::class);
+    expect($provider->maximumCostMinor(externalAnalysisInput()))->toBe(0);
+    $result = $provider->analyze(externalAnalysisInput());
 
     expect($result->normalizedListing)->toMatchArray([
         'title' => 'Bosch drill',
@@ -144,9 +153,13 @@ test('openai production provider uses non-stored strict responses and records co
         ]),
     ]);
 
-    $result = app(OpenAiListingAiAnalyzer::class)->analyze(
-        externalAnalysisInput(),
-    );
+    $provider = app(OpenAiListingAiAnalyzer::class);
+    expect($provider->maximumCostMinor(externalAnalysisInput()))
+        ->toBeGreaterThanOrEqual(1)
+        ->toBeLessThanOrEqual(
+            config('analyses.provider_governance.task_max_cost_minor'),
+        );
+    $result = $provider->analyze(externalAnalysisInput());
 
     expect($result->tokensIn)->toBe(1_000_000)
         ->and($result->tokensOut)->toBe(1_000_000)

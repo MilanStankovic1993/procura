@@ -14,6 +14,32 @@ return [
     'pipeline_version' => 'buy-analysis-pipeline:v8',
     'prompt_version' => 'buy-analysis-extraction:v1',
     'fake_model' => 'deterministic-fixture-v1',
+    'provider_governance' => [
+        'task_max_cost_minor' => (int) env(
+            'ANALYSIS_AI_TASK_MAX_COST_MINOR',
+            10,
+        ),
+        'global_monthly_budget_minor' => (int) env(
+            'ANALYSIS_AI_GLOBAL_MONTHLY_BUDGET_MINOR',
+            100_000,
+        ),
+        'organization_monthly_budget_minor' => (int) env(
+            'ANALYSIS_AI_ORGANIZATION_MONTHLY_BUDGET_MINOR',
+            10_000,
+        ),
+        'user_monthly_budget_minor' => (int) env(
+            'ANALYSIS_AI_USER_MONTHLY_BUDGET_MINOR',
+            2_500,
+        ),
+        'circuit_failure_threshold' => (int) env(
+            'ANALYSIS_AI_CIRCUIT_FAILURE_THRESHOLD',
+            5,
+        ),
+        'circuit_cooldown_seconds' => (int) env(
+            'ANALYSIS_AI_CIRCUIT_COOLDOWN_SECONDS',
+            300,
+        ),
+    ],
     'providers' => [
         'gemini' => [
             'api_key' => env('GEMINI_API_KEY'),

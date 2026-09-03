@@ -4,6 +4,7 @@ namespace App\Operations;
 
 use App\Analysis\Contracts\ConfiguredListingAiAnalyzer;
 use App\Analysis\Contracts\ListingAiAnalyzer;
+use App\Analysis\Governance\AnalysisProviderGovernanceConfiguration;
 use App\Analysis\Metrics\AnalysisPipelineMetricsConfiguration;
 use App\Analysis\Providers\FakeListingAiAnalyzer;
 use App\Billing\BillingConfiguration;
@@ -33,6 +34,7 @@ final class ProductionPreflight
         private readonly BrokerOperationsConfiguration $brokerOperations,
         private readonly AnalysisPipelineMetricsConfiguration $pipelineMetrics,
         private readonly SellPriceIntelligenceMetricsConfiguration $sellMetrics,
+        private readonly AnalysisProviderGovernanceConfiguration $analysisGovernance,
     ) {}
 
     public function inspect(bool $allowNonProduction = false): ProductionPreflightReport
@@ -403,6 +405,7 @@ final class ProductionPreflight
                 $matcher = app(ProductMatcher::class);
                 $providersValid = $analyzer instanceof ConfiguredListingAiAnalyzer
                     && $analyzer->isConfigured()
+                    && $this->analysisGovernance->isValid()
                     && ! $analyzer instanceof FakeListingAiAnalyzer
                     && ! $matcher instanceof FakeCatalogProductMatcher;
             } catch (Throwable) {

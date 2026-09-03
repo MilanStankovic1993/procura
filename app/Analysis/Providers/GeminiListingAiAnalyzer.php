@@ -37,6 +37,25 @@ final class GeminiListingAiAnalyzer implements ConfiguredListingAiAnalyzer
         return $this->configuration->model();
     }
 
+    public function provider(): string
+    {
+        return $this->configuration->provider();
+    }
+
+    public function maximumCostMinor(AnalysisInputData $input): int
+    {
+        $this->configuration->assertConfigured();
+        $requestBytes = strlen(json_encode(
+            $this->request($input),
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE,
+        ));
+
+        return $this->configuration->estimatedCostMinor(
+            $requestBytes,
+            $this->configuration->maxOutputTokens(),
+        );
+    }
+
     public function analyze(AnalysisInputData $input): AiAnalysisData
     {
         $this->configuration->assertConfigured();

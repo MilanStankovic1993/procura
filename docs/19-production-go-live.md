@@ -1,6 +1,6 @@
 # 19 - Production Go-Live Register
 
-Last updated: 2026-08-11
+Last updated: 2026-09-02
 
 This file is the single operational source of truth for everything that must be configured outside
 the Procura codebase before a production release can be activated. It contains variable names,
@@ -783,7 +783,7 @@ processing; already-created subscriptions continue to require reconciliation.
 
 ## 7. AI provider
 
-Status: **Gemini staging and OpenAI production-candidate adapters implemented; activation pending**
+Status: **adapters, atomic cost governance, and circuit breaker implemented; activation pending**
 
 Application boundary now present:
 
@@ -798,19 +798,49 @@ Application boundary now present:
   market scope, or evidence count;
 - append-only AI attempts record configured provider/model, prompt version, token usage, and
   conservatively rounded configured USD cost;
-- production preflight rejects an enabled adapter with invalid configuration and still rejects the
-  deterministic product matcher.
+- every external attempt first reserves a conservative maximum against global, organization, and
+  requesting-user monthly USD-minor-unit budgets; valid responses settle returned cost and unknown
+  provider outcomes consume the reservation conservatively;
+- provider/model circuit state opens after the configured consecutive-failure threshold, rejects
+  outbound calls during cooldown, and allows one half-open probe; budget/circuit rejections do not
+  consume automatic retries;
+- production preflight rejects invalid governance values or an invalid enabled adapter and still
+  rejects the deterministic product matcher.
+
+Deploy migration `2026_09_02_100000_create_analysis_provider_governance_tables.php` through the
+normal release path. Verify the three scope rows are unique per month/scope across all providers
+and models, each usage is
+unique per AI attempt, circuit provider/model identity is unique, foreign keys match the migration,
+and no prompt, response, credential, source URL, listing text, or provider payload is present.
 
 The repository defaults remain `ANALYSIS_PROVIDER=fake` and production
 `ANALYSIS_SUBMISSION_ENABLED=false`. Never place `GEMINI_API_KEY` or `OPENAI_API_KEY` in source,
 committed environment files, logs, tickets, or provider evidence. Supply the selected key through
 the deployment secret manager, rebuild configuration, and restart every web/queue process.
 
+Required reviewed controls use USD minor units:
+
+```dotenv
+ANALYSIS_AI_TASK_MAX_COST_MINOR=<reviewed-positive-limit>
+ANALYSIS_AI_GLOBAL_MONTHLY_BUDGET_MINOR=<reviewed-positive-limit>
+ANALYSIS_AI_ORGANIZATION_MONTHLY_BUDGET_MINOR=<reviewed-positive-limit>
+ANALYSIS_AI_USER_MONTHLY_BUDGET_MINOR=<reviewed-positive-limit>
+ANALYSIS_AI_CIRCUIT_FAILURE_THRESHOLD=<reviewed-1..100>
+ANALYSIS_AI_CIRCUIT_COOLDOWN_SECONDS=<reviewed-30..86400>
+```
+
+The hierarchy must satisfy task <= user <= organization <= global. The reservation treats the
+complete structured-request byte length as a conservative input-token ceiling and combines it with
+configured maximum output tokens/current rates. A zero-cost free-tier estimate still reserves one
+cent and settles to returned zero. Never weaken rates, output limits, or budget values merely to
+turn preflight green.
+
 Before activation, record:
 
 - approved provider/model and exact version policy,
 - regional processing and data-retention terms,
-- credentials, budget caps, per-organization cost controls, timeouts, retries, and circuit breaker,
+- credentials, approved global/organization/user/task budget caps, timeouts, retries, circuit
+  threshold/cooldown, and alert thresholds,
 - redaction/data-minimization rules,
 - accuracy/evaluation evidence and deterministic fallback behavior,
 - provider outage monitoring and disable switch.
@@ -841,8 +871,9 @@ quota, creates no dispatch, and performs no provider call. Before setting it `tr
 
 1. implement and review both configured `ListingAiAnalyzer` and `ProductMatcher` adapters;
 2. prove the container resolves non-fake adapters after configuration is cached;
-3. complete privacy/retention, regional processing, cost-limit, timeout, retry, circuit-breaker,
-   provider-outage, evaluation, and incident-disable evidence;
+3. review the implemented cost-limit, retry, and circuit-breaker controls and complete privacy,
+   retention, regional-processing, provider-outage, evaluation, monitoring, and incident-disable
+   evidence;
 4. run controlled staging submissions through every queue/recovery path and record accuracy,
    latency, cost, malformed-response, timeout, rate-limit, and outage evidence;
 5. set the switch true, rebuild configuration, reload web/workers, rerun
@@ -850,7 +881,10 @@ quota, creates no dispatch, and performs no provider call. Before setting it `tr
 
 Rollback starts by setting `ANALYSIS_SUBMISSION_ENABLED=false`, rebuilding configuration, and
 reloading web/workers. Preserve existing analyses and dispatch history; drain or quarantine queued
-work according to the provider incident procedure rather than deleting ledger rows.
+work according to the provider incident procedure rather than deleting ledger rows. Never edit
+budget, usage, or circuit rows to restore capacity or hide an incident; reconcile unknown provider
+charges externally and retain the conservative ledger until the approved accounting procedure is
+complete.
 
 ### 7.1 Analysis processing operations
 

@@ -6,6 +6,7 @@ use App\Analysis\Contracts\ConfiguredListingAiAnalyzer;
 use App\Analysis\Contracts\ListingAiAnalyzer;
 use App\Analysis\Data\AiAnalysisData;
 use App\Analysis\Data\AnalysisInputData;
+use App\Analysis\Governance\AnalysisProviderGovernor;
 use App\Analysis\Metrics\AnalysisPipelineStageTimer;
 use App\Analysis\Metrics\Contracts\AnalysisPipelineMetricRecorder;
 use App\Analysis\Providers\FakeListingAiAnalyzer;
@@ -24,6 +25,7 @@ use App\Jobs\Monitoring\MatchListingSnapshot;
 use App\Models\AiAnalysis;
 use App\Models\Analysis;
 use App\Models\AnalysisDispatch;
+use App\Models\AnalysisProviderUsage;
 use App\Models\ComparableSet;
 use App\Models\PriceEstimate;
 use App\Models\ProductMatch;
@@ -52,6 +54,7 @@ class RunBuyAnalysis
         private readonly RiskEvaluator $riskEvaluator,
         private readonly RecordRiskAssessment $riskAssessments,
         private readonly RiskAssessmentResultProjection $riskProjection,
+        private readonly AnalysisProviderGovernor $providerGovernor,
         private readonly AnalysisPipelineMetricRecorder $pipelineMetrics,
     ) {}
 
@@ -66,16 +69,34 @@ class RunBuyAnalysis
         [$analysis, $aiAnalysis] = $attempt;
         $timer = new AnalysisPipelineStageTimer;
         $providerScope = $this->providerScope();
+        $providerUsage = null;
+        $providerCompleted = false;
+        $input = new AnalysisInputData(
+            analysisId: $analysis->getKey(),
+            inputHash: $analysis->request_hash,
+            requestPayload: $analysis->request_payload,
+        );
 
         try {
+            if ($this->provider instanceof ConfiguredListingAiAnalyzer) {
+                $providerUsage = $this->providerGovernor->reserve(
+                    $analysis,
+                    $aiAnalysis,
+                    $this->provider,
+                    $input,
+                );
+            }
+
             $result = $timer->measure(
                 AnalysisPipelineStage::ProviderAnalysis,
-                fn () => $this->provider->analyze(new AnalysisInputData(
-                    analysisId: $analysis->getKey(),
-                    inputHash: $analysis->request_hash,
-                    requestPayload: $analysis->request_payload,
-                )),
+                fn () => $this->provider->analyze($input),
             );
+
+            if ($providerUsage instanceof AnalysisProviderUsage) {
+                $this->providerGovernor->complete($providerUsage, $result);
+                $providerCompleted = true;
+            }
+
             $listing = $analysis->request_payload['listing'] ?? [];
             $marketScope = $analysis->request_payload['market_scope'] ?? [];
             $productMatch = $timer->measure(
@@ -216,6 +237,17 @@ class RunBuyAnalysis
                 $timer,
             );
         } catch (Throwable $exception) {
+            if (
+                $providerUsage instanceof AnalysisProviderUsage
+                && ! $providerCompleted
+            ) {
+                try {
+                    $this->providerGovernor->fail($providerUsage, $exception);
+                } catch (Throwable $governanceFailure) {
+                    report($governanceFailure);
+                }
+            }
+
             try {
                 $timer->measure(
                     AnalysisPipelineStage::Finalization,
@@ -574,7 +606,8 @@ class RunBuyAnalysis
             $dispatch = AnalysisDispatch::query()->lockForUpdate()->findOrFail($dispatchId);
             $aiAnalysis = AiAnalysis::query()->lockForUpdate()->findOrFail($aiAnalysisId);
             $delays = config('analyses.retry_delays_seconds');
-            $canRetry = $attemptNumber < $dispatch->max_processing_attempts;
+            $canRetry = $attemptNumber < $dispatch->max_processing_attempts
+                && ! $this->isTerminalProviderControlFailure($exception);
             $delay = (int) ($delays[$attemptNumber - 1] ?? end($delays) ?: 300);
             $retryAt = $canRetry ? now()->addSeconds($delay) : null;
             $message = str($exception->getMessage())->limit(10000)->toString();
@@ -610,6 +643,27 @@ class RunBuyAnalysis
             || $this->productMatcher instanceof FakeCatalogProductMatcher
                 ? AnalysisPipelineProviderScope::Rehearsal
                 : AnalysisPipelineProviderScope::ProductionShaped;
+    }
+
+    private function isTerminalProviderControlFailure(Throwable $exception): bool
+    {
+        if (! $exception instanceof AnalysisProviderException) {
+            return false;
+        }
+
+        return in_array($exception->reasonCode, [
+            'analysis_provider_not_configured',
+            'analysis_provider_governance_not_configured',
+            'analysis_provider_actor_unavailable',
+            'analysis_provider_task_budget_exceeded',
+            'analysis_provider_global_budget_exhausted',
+            'analysis_provider_organization_budget_exhausted',
+            'analysis_provider_user_budget_exhausted',
+            'analysis_provider_circuit_open',
+            'analysis_provider_cost_currency_invalid',
+            'analysis_provider_cost_reservation_invalid',
+            'analysis_provider_cost_exceeded_reservation',
+        ], true);
     }
 
     private function recordPipelineMetric(
